@@ -1,0 +1,171 @@
+{% extends "front/base.html.twig" %}
+
+{% block title %} - Contact us{% endblock %}
+
+{% block mainBarnner %}
+
+{% endblock %}
+
+{% block mainContent %}
+
+    <!-- =======================
+Page Banner START -->
+    <section class="pt-5 pb-0" style="background-image:url({{ asset('assets/images/element/map.svg') }}); background-position: center left; background-size: cover;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-xl-6 text-center mx-auto">
+                    <!-- Title -->
+                    <h6 class="text-primary">{% trans %}CONTACTUS_KEY{% endtrans %}</h6>
+                    <h1 class="mb-4">{% trans %}CONTACTPAGE_HELP_KEY{% endtrans %}</h1>
+                </div>
+            </div>
+
+            <!-- Contact info box -->
+            <div class="row g-4 g-md-5 mt-0 mt-lg-3">
+                <!-- Box item -->
+                <div class="col-lg-4 mt-lg-0">
+                    <div class="card card-body bg-primary shadow py-5 text-center h-100">
+                        <!-- Title -->
+                        <h5 class="text-white mb-3">{% trans %}CONTACTPAGE_WHATSAPP_KEY{% endtrans %}</h5>
+                        <ul class="list-inline mb-0">
+                            <!-- Address -->
+                            <li class="list-item mb-3">
+                                <a href="#" class="text-white"> <i class="fas fa-fw fa-map-marker-alt me-2 mt-1"></i>Douala-Akwa / Carrefour Equinox TV, face Beneficial Assurance</a>
+                            </li>
+                            <!-- Phone number -->
+                            <li class="list-item mb-3">
+                                <a href="#" class="text-white"> <i class="fas fa-fw fa-phone-alt me-2"></i>(+237) 698809093 </a>
+                            </li>
+                            <!-- Email id -->
+                            <li class="list-item mb-0">
+                                <a href="#" class="text-white"> <i class="far fa-fw fa-envelope me-2"></i>kulmapeckcontact@gmail.com </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Box item -->
+                <div class="col-lg-4 mt-lg-0">
+                    <div class="card card-body shadow py-5 text-center h-100">
+                        <!-- Title -->
+                        <h5 class="mb-3">{% trans %}CONTACTPAGE_MTN_KEY{% endtrans %}</h5>
+                        <ul class="list-inline mb-0">
+                            <!-- Address -->
+                            <li class="list-item mb-3 h6 fw-light">
+                                <a href="#"> <i class="fas fa-fw fa-map-marker-alt me-2 mt-1"></i>Douala-Akwa / Carrefour Equinox TV, face Beneficial Assurance</a>
+                            </li>
+                            <!-- Phone number -->
+                            <li class="list-item mb-3 h6 fw-light">
+                                <a href="#"> <i class="fas fa-fw fa-phone-alt me-2"></i>+237 678507398 </a>
+                            </li>
+                            <!-- Email id -->
+                            <li class="list-item mb-0 h6 fw-light">
+                                <a href="#"> <i class="far fa-fw fa-envelope me-2"></i>kulmapeckcontact@gmail.com </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Box item -->
+                <div class="col-lg-4 mt-lg-0">
+                    <div class="card card-body shadow py-5 text-center h-100">
+                        <!-- Title -->
+                        <h5 class="mb-3">{% trans %}CONTACTPAGE_ORANGE_KEY{% endtrans %}</h5>
+                        <ul class="list-inline mb-0">
+                            <!-- Address -->
+                            <li class="list-item mb-3 h6 fw-light">
+                                <a href="#"> <i class="fas fa-fw fa-map-marker-alt me-2 mt-1"></i>Douala-Akwa / Carrefour Equinox TV, face Beneficial Assurance </a>
+                            </li>
+                            <!-- Phone number -->
+                            <li class="list-item mb-3 h6 fw-light">
+                                <a href="#"> <i class="fas fa-fw fa-phone-alt me-2"></i>+237 698809093 </a>
+                            </li>
+                            <!-- Email id -->
+                            <li class="list-item mb-0 h6 fw-light">
+                                <a href="#"> <i class="far fa-fw fa-envelope me-2"></i>kulmapeckcontact@gmail.com </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- =======================
+    Page Banner END -->
+
+    <!-- =======================
+    Image and contact form START -->
+    <section >
+        <div class="container">
+            <div class="row g-4 g-lg-0 align-items-center">
+                {% for msg in app.flashes('messageSend') %}
+                    <div class="col-12">
+                        <div class="alert alert-success text-center">
+                            {{ msg }}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="col-md-6 align-items-center text-center">
+                    <!-- Image -->
+                    <img src="{{ asset('assets/images/element/contact.svg') }}" class="h-400px" alt="">
+
+                    <!-- Social media button -->
+                    {% if socialsSettings is defined and socialsSettings is not same as null %}
+                        <div class="d-sm-flex align-items-center justify-content-center mt-2 mt-sm-4">
+                            <h5 class="mb-0">{% trans %}CONTACTPAGE_FOLLOWUS_KEY{% endtrans %}:</h5>
+                            <ul class="list-inline mb-0 ms-sm-2">
+                                {% for item in socialsSettings %}
+                                    {% if item.icon|lower is same as 'fa-facebook-f' %}
+                                        <li class="list-inline-item"> <a target="_blank" class="btn btn-white btn-sm shadow px-2 text-facebook" href="{{ item.link }}"><i class="fab fa-fw fa-facebook-f"></i></a> </li>
+                                    {% elseif item.icon|lower is same as 'fa-instagram' %}
+                                        <li class="list-inline-item"> <a target="_blank" class="btn btn-white btn-sm shadow px-2 text-instagram" href="{{ item.link }}"><i class="fab fa-fw fa-instagram"></i></a> </li>
+                                    {% elseif item.icon|lower is same as 'fa-fw fa-twitter' %}
+                                        <li class="list-inline-item"> <a target="_blank" class="btn btn-white btn-sm shadow px-2 text-twitter" href="{{ item.link }}"><i class="fab fa-fw fa-twitter"></i></a> </li>
+                                    {% elseif item.icon|lower is same as 'fa-linkedin-in' %}
+                                        <li class="list-inline-item"> <a target="_blank" class="btn btn-white btn-sm shadow px-2 text-linkedin" href="{{ item.link }}"><i class="fab fa-fw fa-linkedin-in"></i></a> </li>
+                                    {% elseif item.icon|lower is same as 'fa-youtube' %}
+                                        <li class="list-inline-item"> <a target="_blank" class="btn btn-white btn-sm shadow px-2 text-danger" href="{{ item.link }}"><i class="fab fa-fw fa-youtube"></i></a> </li>
+                                    {% endif %}
+                                {% endfor %}    
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Contact form START -->
+                <div class="col-md-6">
+                    <!-- Title -->
+                    <h2 class="mt-4 mt-md-0">{% trans %}CONTACTPAGE_LETSTALK_KEY{% endtrans %}</h2>
+                    <p>{% trans %}CONTACTPAGE_LETSTALKDESCRIPTION_KEY{% endtrans %}</p>
+
+                    {{ form_start(contactForm) }}
+                    <!-- Name -->
+                    <div class="mb-4 bg-light-input">
+                        {{ form_label(contactForm.name) }}
+                        {{ form_widget(contactForm.name) }}
+                    </div>
+                    <!-- Email -->
+                    <div class="mb-4 bg-light-input">
+                        {{ form_label(contactForm.email) }}
+                        {{ form_widget(contactForm.email) }}
+                    </div>
+                    <!-- Message -->
+                    <div class="mb-4 bg-light-input">
+                        {{ form_label(contactForm.message) }}
+                        {{ form_widget(contactForm.message) }}
+                    </div>
+                    <!-- Button -->
+                    <div class="d-grid">
+                        <button class="btn btn-lg btn-primary mb-0" type="submit">{% trans %}CONTACTPAGE_SENDMESSAGEBTN_KEY{% endtrans %}</button>
+                    </div>
+                    {{ form_end(contactForm) }}
+                </div>
+                <!-- Contact form END -->
+            </div>
+        </div>
+    </section>
+    <!-- =======================
+    Image and contact form END -->
+
+{% endblock %}

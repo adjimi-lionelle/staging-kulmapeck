@@ -1,0 +1,1118 @@
+<?php //resource_metadata_collection_2be86eb5044fcb00af848efbfd9e1937
+
+return [PHP_INT_MAX, static function () { return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
+    $o = [
+        clone (($p = &\Symfony\Component\VarExporter\Internal\Registry::$prototypes)['ApiPlatform\\Metadata\\ApiResource'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\ApiResource')),
+        clone ($p['ApiPlatform\\Metadata\\Operations'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\Operations')),
+        clone ($p['ApiPlatform\\Metadata\\GetCollection'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\GetCollection')),
+        clone ($p['ApiPlatform\\Metadata\\Link'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\Link')),
+        clone $p['ApiPlatform\\Metadata\\GetCollection'],
+        clone $p['ApiPlatform\\Metadata\\Link'],
+        clone ($p['ApiPlatform\\Metadata\\Post'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\Post')),
+        clone $p['ApiPlatform\\Metadata\\Link'],
+        clone ($p['ApiPlatform\\Metadata\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\Get')),
+        clone $p['ApiPlatform\\Metadata\\Link'],
+        clone $p['ApiPlatform\\Metadata\\Post'],
+        clone $p['ApiPlatform\\Metadata\\Link'],
+        clone $p['ApiPlatform\\Metadata\\Get'],
+        clone $p['ApiPlatform\\Metadata\\Link'],
+        clone $p['ApiPlatform\\Metadata\\Link'],
+    ],
+    null,
+    [
+        'ApiPlatform\\Metadata\\ApiResource' => [
+            'operations' => [
+                $o[1],
+            ],
+            'uriTemplate' => [
+                null,
+            ],
+            'shortName' => [
+                'Evaluation',
+            ],
+            'description' => [
+                null,
+            ],
+            'types' => [
+                null,
+            ],
+            'formats' => [
+                null,
+            ],
+            'inputFormats' => [
+                null,
+            ],
+            'outputFormats' => [
+                null,
+            ],
+            'uriVariables' => [
+                [
+                    'id' => $o[14],
+                ],
+            ],
+            'routePrefix' => [
+                null,
+            ],
+            'defaults' => [
+                null,
+            ],
+            'requirements' => [
+                null,
+            ],
+            'options' => [
+                null,
+            ],
+            'stateless' => [
+                null,
+            ],
+            'sunset' => [
+                null,
+            ],
+            'acceptPatch' => [
+                null,
+            ],
+            'status' => [
+                null,
+            ],
+            'host' => [
+                null,
+            ],
+            'schemes' => [
+                null,
+            ],
+            'condition' => [
+                null,
+            ],
+            'controller' => [
+                null,
+            ],
+            'class' => [
+                'App\\Entity\\Evaluation',
+            ],
+            'urlGenerationStrategy' => [
+                null,
+            ],
+            'deprecationReason' => [
+                null,
+            ],
+            'cacheHeaders' => [
+                null,
+            ],
+            'normalizationContext' => [
+                null,
+            ],
+            'denormalizationContext' => [
+                null,
+            ],
+            'collectDenormalizationErrors' => [
+                null,
+            ],
+            'hydraContext' => [
+                null,
+            ],
+            'openapiContext' => [
+                null,
+            ],
+            'openapi' => [
+                null,
+            ],
+            'validationContext' => [
+                null,
+            ],
+            'filters' => [
+                null,
+            ],
+            'elasticsearch' => [
+                null,
+            ],
+            'order' => [
+                null,
+            ],
+            'fetchPartial' => [
+                null,
+            ],
+            'forceEager' => [
+                null,
+            ],
+            'paginationClientEnabled' => [
+                null,
+            ],
+            'paginationClientItemsPerPage' => [
+                null,
+            ],
+            'paginationClientPartial' => [
+                null,
+            ],
+            'paginationViaCursor' => [
+                null,
+            ],
+            'paginationEnabled' => [
+                null,
+            ],
+            'paginationFetchJoinCollection' => [
+                null,
+            ],
+            'paginationUseOutputWalkers' => [
+                null,
+            ],
+            'paginationItemsPerPage' => [
+                null,
+            ],
+            'paginationMaximumItemsPerPage' => [
+                null,
+            ],
+            'paginationPartial' => [
+                null,
+            ],
+            'paginationType' => [
+                null,
+            ],
+            'security' => [
+                null,
+            ],
+            'securityMessage' => [
+                null,
+            ],
+            'securityPostDenormalize' => [
+                null,
+            ],
+            'securityPostDenormalizeMessage' => [
+                null,
+            ],
+            'securityPostValidation' => [
+                null,
+            ],
+            'securityPostValidationMessage' => [
+                null,
+            ],
+            'compositeIdentifier' => [
+                null,
+            ],
+            'exceptionToStatus' => [
+                null,
+            ],
+            'queryParameterValidationEnabled' => [
+                null,
+            ],
+            'graphQlOperations' => [
+                [],
+            ],
+            'stateOptions' => [
+                null,
+            ],
+            'extraProperties' => [
+                [],
+            ],
+        ],
+        'ApiPlatform\\Metadata\\Operations' => [
+            'operations' => [
+                1 => [
+                    [
+                        '_api_/evaluations/{id}/list_get_collection',
+                        $o[2],
+                    ],
+                    [
+                        '_api_/evaluations/student/{id}_get_collection',
+                        $o[4],
+                    ],
+                    [
+                        '_api_/evaluations/{id}/inscription_post',
+                        $o[6],
+                    ],
+                    [
+                        '_api_/evaluations/{id}/questionnaire_get',
+                        $o[8],
+                    ],
+                    [
+                        '_api_/evaluations/{id}/corrige_post',
+                        $o[10],
+                    ],
+                    [
+                        '_api_/evaluations/{id}/resultat_get',
+                        $o[12],
+                    ],
+                ],
+            ],
+        ],
+        'ApiPlatform\\Metadata\\Operation' => [
+            'shortName' => [
+                2 => 'Evaluation',
+                4 => 'Evaluation',
+                6 => 'Evaluation',
+                8 => 'Evaluation',
+                10 => 'Evaluation',
+                12 => 'Evaluation',
+            ],
+            'class' => [
+                2 => 'App\\Entity\\Evaluation',
+                4 => 'App\\Entity\\Evaluation',
+                6 => 'App\\Entity\\Evaluation',
+                8 => 'App\\Entity\\Evaluation',
+                10 => 'App\\Entity\\Evaluation',
+                12 => 'App\\Entity\\Evaluation',
+            ],
+            'paginationEnabled' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'paginationType' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'paginationItemsPerPage' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'paginationMaximumItemsPerPage' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'paginationPartial' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'paginationClientEnabled' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'paginationClientItemsPerPage' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'paginationClientPartial' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'paginationFetchJoinCollection' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'paginationUseOutputWalkers' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'order' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'description' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'normalizationContext' => [
+                2 => [
+                    'groups' => [
+                        'read:evaluation:collection',
+                    ],
+                ],
+                4 => [
+                    'groups' => [
+                        'read:evaluation:collection',
+                    ],
+                ],
+                6 => null,
+                8 => [
+                    'groups' => [
+                        'read:evaluation:question',
+                        'read:evaluation:item',
+                    ],
+                ],
+                10 => [
+                    'groups' => [
+                        'read:evaluation:question',
+                    ],
+                    'description' => 'id = evaluation_id',
+                ],
+                12 => [
+                    'groups' => [
+                        'read:evaluation:question',
+                    ],
+                ],
+            ],
+            'denormalizationContext' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'collectDenormalizationErrors' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'security' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'securityMessage' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'securityPostDenormalize' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'securityPostDenormalizeMessage' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'securityPostValidation' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'securityPostValidationMessage' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'deprecationReason' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'filters' => [
+                2 => [],
+                4 => [],
+                6 => [],
+                8 => [],
+                10 => [],
+                12 => [],
+            ],
+            'validationContext' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'elasticsearch' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'urlGenerationStrategy' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'read' => [
+                2 => false,
+                4 => false,
+                6 => null,
+                8 => false,
+                10 => null,
+                12 => false,
+            ],
+            'deserialize' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'validate' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'write' => [
+                2 => null,
+                4 => null,
+                6 => false,
+                8 => null,
+                10 => false,
+                12 => null,
+            ],
+            'serialize' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'fetchPartial' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'forceEager' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'priority' => [
+                2 => 0,
+                4 => 1,
+                6 => 2,
+                8 => 3,
+                10 => 4,
+                12 => 5,
+            ],
+            'name' => [
+                2 => '_api_/evaluations/{id}/list_get_collection',
+                4 => '_api_/evaluations/student/{id}_get_collection',
+                6 => '_api_/evaluations/{id}/inscription_post',
+                8 => '_api_/evaluations/{id}/questionnaire_get',
+                10 => '_api_/evaluations/{id}/corrige_post',
+                12 => '_api_/evaluations/{id}/resultat_get',
+            ],
+            'provider' => [
+                2 => 'ApiPlatform\\Doctrine\\Orm\\State\\CollectionProvider',
+                4 => 'ApiPlatform\\Doctrine\\Orm\\State\\CollectionProvider',
+                6 => 'ApiPlatform\\Doctrine\\Orm\\State\\ItemProvider',
+                8 => 'ApiPlatform\\Doctrine\\Orm\\State\\ItemProvider',
+                10 => 'ApiPlatform\\Doctrine\\Orm\\State\\ItemProvider',
+                12 => 'ApiPlatform\\Doctrine\\Orm\\State\\ItemProvider',
+            ],
+            'processor' => [
+                2 => 'api_platform.doctrine.orm.state.persist_processor',
+                4 => 'api_platform.doctrine.orm.state.persist_processor',
+                6 => 'api_platform.doctrine.orm.state.persist_processor',
+                8 => 'api_platform.doctrine.orm.state.persist_processor',
+                10 => 'api_platform.doctrine.orm.state.persist_processor',
+                12 => 'api_platform.doctrine.orm.state.persist_processor',
+            ],
+            'stateOptions' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'extraProperties' => [
+                2 => [
+                    'user_defined_uri_template' => true,
+                ],
+                4 => [
+                    'user_defined_uri_template' => true,
+                ],
+                6 => [
+                    'user_defined_uri_template' => true,
+                ],
+                8 => [
+                    'user_defined_uri_template' => true,
+                ],
+                10 => [
+                    'user_defined_uri_template' => true,
+                ],
+                12 => [
+                    'user_defined_uri_template' => true,
+                ],
+            ],
+        ],
+        'ApiPlatform\\Metadata\\HttpOperation' => [
+            'paginationViaCursor' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'method' => [
+                2 => 'GET',
+                4 => 'GET',
+                6 => 'POST',
+                8 => 'GET',
+                10 => 'POST',
+                12 => 'GET',
+            ],
+            'uriTemplate' => [
+                2 => '/evaluations/{id}/list',
+                4 => '/evaluations/student/{id}',
+                6 => '/evaluations/{id}/inscription',
+                8 => '/evaluations/{id}/questionnaire',
+                10 => '/evaluations/{id}/corrige',
+                12 => '/evaluations/{id}/resultat',
+            ],
+            'types' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'inputFormats' => [
+                2 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                4 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                6 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                8 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                10 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                12 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+            ],
+            'outputFormats' => [
+                2 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                4 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                6 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                8 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                10 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                12 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+            ],
+            'uriVariables' => [
+                2 => [
+                    'id' => $o[3],
+                ],
+                4 => [
+                    'id' => $o[5],
+                ],
+                6 => [
+                    'id' => $o[7],
+                ],
+                8 => [
+                    'id' => $o[9],
+                ],
+                10 => [
+                    'id' => $o[11],
+                ],
+                12 => [
+                    'id' => $o[13],
+                ],
+            ],
+            'routePrefix' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'routeName' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'defaults' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'requirements' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'options' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'stateless' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'sunset' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'acceptPatch' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'host' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'schemes' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'condition' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'controller' => [
+                2 => 'App\\Controller\\Api\\Controller\\Evaluation\\ListController',
+                4 => 'App\\Controller\\Api\\Controller\\Evaluation\\EvaluationsEleve',
+                6 => 'App\\Controller\\Api\\Controller\\Evaluation\\InscriptionController',
+                8 => 'App\\Controller\\Api\\Controller\\Evaluation\\QuestionnaireController',
+                10 => 'App\\Controller\\Api\\Controller\\Evaluation\\PostCorrectionController',
+                12 => 'App\\Controller\\Api\\Controller\\Evaluation\\ResultatController',
+            ],
+            'cacheHeaders' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'hydraContext' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'openapiContext' => [
+                2 => [
+                    'security' => [
+                        [
+                            'bearerAuth' => [],
+                        ],
+                    ],
+                    'description' => 'ID = Id de eleve',
+                ],
+                4 => [
+                    'security' => [
+                        [
+                            'bearerAuth' => [],
+                        ],
+                    ],
+                    'description' => 'Permet de recuperer la liste des évaluations d\'un élève',
+                ],
+                6 => [
+                    'security' => [
+                        [
+                            'bearerAuth' => [],
+                        ],
+                    ],
+                    'description' => 'id = evaluation_id',
+                ],
+                8 => [
+                    'security' => [
+                        [
+                            'bearerAuth' => [],
+                        ],
+                    ],
+                    'description' => 'id = evaluation_id',
+                ],
+                10 => [
+                    'security' => [
+                        [
+                            'bearerAuth' => [],
+                        ],
+                    ],
+                    'description' => 'id = evaluation_id',
+                ],
+                12 => [
+                    'security' => [
+                        [
+                            'bearerAuth' => [],
+                        ],
+                    ],
+                    'description' => 'Cette route permet de récupérer la correction d\'une évaluation. id = evaluation_id',
+                ],
+            ],
+            'openapi' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'exceptionToStatus' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+            'queryParameterValidationEnabled' => [
+                2 => null,
+                4 => null,
+                6 => null,
+                8 => null,
+                10 => null,
+                12 => null,
+            ],
+        ],
+        'ApiPlatform\\Metadata\\GetCollection' => [
+            'itemUriTemplate' => [
+                2 => null,
+                4 => null,
+            ],
+        ],
+        'ApiPlatform\\Metadata\\Link' => [
+            'parameterName' => [
+                3 => 'id',
+                5 => 'id',
+                7 => 'id',
+                9 => 'id',
+                11 => 'id',
+                13 => 'id',
+                'id',
+            ],
+            'fromProperty' => [
+                3 => null,
+                5 => null,
+                7 => null,
+                9 => null,
+                11 => null,
+                13 => null,
+                null,
+            ],
+            'toProperty' => [
+                3 => null,
+                5 => null,
+                7 => null,
+                9 => null,
+                11 => null,
+                13 => null,
+                null,
+            ],
+            'fromClass' => [
+                3 => 'App\\Entity\\Evaluation',
+                5 => 'App\\Entity\\Evaluation',
+                7 => 'App\\Entity\\Evaluation',
+                9 => 'App\\Entity\\Evaluation',
+                11 => 'App\\Entity\\Evaluation',
+                13 => 'App\\Entity\\Evaluation',
+                'App\\Entity\\Evaluation',
+            ],
+            'toClass' => [
+                3 => null,
+                5 => null,
+                7 => null,
+                9 => null,
+                11 => null,
+                13 => null,
+                null,
+            ],
+            'identifiers' => [
+                3 => [
+                    'id',
+                ],
+                5 => [
+                    'id',
+                ],
+                7 => [
+                    'id',
+                ],
+                9 => [
+                    'id',
+                ],
+                11 => [
+                    'id',
+                ],
+                13 => [
+                    'id',
+                ],
+                [
+                    'id',
+                ],
+            ],
+            'compositeIdentifier' => [
+                3 => null,
+                5 => null,
+                7 => null,
+                9 => null,
+                11 => null,
+                13 => null,
+                null,
+            ],
+            'expandedValue' => [
+                3 => null,
+                5 => null,
+                7 => null,
+                9 => null,
+                11 => null,
+                13 => null,
+                null,
+            ],
+        ],
+        'ApiPlatform\\Metadata\\Post' => [
+            'itemUriTemplate' => [
+                6 => null,
+                10 => null,
+            ],
+        ],
+    ],
+    [
+        $o[0],
+    ],
+    []
+); }];

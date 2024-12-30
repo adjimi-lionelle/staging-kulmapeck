@@ -1,0 +1,17 @@
+{% extends "front/base.html.twig" %}
+
+{% block title %} - Forum, {{ course.intitule }}{% endblock %}
+
+{% block mainContent %}
+
+    <!-- =======================
+    Page content START -->
+    <section class="pb-0 py-lg-5">
+        <div class="container">
+            {{ include('front/course_forum/_subjects.html.twig') }}
+        </div>
+    </section>
+    <!-- =======================
+    Page content END -->
+
+{% endblock %}

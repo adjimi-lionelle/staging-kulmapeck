@@ -1,0 +1,3 @@
+<?php //App%255CEntity%255CLecture
+
+return [PHP_INT_MAX, []];

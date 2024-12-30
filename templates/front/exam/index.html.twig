@@ -1,0 +1,220 @@
+{% extends "front/base.html.twig" %}
+
+{% block title %} - Courses{% endblock %}
+
+{% block script %}
+	
+{% endblock %}
+
+{% block mainContent %}
+    
+    <section class="bg-dark align-items-center d-flex" style="background:url({{ asset('assets/images/pattern/04.png') }}) no-repeat center center; background-size:cover;">
+        <!-- Main banner background image -->
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <!-- Title -->
+                    <h1 class="text-white">{% trans %}EXAMS_KEY{% endtrans %}</h1>
+                    <!-- Breadcrumb -->
+                    <div class="d-flex">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb breadcrumb-dark breadcrumb-dots mb-0">
+                                <li class="breadcrumb-item"><a href="{{ url("app_front") }}">{% trans %}HOME_KEY{% endtrans %}</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">{% trans %}EXAMS_KEY{% endtrans %}</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<!-- Page content START -->
+	<section class="pb-0 py-sm-5">
+		<div class="container">
+			<!-- Title and select START -->
+			<div class="row g-3 align-items-center mb-4">
+                {% if exams.getTotalItemCount %}
+				<!-- Content -->
+				<div class="col-md-5">
+					<h4 class="mb-0">Showing {{ ((exams.getCurrentPageNumber - 1) * exams.getItemNumberPerPage) + 1 }} to {{ exams.getItemNumberPerPage * exams.getCurrentPageNumber }} of {{exams.getTotalItemCount}} result</h4>
+				</div>
+                {% endif %}
+
+				<!-- Select option -->
+				<div class="col-md-7">
+					<div class="row g-3 align-items-center justify-content-md-end me-auto">
+
+						<!-- Advanced filter responsive toggler START -->
+						<div class="col-4 text-md-end">
+							<button class="btn btn-primary mb-0 d-xl-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+								<i class="fas fa-sliders-h me-1"></i> {% trans %}SHOWFILTER_KEY{% endtrans %}
+							</button>
+						</div>
+						<!-- Advanced filter responsive toggler END -->
+
+					</div>
+				</div>
+
+			</div>
+			<!-- Title and select END -->
+
+			<div class="row">
+				<!-- Main content START -->
+				<div class="col-xl-9 col-xxl-8">
+					<!-- Course list START -->
+					<div class="row g-4">
+                        {% for exam in exams %}
+						<!-- Card list START -->
+						{{ include('front/exam/_item.html.twig') }}
+						<!-- Card list END -->
+                        {% else %}
+                            <div class="text-center p-4 mb-5 mt-5">
+                                <h2>{% trans %}EMPTY_KEY{% endtrans %}</h2>
+                            </div>
+                        {% endfor %}
+					</div>
+					<!-- Course list END -->
+					<!-- Pagination START -->
+					<div class="col-12">
+						{{ knp_pagination_render(exams) }}
+					</div>
+					<!-- Pagination END -->
+				</div>
+				<!-- Main content END -->
+
+				<!-- Right sidebar START -->
+				<div class="col-lg-3 col-xxl-4">
+					<!-- Responsive offcanvas body START -->
+					<div class="offcanvas-xl offcanvas-end" tabindex="-1" id="offcanvasSidebar">
+						<div class="offcanvas-header bg-light">
+							<h5 class="offcanvas-title" id="offcanvasNavbarLabel">{% trans %}ADVANCEFILTER_KEY{% endtrans %}</h5>
+							<button  type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasSidebar" aria-label="Close"></button>
+						</div>
+						<div class="offcanvas-body p-3 p-xl-0">
+							<form id="filter-form">
+								<!-- Category START -->
+								<div class="card card-body shadow p-4 mb-4">
+									<!-- Title -->
+									<h4 class="mb-4">{% trans %}CATEGORY_KEY{% endtrans %}</h4>
+									<div class="row">
+										<!-- Category group -->
+										<div class="col-xxl-6">
+											<div class="form-check">
+												<input {{ sCategory is same as null ? 'checked' : '' }} required name="category" class="form-check-input" type="radio" value="all" id="flexCheckDefaultall">
+												<label class="form-check-label" for="flexCheckDefaultall">{% trans %}ALL_KEY{% endtrans %}</label>
+											</div>
+											{% set i = 1 %}
+											{% for category in categories %}
+												{% if i <= (categories|length) / 2 %}
+													<div class="form-check">
+														<input {{ sCategory is same as category ? 'checked' :'' }} name="category" required data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title='{{ category.name }}' class="form-check-input" type="radio" value="{{ category.slug }}" id="flexCheckDefault{{ category.id }}">
+														<label data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title='{{ category.name }}' class="form-check-label" for="flexCheckDefault{{ category.id }}">{{ category.name }}</label>
+													</div>
+												{% endif %}
+												{% set i = i + 1 %}
+											{% endfor %}
+										</div>
+	
+										<!-- Category group -->
+										<div class="col-xxl-6">
+											{% set i = 1 %}
+											{% for category in categories %}
+												{% if i > (categories|length) / 2 %}
+													<div class="form-check">
+														<input {{ sCategory is same as category ? 'checked' : '' }} name="category" required data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title='{{ category.name }}' class="form-check-input" type="radio" value="{{ category.slug }}" id="flexCheckDefault{{ category.id }}">
+														<label data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title='{{ category.name }}' title="{{ category.name }}" class="form-check-label" for="flexCheckDefault{{ category.id }}">{{ category.name|u.truncate(13) }}</label>
+													</div>
+												{% endif %}
+												{% set i = i + 1 %}
+											{% endfor %}
+										</div>
+									</div><!-- Row END -->
+								</div>
+								<!-- Category END -->
+
+								<!-- Price START -->
+								<div class="card card-body shadow p-4 mb-4">
+									<!-- Title -->
+									<h4 class="mb-3">{% trans %}SKILLLEVEL_KEY{% endtrans %}</h4>
+									<ul class="list-inline mb-0">
+										<!-- Price item -->
+										<li class="list-inline-item">
+											<input {{ skillLevel is same as null ? 'checked' : '' }} type="radio" value="all" class="btn-check" name="skill" id="skill">
+											<label class="btn btn-light btn-primary-soft-check" for="skill">{% trans %}ALL_KEY{% endtrans %}</label>
+										</li>
+										{% for skill in skillLevels %}
+											<!-- Price item -->
+											<li class="list-inline-item">
+												<input {{ skillLevel is same as skill ? 'checked' : '' }} type="radio" class="btn-check" name="skill" value="{{ skill.slug }}" id="skill{{ loop.index }}">
+												<label class="btn btn-light btn-primary-soft-check" for="skill{{ loop.index }}">{{ skill.name }}</label>
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
+								<!-- Price END -->
+		
+								<!-- Price START -->
+								<div class="card card-body shadow p-4 mb-4">
+									<!-- Title -->
+									<h4 class="mb-3">{% trans %}CLASSES_KEY{% endtrans %}</h4>
+									<ul class="list-inline mb-0">
+										<!-- Price item -->
+										<li class="list-inline-item">
+											<input {{ sClasse is same as null ? 'checked' : '' }} checked type="radio" value="all" class="btn-check" name="classe" id="option">
+											<label class="btn btn-light btn-primary-soft-check" for="option">{% trans %}ALL_KEY{% endtrans %}</label>
+										</li>
+										{% for classe in classes %}
+											<!-- Price item -->
+											<li class="list-inline-item">
+												<input {{ sClasse is same as classe ? 'checked' : '' }} type="radio" class="btn-check" name="classe" value="{{ classe.slug }}" id="option{{ loop.index }}">
+												<label class="btn btn-light btn-primary-soft-check" for="option{{ loop.index }}">{{ classe.name }}</label>
+											</li>
+										{% endfor %}
+									</ul>
+								</div>
+								<!-- Price END -->
+		
+								<!-- Language START -->
+								<div class="card card-body shadow p-4 mb-4">
+									<!-- Title -->
+									<h4 class="mb-3">{% trans %}LANGUAGE_KEY{% endtrans %}</h4>
+									<ul class="list-inline mb-0 g-3">
+										<!-- Item -->
+										<li class="list-inline-item mb-2">
+											<input {{ language is same as null ? 'checked' : '' }} value="all" checked type="radio" name="language" class="btn-check" id="btn-check-2">
+											<label class="btn btn-light btn-primary-soft-check" for="btn-check-2">{% trans %}ALL_KEY{% endtrans %}</label>
+										</li>
+										<!-- Item -->
+										<li class="list-inline-item mb-2">
+											<input  {{ language|upper is same as 'FRENCH' ? 'checked' : '' }} name="language" value="French" type="radio" class="btn-check" id="btn-check-3">
+											<label class="btn btn-light btn-primary-soft-check" for="btn-check-3">{% trans %}FRENCH_KEY{% endtrans %}</label>
+										</li>
+										<!-- Item -->
+										<li class="list-inline-item mb-2">
+											<input {{ language|upper is same as 'ENGLISH' ? 'checked' : '' }} value="English" name="language" type="radio" class="btn-check" id="btn-check-4">
+											<label class="btn btn-light btn-primary-soft-check" for="btn-check-4">{% trans %}ENGLISH_KEY{% endtrans %}</label>
+										</li>
+									</ul>
+								</div>
+								<!-- Language END -->
+							</form>
+							<!-- Form End -->
+						</div>
+
+						<!-- Button -->
+						<div class="d-grid p-2 p-xl-0 bg-body text-center">
+							<button class="btn btn-primary mb-0" type="button" onclick="$('#filter-form').submit()">{% trans %}FILTERRESULTS_KEY{% endtrans %}</button>
+						</div>
+					</div>
+					<!-- Responsive offcanvas body END -->
+				</div>
+				<!-- Right sidebar END -->
+			</div><!-- Row END -->
+		</div>
+	</section>
+	<!-- Page content END -->
+
+	{{ include('front/includes/_newsletterorange.html.twig') }}
+
+{% endblock %}
