@@ -82,7 +82,7 @@
                         {% if lecture and lecture.lesson is not same as null %}
                             <div class="card-footer p-4">
                                 {# {% if not lecture.isFinished %} #}
-                                    <a href="{{ url("app_front_course_lecture_finished", {reference: lecture.reference}) }}" class="btn btn-success">J'ai fini cette leçon, je passe à la leçon suivante !</a>
+                                    <a href="{{ url("app_front_course_lecture_finished", {reference: lecture.reference}) }}" class="btn btn-success">Leçon suivante !</a>
                                 {# {% else %}
                                     #<a href="{{ url("app_front_course_start", {'slug': lecture.lesson.chapitre.cours.slug}) }}" class="btn btn-success">Poursuivre la lecture !</a>
                                 {% endif %} #}
@@ -109,81 +109,43 @@
                                         <div class="col-12">
                                             <!-- Accordion START -->
                                             <div class="accordion accordion-icon accordion-bg-light" id="accordionExample2">
-                                                {% for chapter in lesson.chapitre.cours.chapitres|sort((a, b) => a.numero <=> b.numero) %}
-                                                    <!-- Item -->
-                                                    <div class="accordion-item mb-3">
-                                                        <h6 class="accordion-header font-base" id="heading-{{ loop.index }}">
-                                                              <a class="accordion-button fw-bold rounded collapsed d-block" href="#collapse-{{ loop.index }}" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="{{ lesson.chapitre is same as chapter ? 'true' : 'false'}}" aria-controls="collapse-{{ loop.index }}">
+                                               {% for chapter in lesson.chapitre.cours.chapitres|sort((a, b) => a.numero <=> b.numero) %}
+                                                    <div class="accordion-item">
+                                                        <h6 class="accordion-header" id="heading-{{ loop.index }}">
+                                                            <a class="accordion-button fw-bold rounded collapsed d-block" href="#collapse-{{ loop.index }}" data-bs-toggle="collapse" >
                                                                 <span class="mb-0">{{ chapter.title }}</span> 
                                                                 <span class="small d-block mt-1">({{chapter.lessons|length}} Lectures)</span>
                                                             </a>
                                                         </h6>
-                                                        <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse {{ lesson.chapitre is same as chapter ? 'show' : '' }}" aria-labelledby="heading-{{ loop.index }}" data-bs-parent="#accordionExample2">
-                                                            <div class="accordion-body mt-3">
-                                                                <div class="vstack gap-3">
-                                                                    {% set finishedLessons = 0 %}
-                                                                    {% if eleve %}
-                                                                        {% for l in eleve.lectures %}
-                                                                            {% if l.lesson is not same as null and l.lesson in chapter.lessons and l.isFinished %}
-                                                                                {% set finishedLessons = finishedLessons + 1 %}
-                                                                            {% endif %}
-                                                                        {% endfor %}
-                                                                    {% endif %}
-                                                                    <!-- Progress bar -->
-                                                                    <div class="overflow-hidden">
-                                                                        <div class="d-flex justify-content-between">
-                                                                            <p class="mb-1 h6">{{ finishedLessons }}/{{ chapter.lessons|length }} {% trans %}COMPLETED_KEY{% endtrans %}</p>
-                                                                            {% set percent = finishedLessons * 100 / chapter.lessons|length %}
-                                                                            <h6 class="mb-1 text-end">{{ percent|number_format(0) }}</h6>
-                                                                        </div>
-                                                                        <div class="progress progress-sm bg-primary bg-opacity-10">
-                                                                            <div class="progress-bar bg-primary aos" role="progressbar" data-aos="slide-right" data-aos-delay="200" data-aos-duration="1000" data-aos-easing="ease-in-out" style="width: {{ percent }}%" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100">
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {% for les in chapter.lessons|sort((c, d) => c.numero <=> d.numero) %}
-                                                                        <!-- Course lecture -->
-                                                                        {% set exist = false %}
-                                                                        {% for l in finishedLectures %}
-                                                                            {% if l.lesson is not null and l.lesson is same as les %}
-                                                                                {% set exist = true %}
-                                                                            {% endif %}
-                                                                        {% endfor %}
+                                                        <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse">
+                                                            <div class="accordion-body">
+                                                                {% for les in chapter.lessons|sort((c, d) => c.numero <=> d.numero) %}
+                                        
                                                                         <div class="d-flex justify-content-between align-items-center">
                                                                             <div class="position-relative d-flex align-items-center">
-                                                                                <a href="{{ lecture and not exist ? '#' : url("app_front_read_lesson", {slug: les.slug})  }}" class="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
-                                                                                    <i class="fas fa-play me-0"></i>
-                                                                                </a>
-                                                                                <span class="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-200px">{{ les.title }}</span>
-                                                                            </div>
+                                                                                    <a href="{{url("app_front_read_lesson", {slug: les.slug})  }}" class="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
+                                                                                        <i class="fas fa-play me-0"></i>
+                                                                                    </a>
+                                                                                    <span class="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-200px">{{ les.title }}</span>
+                                                                                </div>
                                                                             <p class="mb-0 text-truncate"></p>
                                                                         </div>
-                                                                    {% endfor %}
-
-                                                                    {% set exist = false %}
-                                                                    {% for l in finishedLectures %}
-                                                                        {% if l.chapitre is not null and l.chapitre is same as chapter %}
-                                                                            {% set exist = true %}
-                                                                        {% endif %}
-                                                                    {% endfor %}
-
-                                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                 {% endfor %}
+                                                                  <div class="d-flex justify-content-between align-items-center">
                                                                         <div class="position-relative d-flex align-items-center">
-                                                                            <a href="{{ lecture and exist ? '#' : url("app_front_course_chapitre_quizzes", {slugChapitre: chapter.slug, slugCours: chapter.cours.slug})  }}" class="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
+                                                                            <a href="{{url("app_front_course_chapitre_quizzes", {slugChapitre: chapter.slug, slugCours: chapter.cours.slug})  }}" class="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
                                                                                 <i class="fas fa-play me-0"></i>
                                                                             </a>
                                                                             <span class="d-inline-block text-truncate ms-2 mb-0 h6 fw-light w-200px">Quiz</span>
                                                                         </div>
                                                                         <p class="mb-0 text-truncate"></p>
                                                                     </div>
-
-
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                {% endfor %}
+                                                        
+                                                {% endfor %}        
+
 
                                             </div>
                                             <!-- Accordion END -->
