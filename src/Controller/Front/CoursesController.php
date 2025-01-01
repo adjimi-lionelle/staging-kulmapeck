@@ -482,7 +482,7 @@ class CoursesController extends AbstractController
         return $this->redirectToRoute('app_front_read_lesson', ['slug' => $lesson->getSlug()]);
     }
 
-    #[Route('/course/{slug}/lesson', name: 'app_front_read_lesson', methods: ['GET'])]
+   /* #[Route('/course/{slug}/lesson', name: 'app_front_read_lesson', methods: ['GET'])]
     public function readLesson(Lesson $lesson, Request $request, PaymentRepository $paymentRepository, MembreRepository $membreRepository, EleveRepository $eleveRepository, EnseignantRepository $enseignantRepository, LectureRepository $lectureRepository)
     {
         $eleve = $eleveRepository->findOneBy(['utilisateur' => $this->getUser()]);
@@ -557,7 +557,84 @@ class CoursesController extends AbstractController
             'eleve' => $eleve,
             'finishedLectures' => $lectureRepository->findBy(['eleve' => $eleve, 'isFinished' => true]),
         ]);
+    }*/
+    #[Route('/course/{slug}/lesson', name: 'app_front_read_lesson', methods: ['GET'])]
+public function readLesson(Lesson $lesson, Request $request, PaymentRepository $paymentRepository, MembreRepository $membreRepository, EleveRepository $eleveRepository, EnseignantRepository $enseignantRepository, LectureRepository $lectureRepository)
+{
+    $eleve = $eleveRepository->findOneBy(['utilisateur' => $this->getUser()]);
+
+    if ($this->isGranted('ROLE_STUDENT')) {
+        // Si l'utilisateur est un élève, on vérifie les autorisations d'accès au cours
+        if ($eleve === null) {
+            throw $this->createAccessDeniedException();
+        }
+
+        // Ajout direct du cours à la liste de l'élève sans contrainte de progression
+        if (!$eleve->getCours()->contains($lesson->getChapitre()->getCours())) {
+            $eleve->addCour($lesson->getChapitre()->getCours());
+        }
+    } else {
+        // Gestion pour les enseignants et les gestionnaires de cours
+        $enseignant = $enseignantRepository->findOneBy(['utilisateur' => $this->getUser()]);
+        if (!$this->isGranted('ROLE_COURSE_MANAGER') && ($enseignant !== null && !$enseignant->getCours()->contains($lesson->getChapitre()->getCours()))) {
+            throw $this->createAccessDeniedException();
+        }
     }
+
+    // Vérification pour rediriger vers le lecteur vidéo si besoin
+    if ($lesson->getVideoLink() !== null && $request->query->get('view') === null) {
+        return $this->redirectToRoute('app_front_read_lesson', ['slug' => $lesson->getSlug(), 'view' => 'video_player']);
+    }
+
+    // Vérification si l'utilisateur est membre du forum
+    $heIsMembre = false;
+    $cours = $lesson->getChapitre()->getCours();
+    $membre = $membreRepository->findOneBy(['utilisateur' => $this->getUser()]);
+    if ($membre !== null && $membre->getForums()->contains($cours->getForum())) {
+        $heIsMembre = true;
+    }
+
+    // Création du formulaire pour les sujets du forum
+    $sujet = new Sujet();
+    $sujetForm = $this->createForm(SujetType::class, $sujet, [
+        'action' => $heIsMembre ? $this->generateUrl('app_front_course_new_forum', ['id' => $membre->getId(), 'slug' => $cours->getSlug()])  : '',
+    ]);
+
+    // Gestion de la progression des lectures
+    $lecture = null;
+    if ($eleve !== null) {
+        $lecture = $lectureRepository->findOneBy(['lesson' => $lesson, 'eleve' => $eleve]);
+        if ($lecture === null) {
+            $lecture = new Lecture();
+            $lecture->setReference($lesson->getId() + time())
+                    ->setEleve($eleve)
+                    ->setLesson($lesson)
+                    ->setIsFinished(false)
+                    ->setStartAt(new \DateTimeImmutable());
+            $lectureRepository->save($lecture, true);
+        }
+    }
+
+    // Choix de la vue à afficher
+    $view = 'front/courses/read.html.twig';
+    if ($lesson->getVideoLink() !== null && $request->query->get('view') === 'video_player') {
+        $view = 'front/courses/video_player.html.twig';
+    }
+
+    return $this->render($view, [
+        'lesson' => $lesson,
+        'lecture' => $lecture,
+        'heIsMembre' => $heIsMembre,
+        'course' => $cours,
+        'sujetForm' => $sujetForm,
+        'nbReviews' => count($cours->getReviews()) <= 0 ? 1 : count($cours->getReviews()),
+        'isReadLessonPage' => true,
+        'membre' => $membre,
+        'isCoursePage' => true,
+        'eleve' => $eleve,
+        'finishedLectures' => $lectureRepository->findBy(['eleve' => $eleve, 'isFinished' => true]),
+    ]);
+}
 
     #[Route('/course/{reference}/lecture/finished', name: 'app_front_course_lecture_finished', methods: ['GET'])]
     public function lectureIsFinished(Lecture $lecture, LectureRepository $lectureRepository, LessonRepository $lessonRepository)
