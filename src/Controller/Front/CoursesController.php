@@ -429,11 +429,17 @@ class CoursesController extends AbstractController
                 throw $this->createAccessDeniedException();
             }
 
+            // Vérification de la période de gratuité
+            $dateInscription = $eleve->getJoinAt(); // Utilisez le champ existant `join_at`
+            $dateFinGratuite = (clone $dateInscription)->modify('+2 months +2 weeks'); // Ajoutez 2 semaines à la date d'inscription
+            $periodeGratuiteActive = new \DateTime() <= $dateFinGratuite; // Vérifiez si la période gratuite est active
+            var_dump($dateInscription); die();
+
             // On verifie si l'élève n'a pas déjà ce cours dans sa liste des cours
             // le cours soit souscrire a un compte premium
 
-            if (!$course->isIsFree() && (!$eleve->isIsPremium() && (!$paymentRepository->findOneBy(['eleve' => $eleve, 'cours' => $course, 'isExpired' => false])))) {
-
+            //if (!$course->isIsFree() && (!$eleve->isIsPremium() && (!$paymentRepository->findOneBy(['eleve' => $eleve, 'cours' => $course, 'isExpired' => false])))) {
+            if ( !$eleve->isIsPremium() && (!$paymentRepository->findOneBy(['eleve' => $eleve, 'cours' => $course, 'isExpired' => false]))) {
                 return $this->redirectToRoute('app_front_payment_buy_course', ['slug' => $course->getSlug()]);
             }
             if (!$eleve->getCours()->contains($course)) {
@@ -756,7 +762,7 @@ public function readLesson(Lesson $lesson, Request $request, PaymentRepository $
                     $lecture->setEleve($eleve)->setReference(time() + $quiz->getId())->setEndAt(new \DateTimeImmutable());
                 }
                 $isFinished = false;
-                if (($noteQuiz * 100) / 20 >= 50) {
+                if (($noteQuiz * 100) / 20 >= 00) {
                     $isFinished = true;
                 }
                 $lecture->setIsFinished($isFinished)->setNote($noteQuiz);
