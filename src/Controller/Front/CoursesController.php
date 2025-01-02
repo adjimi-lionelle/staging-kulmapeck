@@ -433,7 +433,7 @@ class CoursesController extends AbstractController
             $dateInscription = $eleve->getJoinAt(); // Utilisez le champ existant `join_at`
             $dateFinGratuite = (clone $dateInscription)->modify('+2 weeks'); // Ajoutez 2 semaines à la date d'inscription
             $periodeGratuiteActive = new \DateTime() <= $dateFinGratuite; // Vérifiez si la période gratuite est active
-            //var_dump($periodeGratuiteActive); die();
+            var_dump($periodeGratuiteActive); die();
 
             // On verifie si l'élève n'a pas déjà ce cours dans sa liste des cours
             // le cours soit souscrire a un compte premium
