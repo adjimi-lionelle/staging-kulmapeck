@@ -1,0 +1,77 @@
+{% extends "front/base.html.twig" %}
+
+{% block title %} - Register{% endblock %}
+
+{% block mainContent %}
+    <section class="mb-9 position-relative" style="background-image:url(assets/images/bg/07.jpg); background-position: center left; background-size: cover;">
+        <!-- Background dark overlay -->
+        <div class="bg-overlay bg-blue opacity-9"></div>
+        <div class="container z-index-9 position-relative">
+            <div class="row g-4 justify-content-between align-items-center">
+                <!-- Content -->
+                <div class="col-lg-6">
+                    <h1 class="text-white">{% trans %}WELCOME_REGISTER_KEY{% endtrans %}</h1>
+                    <p class="text-white mb-3">Join our community of learners and educators. Create your account to start your learning journey.</p>
+                    <a href="{{ url("app_front_courses") }}" class="btn btn-white mb-0">Explore our courses<i class="bi bi-arrow-right ms-2"></i></a>
+                </div>
+
+                <!-- Form -->
+                <div class="col-lg-6 col-xl-5 mb-n9">
+                    <div class="card card-body shadow p-4 p-sm-5">
+                        <!-- Title -->
+                        <h2 class="mb-0 h3">Create your account</h2>
+                        <p class="mb-0">Already have an account? <a href="{{ path('app_login') }}">Sign in</a></p>
+
+                        {{ form_start(registrationForm, {'attr': {'class': 'mt-4'}}) }}
+                            <!-- Full Name -->
+                            <div class="mb-3">
+                                {{ form_label(registrationForm.fullName, 'Full Name') }}
+                                {{ form_widget(registrationForm.fullName) }}
+                                {{ form_errors(registrationForm.fullName) }}
+                            </div>
+
+                            <!-- Username -->
+                            <div class="mb-3">
+                                {{ form_label(registrationForm.username, 'Username') }}
+                                {{ form_widget(registrationForm.username) }}
+                                {{ form_errors(registrationForm.username) }}
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="mb-3">
+                                {{ form_label(registrationForm.phoneNumber, 'Phone Number') }}
+                                {{ form_widget(registrationForm.phoneNumber) }}
+                                {{ form_errors(registrationForm.phoneNumber) }}
+                            </div>
+
+                            <!-- Invitation Code -->
+                            <div class="mb-3">
+                                {{ form_label(registrationForm.parentCode, 'Invitation Code (Optional)') }}
+                                {{ form_widget(registrationForm.parentCode) }}
+                                {{ form_errors(registrationForm.parentCode) }}
+                            </div>
+
+                            <!-- Password -->
+                            <div class="mb-3">
+                                {{ form_label(registrationForm.plainPassword, 'Password') }}
+                                {{ form_widget(registrationForm.plainPassword) }}
+                                {{ form_errors(registrationForm.plainPassword) }}
+                            </div>
+
+                            <!-- Terms -->
+                            <div class="mb-3">
+                                {{ form_widget(registrationForm.agreeTerms) }}
+                                {{ form_errors(registrationForm.agreeTerms) }}
+                            </div>
+
+                            <!-- Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-dark mb-0">Create account</button>
+                            </div>
+                        {{ form_end(registrationForm) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

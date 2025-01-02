@@ -9,53 +9,29 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
-                property: email
+                property: username
         app_user_phone_provider:
             entity:
                 class: App\Entity\User
-                property: telephone
-        jwt:
-            lexik_jwt: ~
+                property: phoneNumber
+        chain_provider:
+            chain:
+                providers: ['app_user_provider', 'app_user_phone_provider']
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        login:
-            pattern: ^/api/login
-            stateless: true
-            provider: app_user_provider
-            json_login:
-                check_path: api_login
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
-        
-        api:
-            pattern:   ^/api
-            stateless: true
-            provider: app_user_provider
-            entry_point: jwt
-            jwt: ~
-            refresh_jwt:
-                check_path: /api/token/refresh
-
         main:
             pattern: ^/
             lazy: true
-            provider: app_user_provider
+            provider: chain_provider
             custom_authenticator: App\Security\AppAuthenticator
             logout:
                 path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
             remember_me:
-                secret: '%kernel.secret%' # required
-                lifetime: 31536000 # 1 an en seconde
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+                secret: '%kernel.secret%'
+                lifetime: 31536000 # 1 year in seconds
 
     role_hierarchy:
         ROLE_COURSE_MANAGER: ROLE_ADMIN
@@ -73,9 +49,6 @@ security:
         - { path: ^/course/, roles: IS_AUTHENTICATED_FULLY}
         - { path: ^/payment/, roles: IS_AUTHENTICATED_FULLY}
         - { path: ^/firebase/, roles: IS_AUTHENTICATED_FULLY}
-        - { path: ^/api/(login|token/refresh), roles: PUBLIC_ACCESS }
-        - { path: ^/api/pay, roles: PUBLIC_ACCESS }
-        # - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:

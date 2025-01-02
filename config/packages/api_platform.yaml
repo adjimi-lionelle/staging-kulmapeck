@@ -9,4 +9,3 @@ api_platform:
         html: ['text/html']
     patch_formats:
         json: ['application/merge-patch+json']
-
