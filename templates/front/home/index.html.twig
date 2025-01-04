@@ -75,7 +75,7 @@
     </section>
     <!-- =======================
     Counter END -->
-
+    
     <!-- =======================
     Popular course START -->
     <section>
@@ -102,7 +102,7 @@
                 </li>
             </ul>
             <!-- Tabs END -->
-
+            
             <!-- Tabs content START -->
             <div class="tab-content" id="course-pills-tabContent">
                 {% for category in categories %}
@@ -118,8 +118,8 @@
                         </div> <!-- Row END -->
                     </div>
                     <!-- Content END -->
-
-                    {% endfor %}
+                    
+                {% endfor %}
 
             </div>
             <!-- Tabs content END -->
@@ -127,7 +127,7 @@
     </section>
     <!-- =======================
     Popular course END -->
-
+    
     <!-- =======================
     Action box START -->
     <section class="pt-0 pt-lg-5">
@@ -163,7 +163,7 @@
                                     </div>
                                     <!-- Content and input -->
                                     <div class="col-lg-5 text-lg-end">
-                                        <a href="{{ url("app_front_register", {type: 'trainer'}) }}" class="btn btn-outline-warning mb-0">{% trans %}STARTTEACHINGTODAY_KEY{% endtrans %}</a>
+                                        <a href="{{ url("app_register", {type: 'trainer'}) }}" class="btn btn-outline-warning mb-0">{% trans %}STARTTEACHINGTODAY_KEY{% endtrans %}</a>
                                     </div>
                                 </div>
                             </div>
@@ -175,7 +175,7 @@
     </section>
     <!-- =======================
     Action box END -->
-
+    
     <!-- =======================
     Trending courses START -->
     <section class="pb-5 pt-0 pt-lg-5">
@@ -204,7 +204,7 @@
     </section>
     <!-- =======================
     Trending courses END -->
-
+    
     <!-- =======================
     Reviews START -->
     <section class="bg-light">
@@ -303,7 +303,7 @@
                             </div>
                         </div>
                     </div> <!-- Row END -->
-
+                    
                     <div class="row mt-5 mt-xl-0">
                         <!-- Rating -->
                         <div class="col-7 mt-0 mt-xl-5 text-end position-relative z-index-1 d-none d-md-block">
@@ -422,5 +422,5 @@
     </section>
     <!-- =======================
     Reviews END -->
-
+    
 {% endblock %}
