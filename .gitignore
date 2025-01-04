@@ -26,3 +26,9 @@
 /nbproject/private/
 /stat
 /.env
+
+# Backup files
+*.bak
+investir/
+oldDeploy/
+site/
