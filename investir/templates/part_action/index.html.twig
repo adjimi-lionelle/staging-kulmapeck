@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}PartAction index{% endblock %}
+
+{% block body %}
+    <h1>PartAction index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Relation</th>
+                <th>Type</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for part_action in part_actions %}
+            <tr>
+                <td>{{ part_action.id }}</td>
+                <td>{{ part_action.nombre }}</td>
+                <td>{{ part_action.relation }}</td>
+                <td>{{ part_action.type }}</td>
+                <td>
+                    <a href="{{ path('app_part_action_show', {'id': part_action.id}) }}">show</a>
+                    <a href="{{ path('app_part_action_edit', {'id': part_action.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_part_action_new') }}">Create new</a>
+{% endblock %}
