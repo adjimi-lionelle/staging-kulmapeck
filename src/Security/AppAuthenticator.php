@@ -35,7 +35,7 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        $identifier = $request->request->get('identifier', ''); // This can be username or phone number
+        $identifier = $request->request->get('identifier', ''); // This can be username, phone number, or email
 
         $request->getSession()->set(Security::LAST_USERNAME, $identifier);
 
@@ -47,6 +47,11 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
                 // If not found, try by phone number
                 if (!$user) {
                     $user = $this->userRepository->findOneBy(['phoneNumber' => $userIdentifier]);
+                }
+
+                // If still not found, try by email
+                if (!$user) {
+                    $user = $this->userRepository->findOneBy(['email' => $userIdentifier]);
                 }
                 
                 if (!$user) {
