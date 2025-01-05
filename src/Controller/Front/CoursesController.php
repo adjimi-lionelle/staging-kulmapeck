@@ -410,11 +410,76 @@ class CoursesController extends AbstractController
 
         return $this->redirectToRoute('app_front_course_forum_index', ['slug' => $forumMessage->getSujet()->getForum()->getCours()->getSlug()]);
     }
-
+    #[Route('/course/{slug}/start', name: 'app_front_course_start', methods: ['GET'])]
+    public function startCourse(
+        Cours $course,
+        Request $request,
+        PaymentRepository $paymentRepository,
+        MembreRepository $membreRepository,
+        ForumRepository $forumRepository,
+        EleveRepository $eleveRepository,
+        LectureRepository $lectureRepository,
+        EntityManagerInterface $entityManagerInterface
+    ) {
+        // Vérifie si l'utilisateur est authentifié
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    
+        $eleve = $eleveRepository->findOneBy(['utilisateur' => $this->getUser()]);
+        if (!$eleve) {
+            throw $this->createAccessDeniedException();
+        }
+    
+        // Calcul de la période de gratuité
+        $dateInscription = $eleve->getJoinAt();
+        $dateFinGratuite = (clone $dateInscription)->modify('+2 weeks');
+        $periodeGratuiteActive = new \DateTime() <= $dateFinGratuite;
+    
+        // Vérification de l'accès au cours
+        $hasPaidForCourse = $paymentRepository->findOneBy(['eleve' => $eleve, 'cours' => $course, 'isExpired' => false]);
+        $canAccessCourse = $periodeGratuiteActive || $eleve->isIsPremium() || $hasPaidForCourse;
+    
+        // Si l'accès est refusé, redirige vers la page de paiement
+        if (!$canAccessCourse) {
+            return $this->redirectToRoute('app_front_payment_buy_course', ['slug' => $course->getSlug()]);
+        }
+    
+        // Si l'élève n'a pas encore ce cours, l'ajoute à sa liste de cours
+        if (!$eleve->getCours()->contains($course)) {
+            $membre = $membreRepository->findOneBy(['utilisateur' => $this->getUser()]);
+            if (!$membre) {
+                $membre = new Membre();
+                $membre->setUtilisateur($this->getUser());
+            }
+    
+            // Création du forum si nécessaire
+            if (!$course->getForum()) {
+                $forum = new Forum();
+                $forum->setCours($course);
+                $forumRepository->save($forum, true);
+                $course->setForum($forum);
+            }
+    
+            // Ajout de l'élève au forum et du cours à sa liste
+            $course->getForum()->addMembre($membre);
+            $eleve->addCour($course);
+            $membreRepository->save($membre, true);
+        }
+    
+        // Récupération de la prochaine leçon à lire
+        $chapitre = $course->getChapitres()[0];
+        $lecture = $lectureRepository->findStudentLastLecture($eleve, $course);
+        $lesson = $lecture ? $lecture->getLesson() : $chapitre->getLessons()[0];
+    
+        $entityManagerInterface->flush();
+    
+        // Redirection vers la leçon
+        return $this->redirectToRoute('app_front_read_lesson', ['slug' => $lesson->getSlug()]);
+    }
+    
     /**
      * Dans cette fonction nous allons étudier les différentes contraintes pour commencer un cours
      */
-    #[Route('/course/{slug}/start', name: 'app_front_course_start', methods: ['GET'])]
+   /* #[Route('/course/{slug}/start', name: 'app_front_course_start', methods: ['GET'])]
     public function startCourse(Cours $course, Request $request, PaymentRepository $paymentRepository, MembreRepository $membreRepository, ForumRepository $forumRepository, EleveRepository $eleveRepository, LectureRepository $lectureRepository, EntityManagerInterface $entityManagerInterface)
     {
         // La fonction nécessite que l'on soit connecté
@@ -486,7 +551,7 @@ class CoursesController extends AbstractController
         $entityManagerInterface->flush();
 
         return $this->redirectToRoute('app_front_read_lesson', ['slug' => $lesson->getSlug()]);
-    }
+    }*/
 
    /* #[Route('/course/{slug}/lesson', name: 'app_front_read_lesson', methods: ['GET'])]
     public function readLesson(Lesson $lesson, Request $request, PaymentRepository $paymentRepository, MembreRepository $membreRepository, EleveRepository $eleveRepository, EnseignantRepository $enseignantRepository, LectureRepository $lectureRepository)
@@ -847,4 +912,25 @@ public function readLesson(Lesson $lesson, Request $request, PaymentRepository $
             'nextQuizAt' => $nextQuizAt,
         ]);
     }
+
+    public function studentDashboard(Request $request, EleveRepository $eleveRepository): Response
+{
+    $eleve = $eleveRepository->findOneBy(['utilisateur' => $this->getUser()]);
+    $tempsRestant = 0;
+
+    if ($eleve) {
+        $dateInscription = $eleve->getJoinAt();
+        $dateFinGratuite = (clone $dateInscription)->modify('+2 weeks');
+        $now = new \DateTime();
+
+        if ($now <= $dateFinGratuite) {
+            $tempsRestant = $dateFinGratuite->getTimestamp() - $now->getTimestamp();
+        }
+    }
+
+    return $this->render('student/dashboard.html.twig', [
+        'tempsRestant' => $tempsRestant,
+    ]);
+}
+
 }

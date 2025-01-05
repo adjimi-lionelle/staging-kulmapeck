@@ -48,6 +48,17 @@
             <!-- Main banner background image -->
             <div class="container-fluid px-0">
                 <div class="bg-blue h-100px h-md-200px rounded-0" style="background:url({{ asset('assets/images/pattern/04.png') }}) no-repeat center center; background-size:cover;">
+                               <br> <br> <br> <div class="text-center">
+                    {% if tempsRestant() > 0 %}
+                        <h3 class="text-white">
+                            Période de gratuité : 
+                            <span id="countdown" class="text-warning"></span>
+                        </h3>
+                    {% else %}
+                        <h3 class="text-white">Votre période de gratuité a expiré. <a href="{{ path('app_premium_subscription') }}" class="text-warning">Devenez premium</a>.</h3>
+                    {% endif %}
+                </div>
+
                 </div>
             </div>
             {% block profileBlock %}
@@ -182,5 +193,40 @@
     </section>
     <!-- =======================
     Page content END -->
+
+    <script>
+    // Exemple : Temps restant envoyé par le backend en secondes
+    const tempsRestant = {{ tempsRestant|default(0) }};
+
+    if (tempsRestant > 0) {
+        // Fonction pour formater le temps restant
+        function formatTime(seconds) {
+            const days = Math.floor(seconds / (3600 * 24));
+            const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+
+            return `${days}j ${hours}h ${minutes}m ${secs}s`;
+        }
+
+        // Initialisation du compte à rebours
+        const countdownElement = document.getElementById('countdown');
+        let remainingTime = tempsRestant;
+
+        // Mise à jour du compte à rebours chaque seconde
+        const interval = setInterval(() => {
+            if (remainingTime <= 0) {
+                clearInterval(interval);
+                countdownElement.textContent = "Période expirée.";
+            } else {
+                countdownElement.textContent = formatTime(remainingTime);
+                remainingTime--;
+            }
+        }, 1000);
+    } else {
+        // Si la période est expirée
+        document.getElementById('countdown').textContent = "Période expirée.";
+    }
+</script>
 
 {% endblock %}
