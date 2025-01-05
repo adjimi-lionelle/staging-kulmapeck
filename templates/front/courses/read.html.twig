@@ -112,9 +112,9 @@
                                                {% for chapter in lesson.chapitre.cours.chapitres|sort((a, b) => a.numero <=> b.numero) %}
                                                     <div class="accordion-item">
                                                         <h6 class="accordion-header" id="heading-{{ loop.index }}">
-                                                            <a class="accordion-button fw-bold rounded collapsed d-block" href="#collapse-{{ loop.index }}" data-bs-toggle="collapse" >
+                                                            <a class="accordion-button fw-bold rounded collapsed d-block" href="#collapse-{{ loop.index }}" data-bs-toggle="collapse" data-bs-target="#collapse-{{ loop.index }}" aria-expanded="false" aria-controls="collapse-{{ loop.index }}">
                                                                 <span class="mb-0">{{ chapter.title }}</span> 
-                                                                <span class="small d-block mt-1">({{chapter.lessons|length}} Lectures)</span>
+                                                                <span class="small d-block mt-1">({{chapter.lessons|length}} Leçon(s) )</span>
                                                             </a>
                                                         </h6>
                                                         <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse">
