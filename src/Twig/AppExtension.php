@@ -31,20 +31,26 @@ class AppExtension extends AbstractExtension
         if (!$user) {
             return 0; // Pas connecté
         }
-
+    
         $eleve = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
         if (!$eleve) {
             return 0; // Pas un élève
         }
-
+    
         $dateInscription = $eleve->getJoinAt();
         $dateFinGratuite = (clone $dateInscription)->modify('+2 weeks');
         $now = new \DateTime();
-
-        if ($now <= $dateFinGratuite) {
+    
+        // Debug : Affichez les dates
+       /* var_dump([
+            'diff' => $dateFinGratuite->getTimestamp() - $now->getTimestamp(),
+        ]);*/
+    
+        if ($now <= $dateFinGratuite) { 
             return $dateFinGratuite->getTimestamp() - $now->getTimestamp();
         }
-
+    
         return 0; // Temps expiré
     }
+
 }

@@ -49,9 +49,10 @@
             <div class="container-fluid px-0">
                 <div class="bg-blue h-100px h-md-200px rounded-0" style="background:url({{ asset('assets/images/pattern/04.png') }}) no-repeat center center; background-size:cover;">
                                <br> <br> <br> <div class="text-center">
+                     
                     {% if tempsRestant() > 0 %}
                         <h3 class="text-white">
-                            Période de gratuité : 
+                            La période de gratuité prend fin dans : 
                             <span id="countdown" class="text-warning"></span>
                         </h3>
                     {% endif %}
@@ -194,7 +195,7 @@
 
     <script>
     // Exemple : Temps restant envoyé par le backend en secondes
-    const tempsRestant = {{ tempsRestant|default(0) }};
+    const tempsRestant = {{ tempsRestant()|default(0) }};
 
     if (tempsRestant > 0) {
         // Fonction pour formater le temps restant
@@ -204,7 +205,7 @@
             const minutes = Math.floor((seconds % 3600) / 60);
             const secs = seconds % 60;
 
-            return `${days}j ${hours}h ${minutes}m ${secs}s`;
+            return `${days}J ${hours}H ${minutes}M ${secs}S`;
         }
 
         // Initialisation du compte à rebours
@@ -221,10 +222,7 @@
                 remainingTime--;
             }
         }, 1000);
-    } else {
-        // Si la période est expirée
-        document.getElementById('countdown').textContent = "Période expirée.";
-    }
+    } 
 </script>
 
 {% endblock %}
