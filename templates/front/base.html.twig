@@ -142,20 +142,13 @@ gtag('config', 'G-7N7LGGGWT1');
 				<nav class="navbar navbar-expand">
 					<div class="container-fluid px-3 px-xl-5">
 						<p class="pt-3 text-center d-block text-primary" style="width: 100%; margin-bottom: 0;">
-							<span>
-								<span>{% trans %}NUMERO_REGISTRE_COMMERCE_KEY{% endtrans %}
-									:
-								</span>
-								<i>RC/DLA/2022/B/5105</i>
-							</span>
-							<b style="margin: 0px 15px;">|</b>
-							<span>
-								<span>{% trans %}LOCALISATION_KEY{% endtrans %}
-									:
-								</span>
-								<i>DOUALA-Akwa/ Carrefour Équinox Tv face Beneficial Assurance</i>
-							</span>
+							{% if not app.user %}
+    <span style="font-size:20px">
+        Profiter d'un accès gratuit à tous nos cours pendant 2 semaines dès votre inscription sur notre plateforme!
+    </span>
+{% endif %}
 						</p>
+
 					</div>
 				</nav>
 				<!-- Nav START -->
