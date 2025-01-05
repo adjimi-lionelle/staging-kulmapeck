@@ -913,24 +913,6 @@ public function readLesson(Lesson $lesson, Request $request, PaymentRepository $
         ]);
     }
 
-    public function studentDashboard(Request $request, EleveRepository $eleveRepository): Response
-{
-    $eleve = $eleveRepository->findOneBy(['utilisateur' => $this->getUser()]);
-    $tempsRestant = 0;
-
-    if ($eleve) {
-        $dateInscription = $eleve->getJoinAt();
-        $dateFinGratuite = (clone $dateInscription)->modify('+2 weeks');
-        $now = new \DateTime();
-
-        if ($now <= $dateFinGratuite) {
-            $tempsRestant = $dateFinGratuite->getTimestamp() - $now->getTimestamp();
-        }
-    }
-
-    return $this->render('student/dashboard.html.twig', [
-        'tempsRestant' => $tempsRestant,
-    ]);
-}
+   
 
 }
