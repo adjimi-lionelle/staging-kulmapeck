@@ -22,35 +22,40 @@
                         <h2 class="mb-0 h3">Créer votre compte</h2>
                         <p class="mb-0">Vous avez déjà un compte? <a href="{{ path('app_login') }}">Connectez-vous</a></p>
 
-                        <form method="post" class="mt-4">
+                        {{ form_start(registrationForm, {'attr': {'class': 'mt-4', 'id': 'registration_form'}}) }}
                             <!-- Invitation Code -->
                             <div class="mb-3">
                                 <label class="form-label">Code d'invitation</label>
                                 {{ form_widget(registrationForm.parentCode, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(registrationForm.parentCode) }}
                             </div>
 
                             <!-- Full Name -->
                             <div class="mb-3">
                                 <label class="form-label">Nom complet</label>
                                 {{ form_widget(registrationForm.fullName, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(registrationForm.fullName) }}
                             </div>
 
                             <!-- Username -->
                             <div class="mb-3">
                                 <label class="form-label">Nom d'utilisateur</label>
                                 {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(registrationForm.username) }}
                             </div>
 
                             <!-- Phone Number -->
                             <div class="mb-3">
                                 <label class="form-label">Numéro de téléphone</label>
                                 {{ form_widget(registrationForm.phoneNumber, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(registrationForm.phoneNumber) }}
                             </div>
 
                             <!-- Password -->
                             <div class="mb-3">
                                 <label class="form-label">Mot de passe</label>
                                 {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'id': 'password'}}) }}
+                                {{ form_errors(registrationForm.plainPassword) }}
                             </div>
 
                             <!-- Password Confirmation -->
@@ -67,15 +72,13 @@
                                 <small>En vous inscrivant, vous acceptez les <a href="#">conditions d'utilisation</a></small>
                             </div>
 
-                            {{ form_widget(registrationForm._token) }}
-
                             <button type="submit" class="btn btn-primary w-100 mb-0" id="submit_btn">S'inscrire</button>
-                        </form>
+                        {{ form_end(registrationForm) }}
 
                         <!-- Password validation script -->
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
-                                const form = document.querySelector('form');
+                                const form = document.getElementById('registration_form');
                                 const password = document.getElementById('password');
                                 const passwordConfirm = document.getElementById('password_confirm');
                                 const submitBtn = document.getElementById('submit_btn');
