@@ -19,56 +19,89 @@
                 <div class="col-lg-6 col-xl-5 mb-n9">
                     <div class="card card-body shadow p-4 p-sm-5">
                         <!-- Title -->
-                        <h2 class="mb-0 h3">Create your account</h2>
-                        <p class="mb-0">Already have an account? <a href="{{ path('app_login') }}">Sign in</a></p>
+                        <h2 class="mb-0 h3">Créer votre compte</h2>
+                        <p class="mb-0">Vous avez déjà un compte? <a href="{{ path('app_login') }}">Connectez-vous</a></p>
 
-                        {{ form_start(registrationForm, {'attr': {'class': 'mt-4'}}) }}
+                        <form method="post" class="mt-4">
+                            <!-- Invitation Code -->
+                            <div class="mb-3">
+                                <label class="form-label">Code d'invitation</label>
+                                {{ form_widget(registrationForm.invitationCode, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+
                             <!-- Full Name -->
                             <div class="mb-3">
-                                {{ form_label(registrationForm.fullName, 'Full Name') }}
-                                {{ form_widget(registrationForm.fullName) }}
-                                {{ form_errors(registrationForm.fullName) }}
+                                <label class="form-label">Nom complet</label>
+                                {{ form_widget(registrationForm.fullName, {'attr': {'class': 'form-control'}}) }}
                             </div>
 
                             <!-- Username -->
                             <div class="mb-3">
-                                {{ form_label(registrationForm.username, 'Username') }}
-                                {{ form_widget(registrationForm.username) }}
-                                {{ form_errors(registrationForm.username) }}
+                                <label class="form-label">Nom d'utilisateur</label>
+                                {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control'}}) }}
                             </div>
 
                             <!-- Phone Number -->
                             <div class="mb-3">
-                                {{ form_label(registrationForm.phoneNumber, 'Phone Number') }}
-                                {{ form_widget(registrationForm.phoneNumber) }}
-                                {{ form_errors(registrationForm.phoneNumber) }}
-                            </div>
-
-                            <!-- Invitation Code -->
-                            <div class="mb-3">
-                                {{ form_label(registrationForm.parentCode, 'Invitation Code (Optional)') }}
-                                {{ form_widget(registrationForm.parentCode) }}
-                                {{ form_errors(registrationForm.parentCode) }}
+                                <label class="form-label">Numéro de téléphone</label>
+                                {{ form_widget(registrationForm.phoneNumber, {'attr': {'class': 'form-control'}}) }}
                             </div>
 
                             <!-- Password -->
                             <div class="mb-3">
-                                {{ form_label(registrationForm.plainPassword, 'Password') }}
-                                {{ form_widget(registrationForm.plainPassword) }}
-                                {{ form_errors(registrationForm.plainPassword) }}
+                                <label class="form-label">Mot de passe</label>
+                                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'id': 'password'}}) }}
+                            </div>
+
+                            <!-- Password Confirmation -->
+                            <div class="mb-3">
+                                <label class="form-label">Confirmer le mot de passe</label>
+                                <input type="password" class="form-control" id="password_confirm" required>
+                                <div class="invalid-feedback">
+                                    Les mots de passe ne correspondent pas
+                                </div>
                             </div>
 
                             <!-- Terms -->
                             <div class="mb-3">
-                                {{ form_widget(registrationForm.agreeTerms) }}
-                                {{ form_errors(registrationForm.agreeTerms) }}
+                                <small>En vous inscrivant, vous acceptez les <a href="#">conditions d'utilisation</a></small>
                             </div>
 
-                            <!-- Button -->
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-dark mb-0">Create account</button>
-                            </div>
-                        {{ form_end(registrationForm) }}
+                            {{ form_widget(registrationForm._token) }}
+
+                            <button type="submit" class="btn btn-primary w-100 mb-0" id="submit_btn">S'inscrire</button>
+                        </form>
+
+                        <!-- Password validation script -->
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const form = document.querySelector('form');
+                                const password = document.getElementById('password');
+                                const passwordConfirm = document.getElementById('password_confirm');
+                                const submitBtn = document.getElementById('submit_btn');
+
+                                function validatePasswords() {
+                                    if (password.value !== passwordConfirm.value) {
+                                        passwordConfirm.classList.add('is-invalid');
+                                        submitBtn.disabled = true;
+                                        return false;
+                                    } else {
+                                        passwordConfirm.classList.remove('is-invalid');
+                                        submitBtn.disabled = false;
+                                        return true;
+                                    }
+                                }
+
+                                password.addEventListener('input', validatePasswords);
+                                passwordConfirm.addEventListener('input', validatePasswords);
+
+                                form.addEventListener('submit', function(e) {
+                                    if (!validatePasswords()) {
+                                        e.preventDefault();
+                                    }
+                                });
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
