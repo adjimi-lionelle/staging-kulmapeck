@@ -40,7 +40,7 @@ class SimpleRegistrationType extends AbstractType
                 ],
             ])
             ->add('username', TextType::class, [
-                'property_path' => 'pseudo',
+                'mapped' => false,
                 'required' => true,
                 'label' => 'Nom d\'utilisateur',
                 'attr' => [
