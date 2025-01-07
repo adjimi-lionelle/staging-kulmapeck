@@ -59,15 +59,11 @@ class SimpleRegistrationType extends AbstractType
                 ],
             ])
             ->add('phoneNumber', TextType::class, [
+                'required' => false,
                 'attr' => [
                     'class' => 'border-0 bg-light rounded-end ps-1',
                     'placeholder' => 'Phone Number'
-                ],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter your phone number',
-                    ]),
-                ],
+                ]
             ])
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
