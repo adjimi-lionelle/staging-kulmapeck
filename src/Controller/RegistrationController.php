@@ -65,10 +65,10 @@ class RegistrationController extends AbstractController
             $personne->setPseudo($username); // Set pseudo same as username
             
             // Set default values for required fields
-            $personne->setBornAt(null);  // Now nullable
-            $personne->setLieuNaissance(null);  // Now nullable
-            $personne->setSexe(null);  // Now nullable
-            $personne->setTelephone(null);  // Now nullable
+            $personne->setBornAt(new \DateTime('2000-01-01'));  // Default birth date
+            $personne->setLieuNaissance('');  // Empty string for nullable string
+            $personne->setSexe('N');  // Default gender as 'N' for "Not specified"
+            $personne->setTelephone('');  // Empty string for nullable string
             
             $personne->setUtilisateur($user);
             $user->setPersonne($personne);
