@@ -389,10 +389,14 @@ class Personne
 
     public function getAvatarPath(): string
     {
+        if (!$this->getUtilisateur()) {
+            return "assets/images/avatar/avatar.png";
+        }
+
         $avatarPath = 'uploads/images/admin/' . $this->getAvatar();
         if ($this->getUtilisateur()->getEleve() !== null) {
             $avatarPath = 'uploads/images/eleves/' . $this->getAvatar();
-        }elseif ($this->getUtilisateur()->getEnseignant() !== null) {
+        } elseif ($this->getUtilisateur()->getEnseignant() !== null) {
             $avatarPath = 'uploads/images/enseignants/kyc/' . $this->getAvatar();
         }
 
