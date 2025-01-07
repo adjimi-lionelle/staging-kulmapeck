@@ -31,11 +31,25 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'attr' => [
                     'class' => 'border-0 bg-light rounded-end ps-1',
-                    'placeholder' => 'Full Name'
+                    'placeholder' => 'Votre nom complet'
                 ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter your full name',
+                    ]),
+                ],
+            ])
+            ->add('username', TextType::class, [
+                'mapped' => false,
+                'required' => true,
+                'label' => 'Nom d\'utilisateur',
+                'attr' => [
+                    'class' => 'border-0 bg-light rounded-end ps-1',
+                    'placeholder' => 'Votre nom d\'utilisateur'
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Please enter a username',
                     ]),
                 ],
             ])

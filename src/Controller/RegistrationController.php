@@ -58,6 +58,7 @@ class RegistrationController extends AbstractController
             
             $personne->setFirstName($firstName);
             $personne->setLastName($lastName);
+            $personne->setPseudo($form->get('username')->getData());
             $personne->setUtilisateur($user);
             $user->setPersonne($personne);
 
