@@ -63,8 +63,16 @@ class RegistrationController extends AbstractController
             $personne->setFirstName($firstName);
             $personne->setLastName($lastName);
             $personne->setPseudo($username); // Set pseudo same as username
+            
+            // Set default values for required fields
+            $personne->setBornAt(null);  // Now nullable
+            $personne->setLieuNaissance(null);  // Now nullable
+            $personne->setSexe(null);  // Now nullable
+            $personne->setTelephone(null);  // Now nullable
+            
             $personne->setUtilisateur($user);
             $user->setPersonne($personne);
+            $user->setPhoneNumber(null);  // Now nullable
 
             if ($form->get('parentCode')->getData()) {
                 $parentUser = $userRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]);
