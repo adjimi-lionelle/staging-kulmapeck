@@ -53,6 +53,11 @@ class UserListener
 
     public function postPersist(User $user): void 
     {
+        // Skip email verification if email is null or user is already verified
+        if (!$user->getEmail() || $user->isVerified()) {
+            return;
+        }
+
         // generate a signed url and email it to the user
         $this->emailVerifier->sendEmailConfirmation(
             'app_verify_email',
