@@ -72,7 +72,7 @@ class RegistrationController extends AbstractController
             
             $personne->setUtilisateur($user);
             $user->setPersonne($personne);
-            $user->setPhoneNumber(null);  // Now nullable
+            $user->setPhoneNumber($form->get('phoneNumber')->getData());
 
             if ($form->get('parentCode')->getData()) {
                 $parentUser = $userRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]);
