@@ -21,35 +21,40 @@ class SimpleRegistrationType extends AbstractType
             ->add('parentCode', TextType::class, [
                 'mapped' => false,
                 'required' => false,
+                'label' => 'Code d\'invitation',
                 'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
-                    'placeholder' => 'Invitation Code (Optional)'
-                ],
+                    'placeholder' => 'Code d\'invitation'
+                ]
             ])
             ->add('fullName', TextType::class, [
                 'mapped' => false,
                 'required' => true,
+                'label' => 'Nom complet',
                 'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
                     'placeholder' => 'Votre nom complet'
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter your full name',
+                        'message' => 'Veuillez entrer votre nom complet',
                     ]),
                 ],
             ])
             ->add('username', TextType::class, [
-                'mapped' => false,
+                'property_path' => 'pseudo',
                 'required' => true,
                 'label' => 'Nom d\'utilisateur',
                 'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
                     'placeholder' => 'Votre nom d\'utilisateur'
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter a username',
+                        'message' => 'Veuillez entrer un nom d\'utilisateur',
+                    ]),
+                    new Length([
+                        'min' => 5,
+                        'max' => 8,
+                        'minMessage' => 'Le nom d\'utilisateur doit faire au moins {{ limit }} caractères',
+                        'maxMessage' => 'Le nom d\'utilisateur ne peut pas dépasser {{ limit }} caractères',
                     ]),
                 ],
             ])
