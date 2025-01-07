@@ -44,6 +44,10 @@ class RegistrationController extends AbstractController
                 )
             );
 
+            // Set username from the form
+            $username = $form->get('username')->getData();
+            $user->setUsername($username);
+
             // Set the user as verified immediately
             $user->setIsVerified(true);
 
@@ -58,7 +62,7 @@ class RegistrationController extends AbstractController
             
             $personne->setFirstName($firstName);
             $personne->setLastName($lastName);
-            $personne->setPseudo($form->get('username')->getData());
+            $personne->setPseudo($username); // Set pseudo same as username
             $personne->setUtilisateur($user);
             $user->setPersonne($personne);
 
