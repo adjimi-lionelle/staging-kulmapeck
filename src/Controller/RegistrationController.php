@@ -54,11 +54,11 @@ class RegistrationController extends AbstractController
             // Create and set Personne entity
             $personne = new Personne();
             
-            // Split fullName into firstName and lastName
-            $fullName = $form->get('fullName')->getData();
-            $nameParts = explode(' ', trim($fullName), 2);
+            // Split fullName into firstName and lastName, handle single name case
+            $fullName = trim($form->get('fullName')->getData());
+            $nameParts = explode(' ', $fullName);
             $firstName = $nameParts[0];
-            $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
+            $lastName = isset($nameParts[1]) ? implode(' ', array_slice($nameParts, 1)) : null;
             
             $personne->setFirstName($firstName);
             $personne->setLastName($lastName);

@@ -384,6 +384,9 @@ class Personne
 
     public function getNomComplet(): ? string
     {
+        if ($this->getLastName() === null) {
+            return $this->getFirstName();
+        }
         return $this->getFirstName() .' '. $this->getLastName();
     }
 
