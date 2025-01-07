@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Personne;
 use App\Form\SimpleRegistrationType;
+use App\Form\RegistrationTeacherType;
 use App\Repository\NetworkConfigRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\UserRepository;
@@ -31,8 +32,16 @@ class RegistrationController extends AbstractController
     #[Route('/register', name: 'app_front_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, FileUploader $fileUploader, UserRepository $userRepository, NetworkConfigRepository $networkConfigRepository, PersonneRepository $personneRepository): Response
     {
+        $userType = $request->query->get('type', 'student'); // Default to student if no type specified
         $user = new User();
-        $form = $this->createForm(SimpleRegistrationType::class, $user);
+        
+        // Choose form type based on user type
+        if ($userType === 'trainer') {
+            $form = $this->createForm(RegistrationTeacherType::class, $user);
+        } else {
+            $form = $this->createForm(SimpleRegistrationType::class, $user);
+        }
+        
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -44,44 +53,75 @@ class RegistrationController extends AbstractController
                 )
             );
 
-            // Set username from the form
-            $username = $form->get('username')->getData();
-            $user->setUsername($username);
-
-            // Set the user as verified immediately
+            // Set username and verify immediately
             $user->setIsVerified(true);
 
-            // Create and set Personne entity
-            $personne = new Personne();
-            
-            // Split fullName into firstName and lastName, handle single name case
-            $fullName = trim($form->get('fullName')->getData());
-            $nameParts = explode(' ', $fullName);
-            $firstName = $nameParts[0];
-            $lastName = isset($nameParts[1]) ? implode(' ', array_slice($nameParts, 1)) : '';
-            
-            $personne->setFirstName($firstName);
-            $personne->setLastName($lastName);
-            $personne->setPseudo($username); // Set pseudo same as username
-            
-            // Set default values for required fields
-            $personne->setBornAt(new \DateTime('2000-01-01'));  // Default birth date
-            $personne->setLieuNaissance('');  // Empty string for nullable string
-            $personne->setSexe('N');  // Default gender as 'N' for "Not specified"
-            $personne->setTelephone('');  // Empty string for nullable string
-            
-            $personne->setUtilisateur($user);
-            $user->setPersonne($personne);
-            $user->setPhoneNumber($form->get('phoneNumber')->getData());
+            if ($userType === 'trainer') {
+                // Handle teacher registration
+                $user->addRole('ROLE_INSTRUCTOR');
+                
+                // The personne and enseignant entities are already handled by the form
+                $personne = $user->getPersonne();
+                $enseignant = $user->getEnseignant();
+                
+                if ($personne && $enseignant) {
+                    $personne->setUtilisateur($user);
+                    $enseignant->setUtilisateur($user);
+                }
 
-            if ($form->get('parentCode')->getData()) {
+                // Handle file uploads for teacher documents
+                if ($enseignant) {
+                    $path = 'uploads/teacher_documents';
+                    // Upload CNI files
+                    if ($form->get('enseignant')->get('rectoCNIFile')->getData()) {
+                        $rectoCNIFileName = $fileUploader->upload($form->get('enseignant')->get('rectoCNIFile')->getData(), $path);
+                        $enseignant->setRectoCNI($rectoCNIFileName);
+                    }
+                    if ($form->get('enseignant')->get('versoCNIFile')->getData()) {
+                        $versoCNIFileName = $fileUploader->upload($form->get('enseignant')->get('versoCNIFile')->getData(), $path);
+                        $enseignant->setVersoCNI($versoCNIFileName);
+                    }
+                    if ($form->get('enseignant')->get('selfieCNIFile')->getData()) {
+                        $selfieCNIFileName = $fileUploader->upload($form->get('enseignant')->get('selfieCNIFile')->getData(), $path);
+                        $enseignant->setSelfieCNI($selfieCNIFileName);
+                    }
+                }
+            } else {
+                // Handle student registration
+                $user->addRole('ROLE_STUDENT');
+                
+                // Create and set Personne entity
+                $personne = new Personne();
+                
+                // Split fullName into firstName and lastName
+                $fullName = trim($form->get('fullName')->getData());
+                $nameParts = explode(' ', $fullName);
+                $firstName = $nameParts[0];
+                $lastName = isset($nameParts[1]) ? implode(' ', array_slice($nameParts, 1)) : '';
+                
+                $personne->setFirstName($firstName)
+                        ->setLastName($lastName)
+                        ->setPseudo($form->get('username')->getData())
+                        ->setBornAt(new \DateTime('2000-01-01'))
+                        ->setLieuNaissance('')
+                        ->setSexe('N')
+                        ->setTelephone('')
+                        ->setUtilisateur($user);
+                
+                $user->setPersonne($personne)
+                     ->setPhoneNumber($form->get('phoneNumber')->getData())
+                     ->setUsername($form->get('username')->getData());
+            }
+
+            // Handle invitation code for both types
+            if ($form->has('parentCode') && $form->get('parentCode')->getData()) {
                 $parentUser = $userRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]);
                 if ($parentUser) {
                     $personne->setParent($personneRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]));
                 }
             }
 
-            // Generate invitation code
+            // Generate invitation code for both types
             $codeInvitation = $this->generateInvitationCode($personneRepository);
             $invitationLink = $request->getSchemeAndHttpHost() . $this->generateUrl('app_front_register', [
                 'code' => $codeInvitation
@@ -90,19 +130,16 @@ class RegistrationController extends AbstractController
             $personne->setInvitationCode($codeInvitation)
                     ->setInvitationLink($invitationLink);
 
-            $entityManager->persist($personne);
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // Add flash message for success
-            $this->addFlash('success', 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.');
-
-            // Redirect to login page instead of registration page
+            $this->addFlash('success', 'Your account has been created successfully. You can now log in.');
             return $this->redirectToRoute('app_login');
         }
 
-        return $this->render('registration/register_simple.html.twig', [
+        return $this->render($userType === 'trainer' ? 'registration/register.html.twig' : 'registration/register_simple.html.twig', [
             'registrationForm' => $form->createView(),
+            'userType' => $userType
         ]);
     }
 

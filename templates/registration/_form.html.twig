@@ -1,224 +1,144 @@
-{% set classNames = userType is defined and userType is same as 'trainer' ? 'row g-3' : '' %}
-{{ form_start(registrationForm, {'attr': {'class': classNames}}) }}
+{% set classNames = userType is defined and userType is same as 'trainer' ? 'needs-validation' : '' %}
+{{ form_start(registrationForm, {'attr': {'class': classNames, 'novalidate': 'novalidate'}}) }}
+
     {% if registrationForm.parentCode is defined %}
-        {% if  userType is defined and userType is same as 'trainer' %}
-        <!-- Divider -->
-        <hr class="my-5">
-        <h5 class="mt-0">Invitation code</h5>
-    {% endif %}
-        {% if  userType is defined and userType is same as 'trainer' %}
-            <div class="col-12">
-                <div class="row g-xl-0 align-items-center">
-                    <div class="col-lg-4">
-                        <h6 class="mb-lg-0">{{ form_label(registrationForm.parentCode) }}</h6>
-                    </div>
-                    <div class="col-lg-8">
-                        {{ form_widget(registrationForm.parentCode, {'attr': {'value': invitation, 'class': ''}}) }}
-                    </div>
-                </div>
-            </div>
-        {% else %}
-            <div class="mb-4">
-                <label for="" class="form-label">{{ form_label(registrationForm.parentCode) }}</label>
-                <div class="input-group input-group-lg">
-                    <span class="input-group-text bg-light rounded-start border-0 text-secondary px-3"><i class="fas fa-user"></i></span>
-                    {{ form_widget(registrationForm.parentCode, {'attr': {'value': invitation}}) }}
-                </div>
-            </div>
-        {% endif %}
-        
-    {% endif %}
-    
-    {% if  userType is defined and userType is same as 'trainer' %}
-        <!-- Divider -->
-        <hr class="my-5">
-        <h5 class="mt-0">Personal information</h5>
-    {% endif %}
-
-    {% for item in registrationForm.personne %}
-        {% if  userType is defined and userType is same as 'trainer' %}
-            <div class="col-12">
-                <div class="row g-xl-0 align-items-center">
-                    <div class="col-lg-4">
-                        <h6 class="mb-lg-0">{{ form_label(item) }}</h6>
-                    </div>
-                    <div class="col-lg-8">
-                        {% set classNames = '' %}
-                        {% if item is same as registrationForm.personne.sexe or item is same as registrationForm.personne.pays %}
-                            {% set classNames = 'form-select js-choice z-index-9 rounded-3 border-0 bg-light' %}
-                        {% endif %}
-                        {{ form_widget(item, {'attr': {'class': classNames}}) }}
-                    </div>
-                </div>
-            </div>
-        {% else %}
-            <div class="mb-4">
-                <label for="" class="form-label">{{ form_label(item) }}</label>
-                <div class="{{  item is not same as registrationForm.personne.imageFile and item is not same as registrationForm.personne.sexe and item is not same as registrationForm.personne.pays ? 'input-group input-group-lg' : '' }}">
-                    {% if item is not same as registrationForm.personne.imageFile and item is not same as registrationForm.personne.sexe and item is not same as registrationForm.personne.pays %}
-                        <span class="input-group-text bg-light rounded-start border-0 text-secondary px-3"><i class="fas fa-arrow-alt-circle-right"></i></span>
-                    {% endif %}
-                    {{ form_widget(item) }}
-                </div>
-            </div>
-        {% endif %}
-        
-    {% endfor %}
-
-    {% if  userType is defined and userType is same as 'trainer' %}
-        <!-- Divider -->
-        <hr class="my-5">
-        <h5 class="mt-0">Login information</h5>
-    {% endif %}
-    
-    {% if registrationForm.email is defined %}   
         {% if userType is defined and userType is same as 'trainer' %}
-            <div class="col-12">
-                <div class="row g-xl-0 align-items-center">
-                    <div class="col-lg-4">
-                        <h6 class="mb-lg-0">{{ form_label(registrationForm.email) }}</h6>
-                    </div>
-                    <div class="col-lg-8">
-                        {{ form_widget(registrationForm.email, {'attr': {'class': ''}}) }}
-                    </div>
-                </div>
-            </div>
-        {% else %}
             <div class="mb-4">
-            <label for="" class="form-label">{{ form_label(registrationForm.email) }}*</label>
-            <div class="input-group input-group-lg">
-                <span class="input-group-text bg-light rounded-start border-0 text-secondary px-3"><i class="bi bi-envelope-fill"></i></span>
-                {{ form_widget(registrationForm.email) }}
+                <label class="form-label">{{ form_label(registrationForm.parentCode) }}</label>
+                {{ form_widget(registrationForm.parentCode, {'attr': {'class': 'form-control', 'value': invitation|default('')}}) }}
+                <div class="form-text">Enter your invitation code if you have one</div>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {% if userType is defined and userType is same as 'trainer' %}
+        <div class="mb-4">
+            <h5 class="mb-3">Personal Information</h5>
+            <div class="row g-3">
+                {% for item in registrationForm.personne %}
+                    <div class="col-12">
+                        <label class="form-label">{{ form_label(item) }}</label>
+                        {% if item is same as registrationForm.personne.sexe or item is same as registrationForm.personne.pays %}
+                            {{ form_widget(item, {'attr': {'class': 'form-select'}}) }}
+                        {% elseif item is same as registrationForm.personne.imageFile %}
+                            {{ form_widget(item, {'attr': {'class': 'form-control', 'accept': 'image/*'}}) }}
+                            <div class="form-text">Upload a profile photo (optional)</div>
+                        {% else %}
+                            {{ form_widget(item, {'attr': {'class': 'form-control'}}) }}
+                        {% endif %}
+                        {% if form_errors(item) %}
+                            <div class="invalid-feedback d-block">{{ form_errors(item) }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
         </div>
+
+        {% if registrationForm.enseignant is defined %}
+            <div class="mb-4">
+                <h5 class="mb-3">Teacher Information</h5>
+                <div class="row g-3">
+                    {% for item in registrationForm.enseignant %}
+                        <div class="col-12">
+                            <label class="form-label">{{ form_label(item) }}</label>
+                            {% if item.vars.name ends with 'File' %}
+                                {{ form_widget(item, {'attr': {'class': 'form-control', 'accept': 'image/*'}}) }}
+                                <div class="form-text">Upload required document</div>
+                            {% else %}
+                                {{ form_widget(item, {'attr': {'class': 'form-control'}}) }}
+                            {% endif %}
+                            {% if form_errors(item) %}
+                                <div class="invalid-feedback d-block">{{ form_errors(item) }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        {% if registrationForm.fullName is defined %}
+            <div class="mb-4">
+                <label class="form-label">{{ form_label(registrationForm.fullName) }}</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="fas fa-user"></i></span>
+                    {{ form_widget(registrationForm.fullName, {'attr': {'class': 'form-control'}}) }}
+                </div>
+                {% if form_errors(registrationForm.fullName) %}
+                    <div class="invalid-feedback d-block">{{ form_errors(registrationForm.fullName) }}</div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if registrationForm.username is defined %}
+            <div class="mb-4">
+                <label class="form-label">{{ form_label(registrationForm.username) }}</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="fas fa-at"></i></span>
+                    {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control'}}) }}
+                </div>
+                {% if form_errors(registrationForm.username) %}
+                    <div class="invalid-feedback d-block">{{ form_errors(registrationForm.username) }}</div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if registrationForm.phoneNumber is defined %}
+            <div class="mb-4">
+                <label class="form-label">{{ form_label(registrationForm.phoneNumber) }}</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-0"><i class="fas fa-phone"></i></span>
+                    {{ form_widget(registrationForm.phoneNumber, {'attr': {'class': 'form-control'}}) }}
+                </div>
+                {% if form_errors(registrationForm.phoneNumber) %}
+                    <div class="invalid-feedback d-block">{{ form_errors(registrationForm.phoneNumber) }}</div>
+                {% endif %}
+            </div>
         {% endif %}
     {% endif %}
-    
+
+    {% if registrationForm.email is defined %}
+        <div class="mb-4">
+            <label class="form-label">{{ form_label(registrationForm.email) }}*</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-0"><i class="bi bi-envelope-fill"></i></span>
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'required': true}}) }}
+            </div>
+            {% if form_errors(registrationForm.email) %}
+                <div class="invalid-feedback d-block">{{ form_errors(registrationForm.email) }}</div>
+            {% endif %}
+        </div>
+    {% endif %}
+
     {% if registrationForm.plainPassword is defined %}
-        {% if userType is defined and userType is same as 'trainer' %}
-            <div class="col-12">
-                <div class="row g-xl-0 align-items-center">
-                    <div class="col-lg-4">
-                        <h6 class="mb-lg-0">{{ form_label(registrationForm.plainPassword.first) }}</h6>
-                    </div>
-                    <div class="col-lg-8">
-                        {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': ''}}) }}
-                    </div>
-                </div>
+        <div class="mb-4">
+            <label class="form-label">{{ form_label(registrationForm.plainPassword) }}*</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-0"><i class="bi bi-key-fill"></i></span>
+                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'required': true}}) }}
             </div>
-            <div class="col-12">
-                <div class="row g-xl-0 align-items-center">
-                    <div class="col-lg-4">
-                        <h6 class="mb-lg-0">{{ form_label(registrationForm.plainPassword.second) }}</h6>
-                    </div>
-                    <div class="col-lg-8">
-                        {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': ''}}) }}
-                    </div>
-                </div>
-            </div>
-        {% else %}
-            <div class="mb-4">
-                <label for="" class="form-label">{{ form_label(registrationForm.plainPassword.first) }}*</label>
-                <div class="input-group input-group-lg">
-                    <span class="input-group-text bg-light rounded-start border-0 text-secondary px-3"><i class="fas fa-lock"></i></span>
-                    {{ form_widget(registrationForm.plainPassword.first) }}
-                </div>
-            </div>
-            <div class="mb-4">
-                <label for="" class="form-label">{{ form_label(registrationForm.plainPassword.second) }}*</label>
-                <div class="input-group input-group-lg">
-                    <span class="input-group-text bg-light rounded-start border-0 text-secondary px-3"><i class="fas fa-lock"></i></span>
-                    {{ form_widget(registrationForm.plainPassword.second) }}
-                </div>
-            </div>
-        {% endif %}
-        
-    {% endif %}
-    
-    {% if  userType is defined and userType is same as 'trainer' %}
-        <!-- Divider -->
-        <hr class="my-5">
-        <h5 class="mt-0">KYC</h5>
+            {% if form_errors(registrationForm.plainPassword) %}
+                <div class="invalid-feedback d-block">{{ form_errors(registrationForm.plainPassword) }}</div>
+            {% endif %}
+            <div class="form-text">Password must be at least 6 characters long</div>
+        </div>
     {% endif %}
 
-    {% if registrationForm.enseignant is defined %}
-        {% for item in registrationForm.enseignant %}
-            {% if userType is defined and userType is same as 'trainer' %}
-                {% set classNames = '' %}
-                        {% if item is same as registrationForm.enseignant.discipline or item is same as registrationForm.enseignant.etablissement %}
-                            {% set classNames = 'form-select js-choice z-index-9 rounded-3 border-0 bg-light' %}
-                        {% endif %}
-                <div class="col-12">
-                    <div class="row g-xl-0 align-items-center">
-                        <div class="col-lg-4">
-                            <h6 class="mb-lg-0">{{ form_label(item) }}</h6>
-                        </div>
-                        <div class="col-lg-8">
-                            {{ form_widget(item, {'attr': {'class': classNames}}) }}
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <div class="mb-4">
-                    <label for="registration_teacher_enseignant_discipline" class="form-label">{{ form_label(item) }}</label>
-                    <div class="">
-                        {{ form_widget(item) }}
-                    </div>
-                </div>
-            {% endif %}
-            
-        {% endfor %}
-    {% endif %}
-
-    {% if registrationForm.eleve is defined %}
-        {% for item in registrationForm.eleve %}
-            {% if userType is defined and userType is same as 'trainer' %}
-                <div class="col-12">
-                    <div class="row g-xl-0 align-items-center">
-                        <div class="col-lg-4">
-                            <h6 class="mb-lg-0">{{ form_label(item) }}</h6>
-                        </div>
-                        <div class="col-lg-8">
-                            {{ form_widget(item, {'attr': {'class': ''}}) }}
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <div class="mb-4">
-                    <label for="" class="form-label">{{ form_label(item) }}</label>
-                    <div class="{{ item is not same as registrationForm.eleve.etablissement and item is not same as registrationForm.eleve.filiere and item is not same as registrationForm.eleve.specialite and item is not same as registrationForm.eleve.classe ? 'input-group input-group-lg' : '' }}">
-                        {% if item is not same as registrationForm.eleve.etablissement and item is not same as registrationForm.eleve.filiere and item is not same as registrationForm.eleve.specialite and item is not same as registrationForm.eleve.classe %}
-                            <span class="input-group-text bg-light rounded-start border-0 text-secondary px-3"><i class="fas fa-arrow-alt-circle-right"></i></span>
-                        {% endif %}
-                        {{ form_widget(item) }}
-                    </div>
-                </div>
-            {% endif %}
-            
-        {% endfor %}
-    {% endif %}
-    <hr class="mt-5">
     {% if registrationForm.agreeTerms is defined %}
-        <!-- Check box -->
         <div class="mb-4">
             <div class="form-check">
-                {{ form_widget(registrationForm.agreeTerms) }}
+                {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                <label class="form-check-label">
+                    I agree to the <a href="#" class="text-primary">terms and conditions</a>
+                </label>
             </div>
-        </div>
-    {% endif %}
-    
-    <!-- Button -->
-    {% if userType is defined and userType is same as 'trainer' %}
-        <div class="col-12 text-sm-end">
-            <button class="btn btn-primary mb-0">Submit</button>
-        </div>
-    {% else %}
-        <div class="align-items-center mt-0">
-            <div class="d-grid">
-                <button class="btn btn-primary mb-0" type="submit">Créer le compte</button>
-            </div>
+            {% if form_errors(registrationForm.agreeTerms) %}
+                <div class="invalid-feedback d-block">{{ form_errors(registrationForm.agreeTerms) }}</div>
+            {% endif %}
         </div>
     {% endif %}
 
-    
+    <div class="d-grid">
+        <button type="submit" class="btn btn-primary">Register</button>
+    </div>
+
 {{ form_end(registrationForm) }}
