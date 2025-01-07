@@ -147,9 +147,6 @@ class Personne
     #[Groups(['read:course:item', 'read:course:collection', 'read:review:collection', 'read:personne:item'])]
     public ?string $contentUrl = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $fullName = null;
-
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $joinAt = null;
 
@@ -427,17 +424,6 @@ class Personne
     {
         $this->updateAt = $updateAt;
 
-        return $this;
-    }
-
-    public function getFullName(): ?string
-    {
-        return $this->fullName;
-    }
-
-    public function setFullName(?string $fullName): self
-    {
-        $this->fullName = $fullName;
         return $this;
     }
 }
