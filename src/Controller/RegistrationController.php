@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Personne;
+use App\Entity\Eleve;
 use App\Form\SimpleRegistrationType;
 use App\Form\RegistrationTeacherType;
 use App\Repository\NetworkConfigRepository;
@@ -111,6 +112,13 @@ class RegistrationController extends AbstractController
                 $user->setPersonne($personne)
                      ->setPhoneNumber($form->get('phoneNumber')->getData())
                      ->setUsername($form->get('username')->getData());
+
+                // Create and set Eleve entity
+                $eleve = new Eleve();
+                $eleve->setUtilisateur($user);
+                $eleve->setReference(uniqid('STD'));
+                $eleve->setIsPremium(false);
+                $entityManager->persist($eleve);
             }
 
             // Handle invitation code for both types
