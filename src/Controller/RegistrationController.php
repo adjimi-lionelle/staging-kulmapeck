@@ -58,7 +58,7 @@ class RegistrationController extends AbstractController
             $fullName = trim($form->get('fullName')->getData());
             $nameParts = explode(' ', $fullName);
             $firstName = $nameParts[0];
-            $lastName = isset($nameParts[1]) ? implode(' ', array_slice($nameParts, 1)) : null;
+            $lastName = isset($nameParts[1]) ? implode(' ', array_slice($nameParts, 1)) : '';
             
             $personne->setFirstName($firstName);
             $personne->setLastName($lastName);
