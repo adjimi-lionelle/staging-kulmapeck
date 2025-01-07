@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,8 +18,17 @@ class SimpleRegistrationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('parentCode', TextType::class, [
+                'mapped' => false,
+                'required' => false,
+                'attr' => [
+                    'class' => 'border-0 bg-light rounded-end ps-1',
+                    'placeholder' => 'Invitation Code (Optional)'
+                ],
+            ])
             ->add('fullName', TextType::class, [
                 'mapped' => false,
+                'required' => true,
                 'attr' => [
                     'class' => 'border-0 bg-light rounded-end ps-1',
                     'placeholder' => 'Full Name'
@@ -26,17 +36,6 @@ class SimpleRegistrationType extends AbstractType
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter your full name',
-                    ]),
-                ],
-            ])
-            ->add('username', TextType::class, [
-                'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
-                    'placeholder' => 'Username'
-                ],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Please enter a username',
                     ]),
                 ],
             ])
@@ -49,13 +48,6 @@ class SimpleRegistrationType extends AbstractType
                     new NotBlank([
                         'message' => 'Please enter your phone number',
                     ]),
-                ],
-            ])
-            ->add('parentCode', TextType::class, [
-                'required' => false,
-                'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
-                    'placeholder' => 'Invitation Code (Optional)'
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
