@@ -69,7 +69,9 @@
 
                             <!-- Terms -->
                             <div class="mb-3">
-                                <small>En vous inscrivant, vous acceptez les <a href="#">conditions d'utilisation</a></small>
+                                {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input me-2'}}) }}
+                                {{ form_label(registrationForm.agreeTerms, 'En vous inscrivant, vous acceptez les conditions d\'utilisation', {'label_attr': {'class': 'form-check-label'}}) }}
+                                {{ form_errors(registrationForm.agreeTerms) }}
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100 mb-0" id="submit_btn">S'inscrire</button>

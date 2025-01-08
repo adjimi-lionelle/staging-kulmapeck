@@ -59,11 +59,27 @@ class SimpleRegistrationType extends AbstractType
                 ],
             ])
             ->add('phoneNumber', TextType::class, [
-                'required' => false,
+                'mapped' => true,
+                'required' => true,
+                'label' => 'Numéro de téléphone',
                 'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
-                    'placeholder' => 'Phone Number'
-                ]
+                    'placeholder' => 'Votre numéro de téléphone'
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Veuillez entrer votre numéro de téléphone',
+                    ]),
+                ],
+            ])
+            ->add('agreeTerms', CheckboxType::class, [
+                'mapped' => false,
+                'required' => true,
+                'label' => 'J\'accepte les conditions d\'utilisation',
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Vous devez accepter les conditions d\'utilisation',
+                    ]),
+                ],
             ])
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
@@ -81,16 +97,6 @@ class SimpleRegistrationType extends AbstractType
                         'max' => 4096,
                     ]),
                 ],
-            ])
-            ->add('agreeTerms', CheckboxType::class, [
-                'mapped' => false,
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'You should agree to our terms.',
-                    ]),
-                ],
-                'label_html' => true,
-                'label' => 'By signing up, you agree to the <a href="">terms</a>'
             ])
         ;
     }
