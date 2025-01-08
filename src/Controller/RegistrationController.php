@@ -11,6 +11,7 @@ use App\Repository\NetworkConfigRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\UserRepository;
 use App\Service\FileUploader;
+use App\Service\InvitationCodeGenerator;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,10 +25,14 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
+    private InvitationCodeGenerator $invitationCodeGenerator;
 
-    public function __construct(EmailVerifier $emailVerifier)
-    {
+    public function __construct(
+        EmailVerifier $emailVerifier,
+        InvitationCodeGenerator $invitationCodeGenerator
+    ) {
         $this->emailVerifier = $emailVerifier;
+        $this->invitationCodeGenerator = $invitationCodeGenerator;
     }
 
     #[Route('/register', name: 'app_front_register')]
@@ -130,7 +135,7 @@ class RegistrationController extends AbstractController
             }
 
             // Generate invitation code for both types
-            $codeInvitation = $this->generateInvitationCode($personneRepository);
+            $codeInvitation = $this->invitationCodeGenerator->generateCode();
             $invitationLink = $request->getSchemeAndHttpHost() . $this->generateUrl('app_front_register', [
                 'code' => $codeInvitation
             ]);
@@ -149,15 +154,6 @@ class RegistrationController extends AbstractController
             'registrationForm' => $form->createView(),
             'userType' => $userType
         ]);
-    }
-
-    private function generateInvitationCode(PersonneRepository $pr): string
-    {
-        $code = substr(str_shuffle(str_repeat('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6)), 0, 6);
-        while ($pr->findOneBy(['invitationCode' => $code])) {
-            $code = substr(str_shuffle(str_repeat('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 6)), 0, 6);
-        }
-        return $code;
     }
 
     #[Route('/verify/email', name: 'app_verify_email')]
