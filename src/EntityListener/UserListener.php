@@ -3,6 +3,7 @@ namespace App\EntityListener;
 
 use App\Entity\User;
 use App\Repository\PersonneRepository;
+use App\Security\EmailVerifier;
 use App\Service\InvitationCodeGenerator;
 use Symfony\Component\Mime\Address;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
