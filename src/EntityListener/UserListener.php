@@ -7,7 +7,6 @@ use App\Security\EmailVerifier;
 use App\Service\InvitationCodeGenerator;
 use Symfony\Component\Mime\Address;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Security;
 
@@ -16,8 +15,7 @@ class UserListener
     public function __construct(private PersonneRepository $personneRepository, 
         private UrlGeneratorInterface $urlGeneratorInterface,
         private InvitationCodeGenerator $invitationCodeGenerator,
-        private EmailVerifier $emailVerifier,
-        private UserPasswordHasherInterface $userPasswordHasherInterface)
+        private EmailVerifier $emailVerifier)
     {
         
     }
@@ -32,12 +30,6 @@ class UserListener
             $user->getPersonne()->setInvitationCode($codeInvitation)
                 ->setInvitationLink($invitationLink)
                 ->setParent($this->personneRepository->findOneBy(['invitationCode' => $user->parentCode]));
-            $user->setPassword(
-                $this->userPasswordHasherInterface->hashPassword(
-                    $user,
-                    $user->getPassword()
-                )
-            );
         }
 
         if ($user->getEleve() && !$user->getEleve()->getReference()) {
