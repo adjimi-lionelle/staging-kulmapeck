@@ -91,7 +91,7 @@ class Personne
     #[Groups(['read:course:collection', 'read:forum:messsage:collection', 'read:sujet:item', 'read:sujet:collection', 'read:review:collection','read:exam:collection','post:user:item', 'read:personne:item'])]
     private ?string $pseudo = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Groups(['post:user:item', 'read:personne:item'])]
     private ?\DateTimeInterface $bornAt = null;
 
@@ -99,22 +99,20 @@ class Personne
     #[Groups(['post:user:item', 'read:personne:item'])]
     private ?string $lieuNaissance = null;
 
-    #[ORM\Column(length: 100)]
-    #[Assert\NotBlank(message: "Ne peut être vide !")]
-    #[Assert\NotNull(message: "Ne peut être nul !")]
+    #[ORM\Column(length: 100, nullable: true)]
     #[Groups(['read:course:item', 'read:forum:messsage:collection', 'read:sujet:item', 'read:sujet:collection', 'read:review:collection', 'read:exam:collection','post:user:item', 'read:personne:item'])]
     private ?string $sexe = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['read:course:collection', 'read:forum:item', 'read:forum:messsage:collection', 'read:sujet:item', 'read:sujet:collection', 'read:review:collection', 'read:exam:collection','read:personne:item', 'read:personne:item'])]
+    #[Groups(['read:course:collection', 'read:forum:item', 'read:forum:messsage:collection', 'read:sujet:item', 'read:sujet:collection', 'read:review:collection', 'read:exam:collection', 'read:payment:collection', 'read:personne:item'])]
     private ?string $avatar = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['read:course:item','post:user:item', 'read:personne:item'])]
+    #[Groups(['post:user:item', 'read:personne:item'])]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['read:course:item','post:user:item', 'read:personne:item'])]
+    #[Groups(['read:course:collection', 'read:forum:item', 'read:forum:messsage:collection', 'read:sujet:item', 'read:sujet:collection', 'read:review:collection', 'read:exam:collection', 'post:user:item', 'read:payment:collection', 'read:personne:item'])]
     private ?string $telephone = null;
 
     #[ORM\OneToOne(mappedBy: "personne", cascade: ['persist', 'remove'])]
@@ -161,8 +159,6 @@ class Personne
         $this->joinAt = new \DateTimeImmutable();
     }
 
-
-
     public function getId(): ?int
     {
         return $this->id;
@@ -173,7 +169,7 @@ class Personne
         return $this->lastName;
     }
 
-    public function setLastName(string $lastName): self
+    public function setLastName(?string $lastName): self
     {
         $this->lastName = $lastName;
 
@@ -209,7 +205,7 @@ class Personne
         return $this->bornAt;
     }
 
-    public function setBornAt(\DateTimeInterface $bornAt): self
+    public function setBornAt(?\DateTimeInterface $bornAt): self
     {
         $this->bornAt = $bornAt;
 
@@ -221,7 +217,7 @@ class Personne
         return $this->lieuNaissance;
     }
 
-    public function setLieuNaissance(string $lieuNaissance): self
+    public function setLieuNaissance(?string $lieuNaissance): self
     {
         $this->lieuNaissance = $lieuNaissance;
 
@@ -233,7 +229,7 @@ class Personne
         return $this->sexe;
     }
 
-    public function setSexe(string $sexe): self
+    public function setSexe(?string $sexe): self
     {
         $this->sexe = $sexe;
 
@@ -269,7 +265,7 @@ class Personne
         return $this->telephone;
     }
 
-    public function setTelephone(string $telephone): self
+    public function setTelephone(?string $telephone): self
     {
         $this->telephone = $telephone;
 
@@ -385,15 +381,22 @@ class Personne
 
     public function getNomComplet(): ? string
     {
+        if ($this->getLastName() === null) {
+            return $this->getFirstName();
+        }
         return $this->getFirstName() .' '. $this->getLastName();
     }
 
     public function getAvatarPath(): string
     {
+        if (!$this->getUtilisateur()) {
+            return "assets/images/avatar/avatar.png";
+        }
+
         $avatarPath = 'uploads/images/admin/' . $this->getAvatar();
         if ($this->getUtilisateur()->getEleve() !== null) {
             $avatarPath = 'uploads/images/eleves/' . $this->getAvatar();
-        }elseif ($this->getUtilisateur()->getEnseignant() !== null) {
+        } elseif ($this->getUtilisateur()->getEnseignant() !== null) {
             $avatarPath = 'uploads/images/enseignants/kyc/' . $this->getAvatar();
         }
 

@@ -1,28 +1,28 @@
 <?php
 namespace App\EntityListener;
 
-use App\Controller\RegistrationController;
 use App\Entity\User;
 use App\Repository\PersonneRepository;
 use App\Security\EmailVerifier;
+use App\Service\InvitationCodeGenerator;
 use Symfony\Component\Mime\Address;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Security;
 
 class UserListener
 {
     public function __construct(private PersonneRepository $personneRepository, 
         private UrlGeneratorInterface $urlGeneratorInterface,
-        private EmailVerifier $emailVerifier,
-        private UserPasswordHasherInterface $userPasswordHasherInterface)
+        private InvitationCodeGenerator $invitationCodeGenerator,
+        private EmailVerifier $emailVerifier)
     {
         
     }
     public function prePersist(User $user): void
     {
         if (!$user->getPersonne()->getInvitationCode()) {
-            $codeInvitation = RegistrationController::generateInvitationCode($this->personneRepository);
+            $codeInvitation = $this->invitationCodeGenerator->generateCode();
             $invitationLink = json_encode([
                 'trainer' => $this->urlGeneratorInterface->generate('app_front_register', ['type' => 'trainer', 'invitation' => $codeInvitation]),
                 'student' => $this->urlGeneratorInterface->generate('app_front_register', ['type' => 'student', 'invitation' => $codeInvitation])
@@ -30,12 +30,6 @@ class UserListener
             $user->getPersonne()->setInvitationCode($codeInvitation)
                 ->setInvitationLink($invitationLink)
                 ->setParent($this->personneRepository->findOneBy(['invitationCode' => $user->parentCode]));
-            $user->setPassword(
-                $this->userPasswordHasherInterface->hashPassword(
-                    $user,
-                    $user->getPassword()
-                )
-            );
         }
 
         if ($user->getEleve() && !$user->getEleve()->getReference()) {
@@ -53,6 +47,11 @@ class UserListener
 
     public function postPersist(User $user): void 
     {
+        // Skip email verification if email is null or user is already verified
+        if (!$user->getEmail() || $user->isVerified()) {
+            return;
+        }
+
         // generate a signed url and email it to the user
         $this->emailVerifier->sendEmailConfirmation(
             'app_verify_email',

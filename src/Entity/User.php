@@ -74,7 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['read:course:collection', 'read:sujet:collection', 'post:user:item', 'read:payment:collection', 'read:review:collection'])]
     private ?string $username = null;
 
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(length: 180, unique: true, nullable: true)]
     #[Groups(['read:course:collection', 'read:sujet:collection', 'post:user:item', 'read:payment:collection', 'read:review:collection'])]
     private ?string $phoneNumber = null;
 
@@ -203,7 +203,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(string $phoneNumber): self
+    public function setPhoneNumber(?string $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
 

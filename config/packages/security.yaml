@@ -9,7 +9,7 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
-                property: email
+                property: username
         app_user_phone_provider:
             entity:
                 class: App\Entity\User

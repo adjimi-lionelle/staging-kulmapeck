@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,45 +18,67 @@ class SimpleRegistrationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('parentCode', TextType::class, [
+                'mapped' => false,
+                'required' => false,
+                'label' => 'Code d\'invitation',
+                'attr' => [
+                    'placeholder' => 'Code d\'invitation'
+                ]
+            ])
             ->add('fullName', TextType::class, [
                 'mapped' => false,
+                'required' => true,
+                'label' => 'Nom complet',
                 'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
-                    'placeholder' => 'Full Name'
+                    'placeholder' => 'Votre nom complet'
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter your full name',
+                        'message' => 'Veuillez entrer votre nom complet',
                     ]),
                 ],
             ])
             ->add('username', TextType::class, [
+                'mapped' => false,
+                'required' => true,
+                'label' => 'Nom d\'utilisateur',
                 'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
-                    'placeholder' => 'Username'
+                    'placeholder' => 'Votre nom d\'utilisateur'
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter a username',
+                        'message' => 'Veuillez entrer un nom d\'utilisateur',
+                    ]),
+                    new Length([
+                        'min' => 5,
+                        'max' => 8,
+                        'minMessage' => 'Le nom d\'utilisateur doit faire au moins {{ limit }} caractères',
+                        'maxMessage' => 'Le nom d\'utilisateur ne peut pas dépasser {{ limit }} caractères',
                     ]),
                 ],
             ])
             ->add('phoneNumber', TextType::class, [
+                'mapped' => true,
+                'required' => true,
+                'label' => 'Numéro de téléphone',
                 'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
-                    'placeholder' => 'Phone Number'
+                    'placeholder' => 'Votre numéro de téléphone'
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter your phone number',
+                        'message' => 'Veuillez entrer votre numéro de téléphone',
                     ]),
                 ],
             ])
-            ->add('parentCode', TextType::class, [
-                'required' => false,
-                'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
-                    'placeholder' => 'Invitation Code (Optional)'
+            ->add('agreeTerms', CheckboxType::class, [
+                'mapped' => false,
+                'required' => true,
+                'label' => 'J\'accepte les conditions d\'utilisation',
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Vous devez accepter les conditions d\'utilisation',
+                    ]),
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
@@ -74,16 +97,6 @@ class SimpleRegistrationType extends AbstractType
                         'max' => 4096,
                     ]),
                 ],
-            ])
-            ->add('agreeTerms', CheckboxType::class, [
-                'mapped' => false,
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'You should agree to our terms.',
-                    ]),
-                ],
-                'label_html' => true,
-                'label' => 'By signing up, you agree to the <a href="">terms</a>'
             ])
         ;
     }
