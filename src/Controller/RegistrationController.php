@@ -105,17 +105,20 @@ class RegistrationController extends AbstractController
                 $firstName = $nameParts[0];
                 $lastName = isset($nameParts[1]) ? implode(' ', array_slice($nameParts, 1)) : '';
                 
+                // Get phone number from the form
+                $phoneNumber = $form->get('phoneNumber')->getData();
+                
                 $personne->setFirstName($firstName)
                         ->setLastName($lastName)
                         ->setPseudo($form->get('username')->getData())
                         ->setBornAt(new \DateTime('2000-01-01'))
                         ->setLieuNaissance('')
                         ->setSexe('N')
-                        ->setTelephone('')
+                        ->setTelephone($phoneNumber)
                         ->setUtilisateur($user);
                 
                 $user->setPersonne($personne)
-                     ->setPhoneNumber($form->get('phoneNumber')->getData())
+                     ->setPhoneNumber($phoneNumber)
                      ->setUsername($form->get('username')->getData());
 
                 // Create and set Eleve entity
