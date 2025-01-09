@@ -41,7 +41,7 @@ class SimpleRegistrationType extends AbstractType
                 ],
             ])
             ->add('username', TextType::class, [
-                'mapped' => false,
+                'mapped' => true,
                 'required' => true,
                 'label' => 'Nom d\'utilisateur',
                 'attr' => [
