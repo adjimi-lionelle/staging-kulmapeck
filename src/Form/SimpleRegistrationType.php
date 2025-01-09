@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class SimpleRegistrationType extends AbstractType
 {
@@ -59,25 +60,24 @@ class SimpleRegistrationType extends AbstractType
                 ],
             ])
             ->add('phoneNumber', TextType::class, [
-                'mapped' => true,
                 'required' => true,
-                'label' => 'Numéro de téléphone',
                 'attr' => [
-                    'placeholder' => 'Votre numéro de téléphone'
+                    'class' => 'border-0 bg-light rounded-end ps-1',
+                    'placeholder' => 'Numéro de téléphone'
                 ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Veuillez entrer votre numéro de téléphone',
                     ]),
-                ],
-            ])
-            ->add('agreeTerms', CheckboxType::class, [
-                'mapped' => false,
-                'required' => true,
-                'label' => 'J\'accepte les conditions d\'utilisation',
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Vous devez accepter les conditions d\'utilisation',
+                    new Length([
+                        'min' => 8,
+                        'max' => 15,
+                        'minMessage' => 'Le numéro de téléphone doit faire au moins {{ limit }} caractères',
+                        'maxMessage' => 'Le numéro de téléphone ne peut pas dépasser {{ limit }} caractères',
+                    ]),
+                    new Regex([
+                        'pattern' => '/^[0-9\+]+$/',
+                        'message' => 'Le numéro de téléphone ne doit contenir que des chiffres et le signe +',
                     ]),
                 ],
             ])
@@ -97,6 +97,16 @@ class SimpleRegistrationType extends AbstractType
                         'max' => 4096,
                     ]),
                 ],
+            ])
+            ->add('agreeTerms', CheckboxType::class, [
+                'mapped' => false,
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'You should agree to our terms.',
+                    ]),
+                ],
+                'label_html' => true,
+                'label' => 'By signing up, you agree to the <a href="">terms</a>'
             ])
         ;
     }
