@@ -20,7 +20,8 @@ use Symfony\Component\Validator\Constraints\Valid;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`kulmapeck_user`')]
-#[UniqueEntity(fields: ['username', 'phoneNumber'], message: 'This value is already in use')]
+#[UniqueEntity(fields: ['username'], message: 'Ce nom d\'utilisateur est déjà utilisé.')]
+#[UniqueEntity(fields: ['phoneNumber'], message: 'Ce numéro de téléphone est déjà utilisé.')]
 #[ORM\EntityListeners(['App\EntityListener\UserListener'])]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(

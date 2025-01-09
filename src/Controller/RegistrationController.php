@@ -110,7 +110,7 @@ class RegistrationController extends AbstractController
                 
                 $personne->setFirstName($firstName)
                         ->setLastName($lastName)
-                        ->setPseudo($form->get('username')->getData())
+                        ->setPseudo($user->getUsername())
                         ->setBornAt(new \DateTime('2000-01-01'))
                         ->setLieuNaissance('')
                         ->setSexe('N')
@@ -118,8 +118,7 @@ class RegistrationController extends AbstractController
                         ->setUtilisateur($user);
                 
                 $user->setPersonne($personne)
-                     ->setPhoneNumber($phoneNumber)
-                     ->setUsername($form->get('username')->getData());
+                     ->setPhoneNumber($phoneNumber);
 
                 // Create and set Eleve entity
                 $eleve = new Eleve();
@@ -149,10 +148,7 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // Add flash message for success
-            $this->addFlash('success', 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.');
-
-            // Redirect to login page instead of registration page
+            $this->addFlash('success', 'Your account has been created successfully. You can now log in.');
             return $this->redirectToRoute('app_login');
         }
 
