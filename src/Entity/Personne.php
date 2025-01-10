@@ -16,6 +16,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -389,16 +391,22 @@ class Personne
         return $this->firstName . ' ' . $this->lastName;
     }
 
-    public function setImageFile(File $image = null)
-    {
-        $this->imageFile = $image;
-
-        return $this;
-    }
-
-    public function getImageFile()
+    public function getImageFile(): ?File
     {
         return $this->imageFile;
+    }
+
+    public function setImageFile(?File $imageFile = null): self
+    {
+        $this->imageFile = $imageFile;
+
+        if ($imageFile instanceof UploadedFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updateAt = new \DateTimeImmutable();
+        }
+
+        return $this;
     }
 
     public function getNomComplet(): ? string
