@@ -16,8 +16,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
@@ -39,9 +39,16 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
                                 'schema' => [
                                     'type' => 'object',
                                     'properties' => [
-                                        'id' => ['type' => 'integer'],
-                                        'avatar' => ['type' => 'string'],
-                                        'message' => ['type' => 'string']
+                                        'success' => ['type' => 'boolean'],
+                                        'data' => [
+                                            'type' => 'object',
+                                            'properties' => [
+                                                'id' => ['type' => 'integer'],
+                                                'avatar' => ['type' => 'string'],
+                                                'avatarUrl' => ['type' => 'string'],
+                                                'message' => ['type' => 'string']
+                                            ]
+                                        ]
                                     ]
                                 ]
                             ]
@@ -156,11 +163,12 @@ class Personne
     #[Groups(['read:course:item', 'post:user:item'])]
     private ?Pays $pays = null;
 
+    #[Ignore]
     private ?File $imageFile = null;
 
     #[ApiProperty(types: ['https://schema.org/contentUrl'])]
     #[Groups(['read:course:item', 'read:course:collection', 'read:review:collection', 'read:personne:item'])]
-    public ?string $contentUrl = null;
+    private ?string $contentUrl = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $joinAt = null;
@@ -458,7 +466,7 @@ class Personne
      *
      * @return  self
      */ 
-    public function setContentUrl($contentUrl)
+    public function setContentUrl(?string $contentUrl)
     {
         $this->contentUrl = $contentUrl;
         return $this;
