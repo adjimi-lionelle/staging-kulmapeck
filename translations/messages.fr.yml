@@ -76,7 +76,7 @@ BECOMEINSTRUCTOR_KEY: Devenir formateur!
 BECOMEINSTRUCTORDESCRIPTION_KEY: Speedily say has suitable disposal add boy. On forth doubt miles of child. Exercise joy man children rejoiced. Yet uncommonly his ten who diminution astonished
 STARTTEACHINGTODAY_KEY: Commencez à enseigner aujourd'hui
 TRENDINGCOURSES_KEY: Nos cours tendances
-TRENDINGCOURSESDESCRIPTION_KEY: Découvrez la plupart des cours 🔥 sur le marché
+TRENDINGCOURSESDESCRIPTION_KEY: Découvrez la plupart des cours sur le marché
 VERIFIEDMENTOR_KEY: Mentors vérifiés
 FEEDBACK_KEY: Quelques précieux retours de nos étudiants
 FEEDBACKDESCRIPTION_KEY: Supposing so be resolving breakfast am or perfectly. It drew a hill from me. Valley by oh twenty direct me so. Departure defective arranging rapturous did believe him all had supported. Family months lasted simple set nature vulgar him. Picture for attempt joy excited ten carried manners talking how.
@@ -158,7 +158,7 @@ ABOUTUSPAGE_OURGOAL_KEY: Soyez ouvert aux nouvelles idées et approches. Dévelo
 ABOUTUSPAGE_ABOUTKULMAPECKTILE_KEY: À propos du portail Kulmapeck
 ABOUTUSPAGE_ABOUTKULMAPECKDESCRIPTION1_KEY: How promotion excellent curiosity yet attempted happiness Gay prosperous impression had conviction For every delay death ask to style Me mean able my by in they Extremity now strangers contained.
 ABOUTUSPAGE_H4STUDENTS_KEY: Plus de 35 000 étudiants heureux se sont joints à nous pour atteindre leurs objectifs
-ABOUTUSPAGE_H4STUDENTS1_KEY: How promotion excellent curiosity yet attempted happiness Gay prosperous impression had conviction For every delay death ask to style Me mean able  my by in they Extremity now strangers contained breakfast him discourse additions Sincerity collected contented led now perpetual extremely forfeited
+ABOUTUSPAGE_H4STUDENTS1_KEY: How promotion excellent curiosity yet attempted happiness Gay prosperous impression had conviction For every delay in they Extremity now strangers contained breakfast him discourse additions Sincerity collected contented led now perpetual extremely forfeited
 ABOUTUSPAGE_H4STUDENTS2_KEY: Happiness prosperous impression had conviction For every delay in they Extremity now strangers contained breakfast him discourse additions Sincerity collected contented led now perpetual extremely forfeited
 ABOUTUSPAGE_SETUPTIME_KEY: Setup and installation takes less time
 ABOUTUSPAGE_PROFESSIONAL_KEY: Professional and easy to use software
@@ -237,3 +237,43 @@ BACK_TO_COURSE_KEY: Continuer la lecture
 NEXT_KEY: Suivant
 PREV_KEY: Précédent
 MANY_ANSWERS_POSSIBLE_KEY: Plusieurs réponses sont possibles pour cette question
+
+# Registration translations
+WELCOME_COMMUNITY_KEY: Bienvenue dans notre communauté
+JOIN_COMMUNITY_DESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
+EXPLORE_COURSES_KEY: Explorez nos cours
+
+# Dashboard translations
+DASHBOARD_WELCOME_KEY: Bienvenue sur votre tableau de bord
+DASHBOARD_OVERVIEW_KEY: Aperçu de vos activités
+MY_COURSES_KEY: Mes cours
+MY_PROGRESS_KEY: Ma progression
+MY_CERTIFICATES_KEY: Mes certificats
+UPCOMING_LESSONS_KEY: Prochaines leçons
+RECENT_ACTIVITIES_KEY: Activités récentes
+PERFORMANCE_KEY: Performance
+ACHIEVEMENTS_KEY: Réalisations
+
+# Settings translations
+ACCOUNT_SETTINGS_KEY: Paramètres du compte
+PROFILE_SETTINGS_KEY: Paramètres du profil
+PERSONAL_INFO_KEY: Informations personnelles
+SECURITY_KEY: Sécurité
+NOTIFICATIONS_KEY: Notifications
+PRIVACY_KEY: Confidentialité
+CONNECTED_ACCOUNTS_KEY: Comptes connectés
+SUBSCRIPTION_KEY: Abonnement
+BILLING_KEY: Facturation
+SAVE_CHANGES_KEY: Enregistrer les modifications
+CANCEL_KEY: Annuler
+
+# Welcome screen translations
+WELCOME_TITLE_KEY: Bienvenue sur Kulmapeck
+WELCOME_MESSAGE_KEY: Votre parcours d'apprentissage commence ici
+GET_STARTED_KEY: Commencer
+DISCOVER_COURSES_KEY: Découvrir les cours
+MEET_INSTRUCTORS_KEY: Rencontrer les formateurs
+JOIN_COMMUNITY_KEY: Rejoindre la communauté
+QUICK_START_GUIDE_KEY: Guide de démarrage rapide
+RECOMMENDED_COURSES_KEY: Cours recommandés
+TRENDING_NOW_KEY: Tendances actuelles
