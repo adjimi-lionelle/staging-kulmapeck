@@ -23,6 +23,11 @@ class FileUploader
         '/user_photos/'
     ];
 
+    // Allowed image extensions
+    private const ALLOWED_IMAGE_EXTENSIONS = [
+        'jpg', 'jpeg', 'jfif', 'jpe', 'png', 'gif'
+    ];
+
     public function __construct(
         $targetDirectory,
         $publicDirectory,
@@ -40,12 +45,37 @@ class FileUploader
     public function upload(?UploadedFile $file, string $path = null)
     {
         if ($file === null) {
-            return;
+            return null;
+        }
+
+        // Log initial upload attempt
+        $this->logger->info('Starting file upload', [
+            'originalName' => $file->getClientOriginalName(),
+            'size' => $file->getSize(),
+            'mimeType' => $file->getMimeType(),
+            'path' => $path
+        ]);
+
+        // Validate file
+        if (!$file->isValid()) {
+            $errorMessage = $this->getUploadErrorMessage($file->getError());
+            $this->logger->error('Invalid upload file', [
+                'error' => $file->getError(),
+                'errorMessage' => $errorMessage,
+                'file' => $file->getClientOriginalName()
+            ]);
+            throw new FileException('Invalid upload file: ' . $errorMessage);
         }
 
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $extension = strtolower($file->getClientOriginalExtension());
+        
+        // If it's a JFIF file, convert extension to jpg
+        if ($extension === 'jfif') {
+            $extension = 'jpg';
+        }
+
         $safeFilename = $this->slugger->slug($originalFilename);
-        $extension = $file->guessExtension();
 
         // Ensure target directory exists
         $fullUploadPath = $this->getTargetDirectory() . ($path ? $path : '');
@@ -72,6 +102,15 @@ class FileUploader
                 ]);
                 break;
             }
+        }
+
+        // For profile pictures, validate that it's an image
+        if ($shouldSkipConversion && !in_array($extension, self::ALLOWED_IMAGE_EXTENSIONS)) {
+            $this->logger->error('Invalid image file type', [
+                'extension' => $extension,
+                'allowedTypes' => implode(', ', self::ALLOWED_IMAGE_EXTENSIONS)
+            ]);
+            throw new FileException('Invalid image file type. Allowed types: ' . implode(', ', self::ALLOWED_IMAGE_EXTENSIONS));
         }
 
         // Convert to PDF if it's a supported format and not a profile picture
@@ -104,16 +143,8 @@ class FileUploader
 
         // If not converted to PDF or conversion failed, handle original file
         $fileName = $safeFilename . '-' . uniqid() . '.' . $extension;
+        
         try {
-            // Check if file is actually uploaded
-            if (!$file->isValid()) {
-                $this->logger->error('Invalid upload file', [
-                    'error' => $file->getError(),
-                    'file' => $originalFilename
-                ]);
-                throw new FileException('Invalid upload file: ' . $file->getErrorMessage());
-            }
-
             // Try to move the file
             if (!$file->move($fullUploadPath, $fileName)) {
                 throw new FileException('Failed to move uploaded file');
@@ -123,6 +154,8 @@ class FileUploader
                 'file' => $fileName,
                 'path' => $fullUploadPath
             ]);
+            
+            return $fileName;
         } catch (FileException $e) {
             $this->logger->error('File upload failed', [
                 'error' => $e->getMessage(),
@@ -131,8 +164,28 @@ class FileUploader
             ]);
             throw $e;
         }
+    }
 
-        return $fileName;
+    private function getUploadErrorMessage($errorCode)
+    {
+        switch ($errorCode) {
+            case UPLOAD_ERR_INI_SIZE:
+                return 'The file is too large (exceeds PHP upload_max_filesize)';
+            case UPLOAD_ERR_FORM_SIZE:
+                return 'The file is too large (exceeds HTML MAX_FILE_SIZE)';
+            case UPLOAD_ERR_PARTIAL:
+                return 'The file was only partially uploaded';
+            case UPLOAD_ERR_NO_FILE:
+                return 'No file was uploaded';
+            case UPLOAD_ERR_NO_TMP_DIR:
+                return 'Missing a temporary folder';
+            case UPLOAD_ERR_CANT_WRITE:
+                return 'Failed to write file to disk';
+            case UPLOAD_ERR_EXTENSION:
+                return 'A PHP extension stopped the file upload';
+            default:
+                return 'Unknown upload error';
+        }
     }
 
     public function getTargetDirectory()
