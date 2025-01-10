@@ -81,15 +81,15 @@ class ProfileController extends AbstractController
 
         if ($eleve !== null) {
             $postUri = $this->generateUrl('app_student_profile_edit');
-            $path = 'avatars';
+            $path = 'images/eleves';
             $redirectUri = 'app_student_profile';
         } elseif ($enseignant !== null) {
             $postUri = $this->generateUrl('app_instructor_profile');
-            $path = 'avatars';
+            $path = 'images/enseignants/kyc';
             $redirectUri = 'app_instructor_profile';
         } else {
             $postUri = $this->generateUrl('app_profile_edit');
-            $path = 'avatars';
+            $path = 'images/admin';
             $redirectUri = 'app_profile';
         }
 

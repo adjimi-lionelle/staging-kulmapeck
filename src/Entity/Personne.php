@@ -130,10 +130,6 @@ class Personne
     private ?string $avatar = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['post:user:item', 'read:personne:item'])]
-    private ?string $adresse = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['read:course:collection', 'read:forum:item', 'read:forum:messsage:collection', 'read:sujet:item', 'read:sujet:collection', 'read:review:collection', 'read:exam:collection', 'post:user:item', 'read:payment:collection', 'read:personne:item'])]
     private ?string $telephone = null;
 
@@ -168,6 +164,10 @@ class Personne
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updateAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['post:user:item', 'read:personne:item'])]
+    private ?string $adresse = null;
 
     public function __construct()
     {
