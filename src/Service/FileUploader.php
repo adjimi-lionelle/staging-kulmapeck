@@ -47,6 +47,20 @@ class FileUploader
         $safeFilename = $this->slugger->slug($originalFilename);
         $extension = $file->guessExtension();
 
+        // Ensure target directory exists
+        $fullUploadPath = $this->getTargetDirectory() . ($path ? $path : '');
+        if (!file_exists($fullUploadPath)) {
+            if (!mkdir($fullUploadPath, 0777, true)) {
+                $error = error_get_last();
+                $this->logger->error('Failed to create upload directory', [
+                    'path' => $fullUploadPath,
+                    'error' => $error['message'] ?? 'Unknown error'
+                ]);
+                throw new FileException('Unable to create upload directory');
+            }
+            chmod($fullUploadPath, 0777); // Ensure directory is writable
+        }
+
         // Check if this is a profile/avatar upload path
         $shouldSkipConversion = false;
         foreach (self::SKIP_CONVERSION_PATHS as $skipPath) {
@@ -70,7 +84,10 @@ class FileUploader
                 
                 $pdfPath = $this->fileConverter->convertToPdf($file);
                 $fileName = $safeFilename . '-' . uniqid() . '.pdf';
-                rename($pdfPath, $this->getTargetDirectory() . $path . '/' . $fileName);
+                
+                if (!rename($pdfPath, $fullUploadPath . '/' . $fileName)) {
+                    throw new FileException('Failed to move converted file');
+                }
                 
                 $this->logger->info('File converted and moved successfully', [
                     'newFile' => $fileName
@@ -88,15 +105,29 @@ class FileUploader
         // If not converted to PDF or conversion failed, handle original file
         $fileName = $safeFilename . '-' . uniqid() . '.' . $extension;
         try {
-            $file->move($this->getTargetDirectory() . $path, $fileName);
+            // Check if file is actually uploaded
+            if (!$file->isValid()) {
+                $this->logger->error('Invalid upload file', [
+                    'error' => $file->getError(),
+                    'file' => $originalFilename
+                ]);
+                throw new FileException('Invalid upload file: ' . $file->getErrorMessage());
+            }
+
+            // Try to move the file
+            if (!$file->move($fullUploadPath, $fileName)) {
+                throw new FileException('Failed to move uploaded file');
+            }
             
             $this->logger->info('File uploaded successfully', [
-                'file' => $fileName
+                'file' => $fileName,
+                'path' => $fullUploadPath
             ]);
         } catch (FileException $e) {
             $this->logger->error('File upload failed', [
                 'error' => $e->getMessage(),
-                'file' => $originalFilename
+                'file' => $originalFilename,
+                'path' => $fullUploadPath
             ]);
             throw $e;
         }
@@ -106,6 +137,6 @@ class FileUploader
 
     public function getTargetDirectory()
     {
-        return $this->targetDirectory;
+        return rtrim($this->targetDirectory, '/\\');
     }
 }
