@@ -139,10 +139,6 @@ class Personne
 
     private ?File $imageFile = null;
 
-    #[Vich\UploadableField(mapping: "personne_avatar", fileNameProperty: "avatar")]
-    #[Assert\NotNull(groups: ['media_object_create'])]
-    public ?File $file = null;
-
     #[ApiProperty(types: ['https://schema.org/contentUrl'])]
     #[Groups(['read:course:item', 'read:course:collection', 'read:review:collection', 'read:personne:item'])]
     public ?string $contentUrl = null;
@@ -244,7 +240,6 @@ class Personne
     public function setAvatar(?string $avatar): self
     {
         $this->avatar = $avatar;
-
         return $this;
     }
 
@@ -428,6 +423,25 @@ class Personne
     {
         $this->updateAt = $updateAt;
 
+        return $this;
+    }
+
+    /**
+     * Get the value of contentUrl
+     */ 
+    public function getContentUrl()
+    {
+        return $this->contentUrl;
+    }
+
+    /**
+     * Set the value of contentUrl
+     *
+     * @return  self
+     */ 
+    public function setContentUrl($contentUrl)
+    {
+        $this->contentUrl = $contentUrl;
         return $this;
     }
 }
