@@ -30,7 +30,24 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
             uriTemplate: '/post/{id}/avatar',
             controller: ChangeAvatarController::class,
             openapiContext: [
-                'security' => [['bearerAuth' => []]]
+                'security' => [['bearerAuth' => []]],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Avatar updated successfully',
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'id' => ['type' => 'integer'],
+                                        'avatar' => ['type' => 'string'],
+                                        'message' => ['type' => 'string']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ],
             openapi: new Operation(
                 requestBody: new RequestBody(
@@ -49,7 +66,9 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
                     ])
                 )
             ),
-            deserialize: false
+            deserialize: false,
+            validate: false,
+            write: false
         ),
         new GetCollection(
             uriTemplate: '/personne/{id}/network',
