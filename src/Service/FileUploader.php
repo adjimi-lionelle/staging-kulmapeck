@@ -15,6 +15,14 @@ class FileUploader
     private $fileConverter;
     private $logger;
 
+    // File paths that should skip conversion
+    private const SKIP_CONVERSION_PATHS = [
+        '/avatars/',
+        '/profile_pictures/',
+        '/profile_images/',
+        '/user_photos/'
+    ];
+
     public function __construct(
         $targetDirectory,
         $publicDirectory,
@@ -29,7 +37,7 @@ class FileUploader
         $this->logger = $logger;
     }
 
-    public function upload(?UploadedFile $file, string $path=null)
+    public function upload(?UploadedFile $file, string $path = null)
     {
         if ($file === null) {
             return;
@@ -39,8 +47,21 @@ class FileUploader
         $safeFilename = $this->slugger->slug($originalFilename);
         $extension = $file->guessExtension();
 
-        // Convert to PDF if it's a supported format
-        if (in_array($extension, ['doc', 'docx', 'jpg', 'jpeg', 'png'])) {
+        // Check if this is a profile/avatar upload path
+        $shouldSkipConversion = false;
+        foreach (self::SKIP_CONVERSION_PATHS as $skipPath) {
+            if ($path && strpos($path, $skipPath) !== false) {
+                $shouldSkipConversion = true;
+                $this->logger->info('Skipping conversion for profile/avatar image', [
+                    'path' => $path,
+                    'file' => $originalFilename
+                ]);
+                break;
+            }
+        }
+
+        // Convert to PDF if it's a supported format and not a profile picture
+        if (!$shouldSkipConversion && in_array($extension, ['doc', 'docx', 'jpg', 'jpeg', 'png'])) {
             try {
                 $this->logger->info('Converting file to PDF', [
                     'originalFile' => $originalFilename,
@@ -57,7 +78,6 @@ class FileUploader
                 
                 return $fileName;
             } catch (\Exception $e) {
-                // If conversion fails, fall back to original file
                 $this->logger->warning('File conversion failed, uploading original file', [
                     'error' => $e->getMessage(),
                     'file' => $originalFilename
