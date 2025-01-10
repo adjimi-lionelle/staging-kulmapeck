@@ -11,19 +11,13 @@ use ApiPlatform\OpenApi\Model\RequestBody;
 use App\Controller\Api\Controller\User\ChangeAvatarController;
 use App\Controller\Api\Controller\User\NetworkController;
 use App\Repository\PersonneRepository;
-use App\Service\FileUploader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: PersonneRepository::class)]
 #[ApiResource(
     types: ['https://schema.org/MediaObject'],
@@ -164,9 +158,6 @@ class Personne
     #[ORM\ManyToOne(inversedBy: 'personnes')]
     #[Groups(['read:course:item', 'post:user:item'])]
     private ?Pays $pays = null;
-
-    #[Ignore]
-    private ?File $imageFile = null;
 
     #[ApiProperty(types: ['https://schema.org/contentUrl'])]
     #[Groups(['read:course:item', 'read:course:collection', 'read:review:collection', 'read:personne:item'])]
@@ -389,24 +380,6 @@ class Personne
     public function getName(): ?string
     {
         return $this->firstName . ' ' . $this->lastName;
-    }
-
-    public function getImageFile(): ?File
-    {
-        return $this->imageFile;
-    }
-
-    public function setImageFile(?File $imageFile = null): self
-    {
-        $this->imageFile = $imageFile;
-
-        if ($imageFile instanceof UploadedFile) {
-            // It is required that at least one field changes if you are using doctrine
-            // otherwise the event listeners won't be called and the file is lost
-            $this->updateAt = new \DateTimeImmutable();
-        }
-
-        return $this;
     }
 
     public function getNomComplet(): ? string
