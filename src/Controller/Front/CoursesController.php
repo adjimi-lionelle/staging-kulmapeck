@@ -436,8 +436,7 @@ class CoursesController extends AbstractController
     
         // Vérification de l'accès au cours
         $hasPaidForCourse = $paymentRepository->findOneBy(['eleve' => $eleve, 'cours' => $course, 'isExpired' => false]);
-        $canAccessCourse = $eleve->isIsPremium() || $hasPaidForCourse;
-        //$periodeGratuiteActive || 
+        $canAccessCourse = $periodeGratuiteActive || $eleve->isIsPremium() || $hasPaidForCourse;
     
         // Si l'accès est refusé, redirige vers la page de paiement
         if (!$canAccessCourse) {
