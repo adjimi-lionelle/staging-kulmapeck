@@ -11,17 +11,13 @@ use ApiPlatform\OpenApi\Model\RequestBody;
 use App\Controller\Api\Controller\User\ChangeAvatarController;
 use App\Controller\Api\Controller\User\NetworkController;
 use App\Repository\PersonneRepository;
-use App\Service\FileUploader;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-#[Vich\Uploadable]
 #[ORM\Entity(repositoryClass: PersonneRepository::class)]
 #[ApiResource(
     types: ['https://schema.org/MediaObject'],
@@ -30,7 +26,31 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
             uriTemplate: '/post/{id}/avatar',
             controller: ChangeAvatarController::class,
             openapiContext: [
-                'security' => [['bearerAuth' => []]]
+                'security' => [['bearerAuth' => []]],
+                'responses' => [
+                    '200' => [
+                        'description' => 'Avatar updated successfully',
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'success' => ['type' => 'boolean'],
+                                        'data' => [
+                                            'type' => 'object',
+                                            'properties' => [
+                                                'id' => ['type' => 'integer'],
+                                                'avatar' => ['type' => 'string'],
+                                                'avatarUrl' => ['type' => 'string'],
+                                                'message' => ['type' => 'string']
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ],
             openapi: new Operation(
                 requestBody: new RequestBody(
@@ -49,7 +69,9 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
                     ])
                 )
             ),
-            deserialize: false
+            deserialize: false,
+            validate: false,
+            write: false
         ),
         new GetCollection(
             uriTemplate: '/personne/{id}/network',
@@ -108,10 +130,6 @@ class Personne
     private ?string $avatar = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['post:user:item', 'read:personne:item'])]
-    private ?string $adresse = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['read:course:collection', 'read:forum:item', 'read:forum:messsage:collection', 'read:sujet:item', 'read:sujet:collection', 'read:review:collection', 'read:exam:collection', 'post:user:item', 'read:payment:collection', 'read:personne:item'])]
     private ?string $telephone = null;
 
@@ -137,21 +155,19 @@ class Personne
     #[Groups(['read:course:item', 'post:user:item'])]
     private ?Pays $pays = null;
 
-    private ?File $imageFile = null;
-
-    #[Vich\UploadableField(mapping: "personne_avatar", fileNameProperty: "avatar")]
-    #[Assert\NotNull(groups: ['media_object_create'])]
-    public ?File $file = null;
-
     #[ApiProperty(types: ['https://schema.org/contentUrl'])]
     #[Groups(['read:course:item', 'read:course:collection', 'read:review:collection', 'read:personne:item'])]
-    public ?string $contentUrl = null;
+    private ?string $contentUrl = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $joinAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updateAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['post:user:item', 'read:personne:item'])]
+    private ?string $adresse = null;
 
     public function __construct()
     {
@@ -244,7 +260,6 @@ class Personne
     public function setAvatar(?string $avatar): self
     {
         $this->avatar = $avatar;
-
         return $this;
     }
 
@@ -367,18 +382,6 @@ class Personne
         return $this->firstName . ' ' . $this->lastName;
     }
 
-    public function setImageFile(File $image = null)
-    {
-        $this->imageFile = $image;
-
-        return $this;
-    }
-
-    public function getImageFile()
-    {
-        return $this->imageFile;
-    }
-
     public function getNomComplet(): ? string
     {
         if ($this->getLastName() === null) {
@@ -428,6 +431,25 @@ class Personne
     {
         $this->updateAt = $updateAt;
 
+        return $this;
+    }
+
+    /**
+     * Get the value of contentUrl
+     */ 
+    public function getContentUrl()
+    {
+        return $this->contentUrl;
+    }
+
+    /**
+     * Set the value of contentUrl
+     *
+     * @return  self
+     */ 
+    public function setContentUrl(?string $contentUrl)
+    {
+        $this->contentUrl = $contentUrl;
         return $this;
     }
 }
