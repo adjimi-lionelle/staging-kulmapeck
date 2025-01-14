@@ -21,6 +21,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Address;
 
 class RegistrationController extends AbstractController
 {
@@ -39,6 +41,7 @@ class RegistrationController extends AbstractController
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, FileUploader $fileUploader, UserRepository $userRepository, NetworkConfigRepository $networkConfigRepository, PersonneRepository $personneRepository): Response
     {
         $userType = $request->query->get('type', 'student'); // Default to student if no type specified
+        $invitationCode = $request->query->get('code');
         $user = new User();
         
         // Choose form type based on user type
@@ -46,6 +49,11 @@ class RegistrationController extends AbstractController
             $form = $this->createForm(RegistrationTeacherType::class, $user);
         } else {
             $form = $this->createForm(SimpleRegistrationType::class, $user);
+        }
+
+        // Set invitation code if provided
+        if ($invitationCode && $form->has('parentCode')) {
+            $form->get('parentCode')->setData($invitationCode);
         }
         
         $form->handleRequest($request);
@@ -130,20 +138,43 @@ class RegistrationController extends AbstractController
 
             // Handle invitation code for both types
             if ($form->has('parentCode') && $form->get('parentCode')->getData()) {
-                $parentUser = $userRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]);
-                if ($parentUser) {
-                    $personne->setParent($personneRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]));
+                $parentPerson = $personneRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]);
+                if ($parentPerson) {
+                    $personne->setParent($parentPerson);
+                    
+                    // Send email notification to parent only if they have an email
+                    if ($parentPerson->getUtilisateur() && $parentPerson->getUtilisateur()->getEmail()) {
+                        $this->emailVerifier->sendEmailConfirmation('app_verify_email',
+                            $parentPerson->getUtilisateur(),
+                            (new TemplatedEmail())
+                                ->from(new Address('no-reply@kulmapeck.com', 'Kulmapeck'))
+                                ->to($parentPerson->getUtilisateur()->getEmail())
+                                ->subject('New Student Registration Using Your Invitation Code')
+                                ->htmlTemplate('registration/invitation_used_email.html.twig')
+                                ->context([
+                                    'inviter' => $parentPerson,
+                                    'invited' => $personne,
+                                ])
+                        );
+                    }
                 }
             }
 
             // Generate invitation code for both types
             $codeInvitation = $this->invitationCodeGenerator->generateCode();
-            $invitationLink = $request->getSchemeAndHttpHost() . $this->generateUrl('app_front_register', [
-                'code' => $codeInvitation
-            ]);
+            $invitationLinks = [
+                'trainer' => $request->getSchemeAndHttpHost() . $this->generateUrl('app_front_register', [
+                    'type' => 'trainer',
+                    'code' => $codeInvitation
+                ]),
+                'student' => $request->getSchemeAndHttpHost() . $this->generateUrl('app_front_register', [
+                    'type' => 'student',
+                    'code' => $codeInvitation
+                ])
+            ];
 
             $personne->setInvitationCode($codeInvitation)
-                    ->setInvitationLink($invitationLink);
+                    ->setInvitationLink(json_encode($invitationLinks));
 
             $entityManager->persist($user);
             $entityManager->flush();
@@ -167,13 +198,13 @@ class RegistrationController extends AbstractController
         try {
             $this->emailVerifier->handleEmailConfirmation($request, $this->getUser());
         } catch (VerifyEmailExceptionInterface $exception) {
-            $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
+            $this->addFlash('error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
 
-            return $this->redirectToRoute('app_front_register');
+            return $this->redirectToRoute('app_student_profile');
         }
 
-        $this->addFlash('success', 'Your email address has been verified.');
+        $this->addFlash('success', 'Votre adresse email a été vérifiée avec succès.');
 
-        return $this->redirectToRoute('app_front_register');
+        return $this->redirectToRoute('app_student_profile');
     }
 }
