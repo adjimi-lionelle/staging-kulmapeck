@@ -39,6 +39,7 @@ class RegistrationController extends AbstractController
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, FileUploader $fileUploader, UserRepository $userRepository, NetworkConfigRepository $networkConfigRepository, PersonneRepository $personneRepository): Response
     {
         $userType = $request->query->get('type', 'student'); // Default to student if no type specified
+        $invitationCode = $request->query->get('code');
         $user = new User();
         
         // Choose form type based on user type
@@ -46,6 +47,11 @@ class RegistrationController extends AbstractController
             $form = $this->createForm(RegistrationTeacherType::class, $user);
         } else {
             $form = $this->createForm(SimpleRegistrationType::class, $user);
+        }
+
+        // Set invitation code if provided
+        if ($invitationCode && $form->has('parentCode')) {
+            $form->get('parentCode')->setData($invitationCode);
         }
         
         $form->handleRequest($request);

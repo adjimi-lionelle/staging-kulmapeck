@@ -26,8 +26,16 @@
                             <!-- Invitation Code -->
                             <div class="mb-3">
                                 <label class="form-label">Code d'invitation</label>
-                                {{ form_widget(registrationForm.parentCode, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_widget(registrationForm.parentCode, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'readonly': registrationForm.parentCode.vars.value is not empty
+                                    }
+                                }) }}
                                 {{ form_errors(registrationForm.parentCode) }}
+                                {% if registrationForm.parentCode.vars.value is not empty %}
+                                    <small class="text-muted">Code d'invitation appliqué automatiquement</small>
+                                {% endif %}
                             </div>
 
                             <!-- Full Name -->
