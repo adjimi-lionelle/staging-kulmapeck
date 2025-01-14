@@ -125,7 +125,7 @@ class ProfileController extends AbstractController
         
         if (!$this->isCsrfTokenValid('change_email', $request->request->get('_csrf_token'))) {
             $this->addFlash('error', 'Token CSRF invalide.');
-            return $this->redirectToReferer($request);
+            return $this->getProfileRedirect();
         }
 
         $user = $this->getUser();
@@ -134,44 +134,61 @@ class ProfileController extends AbstractController
         // Validate email format
         if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
             $this->addFlash('error', 'Format d\'email invalide.');
-            return $this->redirectToReferer($request);
+            return $this->getProfileRedirect();
         }
 
         // Check if email is already used
         if ($userRepository->findOneBy(['email' => $newEmail])) {
             $this->addFlash('error', 'Cet email est déjà utilisé.');
-            return $this->redirectToReferer($request);
+            return $this->getProfileRedirect();
         }
 
-        // Store the old email for the message
-        $oldEmail = $user->getEmail();
-        
-        // Update email
-        $user->setEmail($newEmail);
-        $user->setIsVerified(false);
-        
-        // Send verification email
-        $this->emailVerifier->sendEmailConfirmation(
-            'app_verify_email',
-            $user,
-            (new TemplatedEmail())
-                ->from(new Address('no-reply@kulmapeck.com', 'Kulmapeck'))
-                ->to($newEmail)
-                ->subject('Veuillez confirmer votre email')
-                ->htmlTemplate('registration/confirmation_email.html.twig')
-        );
+        try {
+            // Store the old email for the message
+            $oldEmail = $user->getEmail();
+            
+            // Update email
+            $user->setEmail($newEmail);
+            $user->setIsVerified(false);
+            
+            // Send verification email
+            $this->emailVerifier->sendEmailConfirmation(
+                'app_verify_email',
+                $user,
+                (new TemplatedEmail())
+                    ->from(new Address('no-reply@kulmapeck.com', 'Kulmapeck'))
+                    ->to($newEmail)
+                    ->subject('Veuillez confirmer votre email')
+                    ->htmlTemplate('registration/confirmation_email.html.twig')
+            );
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+            $entityManager->persist($user);
+            $entityManager->flush();
 
-        // Add appropriate flash message
-        if ($oldEmail) {
-            $this->addFlash('success', 'Votre email a été modifié. Un email de vérification a été envoyé à votre nouvelle adresse.');
+            // Add appropriate flash message
+            if ($oldEmail) {
+                $this->addFlash('success', 'Votre email a été modifié. Un email de vérification a été envoyé à votre nouvelle adresse.');
+            } else {
+                $this->addFlash('success', 'Votre email a été ajouté. Un email de vérification vous a été envoyé.');
+            }
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de l\'email. Veuillez réessayer.');
+        }
+
+        return $this->getProfileRedirect();
+    }
+
+    private function getProfileRedirect(): Response
+    {
+        $user = $this->getUser();
+        
+        if ($user->getEleve()) {
+            return $this->redirectToRoute('app_student_profile');
+        } elseif ($user->getEnseignant()) {
+            return $this->redirectToRoute('app_instructor_profile');
         } else {
-            $this->addFlash('success', 'Votre email a été ajouté. Un email de vérification vous a été envoyé.');
+            return $this->redirectToRoute('app_profile');
         }
-
-        return $this->redirectToReferer($request);
     }
 
     private function redirectToReferer(Request $request): Response
