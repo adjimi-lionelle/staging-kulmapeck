@@ -1,6 +1,6 @@
 {% extends "front/base.html.twig" %}
 
-{% block title %} - CONNEXION{% endblock %}
+{% block title %} - LOGIN{% endblock %}
 
 {% block mainContent %}
     <section class="mb-9 position-relative" style="background-image:url(assets/images/bg/07.jpg); background-position: center left; background-size: cover;">
@@ -11,8 +11,8 @@
 			<!-- Content -->
 			<div class="col-lg-6">
 				<h1 class="text-white">{% trans %}WELCOME_LOGIN_KEY{% endtrans %}</h1>
-				<p class="text-white mb-3">Bienvenue dans notre communauté d'apprentissage. Rejoignez-nous pour une expérience éducative enrichissante.</p>
-				<a href="{{ url("app_front_courses") }}" class="btn btn-white mb-0">Explorez nos cours<i class="bi bi-arrow-right ms-2"></i></a>
+				<p class="text-white mb-3">Man children rejoiced yet uncommonly his ten who. Yet uncommonly his ten who diminution astonished. Yet uncommonly his ten who diminution astonished.</p>
+				<a href="{{ url("app_front_courses") }}" class="btn btn-white mb-0">Explore our courses<i class="bi bi-arrow-right ms-2"></i></a>
 			</div>
 
 			<!-- Form -->
@@ -20,8 +20,8 @@
 				<div class="card card-body shadow p-4 p-sm-5">
 					{% block formBlock %}
 						<!-- Title -->
-						<h2 class="mb-0 h3">Bon retour parmi nous</h2>
-						<p class="mb-0">Nouveau ici ?<a href="#" data-bs-toggle="modal" data-bs-target="#coursePremium"> Créer un compte</a></p>
+						<h2 class="mb-0 h3">Welcome back</h2>
+						<p class="mb-0">New here?<a href="#" data-bs-toggle="modal" data-bs-target="#coursePremium"> Create an account</a></p>
 
                         {% for message in app.flashes('success') %}
                             <div class="alert alert-success">
@@ -36,12 +36,12 @@
 						<form method="post" class="mt-3 mt-sm-4 text-start">
 							<!-- Email -->
 							<div class="mb-3">
-								<label class="form-label">Entrez votre email, nom d'utilisateur ou numéro de téléphone</label>
+								<label class="form-label">Enter email, username, or phone number</label>
 								<input type="text" name="identifier" value="{{ last_username }}" class="form-control">
 							</div>
 							<!-- Password -->
 							<div class="mb-3">
-								<label class="form-label">Entrez votre mot de passe</label>
+								<label class="form-label">Enter password</label>
 								<input class="form-control" type="password" name="password">
 							</div>
 							<!-- Remember me -->
@@ -49,17 +49,17 @@
 							<div class="mb-3 d-sm-flex justify-content-between">
 								<div>
 									<input type="checkbox"  name="_remember_me" class="form-check-input" id="rememberCheck">
-									<label class="form-check-label" for="rememberCheck">Se souvenir de moi</label>
+									<label class="form-check-label" for="rememberCheck">Remember me?</label>
 								</div>
-								<a href="{{ url("app_forgot_password_request") }}" class="text-primary-hover">Mot de passe oublié ?</a>
+								<a href="{{ url("app_forgot_password_request") }}" class="text-primary-hover">Forgot password?</a>
 							</div>
 							<!-- Button -->
-							<div class="d-grid"><button type="submit" class="btn btn-dark mb-0">Se connecter</button></div>
+							<div class="d-grid"><button type="submit" class="btn btn-dark mb-0">Login</button></div>
 
 							<!-- Divider -->
 							<div class="position-relative my-4">
 								<hr>
-								<p class="small position-absolute top-50 start-50 translate-middle bg-body px-2">Ou connectez-vous avec</p>
+								<p class="small position-absolute top-50 start-50 translate-middle bg-body px-2">Or sign in with</p>
 							</div>
 
 							<div class="row g-3">
