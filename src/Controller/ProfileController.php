@@ -171,15 +171,16 @@ class ProfileController extends AbstractController
             
             try {
                 // Send verification email
-                $this->emailVerifier->sendEmailConfirmation(
-                    'app_verify_email',
-                    $user,
-                    (new TemplatedEmail())
-                        ->from(new Address('no-reply@kulmapeck.com', 'Kulmapeck'))
-                        ->to($newEmail)
-                        ->subject('Veuillez confirmer votre email')
-                        ->htmlTemplate('registration/confirmation_email.html.twig')
-                );
+                $email = (new TemplatedEmail())
+                    ->from(new Address('no-reply@kulmapeck.com', 'Kulmapeck'))
+                    ->to($newEmail)
+                    ->subject('Veuillez confirmer votre email')
+                    ->htmlTemplate('registration/confirmation_email.html.twig')
+                    ->context([
+                        'user' => $user
+                    ]);
+
+                $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user, $email);
 
                 // Add appropriate flash message
                 if ($oldEmail) {
@@ -188,6 +189,9 @@ class ProfileController extends AbstractController
                     $this->addFlash('success', 'Votre email a été ajouté. Un email de vérification vous a été envoyé.');
                 }
             } catch (\Exception $e) {
+                // Log the error for debugging
+                error_log('Email sending failed: ' . $e->getMessage());
+                
                 // If email sending fails, revert the changes
                 $user->setEmail($oldEmail);
                 $user->setIsVerified($oldEmail !== null);
@@ -198,6 +202,7 @@ class ProfileController extends AbstractController
                 return $this->getProfileRedirect();
             }
         } catch (\Exception $e) {
+            error_log('Email update failed: ' . $e->getMessage());
             $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de l\'email. Veuillez réessayer.');
             return $this->getProfileRedirect();
         }
