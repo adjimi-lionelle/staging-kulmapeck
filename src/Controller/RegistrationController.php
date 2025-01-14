@@ -129,21 +129,47 @@ class RegistrationController extends AbstractController
             }
 
             // Handle invitation code for both types
+            if ($request->query->get('code')) {
+                $form->get('parentCode')->setData($request->query->get('code'));
+            }
+
+            // Handle invitation code for both types
             if ($form->has('parentCode') && $form->get('parentCode')->getData()) {
-                $parentUser = $userRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]);
-                if ($parentUser) {
-                    $personne->setParent($personneRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]));
+                $parentPerson = $personneRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]);
+                if ($parentPerson) {
+                    $personne->setParent($parentPerson);
+                    
+                    // Send email notification to parent
+                    $this->emailVerifier->sendEmailConfirmation('app_verify_email',
+                        $parentPerson->getUtilisateur(),
+                        (new TemplatedEmail())
+                            ->from(new Address('no-reply@kulmapeck.com', 'Kulmapeck'))
+                            ->to($parentPerson->getUtilisateur()->getEmail())
+                            ->subject('New Student Registration Using Your Invitation Code')
+                            ->htmlTemplate('registration/invitation_used_email.html.twig')
+                            ->context([
+                                'inviter' => $parentPerson,
+                                'invited' => $personne,
+                            ])
+                    );
                 }
             }
 
             // Generate invitation code for both types
             $codeInvitation = $this->invitationCodeGenerator->generateCode();
-            $invitationLink = $request->getSchemeAndHttpHost() . $this->generateUrl('app_front_register', [
-                'code' => $codeInvitation
-            ]);
+            $invitationLinks = [
+                'trainer' => $request->getSchemeAndHttpHost() . $this->generateUrl('app_front_register', [
+                    'type' => 'trainer',
+                    'code' => $codeInvitation
+                ]),
+                'student' => $request->getSchemeAndHttpHost() . $this->generateUrl('app_front_register', [
+                    'type' => 'student',
+                    'code' => $codeInvitation
+                ])
+            ];
 
             $personne->setInvitationCode($codeInvitation)
-                    ->setInvitationLink($invitationLink);
+                    ->setInvitationLink(json_encode($invitationLinks));
 
             $entityManager->persist($user);
             $entityManager->flush();
