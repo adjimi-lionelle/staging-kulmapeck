@@ -165,28 +165,41 @@ class ProfileController extends AbstractController
             $user->setEmail($newEmail);
             $user->setIsVerified(false);
             
-            // Send verification email
-            $this->emailVerifier->sendEmailConfirmation(
-                'app_verify_email',
-                $user,
-                (new TemplatedEmail())
-                    ->from(new Address('no-reply@kulmapeck.com', 'Kulmapeck'))
-                    ->to($newEmail)
-                    ->subject('Veuillez confirmer votre email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
-            );
-
+            // Persist changes before sending email
             $entityManager->persist($user);
             $entityManager->flush();
+            
+            try {
+                // Send verification email
+                $this->emailVerifier->sendEmailConfirmation(
+                    'app_verify_email',
+                    $user,
+                    (new TemplatedEmail())
+                        ->from(new Address('no-reply@kulmapeck.com', 'Kulmapeck'))
+                        ->to($newEmail)
+                        ->subject('Veuillez confirmer votre email')
+                        ->htmlTemplate('registration/confirmation_email.html.twig')
+                );
 
-            // Add appropriate flash message
-            if ($oldEmail) {
-                $this->addFlash('success', 'Votre email a été modifié. Un email de vérification a été envoyé à votre nouvelle adresse.');
-            } else {
-                $this->addFlash('success', 'Votre email a été ajouté. Un email de vérification vous a été envoyé.');
+                // Add appropriate flash message
+                if ($oldEmail) {
+                    $this->addFlash('success', 'Votre email a été modifié. Un email de vérification a été envoyé à votre nouvelle adresse.');
+                } else {
+                    $this->addFlash('success', 'Votre email a été ajouté. Un email de vérification vous a été envoyé.');
+                }
+            } catch (\Exception $e) {
+                // If email sending fails, revert the changes
+                $user->setEmail($oldEmail);
+                $user->setIsVerified($oldEmail !== null);
+                $entityManager->persist($user);
+                $entityManager->flush();
+                
+                $this->addFlash('error', 'Une erreur est survenue lors de l\'envoi de l\'email de vérification. Veuillez réessayer.');
+                return $this->getProfileRedirect();
             }
         } catch (\Exception $e) {
             $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de l\'email. Veuillez réessayer.');
+            return $this->getProfileRedirect();
         }
 
         return $this->getProfileRedirect();

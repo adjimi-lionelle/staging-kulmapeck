@@ -98,8 +98,11 @@
                         <p class="alert alert-info">Ajoutez votre email pour sécuriser votre compte et recevoir des notifications importantes.</p>
                     {% endif %}
 
-                    <!-- Email form -->
-                    <form method="post" class="mt-4">
+                    {% set changeEmailUri = path(app.user.eleve ? 'app_student_profile_change_email' : 
+                                               app.user.enseignant ? 'app_instructor_profile_change_email' : 
+                                               'app_profile_change_email') %}
+                    
+                    <form action="{{ changeEmailUri }}" method="post" class="mt-4">
                         {% if app.user.email %}
                             <div class="mb-3">
                                 <label class="form-label">Email actuel</label>
