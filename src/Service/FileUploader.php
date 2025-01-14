@@ -39,8 +39,11 @@ class FileUploader
         $safeFilename = $this->slugger->slug($originalFilename);
         $extension = $file->guessExtension();
 
-        // Convert to PDF if it's a supported format
-        if (in_array($extension, ['doc', 'docx', 'jpg', 'jpeg', 'png'])) {
+        // Skip PDF conversion for avatar images
+        if (!str_contains($path, 'images/admin') && 
+            !str_contains($path, 'images/eleves') && 
+            !str_contains($path, 'images/enseignants/kyc') &&
+            in_array($extension, ['doc', 'docx', 'jpg', 'jpeg', 'png'])) {
             try {
                 $this->logger->info('Converting file to PDF', [
                     'originalFile' => $originalFilename,
