@@ -135,11 +135,6 @@ class RegistrationController extends AbstractController
             }
 
             // Handle invitation code for both types
-            if ($request->query->get('code')) {
-                $form->get('parentCode')->setData($request->query->get('code'));
-            }
-
-            // Handle invitation code for both types
             if ($form->has('parentCode') && $form->get('parentCode')->getData()) {
                 $parentPerson = $personneRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]);
                 if ($parentPerson) {
