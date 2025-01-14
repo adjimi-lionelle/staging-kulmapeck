@@ -16,17 +16,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ProfileController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
-    private UrlGeneratorInterface $urlGenerator;
 
-    public function __construct(EmailVerifier $emailVerifier, UrlGeneratorInterface $urlGenerator)
+    public function __construct(EmailVerifier $emailVerifier)
     {
         $this->emailVerifier = $emailVerifier;
-        $this->urlGenerator = $urlGenerator;
     }
     
     #[Route('/student/profile', name: 'app_student_profile')]
@@ -55,6 +52,7 @@ class ProfileController extends AbstractController
 
         $personneForm = $this->createForm(PersonneFormType::class, $personne, [
             'action' => $postUri,
+
         ]);
 
         return $this->render($template, [
@@ -87,7 +85,7 @@ class ProfileController extends AbstractController
             $postUri = $this->generateUrl('app_instructor_profile');
             $path = 'images/enseignants/kyc';
             $redirectUri = 'app_instructor_profile';
-        } else {
+        }else {
             $postUri = $this->generateUrl('app_profile_edit');
             $path = 'images/admin';
             $redirectUri = 'app_profile';
@@ -95,35 +93,15 @@ class ProfileController extends AbstractController
 
         $personneForm = $this->createForm(PersonneFormType::class, $personne, [
             'action' => $postUri,
+
         ]);
-        
-        // Handle the form submission without the file
         $personneForm->handleRequest($request);
 
         if ($personneForm->isSubmitted() && $personneForm->isValid()) {
-            // Handle file upload separately
-            $uploadedFile = $request->files->get('personne_form')['imageFile'] ?? null;
-            
-            if ($uploadedFile) {
-                try {
-                    $fileName = $fileUploader->upload($uploadedFile, $path);
-                    if ($fileName) {
-                        $personne->setAvatar($fileName);
-                        
-                        // Set the content URL for the avatar
-                        $avatarUrl = $this->urlGenerator->generate('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL);
-                        $avatarUrl = rtrim($avatarUrl, '/') . '/uploads/' . $path . '/' . $fileName;
-                        $personne->setContentUrl($avatarUrl);
-                        
-                        $personne->setUpdateAt(new \DateTimeImmutable());
-                    }
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Failed to upload image: ' . $e->getMessage());
-                }
-            }
-
+            $this->uploadImagesFiles($personne, $fileUploader, $path);
             $personneRepository->save($personne, true);
-            $this->addFlash('success', 'Your personal information was updated');
+
+            $this->addFlash('success', 'Your personnal informations was updated');
 
             return $this->redirectToRoute($redirectUri);
         }
