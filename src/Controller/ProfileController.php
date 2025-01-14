@@ -86,7 +86,7 @@ class ProfileController extends AbstractController
             $postUri = $this->generateUrl('app_instructor_profile');
             $path = 'images/enseignants/kyc';
             $redirectUri = 'app_instructor_profile';
-        }else {
+        } else {
             $postUri = $this->generateUrl('app_profile_edit');
             $path = 'images/admin';
             $redirectUri = 'app_profile';
@@ -94,15 +94,29 @@ class ProfileController extends AbstractController
 
         $personneForm = $this->createForm(PersonneFormType::class, $personne, [
             'action' => $postUri,
-
         ]);
+        
+        // Handle the form submission without the file
         $personneForm->handleRequest($request);
 
         if ($personneForm->isSubmitted() && $personneForm->isValid()) {
-            $this->uploadImagesFiles($personne, $fileUploader, $path);
-            $personneRepository->save($personne, true);
+            // Handle file upload separately
+            $uploadedFile = $request->files->get('personne_form')['imageFile'] ?? null;
+            
+            if ($uploadedFile) {
+                try {
+                    $fileName = $fileUploader->upload($uploadedFile, $path);
+                    if ($fileName) {
+                        $personne->setAvatar($fileName);
+                        $personne->setUpdateAt(new \DateTimeImmutable());
+                    }
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Failed to upload image: ' . $e->getMessage());
+                }
+            }
 
-            $this->addFlash('success', 'Your personnal informations was updated');
+            $personneRepository->save($personne, true);
+            $this->addFlash('success', 'Your personal information was updated');
 
             return $this->redirectToRoute($redirectUri);
         }
