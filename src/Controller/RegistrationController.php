@@ -21,6 +21,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Address;
 
 class RegistrationController extends AbstractController
 {
@@ -140,19 +142,21 @@ class RegistrationController extends AbstractController
                 if ($parentPerson) {
                     $personne->setParent($parentPerson);
                     
-                    // Send email notification to parent
-                    $this->emailVerifier->sendEmailConfirmation('app_verify_email',
-                        $parentPerson->getUtilisateur(),
-                        (new TemplatedEmail())
-                            ->from(new Address('no-reply@kulmapeck.com', 'Kulmapeck'))
-                            ->to($parentPerson->getUtilisateur()->getEmail())
-                            ->subject('New Student Registration Using Your Invitation Code')
-                            ->htmlTemplate('registration/invitation_used_email.html.twig')
-                            ->context([
-                                'inviter' => $parentPerson,
-                                'invited' => $personne,
-                            ])
-                    );
+                    // Send email notification to parent only if they have an email
+                    if ($parentPerson->getUtilisateur() && $parentPerson->getUtilisateur()->getEmail()) {
+                        $this->emailVerifier->sendEmailConfirmation('app_verify_email',
+                            $parentPerson->getUtilisateur(),
+                            (new TemplatedEmail())
+                                ->from(new Address('no-reply@kulmapeck.com', 'Kulmapeck'))
+                                ->to($parentPerson->getUtilisateur()->getEmail())
+                                ->subject('New Student Registration Using Your Invitation Code')
+                                ->htmlTemplate('registration/invitation_used_email.html.twig')
+                                ->context([
+                                    'inviter' => $parentPerson,
+                                    'invited' => $personne,
+                                ])
+                        );
+                    }
                 }
             }
 
