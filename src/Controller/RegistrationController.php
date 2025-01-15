@@ -27,7 +27,6 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\Security\Core\Exception\TooManyRequestsHttpException;
-use PasswordBlacklist\Validator\PasswordBlacklistValidator;
 
 class RegistrationController extends AbstractController
 {
@@ -94,12 +93,6 @@ class RegistrationController extends AbstractController
             $confirmPassword = $request->request->get('password_confirm');
             if ($plainPassword !== $confirmPassword) {
                 $this->addFlash('error', 'Les mots de passe ne correspondent pas.');
-                return $this->redirectToRoute('app_front_register');
-            }
-
-            // Check for common passwords
-            if ($this->passwordBlacklist->isCommonPassword($plainPassword)) {
-                $this->addFlash('error', 'Ce mot de passe est trop commun. Veuillez en choisir un plus sécurisé.');
                 return $this->redirectToRoute('app_front_register');
             }
 
