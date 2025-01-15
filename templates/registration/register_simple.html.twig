@@ -76,12 +76,10 @@
                                 <small class="text-muted">
                                     {{ 'PASSWORD_REQUIREMENTS_KEY'|trans }}:
                                     <ul class="mt-1 mb-0">
-                                        <li>{{ 'MIN_16_CHARS_KEY'|trans }}</li>
+                                        <li>{{ 'MIN_8_CHARS_KEY'|trans }}</li>
                                         <li>{{ 'UPPERCASE_REQUIRED_KEY'|trans }}</li>
                                         <li>{{ 'LOWERCASE_REQUIRED_KEY'|trans }}</li>
                                         <li>{{ 'NUMBER_REQUIRED_KEY'|trans }}</li>
-                                        <li>{{ 'SPECIAL_CHAR_REQUIRED_KEY'|trans }}</li>
-                                        <li>{{ 'NON_ALPHANUMERIC_REQUIRED_KEY'|trans }}</li>
                                     </ul>
                                 </small>
                             </div>
@@ -125,20 +123,16 @@
             function checkPasswordStrength(password) {
                 let strength = 0;
                 const patterns = {
-                    length: password.length >= 16,
+                    length: password.length >= 8,
                     lowercase: /[a-z]/.test(password),
                     uppercase: /[A-Z]/.test(password),
-                    numbers: /\d/.test(password),
-                    special: /[@$!%*?&]/.test(password),
-                    nonAlphanumeric: /[^\w\s]/.test(password)
+                    numbers: /\d/.test(password)
                 };
 
-                strength += patterns.length ? 20 : 0;
-                strength += patterns.lowercase ? 16 : 0;
-                strength += patterns.uppercase ? 16 : 0;
-                strength += patterns.numbers ? 16 : 0;
-                strength += patterns.special ? 16 : 0;
-                strength += patterns.nonAlphanumeric ? 16 : 0;
+                strength += patterns.length ? 25 : 0;
+                strength += patterns.lowercase ? 25 : 0;
+                strength += patterns.uppercase ? 25 : 0;
+                strength += patterns.numbers ? 25 : 0;
 
                 return {
                     score: strength,
@@ -151,16 +145,16 @@
                 const result = checkPasswordStrength(this.value);
                 strengthBar.style.width = result.score + '%';
                 
-                if (result.score <= 20) {
+                if (result.score <= 25) {
                     strengthBar.className = 'progress-bar bg-danger';
                     strengthText.textContent = '{{ 'VERY_WEAK_KEY'|trans }}';
-                } else if (result.score <= 40) {
+                } else if (result.score <= 50) {
                     strengthBar.className = 'progress-bar bg-warning';
                     strengthText.textContent = '{{ 'WEAK_KEY'|trans }}';
-                } else if (result.score <= 60) {
+                } else if (result.score <= 75) {
                     strengthBar.className = 'progress-bar bg-info';
                     strengthText.textContent = '{{ 'MEDIUM_KEY'|trans }}';
-                } else if (result.score <= 80) {
+                } else if (result.score <= 100) {
                     strengthBar.className = 'progress-bar bg-primary';
                     strengthText.textContent = '{{ 'STRONG_KEY'|trans }}';
                 } else {

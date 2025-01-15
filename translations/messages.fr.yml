@@ -64,7 +64,7 @@ USERNAME_KEY: Nom d'utilisateur
 PHONE_NUMBER_KEY: Numéro de téléphone
 CONFIRM_PASSWORD_KEY: Confirmer le mot de passe
 PASSWORD_REQUIREMENTS_KEY: 'Exigences du mot de passe'
-MIN_16_CHARS_KEY: 'Au moins 16 caractères'
+MIN_8_CHARS_KEY: 'Au moins 8 caractères'
 UPPERCASE_REQUIRED_KEY: 'Au moins une lettre majuscule'
 LOWERCASE_REQUIRED_KEY: 'Au moins une lettre minuscule'
 NUMBER_REQUIRED_KEY: 'Au moins un chiffre'

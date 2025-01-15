@@ -67,12 +67,10 @@ USERNAME_KEY: Username
 PHONE_NUMBER_KEY: Phone number
 CONFIRM_PASSWORD_KEY: Confirm password
 PASSWORD_REQUIREMENTS_KEY: 'Password Requirements'
-MIN_16_CHARS_KEY: 'At least 16 characters'
+MIN_8_CHARS_KEY: 'At least 8 characters'
 UPPERCASE_REQUIRED_KEY: 'At least one uppercase letter'
 LOWERCASE_REQUIRED_KEY: 'At least one lowercase letter'
 NUMBER_REQUIRED_KEY: 'At least one number'
-SPECIAL_CHAR_REQUIRED_KEY: 'At least one special character (@$!%*?&)'
-NON_ALPHANUMERIC_REQUIRED_KEY: 'At least one non-alphanumeric character'
 PASSWORDS_DO_NOT_MATCH_KEY: 'Passwords do not match'
 VERY_WEAK_KEY: 'Very Weak'
 WEAK_KEY: 'Weak'
