@@ -87,7 +87,6 @@ REGISTER_NOW_KEY: Register now
 OR_SIGN_IN_WITH_KEY: Or sign in with
 
 # Registration form
-CREATE_ACCOUNT_KEY: 'Create an account'
 ALREADY_HAVE_ACCOUNT_KEY: 'Already have an account?'
 LOGIN_KEY: 'Login'
 INVITATION_CODE_KEY: 'Invitation code'
