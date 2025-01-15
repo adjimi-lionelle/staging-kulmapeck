@@ -46,10 +46,14 @@ STUDENT_KEY: Student
 # AUTH AND REGISTRATION
 SIGN_IN_KEY: Sign In
 EMAIL_ADDRESS_KEY: Email address
+WELCOME_BACK_KEY: Welcome back
+NEW_HERE_KEY: New here?
+CREATE_ACCOUNT_KEY: Create an account
+LOGIN_CREDENTIALS_KEY: Enter email, username, or phone number
+PASSWORD_KEY: Enter password
+LOGIN_KEY: Login
 WELCOME_LOGIN_KEY: Welcome back to our learning community
 LOGIN_DESCRIPTION_KEY: Sign in to continue your learning journey and access your courses
-CREATE_ACCOUNT_KEY: Create Account
-LOGIN_KEY: Login
 REGISTER_KEY: Register
 WELCOME_COMMUNITY_KEY: Welcome to our community
 WELCOME_LARGEST_COMMUNITY_KEY: Welcome to our largest community
@@ -62,7 +66,6 @@ USERNAME_KEY: Username
 PHONE_NUMBER_KEY: Phone number
 CONFIRM_PASSWORD_KEY: Confirm password
 PASSWORDS_DO_NOT_MATCH_KEY: Passwords do not match
-PASSWORD_KEY: Password
 REMEMBER_ME_KEY: Remember me
 FORGOT_PASSWORD_KEY: Forgot password?
 NO_ACCOUNT_KEY: Don't have an account?

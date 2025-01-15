@@ -46,9 +46,11 @@ STUDENT_KEY: Elève & Apprenant
 # AUTH AND REGISTRATION
 SIGN_IN_KEY: Se connecter
 EMAIL_ADDRESS_KEY: Adresse e-mail
-WELCOME_LOGIN_KEY: Bienvenue dans notre communauté d'apprentissage
-LOGIN_DESCRIPTION_KEY: Connectez-vous pour continuer votre parcours d'apprentissage et accéder à vos cours
+WELCOME_BACK_KEY: Bienvenue
+NEW_HERE_KEY: Nouveau ici?
 CREATE_ACCOUNT_KEY: Créer un compte
+LOGIN_CREDENTIALS_KEY: Entrez email, nom d'utilisateur ou numéro de téléphone
+PASSWORD_KEY: Entrez le mot de passe
 LOGIN_KEY: Se connecter
 REGISTER_KEY: S'inscrire
 WELCOME_COMMUNITY_KEY: Bienvenue dans notre communauté
@@ -62,7 +64,6 @@ USERNAME_KEY: Nom d'utilisateur
 PHONE_NUMBER_KEY: Numéro de téléphone
 CONFIRM_PASSWORD_KEY: Confirmer le mot de passe
 PASSWORDS_DO_NOT_MATCH_KEY: Les mots de passe ne correspondent pas
-PASSWORD_KEY: Mot de passe
 REMEMBER_ME_KEY: Se souvenir de moi
 FORGOT_PASSWORD_KEY: Mot de passe oublié?
 NO_ACCOUNT_KEY: Vous n'avez pas de compte?

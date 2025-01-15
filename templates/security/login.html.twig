@@ -3,61 +3,51 @@
 {% block title %} - {{ 'SIGN_IN_KEY'|trans }}{% endblock %}
 
 {% block mainContent %}
-    <section class="mb-9 position-relative" style="background-image:url(assets/images/bg/07.jpg); background-position: center left; background-size: cover;">
-	<!-- Background dark overlay -->
-	<div class="bg-overlay bg-blue opacity-9"></div>
-	<div class="container z-index-9 position-relative">
-		<div class="row g-4 justify-content-between align-items-center">
-			<!-- Content -->
-			<div class="col-lg-6">
-				<h1 class="text-white">{{ 'WELCOME_LOGIN_KEY'|trans }}</h1>
-				<p class="text-white mb-3">{{ 'LOGIN_DESCRIPTION_KEY'|trans }}</p>
-				<a href="{{ url("app_front_courses") }}" class="btn btn-white mb-0">{{ 'EXPLORE_COURSES_KEY'|trans }}<i class="bi bi-arrow-right ms-2"></i></a>
-			</div>
+<section class="mb-9 position-relative" style="background-image:url(assets/images/bg/07.jpg); background-position: center left; background-size: cover;">
+    <!-- Background dark overlay -->
+    <div class="bg-overlay bg-blue opacity-9"></div>
+    <div class="container z-index-9 position-relative">
+        <div class="row g-4 justify-content-between align-items-center">
+            <!-- Form -->
+            <div class="col-lg-6 col-xl-5 mx-auto">
+                <div class="card card-body p-4 p-sm-5">
+                    <!-- Title -->
+                    <h2 class="mb-2">{{ 'WELCOME_BACK_KEY'|trans }}</h2>
+                    <p class="mb-4">{{ 'NEW_HERE_KEY'|trans }} <a href="{{ path('app_front_register') }}">{{ 'CREATE_ACCOUNT_KEY'|trans }}</a></p>
 
-			<!-- Form -->
-			<div class="col-lg-6 col-xl-5 mb-n9">
-				<div class="card card-body p-4 p-sm-5 mt-n4">
-					<!-- Title -->
-					<h2 class="mb-4">{{ 'SIGN_IN_KEY'|trans }}</h2>
-
-					<!-- Form START -->
-					<form method="post">
-						<!-- Email -->
-						<div class="mb-4">
-							<label for="inputEmail" class="form-label">{{ 'EMAIL_ADDRESS_KEY'|trans }}</label>
-							<input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-						</div>
-						<!-- Password -->
-						<div class="mb-4">
-							<label for="inputPassword" class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
-							<input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
-						</div>
-						<!-- Check box -->
-						<div class="mb-4 d-flex justify-content-between">
-							<div class="form-check">
-								<input type="checkbox" class="form-check-input" id="remember_me" name="_remember_me">
-								<label class="form-check-label" for="remember_me">{{ 'REMEMBER_ME_KEY'|trans }}</label>
-							</div>
-							<div class="text-primary-hover">
-								<a href="{{ path('app_forgot_password_request') }}" class="text-secondary">
-									<u>{{ 'FORGOT_PASSWORD_KEY'|trans }}</u>
-								</a>
-							</div>
-						</div>
-						<!-- Button -->
-						<div class="d-grid gap-2">
-							<button type="submit" class="btn btn-primary mb-2">{{ 'SIGN_IN_KEY'|trans }}</button>
-							<div class="text-center">
-								<span>{{ 'NO_ACCOUNT_KEY'|trans }}</span>
-								<a href="{{ path('app_front_register') }}"><u>{{ 'REGISTER_NOW_KEY'|trans }}</u></a>
-							</div>
-						</div>
-					</form>
-					<!-- Form END -->
-				</div>
-			</div>
-		</div>
-	</div>
-    </section>
+                    <!-- Form START -->
+                    <form method="post">
+                        <!-- Login credentials -->
+                        <div class="mb-4">
+                            <label for="inputEmail" class="form-label">{{ 'LOGIN_CREDENTIALS_KEY'|trans }}</label>
+                            <input type="text" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" required autofocus>
+                        </div>
+                        <!-- Password -->
+                        <div class="mb-4">
+                            <label for="inputPassword" class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
+                            <input type="password" name="password" id="inputPassword" class="form-control" required>
+                        </div>
+                        <!-- Check box -->
+                        <div class="mb-4 d-flex justify-content-between align-items-center">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="remember_me" name="_remember_me">
+                                <label class="form-check-label" for="remember_me">{{ 'REMEMBER_ME_KEY'|trans }}</label>
+                            </div>
+                            <div>
+                                <a href="{{ path('app_forgot_password_request') }}" class="text-secondary">
+                                    <u>{{ 'FORGOT_PASSWORD_KEY'|trans }}</u>
+                                </a>
+                            </div>
+                        </div>
+                        <!-- Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">{{ 'LOGIN_KEY'|trans }}</button>
+                        </div>
+                    </form>
+                    <!-- Form END -->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
