@@ -43,6 +43,26 @@ ACCOUNTMODALDESCRIPTION_KEY: Prosperous understood Middletons in conviction an u
 TEACHER_KEY: Enseigant & Formateur
 STUDENT_KEY: Elève & Apprenant
 
+# AUTH AND REGISTRATION
+CREATE_ACCOUNT_KEY: Créer un compte
+LOGIN_KEY: Se connecter
+REGISTER_KEY: S'inscrire
+WELCOME_COMMUNITY_KEY: Bienvenue dans notre communauté
+JOIN_COMMUNITY_DESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
+ALREADY_HAVE_ACCOUNT_KEY: Vous avez déjà un compte?
+INVITATION_CODE_KEY: Code d'invitation
+INVITATION_CODE_APPLIED_KEY: Code d'invitation appliqué automatiquement
+FULL_NAME_KEY: Nom complet
+USERNAME_KEY: Nom d'utilisateur
+PHONE_NUMBER_KEY: Numéro de téléphone
+CONFIRM_PASSWORD_KEY: Confirmer le mot de passe
+PASSWORDS_DO_NOT_MATCH_KEY: Les mots de passe ne correspondent pas
+PASSWORD_KEY: Mot de passe
+REMEMBER_ME_KEY: Se souvenir de moi
+FORGOT_PASSWORD_KEY: Mot de passe oublié?
+NO_ACCOUNT_KEY: Vous n'avez pas de compte?
+REGISTER_NOW_KEY: S'inscrire maintenant
+
 # FICHIER templates/front/home/header/courses.html.twig
 COURSESCATEGORY_KEY: Catégories de cours
 VIEWALLCATEGORIES_KEY: Toutes les catégories
@@ -237,24 +257,6 @@ BACK_TO_COURSE_KEY: Continuer la lecture
 NEXT_KEY: Suivant
 PREV_KEY: Précédent
 MANY_ANSWERS_POSSIBLE_KEY: Plusieurs réponses sont possibles pour cette question
-
-# REGISTRATION PAGE
-WELCOME_COMMUNITY_KEY: Bienvenue dans notre communauté
-JOIN_COMMUNITY_DESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
-REGISTER_TITLE_KEY: S'inscrire
-
-# REGISTRATION FORM
-CREATE_ACCOUNT_KEY: Créer votre compte
-ALREADY_HAVE_ACCOUNT_KEY: Vous avez déjà un compte?
-LOGIN_KEY: Se connecter
-INVITATION_CODE_KEY: Code d'invitation
-INVITATION_CODE_APPLIED_KEY: Code d'invitation appliqué automatiquement
-FULL_NAME_KEY: Nom complet
-USERNAME_KEY: Nom d'utilisateur
-PHONE_NUMBER_KEY: Numéro de téléphone
-CONFIRM_PASSWORD_KEY: Confirmer le mot de passe
-PASSWORDS_DO_NOT_MATCH_KEY: Les mots de passe ne correspondent pas
-REGISTER_KEY: S'inscrire
 
 # EMAIL TEMPLATES
 INVITATION_CODE_USED_TITLE_KEY: Code d'invitation utilisé
