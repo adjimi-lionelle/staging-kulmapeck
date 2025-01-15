@@ -31,6 +31,7 @@ class SimpleRegistrationType extends AbstractType
     {
         $builder
             ->add('parentCode', TextType::class, [
+                'mapped' => false,
                 'required' => false,
                 'constraints' => [
                     new Regex([
@@ -40,6 +41,7 @@ class SimpleRegistrationType extends AbstractType
                 ]
             ])
             ->add('fullName', TextType::class, [
+                'mapped' => false,
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
@@ -48,6 +50,7 @@ class SimpleRegistrationType extends AbstractType
                 ]
             ])
             ->add('username', TextType::class, [
+                'mapped' => true,
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
@@ -61,6 +64,7 @@ class SimpleRegistrationType extends AbstractType
                 ]
             ])
             ->add('phoneNumber', TextType::class, [
+                'mapped' => true,
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
@@ -74,6 +78,7 @@ class SimpleRegistrationType extends AbstractType
                 ]
             ])
             ->add('plainPassword', PasswordType::class, [
+                'mapped' => false,
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
@@ -98,6 +103,7 @@ class SimpleRegistrationType extends AbstractType
                 ]
             ])
             ->add('agreeTerms', CheckboxType::class, [
+                'mapped' => false,
                 'required' => true,
                 'constraints' => [
                     new IsTrue([

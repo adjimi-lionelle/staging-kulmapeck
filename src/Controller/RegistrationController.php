@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Entity\Personne;
 use App\Entity\Eleve;
 use App\Form\SimpleRegistrationType;
-use App\Form\RegistrationTeacherType;
 use App\Repository\NetworkConfigRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\UserRepository;
@@ -107,6 +106,27 @@ class RegistrationController extends AbstractController
             }
 
             if ($form->isValid()) {
+                // Handle non-mapped fields
+                if ($userType === 'student') {
+                    $fullName = $form->get('fullName')->getData();
+                    $nameParts = explode(' ', trim($fullName));
+                    $firstName = $nameParts[0];
+                    $lastName = isset($nameParts[1]) ? implode(' ', array_slice($nameParts, 1)) : '';
+
+                    // Create and set Personne entity
+                    $personne = new Personne();
+                    $personne->setFirstName($firstName)
+                            ->setLastName($lastName)
+                            ->setPseudo($user->getUsername())
+                            ->setBornAt(new \DateTime('2000-01-01'))
+                            ->setLieuNaissance('')
+                            ->setSexe('N')
+                            ->setTelephone($user->getPhoneNumber())
+                            ->setUtilisateur($user);
+
+                    $user->setPersonne($personne);
+                }
+
                 // encode the plain password
                 $user->setPassword(
                     $userPasswordHasher->hashPassword(
@@ -151,30 +171,6 @@ class RegistrationController extends AbstractController
                 } else {
                     // Handle student registration
                     $user->addRole('ROLE_STUDENT');
-                    
-                    // Create and set Personne entity
-                    $personne = new Personne();
-                    
-                    // Split fullName into firstName and lastName
-                    $fullName = trim($form->get('fullName')->getData());
-                    $nameParts = explode(' ', $fullName);
-                    $firstName = $nameParts[0];
-                    $lastName = isset($nameParts[1]) ? implode(' ', array_slice($nameParts, 1)) : '';
-                    
-                    // Get phone number from the form
-                    $phoneNumber = $form->get('phoneNumber')->getData();
-                    
-                    $personne->setFirstName($firstName)
-                            ->setLastName($lastName)
-                            ->setPseudo($user->getUsername())
-                            ->setBornAt(new \DateTime('2000-01-01'))
-                            ->setLieuNaissance('')
-                            ->setSexe('N')
-                            ->setTelephone($phoneNumber)
-                            ->setUtilisateur($user);
-                    
-                    $user->setPersonne($personne)
-                         ->setPhoneNumber($phoneNumber);
 
                     // Create and set Eleve entity
                     $eleve = new Eleve();
