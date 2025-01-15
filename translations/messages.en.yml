@@ -58,7 +58,7 @@ LEARNEXPERT_KEY: Learn with experts
 GETCERTIFICATE_KEY: Get certificate
 GETMEMBERSHIP_KEY: Get membership
 GETSTARTED_KEY: Get started
-CREATEACCOUNT_KEY: Create account
+CREATE_ACCOUNT_KEY: Create account
 CONGRATULATION_KEY: Congratulations
 ADMISSIONCOMPLETE_KEY: Your admission completed
 DAILYSTUDENT_KEY: Our daily new students
@@ -80,7 +80,10 @@ TRENDINGCOURSESDESCRIPTION_KEY: Check out most courses in the market
 VERIFIEDMENTOR_KEY: Verified Mentors
 FEEDBACK_KEY: Some valuable feedback from our students
 FEEDBACKDESCRIPTION_KEY: Supposing so be resolving breakfast am or perfectly. It drew a hill from me. Valley by oh twenty direct me so. Departure defective arranging rapturous did believe him all had supported. Family months lasted simple set nature vulgar him. Picture for attempt joy excited ten carried manners talking how.
-CREATEANACCOUNT_KEY: Create an account
+LOGIN_KEY: Login
+REGISTER_KEY: Register
+WELCOME_COMMUNITY_KEY: Welcome to our community
+JOIN_COMMUNITY_DESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
 
 WHATDOYOUWATTOLEARN_KEY: What do you want to learn?
 WHATDOYOUWATTOLEARNDESCRIPTION_KEY: Grow your skill with the most reliable online courses and certifications
@@ -168,27 +171,16 @@ EMAIL_ADDRESS_KEY: Email address
 PASSWORD_KEY: Password
 REMEMBER_ME_KEY: Remember me
 FORGOT_PASSWORD_KEY: Forgot password?
-SIGN_IN_KEY: Sign in
-NO_ACCOUNT_KEY: Don't have an account?
-REGISTER_NOW_KEY: Register now
 
 # REGISTRATION PAGE
-WELCOME_LARGEST_COMMUNITY_KEY: Welcome to our largest community
-JOIN_COMMUNITY_DESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
 REGISTER_TITLE_KEY: Register
 
 # REGISTRATION FORM
-CREATE_ACCOUNT_KEY: Create your account
-ALREADY_HAVE_ACCOUNT_KEY: Already have an account?
-LOGIN_KEY: Login
-INVITATION_CODE_KEY: Invitation code
-INVITATION_CODE_APPLIED_KEY: Invitation code automatically applied
 FULL_NAME_KEY: Full name
 USERNAME_KEY: Username
 PHONE_NUMBER_KEY: Phone number
 CONFIRM_PASSWORD_KEY: Confirm password
 PASSWORDS_DO_NOT_MATCH_KEY: Passwords do not match
-REGISTER_KEY: Register
 
 # ABAOUT US
 ABOUTUSMAINTITLE_KEY: Kulmapeck education theme, built specifically for the education centers which is dedicated to teaching and involve learners.
@@ -268,7 +260,6 @@ SUBMIT_KEY: Submit
 HELLOHELP_KEY: Hello, how can we help?
 CATEGORYDESCRIPTION_KEY: Perceived end knowledge certainly day sweetness why cordially
 PERSONNE_NAME_KEY: Last name
-WELCOME_LOGIN_KEY: Welcome to our largest community
 
 I_HAVE_FINISHED_KEY: I've finished this lesson !
 COURSE_PLAYLIST_KEY: Course playlist

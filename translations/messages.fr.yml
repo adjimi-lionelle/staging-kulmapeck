@@ -58,7 +58,7 @@ LEARNEXPERT_KEY: Apprenez avec des experts
 GETCERTIFICATE_KEY: Obtenir un certificat
 GETMEMBERSHIP_KEY: Get membership
 GETSTARTED_KEY: Obtenir l'adhésion
-CREATEACCOUNT_KEY: Créer un compte
+CREATE_ACCOUNT_KEY: Créer un compte
 CONGRATULATION_KEY: Félicitations
 ADMISSIONCOMPLETE_KEY: Votre admission terminée
 DAILYSTUDENT_KEY: Nos nouveaux étudiants quotidiens
@@ -80,6 +80,7 @@ VERIFIEDMENTOR_KEY: Mentors vérifiés
 FEEDBACK_KEY: Quelques précieux retours de nos étudiants
 FEEDBACKDESCRIPTION_KEY: Supposing so be resolving breakfast am or perfectly. It drew a hill from me. Valley by oh twenty direct me so. Departure defective arranging rapturous did believe him all had supported. Family months lasted simple set nature vulgar him. Picture for attempt joy excited ten carried manners talking how.
 CREATEANACCOUNT_KEY: Créer un compte
+CHOOSEACCOUNTTYPE_KEY: Choisir le type de compte
 
 WHATDOYOUWATTOLEARN_KEY: Que voulez-vous apprendre?
 WHATDOYOUWATTOLEARNDESCRIPTION_KEY: Développez vos compétences avec les cours et certifications en ligne les plus fiables
@@ -238,7 +239,7 @@ PREV_KEY: Précédent
 MANY_ANSWERS_POSSIBLE_KEY: Plusieurs réponses sont possibles pour cette question
 
 # REGISTRATION PAGE
-WELCOME_LARGEST_COMMUNITY_KEY: Bienvenue dans notre plus grande communauté
+WELCOME_COMMUNITY_KEY: Bienvenue dans notre communauté
 JOIN_COMMUNITY_DESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
 REGISTER_TITLE_KEY: S'inscrire
 
@@ -312,6 +313,6 @@ EMAIL_ADDRESS_KEY: Adresse e-mail
 PASSWORD_KEY: Mot de passe
 REMEMBER_ME_KEY: Se souvenir de moi
 FORGOT_PASSWORD_KEY: Mot de passe oublié?
-SIGN_IN_KEY: Se connecter
+SIGNIN_KEY: Se connecter
 NO_ACCOUNT_KEY: Vous n'avez pas de compte?
 REGISTER_NOW_KEY: S'inscrire maintenant
