@@ -43,122 +43,138 @@ ACCOUNTMODALDESCRIPTION_KEY: Prosperous understood Middletons in conviction an u
 TEACHER_KEY: Teacher & Trainer
 STUDENT_KEY: Student
 
-# FICHIER templates/front/home/header/courses.html.twig
+# AUTH AND REGISTRATION
+SIGN_IN_KEY: Sign In
+EMAIL_ADDRESS_KEY: Email address
+WELCOME_BACK_KEY: Welcome back
+NEW_HERE_KEY: New here?
+CREATE_ACCOUNT_KEY: 'Create an account'
+LOGIN_CREDENTIALS_KEY: Enter email, username, or phone number
+PASSWORD_KEY: 'Password'
+LOGIN_KEY: 'Login'
+WELCOME_LOGIN_KEY: Welcome back to our learning community
+WELCOME_LARGEST_COMMUNITY_KEY: Welcome to our largest community
+LOGIN_DESCRIPTION_KEY: Man children rejoiced yet uncommonly his ten who. Yet uncommonly his ten who diminution astonished. Yet uncommonly his ten who diminution astonished.
+EXPLORE_COURSES_KEY: Explore our courses
+WELCOME_COMMUNITY_KEY: Welcome to our community
+JOIN_COMMUNITY_DESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
+ALREADY_HAVE_ACCOUNT_KEY: 'Already have an account?'
+INVITATION_CODE_KEY: 'Invitation code'
+INVITATION_CODE_APPLIED_KEY: Invitation code automatically applied
+FULL_NAME_KEY: 'Full name'
+USERNAME_KEY: 'Username'
+PHONE_NUMBER_KEY: 'Phone number'
+CONFIRM_PASSWORD_KEY: 'Confirm password'
+PASSWORD_REQUIREMENTS_KEY: 'Password Requirements'
+MIN_8_CHARS_KEY: 'At least 8 characters'
+UPPERCASE_REQUIRED_KEY: 'At least one uppercase letter'
+LOWERCASE_REQUIRED_KEY: 'At least one lowercase letter'
+NUMBER_REQUIRED_KEY: 'At least one number'
+PASSWORDS_DO_NOT_MATCH_KEY: 'Passwords do not match'
+AGREE_TO_TERMS_KEY: 'By signing up, you agree to the'
+TERMS_KEY: 'terms'
+PASSWORD_STRENGTH_KEY: 'Password Strength'
+VERY_WEAK_KEY: 'Very Weak'
+WEAK_KEY: 'Weak'
+MEDIUM_KEY: 'Medium'
+STRONG_KEY: 'Strong'
+VERY_STRONG_KEY: 'Very Strong'
+REMEMBER_ME_KEY: Remember me
+FORGOT_PASSWORD_KEY: Forgot password?
+NO_ACCOUNT_KEY: Don't have an account?
+REGISTER_NOW_KEY: Register now
+OR_SIGN_IN_WITH_KEY: Or sign in with
+REGISTER_KEY: 'Sign up'
+
+# Form validation errors
+REQUIRED_FIELD_KEY: 'This field is required'
+INVALID_USERNAME_KEY: 'Username can only contain letters, numbers, and underscores'
+INVALID_PHONE_KEY: 'Please enter a valid phone number'
+USERNAME_EXISTS_KEY: 'This username is already taken'
+PHONE_EXISTS_KEY: 'This phone number is already registered'
+TERMS_REQUIRED_KEY: 'You must agree to the terms and conditions'
+INVALID_INVITATION_CODE_KEY: 'Invalid invitation code'
+
+# COURSES AND LEARNING
 COURSESCATEGORY_KEY: Courses categories
 VIEWALLCATEGORIES_KEY: View all categories
 LASTCOURSES_KEY: Last courses
 VIEWMORECOURSES_KEY: View more courses
 DOWNLOADKULMAPECK_KEY: Download Kulmapeck
-
-#  FICHIER template/front/home/_main_barner.html.twig
-MAINMESSAGE_KEY: Limitless learning at your
-FINGERSTIPS_KEY: fingertips
-MAINMESSAGEDESCRIPTION_KEY: Online learning and teaching marketplace with 5K+ courses & 10M students. Taught by experts to help you acquire new skills.
-LEARNEXPERT_KEY: Learn with experts
-GETCERTIFICATE_KEY: Get certificate
-GETMEMBERSHIP_KEY: Get membership
-GETSTARTED_KEY: Get started
-CREATEACCOUNT_KEY: Create account
-CONGRATULATION_KEY: Congratulations
-ADMISSIONCOMPLETE_KEY: Your admission completed
-DAILYSTUDENT_KEY: Our daily new students
-
-
 OONLINECOURSES_KEY: Online Courses
-EXPERTSTUTORS_KEY: Expert Tutors
-ONLINESTUDENTS_KEY: Online Students
-CERTIFIEDCOURSES_KEY: Certified Courses
-MOSTPOPULAR_KEY: Most Popular Courses
+EXPERTSTUTORS_KEY: Expert tutors
+ONLINESTUDENTS_KEY: Online students
+CERTIFIEDCOURSES_KEY: Certified courses
+MOSTPOPULAR_KEY: Most popular courses
 MOSTPOPULARDESCRIPTION_KEY: Choose from hundreds of courses from specialist organizations
 LESSONS_KEY: Lessons
 ALLCOURSES_KEY: All courses
-BECOMEINSTRUCTOR_KEY: Become an Instructor!
+BECOMEINSTRUCTOR_KEY: Become an instructor!
 BECOMEINSTRUCTORDESCRIPTION_KEY: Speedily say has suitable disposal add boy. On forth doubt miles of child. Exercise joy man children rejoiced. Yet uncommonly his ten who diminution astonished
-STARTTEACHINGTODAY_KEY: Start Teaching Today
-TRENDINGCOURSES_KEY: Our Trending Courses
-TRENDINGCOURSESDESCRIPTION_KEY: Check out most 🔥 courses in the market
-VERIFIEDMENTOR_KEY: Verified Mentors
+STARTTEACHINGTODAY_KEY: Start teaching today
+TRENDINGCOURSES_KEY: Our trending courses
+TRENDINGCOURSESDESCRIPTION_KEY: Discover most popular courses on the market
+VERIFIEDMENTOR_KEY: Verified mentors
 FEEDBACK_KEY: Some valuable feedback from our students
 FEEDBACKDESCRIPTION_KEY: Supposing so be resolving breakfast am or perfectly. It drew a hill from me. Valley by oh twenty direct me so. Departure defective arranging rapturous did believe him all had supported. Family months lasted simple set nature vulgar him. Picture for attempt joy excited ten carried manners talking how.
-CREATEANACCOUNT_KEY: Create an account
 
+# SEARCH AND FILTERS
 WHATDOYOUWATTOLEARN_KEY: What do you want to learn?
-WHATDOYOUWATTOLEARNDESCRIPTION_KEY: Grow your skill with the most reliable online courses and certifications
+WHATDOYOUWATTOLEARNDESCRIPTION_KEY: Develop your skills with the most reliable online courses and certifications
 SEARCHCOURSES_KEY: Search courses
-CHOOSECATEGORY_KEY: Choose a Categories
+CHOOSECATEGORY_KEY: Choose category
 CHOOSECATEGORYDESCRIPTION_KEY: Perceived end knowledge certainly day sweetness why cordially
-EARNCERTIFICATE_KEY: Earn a Certificate
+EARNCERTIFICATE_KEY: Earn a certificate
 EARNCERTIFICATEDESCRIPTION_KEY: Get the right professional certificate program for you.
-VIEWPROGRAMS_KEY: View Programs
-BESTRATEDCOURSES_KEY: Best Rated Courses
+VIEWPROGRAMS_KEY: View programs
+BESTRATEDCOURSES_KEY: Best rated courses
 BESTRATEDCOURSESDESCRIPTION_KEY: Enroll now in the most popular and best rated courses.
-BESTRATEDCOURSESBTN_KEY: View Courses
+BESTRATEDCOURSESBTN_KEY: View courses
 SECTORS_KEY: Sectors
 SPECIALTIES_KEY: Specialties
 CLASSES_KEY: Classes
 CATEGORIES_KEY: Categories
 ALL_KEY: All
-ALLLEVEL_KEY: All level
+ALLLEVEL_KEY: All levels
 EASY_KEY: Easy
 INTERMEDIATE_KEY: Intermediate
 DIFFICULT_KEY: Difficult
 VERYDIFFICULT_KEY: Very difficult
 FREE_KEY: Free
 PAID_KEY: Paid
-NORESULTS_KEY: No result
-AREYOUREADYFORCONVERSATION_KEY: Are you ready for a more great Conversation?
+NORESULTS_KEY: No Results
+AREYOUREADYFORCONVERSATION_KEY: Are you ready for a bigger conversation?
 SUBSCRIBE_KEY: Subscribe
 TYPEEMAILHERE_KEY: Type your email here
 DETAILS_KEY: Details
 VIEWMORE_KEY: View more
 EXAMS_KEY: Exams
 SHOWFILTER_KEY: Show filter
-EMPTY_KEY: Empty
-ADVANCEFILTER_KEY: Advance Filter
+EMPTY_KEY: Empty List
+ADVANCEFILTER_KEY: Advanced filter
 CATEGORY_KEY: Category
-SKILLLEVEL_KEY: Skill Level
-FILTERRESULTS_KEY: Filter Results
+SKILLLEVEL_KEY: Skill level
+FILTERRESULTS_KEY: Filter results
 SHOWANSWER_KEY: Show answer
-BACKTOSUBJECT_KEY: Back to Subjet
+BACKTOSUBJECT_KEY: Back to subject
 
-APPLYASINSTRUCTOR_KEY: Apply as Instructor
-APPLYASINSTRUCTORDESCRIPTION_KEY: Satisfied conveying a dependent contented he gentleman agreeable do be. Delivered dejection necessary objection do Mr prevailed. Mr feeling does chiefly cordial in do.
-STARTITLE_KEY: You can be your guiding star with our help
-STARTITLEDESCRIPTION_KEY: As it so contrasted oh estimating instrument. Size like body someone had. Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted.
-STARCREATEACCOUNTDESCRIPTION_KEY: Satisfied conveying a dependent contented he gentleman agreeable do be. Delivered dejection necessary objection do Mr prevailed. Mr feeling does chiefly cordial in do
-STARADDYOURCOURSE_KEY: Add your Course
-STARADDYOURCOURSEDESCRIPTION_KEY: Proceed how any engaged visitor. Explained propriety off out perpetual his you. Feel sold off felt nay rose met you. We so entreaties cultivated astonished is. Was sister for a few longer Mrs sudden talent become. Done may bore quit evil old mile. If likely am of beauty tastes.
-STAREARINGMONEY_KEY: Start Earning Money
-STAREARINGMONEYDESCRIPTITON_KEY: Insipidity the sufficient discretion imprudence resolution sir him decisively.  Delivered dejection necessary objection do Mr prevailed. Mr feeling does chiefly cordial in do
-TOTALSTUDENTS_KEY: Total Students
-TOTALINSTRUCTORS_KEY: Total Instructors
-TOTALCOURSES_KEY: Total Courses
-LANGUAGES_KEY: Languages
-HOWTOBECOMEANINSTRUCTOR_KEY: How to become an Instructor?
-BECOMEANINSTRUCTOR_KEY: Become an Instructor
-INSTRUCTORROLE_KEY: Instructor Role
-STARTWITHCOURSE_KEY: Start with Course
-BECOMEANINSTRUCTORDETAIL_KEY: "<p>As it so contrasted oh estimating instrument. Size like body someone had. Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted. Lively use looked latter regard had. Do he it part more last in. Merits ye if Mr narrow points. Melancholy particular Devonshire alteration it favorable appearance up.</p>
-                            <p>Size like body someone had. Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted. Lively use looked latter regard had. Do he it part more last in. Merits ye if Mr narrow points. Melancholy particular Devonshire alteration it favorable appearance up.</p>
-                            <p>Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted. Lively use looked latter regard had. Do he it part more last in. Merits ye if Mr narrow points. Melancholy particular Devonshire alteration it favorable appearance up.</p>"
-INSTRUCTORROLEDESCRIPTION1_KEY: satisfied conveying a dependent contented he gentleman agreeable do be. Water timed folly right aware if oh truth. Imprudence attachment him his for sympathize. Large above be to means. Dashwood does provide stronger is. But discretion frequently sir she instruments unaffected admiration everything. Meant balls it if up doubt small purse. Required his you put the outlived answered position. A pleasure exertion if believed provided to. All led out world this music while asked. Paid mind even sons does he door no. Attended overcame repeated it is perceived Marianne in. I think on style child of. Servants moreover in sensible it ye possible.
-INSTRUCTORROLEDESCRIPTIONLIST1_KEY: The copy warned the Little blind text
-INSTRUCTORROLEDESCRIPTIONLIST2_KEY: Thar where it came from it would have been rewritten a thousand times and everything that was left from origin would be the world
-INSTRUCTORROLEDESCRIPTIONLIST3_KEY: Return to it's own,safe country
-STARTWITHCOURSEDESCRIPTION1_KEY: Large above be to means. Dashwood does provide stronger is. Warrant private blushes removed an in equally totally if. Delivered dejection necessary objection do Mr prevailed. Mr feeling does chiefly cordial in do. 
-STARTWITHCOURSEDESCRIPTION2_KEY: But discretion frequently sir she instruments unaffected admiration everything. Meant balls it if up doubt small purse. Required his you put the outlived answered position. A pleasure exertion if believed provided to. All led out world this music while asked. Paid mind even sons does he door no. Attended overcame repeated it is perceived Marianne in. I think on style child of. Servants moreover in sensible it ye possible. Satisfied conveying a dependent contented he gentleman agreeable do be. Water timed folly right aware if oh truth. Imprudence attachment him his for sympathize. Large above be to means. Dashwood does provide stronger is.
-STARTWITHCOURSEDESCRIPTION3_KEY: But discretion frequently sir she instruments unaffected admiration everything
-STARTWITHCOURSEDESCRIPTION4_KEY: Meant balls it if up doubt small purse. Required his you put the outlived answered position. A pleasure exertion if believed provided to. All led out world this music while asked. Paid mind even sons does he door no.
-BECOMEANINSTRUCTORLOGINDESCRIPTION_KEY: Speedily say has suitable disposal add boy. On forth doubt miles of child. Exercise joy man children rejoiced. Yet uncommonly his ten who diminution astonished.
+# EMAIL TEMPLATES
+INVITATION_CODE_USED_TITLE_KEY: Invitation Code Used
+NEW_REGISTRATION_WITH_CODE_KEY: New Registration with Your Code
+HELLO_USER_KEY: Hello %user%
+REGISTRATION_NOTIFICATION_KEY: We would like to inform you that %user% has just registered on Kulmapeck using your invitation code.
+VIEW_IN_DASHBOARD_KEY: You can now see this account in your dashboard under "My Invitees" section.
+ACCESS_MY_ACCOUNT_KEY: Access My Account
+THANKS_USING_PLATFORM_KEY: Thank you for using Kulmapeck!
 
-# ABAOUT US
+# ABOUT US
 ABOUTUSMAINTITLE_KEY: Kulmapeck education theme, built specifically for the education centers which is dedicated to teaching and involve learners.
 ABOUTUSPAGE_OURGOALTITLE_KEY: Our goal
 ABOUTUSPAGE_OURGOAL_KEY: Be open to new ideas and approaches. Develop your problem-solving skills.
 ABOUTUSPAGE_ABOUTKULMAPECKTILE_KEY: About Eduport Portal
 ABOUTUSPAGE_ABOUTKULMAPECKDESCRIPTION1_KEY: How promotion excellent curiosity yet attempted happiness Gay prosperous impression had conviction For every delay death ask to style Me mean able my by in they Extremity now strangers contained.
 ABOUTUSPAGE_H4STUDENTS_KEY: 35,000+ happy students joined with us to achieve their goals
-ABOUTUSPAGE_H4STUDENTS1_KEY: How promotion excellent curiosity yet attempted happiness Gay prosperous impression had conviction For every delay death ask to style Me mean able  my by in they Extremity now strangers contained breakfast him discourse additions Sincerity collected contented led now perpetual extremely forfeited
+ABOUTUSPAGE_H4STUDENTS1_KEY: How promotion excellent curiosity yet attempted happiness Gay prosperous impression had conviction For every delay in they Extremity now strangers contained breakfast him discourse additions Sincerity collected contented led now perpetual extremely forfeited
 ABOUTUSPAGE_H4STUDENTS2_KEY: Happiness prosperous impression had conviction For every delay in they Extremity now strangers contained breakfast him discourse additions Sincerity collected contented led now perpetual extremely forfeited
 ABOUTUSPAGE_SETUPTIME_KEY: Setup and installation takes less time
 ABOUTUSPAGE_PROFESSIONAL_KEY: Professional and easy to use software
@@ -180,6 +196,7 @@ CONTACTPAGE_LETSTALK_KEY: Let's talk
 CONTACTPAGE_LETSTALKDESCRIPTION_KEY: To request a quote or want to meet up for coffee, contact us directly or fill out the form and we will get back to you promptly
 CONTACTPAGE_SENDMESSAGEBTN_KEY: Send Message
 
+# FAQ
 NOANSWERFOUND_KEY: No answer found
 REPLY_KEY: Reply
 RESOLVEDBY_KEY: Resolved by these post
@@ -195,6 +212,7 @@ ASKQUESTION_KEY: Ask Your Question
 POST_KEY: Post
 OTHERSTOPICS_KEY: Others topics
 
+# COURSE DETAILS
 TOPLISTED_KEY: Top Listed Courses
 STARTREADING_KEY: Start Reading
 CONTINUE_KEY: Continue
@@ -218,6 +236,7 @@ LESSON_KEY: Lesson
 COURSE_CONTENT_KEY: Course content
 BACKTOCOURSE_KEY: Back to course
 
+# GENERAL
 GETINGSTARTED_KEY: Getting started
 GENERAL_GUIDE_KEY: General guide
 ASSISTANCE_KEY: Assistance
@@ -229,8 +248,8 @@ SUBMIT_KEY: Submit
 HELLOHELP_KEY: Hello, how can we help?
 CATEGORYDESCRIPTION_KEY: Perceived end knowledge certainly day sweetness why cordially
 PERSONNE_NAME_KEY: Last name
-WELCOME_LOGIN_KEY: Welcome to our largest community
 
+# LESSON
 I_HAVE_FINISHED_KEY: I've finished this lesson !
 COURSE_PLAYLIST_KEY: Course playlist
 BACK_TO_COURSE_KEY: Back to course

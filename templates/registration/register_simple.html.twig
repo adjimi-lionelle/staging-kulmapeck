@@ -1,6 +1,6 @@
 {% extends "front/base.html.twig" %}
 
-{% block title %} - Register{% endblock %}
+{% block title %} - {{ 'REGISTER_TITLE_KEY'|trans }}{% endblock %}
 
 {% block mainContent %}
     <section class="mb-9 position-relative" style="background-image:url(assets/images/bg/07.jpg); background-position: center left; background-size: cover;">
@@ -10,115 +10,225 @@
             <div class="row g-4 justify-content-between align-items-center">
                 <!-- Content -->
                 <div class="col-lg-6">
-                    <h1 class="text-white">{% trans %}Welcome to our largest community{% endtrans %}</h1>
-                    <p class="text-white mb-3">Join our community of learners and educators. Create your account to start your learning journey.</p>
-                    <a href="{{ url("app_front_courses") }}" class="btn btn-white mb-0">Explore our courses<i class="bi bi-arrow-right ms-2"></i></a>
+                    <h1 class="text-white">{{ 'WELCOME_LARGEST_COMMUNITY_KEY'|trans }}</h1>
+                    <p class="text-white mb-3">{{ 'JOIN_COMMUNITY_DESCRIPTION_KEY'|trans }}</p>
+                    <a href="{{ url("app_front_courses") }}" class="btn btn-white mb-0">{{ 'EXPLORE_COURSES_KEY'|trans }}<i class="bi bi-arrow-right ms-2"></i></a>
                 </div>
 
                 <!-- Form -->
                 <div class="col-lg-6 col-xl-5 mb-n9">
                     <div class="card card-body shadow p-4 p-sm-5">
-                        <!-- Title -->
-                        <h2 class="mb-0 h3">Créer votre compte</h2>
-                        <p class="mb-0">Vous avez déjà un compte? <a href="{{ path('app_login') }}">Connectez-vous</a></p>
+                        <div class="card-header bg-transparent pb-5">
+                            <h1 class="h3">{{ 'CREATE_ACCOUNT_KEY'|trans }}</h1>
+                            <p class="mb-0">
+                                {{ 'ALREADY_HAVE_ACCOUNT_KEY'|trans }} <a href="{{ path('app_login') }}">{{ 'LOGIN_KEY'|trans }}</a>
+                            </p>
+                        </div>
 
-                        {{ form_start(registrationForm, {'attr': {'class': 'mt-4', 'id': 'registration_form'}}) }}
-                            <!-- Invitation Code -->
-                            <div class="mb-3">
-                                <label class="form-label">Code d'invitation</label>
-                                {{ form_widget(registrationForm.parentCode, {
-                                    'attr': {
-                                        'class': 'form-control',
-                                        'readonly': app.request.query.get('code') is not empty,
-                                        'value': app.request.query.get('code')|default('')
-                                    }
-                                }) }}
-                                {{ form_errors(registrationForm.parentCode) }}
-                                {% if app.request.query.get('code') is not empty %}
-                                    <small class="text-muted">Code d'invitation appliqué automatiquement</small>
-                                {% endif %}
-                            </div>
-
-                            <!-- Full Name -->
-                            <div class="mb-3">
-                                <label class="form-label">Nom complet</label>
-                                {{ form_widget(registrationForm.fullName, {'attr': {'class': 'form-control'}}) }}
-                                {{ form_errors(registrationForm.fullName) }}
-                            </div>
-
-                            <!-- Username -->
-                            <div class="mb-3">
-                                <label class="form-label">Nom d'utilisateur</label>
-                                {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control'}}) }}
-                                {{ form_errors(registrationForm.username) }}
-                            </div>
-
-                            <!-- Phone Number -->
-                            <div class="mb-3">
-                                <label class="form-label">Numéro de téléphone</label>
-                                {{ form_widget(registrationForm.phoneNumber, {'attr': {'class': 'form-control'}}) }}
-                                {{ form_errors(registrationForm.phoneNumber) }}
-                            </div>
-
-                            <!-- Password -->
-                            <div class="mb-3">
-                                <label class="form-label">Mot de passe</label>
-                                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'id': 'password'}}) }}
-                                {{ form_errors(registrationForm.plainPassword) }}
-                            </div>
-
-                            <!-- Password Confirmation -->
-                            <div class="mb-3">
-                                <label class="form-label">Confirmer le mot de passe</label>
-                                <input type="password" class="form-control" id="password_confirm" required>
-                                <div class="invalid-feedback">
-                                    Les mots de passe ne correspondent pas
+                        <div class="card-body">
+                            {{ form_start(registrationForm, {'attr': {'class': 'mt-4', 'id': 'registration_form'}}) }}
+                                <!-- Invitation Code -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'INVITATION_CODE_KEY'|trans }}</label>
+                                    {{ form_widget(registrationForm.parentCode, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form_errors(registrationForm.parentCode) ? ' is-invalid' : ''),
+                                            'value': last_parent_code is defined ? last_parent_code : ''
+                                        }
+                                    }) }}
+                                    {{ form_errors(registrationForm.parentCode) }}
                                 </div>
-                            </div>
 
-                            <!-- Terms -->
-                            <div class="mb-3">
-                                {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input me-2'}}) }}
-                                {{ form_label(registrationForm.agreeTerms, 'En vous inscrivant, vous acceptez les conditions d\'utilisation', {'label_attr': {'class': 'form-check-label'}}) }}
-                                {{ form_errors(registrationForm.agreeTerms) }}
-                            </div>
+                                <!-- Full Name -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'FULL_NAME_KEY'|trans }}</label>
+                                    {{ form_widget(registrationForm.fullName, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form_errors(registrationForm.fullName) ? ' is-invalid' : ''),
+                                            'value': last_fullname is defined ? last_fullname : ''
+                                        }
+                                    }) }}
+                                    {{ form_errors(registrationForm.fullName) }}
+                                </div>
 
-                            <button type="submit" class="btn btn-primary w-100 mb-0" id="submit_btn">S'inscrire</button>
-                        {{ form_end(registrationForm) }}
+                                <!-- Username -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'USERNAME_KEY'|trans }}</label>
+                                    {{ form_widget(registrationForm.username, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form_errors(registrationForm.username) ? ' is-invalid' : ''),
+                                            'value': last_username is defined ? last_username : ''
+                                        }
+                                    }) }}
+                                    {{ form_errors(registrationForm.username) }}
+                                </div>
 
-                        <!-- Password validation script -->
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const form = document.getElementById('registration_form');
-                                const password = document.getElementById('password');
-                                const passwordConfirm = document.getElementById('password_confirm');
-                                const submitBtn = document.getElementById('submit_btn');
+                                <!-- Phone Number -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'PHONE_NUMBER_KEY'|trans }}</label>
+                                    {{ form_widget(registrationForm.phoneNumber, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form_errors(registrationForm.phoneNumber) ? ' is-invalid' : ''),
+                                            'value': last_phone is defined ? last_phone : ''
+                                        }
+                                    }) }}
+                                    {{ form_errors(registrationForm.phoneNumber) }}
+                                </div>
 
-                                function validatePasswords() {
-                                    if (password.value !== passwordConfirm.value) {
-                                        passwordConfirm.classList.add('is-invalid');
-                                        submitBtn.disabled = true;
-                                        return false;
-                                    } else {
-                                        passwordConfirm.classList.remove('is-invalid');
-                                        submitBtn.disabled = false;
-                                        return true;
-                                    }
-                                }
+                                <!-- Password -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
+                                    {{ form_widget(registrationForm.plainPassword, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form_errors(registrationForm.plainPassword) ? ' is-invalid' : ''),
+                                            'id': 'password',
+                                            'value': last_password is defined ? last_password : ''
+                                        }
+                                    }) }}
+                                    {{ form_errors(registrationForm.plainPassword) }}
+                                    <div class="password-strength mt-2">
+                                        <small class="text-muted">{{ 'PASSWORD_STRENGTH_KEY'|trans }}:</small>
+                                        <div class="progress" style="height: 5px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                        <small class="password-strength-text text-muted mt-1"></small>
+                                    </div>
+                                    <small class="text-muted">
+                                        {{ 'PASSWORD_REQUIREMENTS_KEY'|trans }}:
+                                        <ul class="mt-1 mb-0">
+                                            <li>{{ 'MIN_8_CHARS_KEY'|trans }}</li>
+                                            <li>{{ 'UPPERCASE_REQUIRED_KEY'|trans }}</li>
+                                            <li>{{ 'LOWERCASE_REQUIRED_KEY'|trans }}</li>
+                                            <li>{{ 'NUMBER_REQUIRED_KEY'|trans }}</li>
+                                        </ul>
+                                    </small>
+                                </div>
 
-                                password.addEventListener('input', validatePasswords);
-                                passwordConfirm.addEventListener('input', validatePasswords);
+                                <!-- Password Confirmation -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
+                                    <input type="password" 
+                                           class="form-control {{ app.flashes('password_confirm_error') ? 'is-invalid' : '' }}" 
+                                           id="password_confirm" 
+                                           name="password_confirm" 
+                                           required 
+                                           value="{{ last_password_confirm is defined ? last_password_confirm : '' }}">
+                                    {% for message in app.flashes('password_confirm_error') %}
+                                        <div class="invalid-feedback">
+                                            {{ message|trans }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
 
-                                form.addEventListener('submit', function(e) {
-                                    if (!validatePasswords()) {
-                                        e.preventDefault();
-                                    }
-                                });
-                            });
-                        </script>
+                                <!-- Terms -->
+                                <div class="mb-3">
+                                    {{ form_widget(registrationForm.agreeTerms, {
+                                        'attr': {
+                                            'class': 'form-check-input me-2' ~ (form_errors(registrationForm.agreeTerms) ? ' is-invalid' : '')
+                                        }
+                                    }) }}
+                                    <label class="form-check-label">
+                                        {{ 'AGREE_TO_TERMS_KEY'|trans }} <a href="{{ path('app_terms') }}" target="_blank">{{ 'TERMS_KEY'|trans }}</a>
+                                    </label>
+                                    {{ form_errors(registrationForm.agreeTerms) }}
+                                </div>
+
+                                <div class="align-items-center mt-0">
+                                    <button class="btn btn-primary" type="submit" id="submit-button">{{ 'REGISTER_KEY'|trans }}</button>
+                                </div>
+                            {{ form_end(registrationForm) }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            const confirmInput = document.getElementById('password_confirm');
+            const strengthBar = document.querySelector('.password-strength .progress-bar');
+            const strengthText = document.querySelector('.password-strength-text');
+            const form = document.querySelector('form');
+            const submitButton = document.getElementById('submit-button');
+            const passwordMatchError = document.getElementById('password-match-error');
+
+            function validatePasswords() {
+                const passwordsMatch = passwordInput.value === confirmInput.value;
+                if (!passwordsMatch && confirmInput.value !== '') {
+                    confirmInput.classList.add('is-invalid');
+                    passwordMatchError.style.display = 'block';
+                    submitButton.disabled = true;
+                } else {
+                    confirmInput.classList.remove('is-invalid');
+                    passwordMatchError.style.display = 'none';
+                    submitButton.disabled = !passwordsMatch;
+                }
+                return passwordsMatch;
+            }
+
+            // Password strength checker
+            function checkPasswordStrength(password) {
+                let strength = 0;
+                const patterns = {
+                    length: password.length >= 8,
+                    lowercase: /[a-z]/.test(password),
+                    uppercase: /[A-Z]/.test(password),
+                    numbers: /\d/.test(password)
+                };
+
+                strength += patterns.length ? 25 : 0;
+                strength += patterns.lowercase ? 25 : 0;
+                strength += patterns.uppercase ? 25 : 0;
+                strength += patterns.numbers ? 25 : 0;
+
+                return {
+                    score: strength,
+                    patterns: patterns
+                };
+            }
+
+            // Update password strength indicator
+            passwordInput.addEventListener('input', function() {
+                const result = checkPasswordStrength(this.value);
+                strengthBar.style.width = result.score + '%';
+                
+                if (result.score <= 25) {
+                    strengthBar.className = 'progress-bar bg-danger';
+                    strengthText.textContent = '{{ 'VERY_WEAK_KEY'|trans }}';
+                } else if (result.score <= 50) {
+                    strengthBar.className = 'progress-bar bg-warning';
+                    strengthText.textContent = '{{ 'WEAK_KEY'|trans }}';
+                } else if (result.score <= 75) {
+                    strengthBar.className = 'progress-bar bg-info';
+                    strengthText.textContent = '{{ 'MEDIUM_KEY'|trans }}';
+                } else if (result.score <= 100) {
+                    strengthBar.className = 'progress-bar bg-primary';
+                    strengthText.textContent = '{{ 'STRONG_KEY'|trans }}';
+                }
+                if (confirmInput.value !== '') {
+                    validatePasswords();
+                }
+            });
+
+            // Check password confirmation
+            confirmInput.addEventListener('input', validatePasswords);
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                const isValid = validatePasswords();
+                if (!isValid) {
+                    e.preventDefault();
+                    confirmInput.focus();
+                }
+            });
+
+            // Initial validation
+            submitButton.disabled = true;
+        });
+    </script>
 {% endblock %}
