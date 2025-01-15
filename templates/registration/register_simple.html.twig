@@ -26,8 +26,17 @@
                             <!-- Invitation Code -->
                             <div class="mb-3">
                                 <label class="form-label">Code d'invitation</label>
-                                {{ form_widget(registrationForm.parentCode, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_widget(registrationForm.parentCode, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'readonly': app.request.query.get('code') is not empty,
+                                        'value': app.request.query.get('code')|default('')
+                                    }
+                                }) }}
                                 {{ form_errors(registrationForm.parentCode) }}
+                                {% if app.request.query.get('code') is not empty %}
+                                    <small class="text-muted">Code d'invitation appliqué automatiquement</small>
+                                {% endif %}
                             </div>
 
                             <!-- Full Name -->

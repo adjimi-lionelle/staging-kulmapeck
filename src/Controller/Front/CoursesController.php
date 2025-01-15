@@ -431,7 +431,7 @@ class CoursesController extends AbstractController
     
         // Calcul de la période de gratuité
         $dateInscription = $eleve->getJoinAt();
-        $dateFinGratuite = (clone $dateInscription)->modify('+5 days');
+        $dateFinGratuite = (clone $dateInscription)->modify('+1 week');
         $periodeGratuiteActive = new \DateTime() <= $dateFinGratuite;
     
         // Vérification de l'accès au cours

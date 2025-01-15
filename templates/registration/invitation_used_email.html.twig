@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Invitation Code Used{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div style="margin: 20px auto; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h1 style="color: #333; text-align: center; margin-bottom: 20px;">Nouvelle Inscription avec Votre Code</h1>
+        
+        <p style="color: #666; font-size: 16px; line-height: 1.5;">
+            Bonjour {{ inviter.nomComplet }},
+        </p>
+
+        <p style="color: #666; font-size: 16px; line-height: 1.5;">
+            Nous vous informons que <strong>{{ invited.nomComplet }}</strong> vient de s'inscrire sur Kulmapeck en utilisant votre code d'invitation.
+        </p>
+
+        <p style="color: #666; font-size: 16px; line-height: 1.5;">
+            Vous pouvez maintenant voir ce compte dans votre tableau de bord sous la section "Mes Invités".
+        </p>
+
+        <div style="margin: 30px 0; text-align: center;">
+            <a href="{{ url('app_login') }}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
+                Accéder à Mon Compte
+            </a>
+        </div>
+
+        <p style="color: #666; font-size: 14px; text-align: center; margin-top: 30px;">
+            Merci d'utiliser Kulmapeck!
+        </p>
+    </div>
+</div>
+{% endblock %}

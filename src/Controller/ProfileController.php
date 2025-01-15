@@ -10,6 +10,7 @@ use App\Repository\PersonneRepository;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use App\Service\FileUploader;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -85,7 +86,7 @@ class ProfileController extends AbstractController
             $postUri = $this->generateUrl('app_instructor_profile');
             $path = 'images/enseignants/kyc';
             $redirectUri = 'app_instructor_profile';
-        }else {
+        } else {
             $postUri = $this->generateUrl('app_profile_edit');
             $path = 'images/admin';
             $redirectUri = 'app_profile';
@@ -93,15 +94,29 @@ class ProfileController extends AbstractController
 
         $personneForm = $this->createForm(PersonneFormType::class, $personne, [
             'action' => $postUri,
-
         ]);
+        
+        // Handle the form submission without the file
         $personneForm->handleRequest($request);
 
         if ($personneForm->isSubmitted() && $personneForm->isValid()) {
-            $this->uploadImagesFiles($personne, $fileUploader, $path);
-            $personneRepository->save($personne, true);
+            // Handle file upload separately
+            $uploadedFile = $request->files->get('personne_form')['imageFile'] ?? null;
+            
+            if ($uploadedFile) {
+                try {
+                    $fileName = $fileUploader->upload($uploadedFile, $path);
+                    if ($fileName) {
+                        $personne->setAvatar($fileName);
+                        $personne->setUpdateAt(new \DateTimeImmutable());
+                    }
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Failed to upload image: ' . $e->getMessage());
+                }
+            }
 
-            $this->addFlash('success', 'Your personnal informations was updated');
+            $personneRepository->save($personne, true);
+            $this->addFlash('success', 'Your personal information was updated');
 
             return $this->redirectToRoute($redirectUri);
         }
@@ -118,41 +133,100 @@ class ProfileController extends AbstractController
     #[Route('/student/profile/change-email', name: 'app_student_profile_change_email', methods: ['POST'])]
     #[Route('/instructor/profile/change-email', name: 'app_instructor_profile_change_email', methods: ['POST'])]
     #[Route('/admin/profile/change-email', name: 'app_profile_change_email', methods: ['POST'])]
-    public function changeEmail(Request $request, UserRepository $userRepository, PersonneRepository $personneRepository, EleveRepository $eleveRepository): Response 
+    public function changeEmail(Request $request, UserRepository $userRepository, EntityManagerInterface $entityManager): Response
     {
-        $personne = $personneRepository->findOneBy(['utilisateur' => $this->getUser()]);
-        if (!$personne) {
-            throw $this->createAccessDeniedException();
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        
+        if (!$this->isCsrfTokenValid('change_email', $request->request->get('_csrf_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+            return $this->getProfileRedirect();
         }
 
-        $eleve = $personne->getUtilisateur()->getEleve();
-        $enseignant = $personne->getUtilisateur()->getEnseignant();
+        $user = $this->getUser();
+        $newEmail = $request->request->get('new_email');
 
-        $user = $userRepository->findOneBy(['email' => $request->request->get('current_email')]);
+        // Validate email format
+        if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            $this->addFlash('error', 'Format d\'email invalide.');
+            return $this->getProfileRedirect();
+        }
 
-        if ($user === null || $user->getEmail() !== $personne->getUtilisateur()->getEmail()) {
-            $this->addFlash('danger', "L'email " . $request->request->get('current_email') . " ne correspond à aucun n'utilisateur ou est reservé à quelqu'un d'autre");
+        // Check if email is already used
+        if ($userRepository->findOneBy(['email' => $newEmail])) {
+            $this->addFlash('error', 'Cet email est déjà utilisé.');
+            return $this->getProfileRedirect();
+        }
+
+        try {
+            // Store the old email for the message
+            $oldEmail = $user->getEmail();
             
-            return $this->redirectToRoute('app_student_profile');
+            // Update email
+            $user->setEmail($newEmail);
+            $user->setIsVerified(false);
+            
+            // Persist changes before sending email
+            $entityManager->persist($user);
+            $entityManager->flush();
+            
+            try {
+                // Send verification email
+                $email = (new TemplatedEmail())
+                    ->from(new Address('no-reply@kulmapeck.com', 'Kulmapeck'))
+                    ->to($newEmail)
+                    ->subject('Veuillez confirmer votre email')
+                    ->htmlTemplate('registration/confirmation_email.html.twig')
+                    ->context([
+                        'user' => $user
+                    ]);
+
+                $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user, $email);
+
+                // Add appropriate flash message
+                if ($oldEmail) {
+                    $this->addFlash('success', 'Votre email a été modifié. Un email de vérification a été envoyé à votre nouvelle adresse.');
+                } else {
+                    $this->addFlash('success', 'Votre email a été ajouté. Un email de vérification vous a été envoyé.');
+                }
+            } catch (\Exception $e) {
+                // Log the error for debugging
+                error_log('Email sending failed: ' . $e->getMessage());
+                
+                // If email sending fails, revert the changes
+                $user->setEmail($oldEmail);
+                $user->setIsVerified($oldEmail !== null);
+                $entityManager->persist($user);
+                $entityManager->flush();
+                
+                $this->addFlash('error', 'Une erreur est survenue lors de l\'envoi de l\'email de vérification. Veuillez réessayer.');
+                return $this->getProfileRedirect();
+            }
+        } catch (\Exception $e) {
+            error_log('Email update failed: ' . $e->getMessage());
+            $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de l\'email. Veuillez réessayer.');
+            return $this->getProfileRedirect();
         }
 
-        $user->setEmail($request->request->get('new_email'))->setIsVerified(false);
-        $userRepository->save($user, true);
+        return $this->getProfileRedirect();
+    }
 
-        // generate a signed url and email it to the user
-        $this->emailVerifier->sendEmailConfirmation(
-            'app_verify_email',
-            $user,
-            (new TemplatedEmail())
-                ->from('no-reply@kulmapeck.com')
-                ->to($user->getEmail())
-                ->subject('Please Confirm your Email')
-                ->htmlTemplate('registration/confirmation_email.html.twig')
-        );
+    private function getProfileRedirect(): Response
+    {
+        $user = $this->getUser();
+        
+        if ($user->getEleve()) {
+            return $this->redirectToRoute('app_student_profile');
+        } elseif ($user->getEnseignant()) {
+            return $this->redirectToRoute('app_instructor_profile');
+        } else {
+            return $this->redirectToRoute('app_profile');
+        }
+    }
 
-        $this->addFlash('notification', "Votre adresse mail a été modifiée ! Un mail voua a été envoyé pour confirmer que c'est vous !");
-
-        return $this->redirectToRoute('app_logout');
+    private function redirectToReferer(Request $request): Response
+    {
+        $referer = $request->headers->get('referer');
+        return $this->redirect($referer ?: $this->generateUrl('app_home'));
     }
 
     private function uploadImagesFiles(Personne $personne, FileUploader $fileUploader, $path = 'images/eleves')

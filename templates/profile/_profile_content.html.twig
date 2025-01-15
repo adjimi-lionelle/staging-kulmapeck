@@ -88,39 +88,46 @@
             <div class="card bg-transparent border rounded-3">
                 <!-- Card header -->
                 <div class="card-header bg-transparent border-bottom">
-                    <h5 class="card-header-title mb-0">Update email</h5>
+                    <h5 class="card-header-title mb-0">{% if app.user.email %}Modifier l'email{% else %}Ajouter un email{% endif %}</h5>
                 </div>
                 <!-- Card body -->
                 <div class="card-body">
-                    <p class="alert alert-danger">Please note this action is irreversible.</span></p>
-                    <!-- Email -->
-                    {% set changeEmailUri = url("app_student_profile_change_email") %}
-                    {% if enseignant is same as null %}
-                        {% set changeEmailUri = url("app_instructor_profile_change_email") %}
-                    {% elseif enseignant is same as null and student is same as null %}
-                        {% set changeEmailUri = url("app_profile_change_email") %}
+                    {% if app.user.email %}
+                        <p class="alert alert-warning">Attention: Cette action est irréversible.</p>
+                    {% else %}
+                        <p class="alert alert-info">Ajoutez votre email pour sécuriser votre compte et recevoir des notifications importantes.</p>
                     {% endif %}
-                    <form onsubmit="return confirm('Etes-vous sure de vouloir poursuivre cette opération ?')" method="post" action="{{ changeEmailUri }}">
-                        <div class="row g-4">
-                            <div class="col-12">
-                                <label class="form-label">Enter your current email adresse</label>
-                                <input class="form-control" required name="current_email" type="email" placeholder="Enter current email">
+
+                    {% set changeEmailUri = path(app.user.eleve ? 'app_student_profile_change_email' : 
+                                               app.user.enseignant ? 'app_instructor_profile_change_email' : 
+                                               'app_profile_change_email') %}
+                    
+                    <form action="{{ changeEmailUri }}" method="post" class="mt-4">
+                        {% if app.user.email %}
+                            <div class="mb-3">
+                                <label class="form-label">Email actuel</label>
+                                <input type="email" class="form-control" value="{{ app.user.email }}" disabled>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">Enter your new email adresse</label>
-                                <input required class="form-control" name="new_email" type="email" placeholder="Enter new email">
-                            </div>
-                        </div>
+                        {% endif %}
                         
-                        <div class="d-flex justify-content-end mt-4">
-                            <button type="submit" class="btn btn-primary mb-0">Update email</button>
+                        <div class="mb-3">
+                            <label class="form-label">{% if app.user.email %}Nouvel email{% else %}Votre email{% endif %}</label>
+                            <input type="email" name="new_email" class="form-control" required>
+                        </div>
+
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('change_email') }}">
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary mb-0">
+                                {% if app.user.email %}Modifier l'email{% else %}Ajouter l'email{% endif %}
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        <!-- EMail change end -->
-
+        <!-- Email change END -->
+        
         <!-- Password change START -->
         <div class="col-lg-6">
             <div class="card border bg-transparent rounded-3">
