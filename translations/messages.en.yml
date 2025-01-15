@@ -52,6 +52,7 @@ CREATE_ACCOUNT_KEY: Create Account
 LOGIN_KEY: Login
 REGISTER_KEY: Register
 WELCOME_COMMUNITY_KEY: Welcome to our community
+WELCOME_LARGEST_COMMUNITY_KEY: Welcome to our largest community
 JOIN_COMMUNITY_DESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
 ALREADY_HAVE_ACCOUNT_KEY: Already have an account?
 INVITATION_CODE_KEY: Invitation code
