@@ -43,6 +43,30 @@ ACCOUNTMODALDESCRIPTION_KEY: Prosperous understood Middletons in conviction an u
 TEACHER_KEY: Teacher & Trainer
 STUDENT_KEY: Student
 
+# AUTH AND REGISTRATION
+SIGN_IN_KEY: Sign In
+EMAIL_ADDRESS_KEY: Email address
+WELCOME_LOGIN_KEY: Welcome back to our learning community
+LOGIN_DESCRIPTION_KEY: Sign in to continue your learning journey and access your courses
+CREATE_ACCOUNT_KEY: Create Account
+LOGIN_KEY: Login
+REGISTER_KEY: Register
+WELCOME_COMMUNITY_KEY: Welcome to our community
+JOIN_COMMUNITY_DESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
+ALREADY_HAVE_ACCOUNT_KEY: Already have an account?
+INVITATION_CODE_KEY: Invitation code
+INVITATION_CODE_APPLIED_KEY: Invitation code automatically applied
+FULL_NAME_KEY: Full name
+USERNAME_KEY: Username
+PHONE_NUMBER_KEY: Phone number
+CONFIRM_PASSWORD_KEY: Confirm password
+PASSWORDS_DO_NOT_MATCH_KEY: Passwords do not match
+PASSWORD_KEY: Password
+REMEMBER_ME_KEY: Remember me
+FORGOT_PASSWORD_KEY: Forgot password?
+NO_ACCOUNT_KEY: Don't have an account?
+REGISTER_NOW_KEY: Register now
+
 # COURSES AND LEARNING
 COURSESCATEGORY_KEY: Courses categories
 VIEWALLCATEGORIES_KEY: View all categories
@@ -65,30 +89,6 @@ TRENDINGCOURSESDESCRIPTION_KEY: Discover most popular courses on the market
 VERIFIEDMENTOR_KEY: Verified mentors
 FEEDBACK_KEY: Some valuable feedback from our students
 FEEDBACKDESCRIPTION_KEY: Supposing so be resolving breakfast am or perfectly. It drew a hill from me. Valley by oh twenty direct me so. Departure defective arranging rapturous did believe him all had supported. Family months lasted simple set nature vulgar him. Picture for attempt joy excited ten carried manners talking how.
-
-# AUTH AND REGISTRATION
-CREATE_ACCOUNT_KEY: Create Account
-LOGIN_KEY: Login
-REGISTER_KEY: Register
-WELCOME_COMMUNITY_KEY: Welcome to our community
-JOIN_COMMUNITY_DESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
-ALREADY_HAVE_ACCOUNT_KEY: Already have an account?
-INVITATION_CODE_KEY: Invitation code
-INVITATION_CODE_APPLIED_KEY: Invitation code automatically applied
-FULL_NAME_KEY: Full name
-USERNAME_KEY: Username
-PHONE_NUMBER_KEY: Phone number
-CONFIRM_PASSWORD_KEY: Confirm password
-PASSWORDS_DO_NOT_MATCH_KEY: Passwords do not match
-PASSWORD_KEY: Password
-REMEMBER_ME_KEY: Remember me
-FORGOT_PASSWORD_KEY: Forgot password?
-NO_ACCOUNT_KEY: Don't have an account?
-REGISTER_NOW_KEY: Register now
-SIGN_IN_KEY: Sign In
-EMAIL_ADDRESS_KEY: Email address
-WELCOME_LOGIN_KEY: Welcome back to our learning community
-LOGIN_DESCRIPTION_KEY: Sign in to continue your learning journey and access your courses
 
 # SEARCH AND FILTERS
 WHATDOYOUWATTOLEARN_KEY: What do you want to learn?

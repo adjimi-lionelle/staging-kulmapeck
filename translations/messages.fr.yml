@@ -43,30 +43,11 @@ ACCOUNTMODALDESCRIPTION_KEY: Prosperous understood Middletons in conviction an u
 TEACHER_KEY: Enseigant & Formateur
 STUDENT_KEY: Elève & Apprenant
 
-# COURSES AND LEARNING
-COURSESCATEGORY_KEY: Catégories de cours
-VIEWALLCATEGORIES_KEY: Toutes les catégories
-LASTCOURSES_KEY: Derniers cours
-VIEWMORECOURSES_KEY: Voir plus de cours
-DOWNLOADKULMAPECK_KEY: Télécharger Kulmapeck
-OONLINECOURSES_KEY: Online Courses
-EXPERTSTUTORS_KEY: Cours en ligne
-ONLINESTUDENTS_KEY: Étudiants en ligne
-CERTIFIEDCOURSES_KEY: Cours certifiés
-MOSTPOPULAR_KEY: Cours les plus populaires
-MOSTPOPULARDESCRIPTION_KEY: Choisissez parmi des centaines de cours d'organisations spécialisées
-LESSONS_KEY: Leçons
-ALLCOURSES_KEY: Tous les cours
-BECOMEINSTRUCTOR_KEY: Devenir formateur!
-BECOMEINSTRUCTORDESCRIPTION_KEY: Speedily say has suitable disposal add boy. On forth doubt miles of child. Exercise joy man children rejoiced. Yet uncommonly his ten who diminution astonished
-STARTTEACHINGTODAY_KEY: Commencez à enseigner aujourd'hui
-TRENDINGCOURSES_KEY: Nos cours tendances
-TRENDINGCOURSESDESCRIPTION_KEY: Découvrez la plupart des cours sur le marché
-VERIFIEDMENTOR_KEY: Mentors vérifiés
-FEEDBACK_KEY: Quelques précieux retours de nos étudiants
-FEEDBACKDESCRIPTION_KEY: Supposing so be resolving breakfast am or perfectly. It drew a hill from me. Valley by oh twenty direct me so. Departure defective arranging rapturous did believe him all had supported. Family months lasted simple set nature vulgar him. Picture for attempt joy excited ten carried manners talking how.
-
 # AUTH AND REGISTRATION
+SIGN_IN_KEY: Se connecter
+EMAIL_ADDRESS_KEY: Adresse e-mail
+WELCOME_LOGIN_KEY: Bienvenue dans notre communauté d'apprentissage
+LOGIN_DESCRIPTION_KEY: Connectez-vous pour continuer votre parcours d'apprentissage et accéder à vos cours
 CREATE_ACCOUNT_KEY: Créer un compte
 LOGIN_KEY: Se connecter
 REGISTER_KEY: S'inscrire
@@ -85,10 +66,6 @@ REMEMBER_ME_KEY: Se souvenir de moi
 FORGOT_PASSWORD_KEY: Mot de passe oublié?
 NO_ACCOUNT_KEY: Vous n'avez pas de compte?
 REGISTER_NOW_KEY: S'inscrire maintenant
-SIGN_IN_KEY: Se connecter
-EMAIL_ADDRESS_KEY: Adresse e-mail
-WELCOME_LOGIN_KEY: Bienvenue dans notre communauté d'apprentissage
-LOGIN_DESCRIPTION_KEY: Connectez-vous pour continuer votre parcours d'apprentissage et accéder à vos cours
 
 # SEARCH AND FILTERS
 WHATDOYOUWATTOLEARN_KEY: Que voulez-vous apprendre?
@@ -220,7 +197,6 @@ SUBMIT_KEY: Soumettre
 HELLOHELP_KEY: Bonjour, comment pouvons-nous vous aider ?
 CATEGORYDESCRIPTION_KEY: Perceived end knowledge certainly day sweetness why cordially
 PERSONNE_NAME_KEY: Nom de famille
-WELCOME_LOGIN_KEY: Welcome to our largest community
 
 # LESSON
 I_HAVE_FINISHED_KEY: J'ai fini cette leçon, je passe à la leçon suivante !
