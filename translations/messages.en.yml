@@ -53,10 +53,11 @@ LOGIN_CREDENTIALS_KEY: Enter email, username, or phone number
 PASSWORD_KEY: Enter password
 LOGIN_KEY: Login
 WELCOME_LOGIN_KEY: Welcome back to our learning community
-LOGIN_DESCRIPTION_KEY: Sign in to continue your learning journey and access your courses
+WELCOME_LARGEST_COMMUNITY_KEY: Welcome to our largest community
+LOGIN_DESCRIPTION_KEY: Man children rejoiced yet uncommonly his ten who. Yet uncommonly his ten who diminution astonished. Yet uncommonly his ten who diminution astonished.
+EXPLORE_COURSES_KEY: Explore our courses
 REGISTER_KEY: Register
 WELCOME_COMMUNITY_KEY: Welcome to our community
-WELCOME_LARGEST_COMMUNITY_KEY: Welcome to our largest community
 JOIN_COMMUNITY_DESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
 ALREADY_HAVE_ACCOUNT_KEY: Already have an account?
 INVITATION_CODE_KEY: Invitation code
