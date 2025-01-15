@@ -38,7 +38,7 @@ class AppExtension extends AbstractExtension
         }
     
         $dateInscription = $eleve->getJoinAt();
-        $dateFinGratuite = (clone $dateInscription)->modify('+5 days');
+        $dateFinGratuite = (clone $dateInscription)->modify('+1 week');
         $now = new \DateTime();
     
         // Debug : Affichez les dates
