@@ -87,7 +87,6 @@ EXPLORE_COURSES_KEY: Explorer nos cours
 OR_SIGN_IN_WITH_KEY: Ou connectez-vous avec
 
 # Registration form
-CREATE_ACCOUNT_KEY: 'Créer un compte'
 ALREADY_HAVE_ACCOUNT_KEY: 'Vous avez déjà un compte?'
 LOGIN_KEY: 'Se connecter'
 INVITATION_CODE_KEY: 'Code d''invitation'
