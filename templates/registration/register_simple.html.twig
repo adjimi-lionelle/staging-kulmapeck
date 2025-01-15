@@ -31,7 +31,8 @@
                                     'attr': {
                                         'class': 'form-control',
                                         'readonly': invitationCode is not empty,
-                                        'value': invitationCode|default('')
+                                        'value': invitationCode|default(''),
+                                        'placeholder': ''
                                     }
                                 }) }}
                                 {{ form_errors(registrationForm.parentCode) }}
@@ -43,28 +44,28 @@
                             <!-- Full Name -->
                             <div class="mb-3">
                                 <label class="form-label">{{ 'FULL_NAME_KEY'|trans }}</label>
-                                {{ form_widget(registrationForm.fullName, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_widget(registrationForm.fullName, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
                                 {{ form_errors(registrationForm.fullName) }}
                             </div>
 
                             <!-- Username -->
                             <div class="mb-3">
                                 <label class="form-label">{{ 'USERNAME_KEY'|trans }}</label>
-                                {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
                                 {{ form_errors(registrationForm.username) }}
                             </div>
 
                             <!-- Phone Number -->
                             <div class="mb-3">
                                 <label class="form-label">{{ 'PHONE_NUMBER_KEY'|trans }}</label>
-                                {{ form_widget(registrationForm.phoneNumber, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_widget(registrationForm.phoneNumber, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
                                 {{ form_errors(registrationForm.phoneNumber) }}
                             </div>
 
                             <!-- Password -->
                             <div class="mb-3">
                                 <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
-                                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'id': 'password'}}) }}
+                                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'id': 'password', 'placeholder': ''}}) }}
                                 {{ form_errors(registrationForm.plainPassword) }}
                                 <div class="password-strength mt-2">
                                     <div class="progress" style="height: 5px;">
@@ -88,7 +89,7 @@
                             <!-- Password Confirmation -->
                             <div class="mb-3">
                                 <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
-                                <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                                <input type="password" class="form-control" id="password_confirm" name="password_confirm" required placeholder="">
                                 <div class="invalid-feedback">
                                     {{ 'PASSWORDS_DO_NOT_MATCH_KEY'|trans }}
                                 </div>

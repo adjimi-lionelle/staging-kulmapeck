@@ -23,16 +23,13 @@ class SimpleRegistrationType extends AbstractType
                 'mapped' => false,
                 'required' => false,
                 'label' => 'Code d\'invitation',
-                'attr' => [
-                    'placeholder' => 'Code d\'invitation'
-                ]
             ])
             ->add('fullName', TextType::class, [
                 'mapped' => false,
                 'required' => true,
                 'label' => 'Nom complet',
                 'attr' => [
-                    'placeholder' => 'Votre nom complet'
+                    'class' => 'border-0 bg-light rounded-end ps-1',
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -45,7 +42,7 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'label' => 'Nom d\'utilisateur',
                 'attr' => [
-                    'placeholder' => 'Votre nom d\'utilisateur'
+                    'class' => 'border-0 bg-light rounded-end ps-1',
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -63,7 +60,6 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'attr' => [
                     'class' => 'border-0 bg-light rounded-end ps-1',
-                    'placeholder' => 'Numéro de téléphone'
                 ],
                 'constraints' => [
                     new NotBlank([
