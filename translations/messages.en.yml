@@ -56,7 +56,6 @@ WELCOME_LOGIN_KEY: Welcome back to our learning community
 WELCOME_LARGEST_COMMUNITY_KEY: Welcome to our largest community
 LOGIN_DESCRIPTION_KEY: Man children rejoiced yet uncommonly his ten who. Yet uncommonly his ten who diminution astonished. Yet uncommonly his ten who diminution astonished.
 EXPLORE_COURSES_KEY: Explore our courses
-REGISTER_KEY: 'Sign up'
 WELCOME_COMMUNITY_KEY: Welcome to our community
 JOIN_COMMUNITY_DESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
 ALREADY_HAVE_ACCOUNT_KEY: 'Already have an account?'
@@ -85,30 +84,7 @@ FORGOT_PASSWORD_KEY: Forgot password?
 NO_ACCOUNT_KEY: Don't have an account?
 REGISTER_NOW_KEY: Register now
 OR_SIGN_IN_WITH_KEY: Or sign in with
-
-# Registration form
-ALREADY_HAVE_ACCOUNT_KEY: 'Already have an account?'
-INVITATION_CODE_KEY: 'Invitation code'
-INVITATION_CODE_APPLIED_KEY: 'Invitation code automatically applied'
-FULL_NAME_KEY: 'Full name'
-USERNAME_KEY: 'Username'
-PHONE_NUMBER_KEY: 'Phone number'
-PASSWORD_KEY: 'Password'
-CONFIRM_PASSWORD_KEY: 'Confirm password'
-PASSWORD_REQUIREMENTS_KEY: 'Password Requirements'
-MIN_8_CHARS_KEY: 'At least 8 characters'
-UPPERCASE_REQUIRED_KEY: 'At least one uppercase letter'
-LOWERCASE_REQUIRED_KEY: 'At least one lowercase letter'
-NUMBER_REQUIRED_KEY: 'At least one number'
-PASSWORDS_DO_NOT_MATCH_KEY: 'Passwords do not match'
-AGREE_TO_TERMS_KEY: 'By signing up, you agree to the'
-TERMS_KEY: 'terms'
 REGISTER_KEY: 'Sign up'
-PASSWORD_STRENGTH_KEY: 'Password Strength'
-VERY_WEAK_KEY: 'Very Weak'
-WEAK_KEY: 'Weak'
-MEDIUM_KEY: 'Medium'
-STRONG_KEY: 'Strong'
 
 # Form validation errors
 REQUIRED_FIELD_KEY: 'This field is required'

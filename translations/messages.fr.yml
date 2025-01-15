@@ -52,10 +52,13 @@ CREATE_ACCOUNT_KEY: 'Créer un compte'
 LOGIN_CREDENTIALS_KEY: Entrez email, nom d'utilisateur ou numéro de téléphone
 PASSWORD_KEY: 'Mot de passe'
 LOGIN_KEY: 'Se connecter'
-REGISTER_KEY: 'S''inscrire'
-WELCOME_COMMUNITY_KEY: Bienvenue dans notre communauté
+WELCOME_LOGIN_KEY: Bienvenue dans notre communauté d'apprentissage
 WELCOME_LARGEST_COMMUNITY_KEY: Bienvenue dans notre plus grande communauté
+LOGIN_DESCRIPTION_KEY: Les enfants se réjouissaient de manière inhabituelle de ses dix qui. Pourtant, ses dix qui diminuaient étonnamment. Pourtant, ses dix qui diminuaient étonnamment.
+EXPLORE_COURSES_KEY: Explorer nos cours
+WELCOME_COMMUNITY_KEY: Bienvenue dans notre communauté
 JOIN_COMMUNITY_DESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
+ALREADY_HAVE_ACCOUNT_KEY: 'Vous avez déjà un compte?'
 INVITATION_CODE_KEY: 'Code d''invitation'
 INVITATION_CODE_APPLIED_KEY: Code d'invitation appliqué automatiquement
 FULL_NAME_KEY: 'Nom complet'
@@ -81,33 +84,9 @@ REMEMBER_ME_KEY: Se souvenir de moi
 FORGOT_PASSWORD_KEY: Mot de passe oublié?
 NO_ACCOUNT_KEY: Vous n'avez pas de compte?
 REGISTER_NOW_KEY: S'inscrire maintenant
-LOGIN_DESCRIPTION_KEY: Les enfants se réjouissaient de manière inhabituelle de ses dix qui. Pourtant, ses dix qui diminuaient étonnamment. Pourtant, ses dix qui diminuaient étonnamment.
-EXPLORE_COURSES_KEY: Explorer nos cours
 OR_SIGN_IN_WITH_KEY: Ou connectez-vous avec
-
-# Registration form
-ALREADY_HAVE_ACCOUNT_KEY: 'Vous avez déjà un compte?'
-INVITATION_CODE_KEY: 'Code d''invitation'
-INVITATION_CODE_APPLIED_KEY: 'Code d''invitation appliqué automatiquement'
-FULL_NAME_KEY: 'Nom complet'
-USERNAME_KEY: 'Nom d''utilisateur'
-PHONE_NUMBER_KEY: 'Numéro de téléphone'
-PASSWORD_KEY: 'Mot de passe'
-CONFIRM_PASSWORD_KEY: 'Confirmer le mot de passe'
-PASSWORD_REQUIREMENTS_KEY: 'Exigences du mot de passe'
-MIN_8_CHARS_KEY: 'Au moins 8 caractères'
-UPPERCASE_REQUIRED_KEY: 'Au moins une lettre majuscule'
-LOWERCASE_REQUIRED_KEY: 'Au moins une lettre minuscule'
-NUMBER_REQUIRED_KEY: 'Au moins un chiffre'
-PASSWORDS_DO_NOT_MATCH_KEY: 'Les mots de passe ne correspondent pas'
-AGREE_TO_TERMS_KEY: 'En vous inscrivant, vous acceptez les'
-TERMS_KEY: 'conditions d''utilisation'
 REGISTER_KEY: 'S''inscrire'
 PASSWORD_STRENGTH_KEY: 'Force du mot de passe'
-VERY_WEAK_KEY: 'Très Faible'
-WEAK_KEY: 'Faible'
-MEDIUM_KEY: 'Moyen'
-STRONG_KEY: 'Fort'
 
 # Form validation errors
 REQUIRED_FIELD_KEY: 'Ce champ est obligatoire'
