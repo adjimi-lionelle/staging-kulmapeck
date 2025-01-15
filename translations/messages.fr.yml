@@ -237,6 +237,33 @@ NEXT_KEY: Suivant
 PREV_KEY: Précédent
 MANY_ANSWERS_POSSIBLE_KEY: Plusieurs réponses sont possibles pour cette question
 
+# REGISTRATION PAGE
+WELCOME_LARGEST_COMMUNITY_KEY: Bienvenue dans notre plus grande communauté
+JOIN_COMMUNITY_DESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
+REGISTER_TITLE_KEY: S'inscrire
+
+# REGISTRATION FORM
+CREATE_ACCOUNT_KEY: Créer votre compte
+ALREADY_HAVE_ACCOUNT_KEY: Vous avez déjà un compte?
+LOGIN_KEY: Se connecter
+INVITATION_CODE_KEY: Code d'invitation
+INVITATION_CODE_APPLIED_KEY: Code d'invitation appliqué automatiquement
+FULL_NAME_KEY: Nom complet
+USERNAME_KEY: Nom d'utilisateur
+PHONE_NUMBER_KEY: Numéro de téléphone
+CONFIRM_PASSWORD_KEY: Confirmer le mot de passe
+PASSWORDS_DO_NOT_MATCH_KEY: Les mots de passe ne correspondent pas
+REGISTER_KEY: S'inscrire
+
+# EMAIL TEMPLATES
+INVITATION_CODE_USED_TITLE_KEY: Code d'invitation utilisé
+NEW_REGISTRATION_WITH_CODE_KEY: Nouvelle Inscription avec Votre Code
+HELLO_USER_KEY: Bonjour %user%
+REGISTRATION_NOTIFICATION_KEY: Nous vous informons que %user% vient de s'inscrire sur Kulmapeck en utilisant votre code d'invitation.
+VIEW_IN_DASHBOARD_KEY: Vous pouvez maintenant voir ce compte dans votre tableau de bord sous la section "Mes Invités".
+ACCESS_MY_ACCOUNT_KEY: Accéder à Mon Compte
+THANKS_USING_PLATFORM_KEY: Merci d'utiliser Kulmapeck!
+
 # Registration translations
 WELCOME_COMMUNITY_KEY: Bienvenue dans notre communauté
 JOIN_COMMUNITY_DESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
@@ -276,3 +303,15 @@ JOIN_COMMUNITY_KEY: Rejoindre la communauté
 QUICK_START_GUIDE_KEY: Guide de démarrage rapide
 RECOMMENDED_COURSES_KEY: Cours recommandés
 TRENDING_NOW_KEY: Tendances actuelles
+
+# LOGIN PAGE
+WELCOME_LOGIN_KEY: Bienvenue dans notre communauté
+LOGIN_DESCRIPTION_KEY: Connectez-vous pour continuer votre parcours d'apprentissage et accéder à vos cours.
+EXPLORE_COURSES_KEY: Explorer nos cours
+EMAIL_ADDRESS_KEY: Adresse e-mail
+PASSWORD_KEY: Mot de passe
+REMEMBER_ME_KEY: Se souvenir de moi
+FORGOT_PASSWORD_KEY: Mot de passe oublié?
+SIGN_IN_KEY: Se connecter
+NO_ACCOUNT_KEY: Vous n'avez pas de compte?
+REGISTER_NOW_KEY: S'inscrire maintenant
