@@ -23,7 +23,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Security\Http\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
+use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\Security\Core\Exception\TooManyRequestsHttpException;
 use ReCaptcha\ReCaptcha;
 use ReCaptcha\RequestMethod\CurlPost;
@@ -33,31 +35,40 @@ class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
     private InvitationCodeGenerator $invitationCodeGenerator;
-    private RateLimiterFactory $rateLimiter;
-    private ReCaptcha $recaptchaVerifier;
-    private PasswordBlacklistValidator $passwordBlacklist;
+    private ?RateLimiterFactory $rateLimiter = null;
 
     public function __construct(
         EmailVerifier $emailVerifier,
-        InvitationCodeGenerator $invitationCodeGenerator,
-        RateLimiterFactory $rateLimiter,
-        ReCaptcha $recaptchaVerifier,
-        PasswordBlacklistValidator $passwordBlacklist
+        InvitationCodeGenerator $invitationCodeGenerator
     ) {
         $this->emailVerifier = $emailVerifier;
         $this->invitationCodeGenerator = $invitationCodeGenerator;
-        $this->rateLimiter = $rateLimiter;
-        $this->recaptchaVerifier = $recaptchaVerifier;
-        $this->passwordBlacklist = $passwordBlacklist;
+        
+        // Initialize rate limiter with in-memory storage
+        $storage = new InMemoryStorage();
+        $this->rateLimiter = new RateLimiterFactory([
+            'id' => 'registration',
+            'policy' => 'fixed_window',
+            'limit' => 5,
+            'interval' => '15 minutes'
+        ], $storage);
     }
 
     #[Route('/register', name: 'app_front_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, FileUploader $fileUploader, UserRepository $userRepository, NetworkConfigRepository $networkConfigRepository, PersonneRepository $personneRepository): Response
     {
-        // Rate limiting check
-        $rateLimiter = $this->rateLimiter->create($request->getClientIp() . '_register');
-        if (false === $rateLimiter->consume(1)->isAccepted()) {
-            throw new TooManyRequestsHttpException();
+        try {
+            // Rate limiting check
+            if ($this->rateLimiter) {
+                $limiter = $this->rateLimiter->create($request->getClientIp() . '_register');
+                $limit = $limiter->consume();
+                
+                if (!$limit->isAccepted()) {
+                    throw new TooManyRequestsHttpException();
+                }
+            }
+        } catch (TooManyRequestsHttpException $e) {
+            throw $e;
         }
 
         $userType = $request->query->get('type', 'student'); // Default to student if no type specified
