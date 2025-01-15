@@ -56,7 +56,6 @@ REGISTER_KEY: 'S''inscrire'
 WELCOME_COMMUNITY_KEY: Bienvenue dans notre communauté
 WELCOME_LARGEST_COMMUNITY_KEY: Bienvenue dans notre plus grande communauté
 JOIN_COMMUNITY_DESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
-ALREADY_HAVE_ACCOUNT_KEY: 'Vous avez déjà un compte?'
 INVITATION_CODE_KEY: 'Code d''invitation'
 INVITATION_CODE_APPLIED_KEY: Code d'invitation appliqué automatiquement
 FULL_NAME_KEY: 'Nom complet'
