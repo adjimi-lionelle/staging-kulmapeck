@@ -41,7 +41,27 @@ ADDCOMMENT_KEY: Add a comment...
 CHOOSETYPEUSERACCOUNT_KEY: 'Choose a type of <span class="text-success">user account</span>'
 ACCOUNTMODALDESCRIPTION_KEY: Prosperous understood Middletons in conviction an uncommonly do. Supposing so be resolving breakfast am or perfectly.
 TEACHER_KEY: Teacher & Trainer
-STUDENT_KEY: Student
+STUDENT_KEY: Student & Learner
+
+# AUTH AND REGISTRATION
+CREATE_ACCOUNT_KEY: Create account
+LOGIN_KEY: Login
+REGISTER_KEY: Register
+WELCOME_COMMUNITY_KEY: Welcome to our community
+JOIN_COMMUNITY_DESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
+ALREADY_HAVE_ACCOUNT_KEY: Already have an account?
+INVITATION_CODE_KEY: Invitation code
+INVITATION_CODE_APPLIED_KEY: Invitation code automatically applied
+FULL_NAME_KEY: Full name
+USERNAME_KEY: Username
+PHONE_NUMBER_KEY: Phone number
+CONFIRM_PASSWORD_KEY: Confirm password
+PASSWORDS_DO_NOT_MATCH_KEY: Passwords do not match
+PASSWORD_KEY: Password
+REMEMBER_ME_KEY: Remember me
+FORGOT_PASSWORD_KEY: Forgot password?
+NO_ACCOUNT_KEY: Don't have an account?
+REGISTER_NOW_KEY: Register now
 
 # FICHIER templates/front/home/header/courses.html.twig
 COURSESCATEGORY_KEY: Courses categories
@@ -159,18 +179,29 @@ INVITATION_CODE_USED_TITLE_KEY: Invitation Code Used
 NEW_REGISTRATION_WITH_CODE_KEY: New Registration with Your Code
 HELLO_USER_KEY: Hello %user%
 REGISTRATION_NOTIFICATION_KEY: We inform you that %user% has just registered on Kulmapeck using your invitation code.
-VIEW_IN_DASHBOARD_KEY: You can now view this account in your dashboard under "My Invitees" section.
+VIEW_IN_DASHBOARD_KEY: You can now see this account in your dashboard under "My Invitees" section.
 ACCESS_MY_ACCOUNT_KEY: Access My Account
 THANKS_USING_PLATFORM_KEY: Thank you for using Kulmapeck!
 
+# Registration translations
+WELCOME_TITLE_KEY: Welcome to Kulmapeck
+WELCOME_MESSAGE_KEY: Your learning journey starts here
+GET_STARTED_KEY: Get Started
+DISCOVER_COURSES_KEY: Discover Courses
+MEET_INSTRUCTORS_KEY: Meet Instructors
+JOIN_COMMUNITY_KEY: Join Community
+QUICK_START_GUIDE_KEY: Quick Start Guide
+RECOMMENDED_COURSES_KEY: Recommended Courses
+TRENDING_NOW_KEY: Trending Now
+
 # LOGIN PAGE
-WELCOME_LOGIN_KEY: Welcome back to our community
-LOGIN_DESCRIPTION_KEY: Sign in to continue your learning journey and access your courses.
-EXPLORE_COURSES_KEY: Explore our courses
+WELCOME_LOGIN_KEY: Welcome to our community
+LOGIN_DESCRIPTION_KEY: Login to continue your learning journey and access your courses
+EXPLORE_COURSES_KEY: Explore courses
 EMAIL_ADDRESS_KEY: Email address
-PASSWORD_KEY: Password
-REMEMBER_ME_KEY: Remember me
-FORGOT_PASSWORD_KEY: Forgot password?
+SIGNIN_KEY: Sign in
+NO_ACCOUNT_KEY: Don't have an account?
+REGISTER_NOW_KEY: Register now
 
 # REGISTRATION PAGE
 REGISTER_TITLE_KEY: Register

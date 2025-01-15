@@ -70,7 +70,7 @@ LASTCOURSES_KEY: Derniers cours
 VIEWMORECOURSES_KEY: Voir plus de cours
 DOWNLOADKULMAPECK_KEY: Télécharger Kulmapeck
 
-#  FICHIER template/front/home/_main_barner.html.twig
+# FICHIER template/front/home/_main_barner.html.twig
 MAINMESSAGE_KEY: Apprentissage illimité à portée
 FINGERSTIPS_KEY: de main
 MAINMESSAGEDESCRIPTION_KEY: Marché d'apprentissage et d'enseignement en ligne avec plus de 5 000 cours et 10 millions d'étudiants. Enseigné par des experts pour vous aider à acquérir de nouvelles compétences.
@@ -268,9 +268,24 @@ ACCESS_MY_ACCOUNT_KEY: Accéder à Mon Compte
 THANKS_USING_PLATFORM_KEY: Merci d'utiliser Kulmapeck!
 
 # Registration translations
-WELCOME_COMMUNITY_KEY: Bienvenue dans notre communauté
-JOIN_COMMUNITY_DESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
-EXPLORE_COURSES_KEY: Explorez nos cours
+WELCOME_TITLE_KEY: Bienvenue sur Kulmapeck
+WELCOME_MESSAGE_KEY: Votre parcours d'apprentissage commence ici
+GET_STARTED_KEY: Commencer
+DISCOVER_COURSES_KEY: Découvrir les cours
+MEET_INSTRUCTORS_KEY: Rencontrer les formateurs
+JOIN_COMMUNITY_KEY: Rejoindre la communauté
+QUICK_START_GUIDE_KEY: Guide de démarrage rapide
+RECOMMENDED_COURSES_KEY: Cours recommandés
+TRENDING_NOW_KEY: Tendances actuelles
+
+# LOGIN PAGE
+WELCOME_LOGIN_KEY: Bienvenue dans notre communauté
+LOGIN_DESCRIPTION_KEY: Connectez-vous pour continuer votre parcours d'apprentissage et accéder à vos cours
+EXPLORE_COURSES_KEY: Explorer nos cours
+EMAIL_ADDRESS_KEY: Adresse e-mail
+SIGNIN_KEY: Se connecter
+NO_ACCOUNT_KEY: Vous n'avez pas de compte?
+REGISTER_NOW_KEY: S'inscrire maintenant
 
 # Dashboard translations
 DASHBOARD_WELCOME_KEY: Bienvenue sur votre tableau de bord
@@ -295,26 +310,3 @@ SUBSCRIPTION_KEY: Abonnement
 BILLING_KEY: Facturation
 SAVE_CHANGES_KEY: Enregistrer les modifications
 CANCEL_KEY: Annuler
-
-# Welcome screen translations
-WELCOME_TITLE_KEY: Bienvenue sur Kulmapeck
-WELCOME_MESSAGE_KEY: Votre parcours d'apprentissage commence ici
-GET_STARTED_KEY: Commencer
-DISCOVER_COURSES_KEY: Découvrir les cours
-MEET_INSTRUCTORS_KEY: Rencontrer les formateurs
-JOIN_COMMUNITY_KEY: Rejoindre la communauté
-QUICK_START_GUIDE_KEY: Guide de démarrage rapide
-RECOMMENDED_COURSES_KEY: Cours recommandés
-TRENDING_NOW_KEY: Tendances actuelles
-
-# LOGIN PAGE
-WELCOME_LOGIN_KEY: Bienvenue dans notre communauté
-LOGIN_DESCRIPTION_KEY: Connectez-vous pour continuer votre parcours d'apprentissage et accéder à vos cours.
-EXPLORE_COURSES_KEY: Explorer nos cours
-EMAIL_ADDRESS_KEY: Adresse e-mail
-PASSWORD_KEY: Mot de passe
-REMEMBER_ME_KEY: Se souvenir de moi
-FORGOT_PASSWORD_KEY: Mot de passe oublié?
-SIGNIN_KEY: Se connecter
-NO_ACCOUNT_KEY: Vous n'avez pas de compte?
-REGISTER_NOW_KEY: S'inscrire maintenant
