@@ -36,7 +36,7 @@ class SimpleRegistrationType extends AbstractType
                 'constraints' => [
                     new Regex([
                         'pattern' => '/^[A-Z0-9]{8}$/',
-                        'message' => 'INVALID_INVITATION_CODE_KEY'
+                        'message' => '{{ "INVALID_INVITATION_CODE_KEY"|trans }}'
                     ])
                 ]
             ])
@@ -45,7 +45,7 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'REQUIRED_FIELD_KEY'
+                        'message' => '{{ "REQUIRED_FIELD_KEY"|trans }}'
                     ])
                 ]
             ])
@@ -54,11 +54,11 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'REQUIRED_FIELD_KEY'
+                        'message' => '{{ "REQUIRED_FIELD_KEY"|trans }}'
                     ]),
                     new Regex([
                         'pattern' => '/^[a-zA-Z0-9_]+$/',
-                        'message' => 'INVALID_USERNAME_KEY'
+                        'message' => '{{ "INVALID_USERNAME_KEY"|trans }}'
                     ]),
                     new Callback([$this, 'validateUniqueUsername'])
                 ]
@@ -68,11 +68,11 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'REQUIRED_FIELD_KEY'
+                        'message' => '{{ "REQUIRED_FIELD_KEY"|trans }}'
                     ]),
                     new Regex([
                         'pattern' => '/^\+?[0-9]{8,15}$/',
-                        'message' => 'INVALID_PHONE_KEY'
+                        'message' => '{{ "INVALID_PHONE_KEY"|trans }}'
                     ]),
                     new Callback([$this, 'validateUniquePhone'])
                 ]
@@ -82,23 +82,23 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'REQUIRED_FIELD_KEY'
+                        'message' => '{{ "REQUIRED_FIELD_KEY"|trans }}'
                     ]),
                     new Length([
                         'min' => 8,
-                        'minMessage' => 'MIN_8_CHARS_KEY'
+                        'minMessage' => '{{ "MIN_8_CHARS_KEY"|trans }}'
                     ]),
                     new Regex([
                         'pattern' => '/[A-Z]/',
-                        'message' => 'UPPERCASE_REQUIRED_KEY'
+                        'message' => '{{ "UPPERCASE_REQUIRED_KEY"|trans }}'
                     ]),
                     new Regex([
                         'pattern' => '/[a-z]/',
-                        'message' => 'LOWERCASE_REQUIRED_KEY'
+                        'message' => '{{ "LOWERCASE_REQUIRED_KEY"|trans }}'
                     ]),
                     new Regex([
                         'pattern' => '/[0-9]/',
-                        'message' => 'NUMBER_REQUIRED_KEY'
+                        'message' => '{{ "NUMBER_REQUIRED_KEY"|trans }}'
                     ])
                 ]
             ])
@@ -107,7 +107,7 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new IsTrue([
-                        'message' => 'TERMS_REQUIRED_KEY'
+                        'message' => '{{ "TERMS_REQUIRED_KEY"|trans }}'
                     ])
                 ]
             ])
@@ -119,7 +119,7 @@ class SimpleRegistrationType extends AbstractType
         $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $value]);
         
         if ($existingUser) {
-            $context->buildViolation('USERNAME_EXISTS_KEY')
+            $context->buildViolation('{{ "USERNAME_EXISTS_KEY"|trans }}')
                    ->addViolation();
         }
     }
@@ -129,7 +129,7 @@ class SimpleRegistrationType extends AbstractType
         $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['phoneNumber' => $value]);
         
         if ($existingUser) {
-            $context->buildViolation('PHONE_EXISTS_KEY')
+            $context->buildViolation('{{ "PHONE_EXISTS_KEY"|trans }}')
                    ->addViolation();
         }
     }
