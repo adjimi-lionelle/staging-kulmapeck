@@ -30,46 +30,61 @@
                                 <!-- Invitation Code -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'INVITATION_CODE_KEY'|trans }}</label>
-                                    {% set invitationCode = app.request.query.get('code') ?? app.request.query.get('invitation') %}
                                     {{ form_widget(registrationForm.parentCode, {
                                         'attr': {
-                                            'class': 'form-control',
-                                            'readonly': invitationCode is not empty,
-                                            'value': invitationCode|default(''),
-                                            'placeholder': ''
+                                            'class': 'form-control' ~ (form_errors(registrationForm.parentCode) ? ' is-invalid' : ''),
+                                            'value': last_parent_code is defined ? last_parent_code : ''
                                         }
                                     }) }}
                                     {{ form_errors(registrationForm.parentCode) }}
-                                    {% if invitationCode is not empty %}
-                                        <small class="text-muted">{{ 'INVITATION_CODE_APPLIED_KEY'|trans }}</small>
-                                    {% endif %}
                                 </div>
 
                                 <!-- Full Name -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'FULL_NAME_KEY'|trans }}</label>
-                                    {{ form_widget(registrationForm.fullName, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
+                                    {{ form_widget(registrationForm.fullName, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form_errors(registrationForm.fullName) ? ' is-invalid' : ''),
+                                            'value': last_fullname is defined ? last_fullname : ''
+                                        }
+                                    }) }}
                                     {{ form_errors(registrationForm.fullName) }}
                                 </div>
 
                                 <!-- Username -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'USERNAME_KEY'|trans }}</label>
-                                    {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
+                                    {{ form_widget(registrationForm.username, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form_errors(registrationForm.username) ? ' is-invalid' : ''),
+                                            'value': last_username is defined ? last_username : ''
+                                        }
+                                    }) }}
                                     {{ form_errors(registrationForm.username) }}
                                 </div>
 
                                 <!-- Phone Number -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'PHONE_NUMBER_KEY'|trans }}</label>
-                                    {{ form_widget(registrationForm.phoneNumber, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
+                                    {{ form_widget(registrationForm.phoneNumber, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form_errors(registrationForm.phoneNumber) ? ' is-invalid' : ''),
+                                            'value': last_phone is defined ? last_phone : ''
+                                        }
+                                    }) }}
                                     {{ form_errors(registrationForm.phoneNumber) }}
                                 </div>
 
                                 <!-- Password -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
-                                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'id': 'password', 'placeholder': ''}}) }}
+                                    {{ form_widget(registrationForm.plainPassword, {
+                                        'attr': {
+                                            'class': 'form-control' ~ (form_errors(registrationForm.plainPassword) ? ' is-invalid' : ''),
+                                            'id': 'password',
+                                            'value': last_password is defined ? last_password : ''
+                                        }
+                                    }) }}
                                     {{ form_errors(registrationForm.plainPassword) }}
                                     <div class="password-strength mt-2">
                                         <small class="text-muted">{{ 'PASSWORD_STRENGTH_KEY'|trans }}:</small>
@@ -92,18 +107,30 @@
                                 <!-- Password Confirmation -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
-                                    <input type="password" class="form-control" id="password_confirm" name="password_confirm" required placeholder="">
-                                    <div class="text-danger mt-1" id="password-match-error" style="display: none;">
-                                        <i class="fas fa-exclamation-circle"></i> {{ 'PASSWORDS_DO_NOT_MATCH_KEY'|trans }}
-                                    </div>
+                                    <input type="password" 
+                                           class="form-control {{ app.flashes('password_confirm_error') ? 'is-invalid' : '' }}" 
+                                           id="password_confirm" 
+                                           name="password_confirm" 
+                                           required 
+                                           value="{{ last_password_confirm is defined ? last_password_confirm : '' }}">
+                                    {% for message in app.flashes('password_confirm_error') %}
+                                        <div class="invalid-feedback">
+                                            {{ message|trans }}
+                                        </div>
+                                    {% endfor %}
                                 </div>
 
                                 <!-- Terms -->
                                 <div class="mb-3">
-                                    {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input me-2'}}) }}
+                                    {{ form_widget(registrationForm.agreeTerms, {
+                                        'attr': {
+                                            'class': 'form-check-input me-2' ~ (form_errors(registrationForm.agreeTerms) ? ' is-invalid' : '')
+                                        }
+                                    }) }}
                                     <label class="form-check-label">
                                         {{ 'AGREE_TO_TERMS_KEY'|trans }} <a href="{{ path('app_terms') }}" target="_blank">{{ 'TERMS_KEY'|trans }}</a>
                                     </label>
+                                    {{ form_errors(registrationForm.agreeTerms) }}
                                 </div>
 
                                 <div class="align-items-center mt-0">
