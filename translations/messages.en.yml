@@ -71,6 +71,7 @@ REMEMBER_ME_KEY: Remember me
 FORGOT_PASSWORD_KEY: Forgot password?
 NO_ACCOUNT_KEY: Don't have an account?
 REGISTER_NOW_KEY: Register now
+OR_SIGN_IN_WITH_KEY: Or sign in with
 
 # COURSES AND LEARNING
 COURSESCATEGORY_KEY: Courses categories
