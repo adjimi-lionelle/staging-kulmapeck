@@ -41,8 +41,7 @@ class RegistrationController extends AbstractController
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, FileUploader $fileUploader, UserRepository $userRepository, NetworkConfigRepository $networkConfigRepository, PersonneRepository $personneRepository): Response
     {
         $userType = $request->query->get('type', 'student'); // Default to student if no type specified
-        // Support both old and new invitation code syntax
-        $invitationCode = $request->query->get('code') ?? $request->query->get('invitation');
+        $invitationCode = $request->query->get('code');
         $user = new User();
         
         // Choose form type based on user type
