@@ -86,6 +86,41 @@ NO_ACCOUNT_KEY: Don't have an account?
 REGISTER_NOW_KEY: Register now
 OR_SIGN_IN_WITH_KEY: Or sign in with
 
+# Registration form
+CREATE_ACCOUNT_KEY: 'Create an account'
+ALREADY_HAVE_ACCOUNT_KEY: 'Already have an account?'
+LOGIN_KEY: 'Login'
+INVITATION_CODE_KEY: 'Invitation code'
+INVITATION_CODE_APPLIED_KEY: 'Invitation code automatically applied'
+FULL_NAME_KEY: 'Full name'
+USERNAME_KEY: 'Username'
+PHONE_NUMBER_KEY: 'Phone number'
+PASSWORD_KEY: 'Password'
+CONFIRM_PASSWORD_KEY: 'Confirm password'
+PASSWORD_REQUIREMENTS_KEY: 'Password Requirements'
+MIN_8_CHARS_KEY: 'At least 8 characters'
+UPPERCASE_REQUIRED_KEY: 'At least one uppercase letter'
+LOWERCASE_REQUIRED_KEY: 'At least one lowercase letter'
+NUMBER_REQUIRED_KEY: 'At least one number'
+PASSWORDS_DO_NOT_MATCH_KEY: 'Passwords do not match'
+AGREE_TO_TERMS_KEY: 'By signing up, you agree to the'
+TERMS_KEY: 'terms'
+REGISTER_KEY: 'Sign up'
+PASSWORD_STRENGTH_KEY: 'Password Strength'
+VERY_WEAK_KEY: 'Very Weak'
+WEAK_KEY: 'Weak'
+MEDIUM_KEY: 'Medium'
+STRONG_KEY: 'Strong'
+
+# Form validation errors
+REQUIRED_FIELD_KEY: 'This field is required'
+INVALID_USERNAME_KEY: 'Username can only contain letters, numbers, and underscores'
+INVALID_PHONE_KEY: 'Please enter a valid phone number'
+USERNAME_EXISTS_KEY: 'This username is already taken'
+PHONE_EXISTS_KEY: 'This phone number is already registered'
+TERMS_REQUIRED_KEY: 'You must agree to the terms and conditions'
+INVALID_INVITATION_CODE_KEY: 'Invalid invitation code'
+
 # COURSES AND LEARNING
 COURSESCATEGORY_KEY: Courses categories
 VIEWALLCATEGORIES_KEY: View all categories

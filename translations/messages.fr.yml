@@ -86,6 +86,41 @@ LOGIN_DESCRIPTION_KEY: Les enfants se réjouissaient de manière inhabituelle de
 EXPLORE_COURSES_KEY: Explorer nos cours
 OR_SIGN_IN_WITH_KEY: Ou connectez-vous avec
 
+# Registration form
+CREATE_ACCOUNT_KEY: 'Créer un compte'
+ALREADY_HAVE_ACCOUNT_KEY: 'Vous avez déjà un compte?'
+LOGIN_KEY: 'Se connecter'
+INVITATION_CODE_KEY: 'Code d''invitation'
+INVITATION_CODE_APPLIED_KEY: 'Code d''invitation appliqué automatiquement'
+FULL_NAME_KEY: 'Nom complet'
+USERNAME_KEY: 'Nom d''utilisateur'
+PHONE_NUMBER_KEY: 'Numéro de téléphone'
+PASSWORD_KEY: 'Mot de passe'
+CONFIRM_PASSWORD_KEY: 'Confirmer le mot de passe'
+PASSWORD_REQUIREMENTS_KEY: 'Exigences du mot de passe'
+MIN_8_CHARS_KEY: 'Au moins 8 caractères'
+UPPERCASE_REQUIRED_KEY: 'Au moins une lettre majuscule'
+LOWERCASE_REQUIRED_KEY: 'Au moins une lettre minuscule'
+NUMBER_REQUIRED_KEY: 'Au moins un chiffre'
+PASSWORDS_DO_NOT_MATCH_KEY: 'Les mots de passe ne correspondent pas'
+AGREE_TO_TERMS_KEY: 'En vous inscrivant, vous acceptez les'
+TERMS_KEY: 'conditions d''utilisation'
+REGISTER_KEY: 'S''inscrire'
+PASSWORD_STRENGTH_KEY: 'Force du mot de passe'
+VERY_WEAK_KEY: 'Très Faible'
+WEAK_KEY: 'Faible'
+MEDIUM_KEY: 'Moyen'
+STRONG_KEY: 'Fort'
+
+# Form validation errors
+REQUIRED_FIELD_KEY: 'Ce champ est obligatoire'
+INVALID_USERNAME_KEY: 'Le nom d''utilisateur ne peut contenir que des lettres, des chiffres et des tirets bas'
+INVALID_PHONE_KEY: 'Veuillez entrer un numéro de téléphone valide'
+USERNAME_EXISTS_KEY: 'Ce nom d''utilisateur est déjà pris'
+PHONE_EXISTS_KEY: 'Ce numéro de téléphone est déjà enregistré'
+TERMS_REQUIRED_KEY: 'Vous devez accepter les conditions d''utilisation'
+INVALID_INVITATION_CODE_KEY: 'Code d''invitation invalide'
+
 # SEARCH AND FILTERS
 WHATDOYOUWATTOLEARN_KEY: Que voulez-vous apprendre?
 WHATDOYOUWATTOLEARNDESCRIPTION_KEY: Développez vos compétences avec les cours et certifications en ligne les plus fiables
