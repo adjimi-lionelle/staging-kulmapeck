@@ -85,6 +85,10 @@ REMEMBER_ME_KEY: Se souvenir de moi
 FORGOT_PASSWORD_KEY: Mot de passe oublié?
 NO_ACCOUNT_KEY: Vous n'avez pas de compte?
 REGISTER_NOW_KEY: S'inscrire maintenant
+SIGN_IN_KEY: Se connecter
+EMAIL_ADDRESS_KEY: Adresse e-mail
+WELCOME_LOGIN_KEY: Bienvenue dans notre communauté d'apprentissage
+LOGIN_DESCRIPTION_KEY: Connectez-vous pour continuer votre parcours d'apprentissage et accéder à vos cours
 
 # SEARCH AND FILTERS
 WHATDOYOUWATTOLEARN_KEY: Que voulez-vous apprendre?
