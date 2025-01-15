@@ -88,7 +88,7 @@
                             <div class="mb-3">
                                 <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
                                 <input type="password" class="form-control" id="password_confirm" name="password_confirm" required placeholder="">
-                                <div class="invalid-feedback">
+                                <div class="invalid-feedback" id="password-match-error">
                                     {{ 'PASSWORDS_DO_NOT_MATCH_KEY'|trans }}
                                 </div>
                             </div>
@@ -96,11 +96,14 @@
                             <!-- Terms -->
                             <div class="mb-3">
                                 {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input me-2'}}) }}
-                                {{ form_label(registrationForm.agreeTerms, 'En vous inscrivant, vous acceptez les conditions d\'utilisation', {'label_attr': {'class': 'form-check-label'}}) }}
-                                {{ form_errors(registrationForm.agreeTerms) }}
+                                <label class="form-check-label">
+                                    {{ 'AGREE_TO_TERMS_KEY'|trans }} <a href="{{ path('app_terms') }}" target="_blank">{{ 'TERMS_KEY'|trans }}</a>
+                                </label>
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100 mb-0" id="submit_btn">{{ 'REGISTER_KEY'|trans }}</button>
+                            <div class="align-items-center mt-0">
+                                <button class="btn btn-primary" type="submit" id="submit-button">{{ 'REGISTER_KEY'|trans }}</button>
+                            </div>
                         {{ form_end(registrationForm) }}
                     </div>
                 </div>
@@ -117,7 +120,23 @@
             const confirmInput = document.getElementById('password_confirm');
             const strengthBar = document.querySelector('.password-strength .progress-bar');
             const strengthText = document.querySelector('.password-strength-text');
-            const form = document.getElementById('registration_form');
+            const form = document.querySelector('form');
+            const submitButton = document.getElementById('submit-button');
+            const passwordMatchError = document.getElementById('password-match-error');
+
+            function validatePasswords() {
+                const passwordsMatch = passwordInput.value === confirmInput.value;
+                if (!passwordsMatch) {
+                    confirmInput.classList.add('is-invalid');
+                    passwordMatchError.style.display = 'block';
+                    submitButton.disabled = true;
+                } else {
+                    confirmInput.classList.remove('is-invalid');
+                    passwordMatchError.style.display = 'none';
+                    submitButton.disabled = false;
+                }
+                return passwordsMatch;
+            }
 
             // Password strength checker
             function checkPasswordStrength(password) {
@@ -157,28 +176,22 @@
                 } else if (result.score <= 100) {
                     strengthBar.className = 'progress-bar bg-primary';
                     strengthText.textContent = '{{ 'STRONG_KEY'|trans }}';
-                } else {
-                    strengthBar.className = 'progress-bar bg-success';
-                    strengthText.textContent = '{{ 'VERY_STRONG_KEY'|trans }}';
                 }
+                validatePasswords();
             });
 
             // Check password confirmation
-            confirmInput.addEventListener('input', function() {
-                if (this.value !== passwordInput.value) {
-                    this.classList.add('is-invalid');
-                } else {
-                    this.classList.remove('is-invalid');
-                }
-            });
+            confirmInput.addEventListener('input', validatePasswords);
 
             // Form submission
             form.addEventListener('submit', function(e) {
-                if (passwordInput.value !== confirmInput.value) {
+                if (!validatePasswords()) {
                     e.preventDefault();
-                    confirmInput.classList.add('is-invalid');
                 }
             });
+
+            // Initial validation
+            submitButton.disabled = true;
         });
     </script>
 {% endblock %}
