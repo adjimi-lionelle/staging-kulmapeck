@@ -48,30 +48,33 @@ SIGN_IN_KEY: Sign In
 EMAIL_ADDRESS_KEY: Email address
 WELCOME_BACK_KEY: Welcome back
 NEW_HERE_KEY: New here?
-CREATE_ACCOUNT_KEY: Create an account
+CREATE_ACCOUNT_KEY: 'Create an account'
 LOGIN_CREDENTIALS_KEY: Enter email, username, or phone number
-PASSWORD_KEY: Enter password
-LOGIN_KEY: Login
+PASSWORD_KEY: 'Password'
+LOGIN_KEY: 'Login'
 WELCOME_LOGIN_KEY: Welcome back to our learning community
 WELCOME_LARGEST_COMMUNITY_KEY: Welcome to our largest community
 LOGIN_DESCRIPTION_KEY: Man children rejoiced yet uncommonly his ten who. Yet uncommonly his ten who diminution astonished. Yet uncommonly his ten who diminution astonished.
 EXPLORE_COURSES_KEY: Explore our courses
-REGISTER_KEY: Register
+REGISTER_KEY: 'Sign up'
 WELCOME_COMMUNITY_KEY: Welcome to our community
 JOIN_COMMUNITY_DESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
-ALREADY_HAVE_ACCOUNT_KEY: Already have an account?
-INVITATION_CODE_KEY: Invitation code
+ALREADY_HAVE_ACCOUNT_KEY: 'Already have an account?'
+INVITATION_CODE_KEY: 'Invitation code'
 INVITATION_CODE_APPLIED_KEY: Invitation code automatically applied
-FULL_NAME_KEY: Full name
-USERNAME_KEY: Username
-PHONE_NUMBER_KEY: Phone number
-CONFIRM_PASSWORD_KEY: Confirm password
+FULL_NAME_KEY: 'Full name'
+USERNAME_KEY: 'Username'
+PHONE_NUMBER_KEY: 'Phone number'
+CONFIRM_PASSWORD_KEY: 'Confirm password'
 PASSWORD_REQUIREMENTS_KEY: 'Password Requirements'
 MIN_8_CHARS_KEY: 'At least 8 characters'
 UPPERCASE_REQUIRED_KEY: 'At least one uppercase letter'
 LOWERCASE_REQUIRED_KEY: 'At least one lowercase letter'
 NUMBER_REQUIRED_KEY: 'At least one number'
 PASSWORDS_DO_NOT_MATCH_KEY: 'Passwords do not match'
+AGREE_TO_TERMS_KEY: 'By signing up, you agree to the'
+TERMS_KEY: 'terms'
+PASSWORD_STRENGTH_KEY: 'Password Strength'
 VERY_WEAK_KEY: 'Very Weak'
 WEAK_KEY: 'Weak'
 MEDIUM_KEY: 'Medium'

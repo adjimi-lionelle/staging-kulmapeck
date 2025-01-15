@@ -18,93 +18,99 @@
                 <!-- Form -->
                 <div class="col-lg-6 col-xl-5 mb-n9">
                     <div class="card card-body shadow p-4 p-sm-5">
-                        <!-- Title -->
-                        <h2 class="mb-0 h3">{{ 'CREATE_ACCOUNT_KEY'|trans }}</h2>
-                        <p class="mb-0">{{ 'ALREADY_HAVE_ACCOUNT_KEY'|trans }} <a href="{{ path('app_login') }}">{{ 'LOGIN_KEY'|trans }}</a></p>
+                        <div class="card-header bg-transparent pb-5">
+                            <h1 class="h3">{{ 'CREATE_ACCOUNT_KEY'|trans }}</h1>
+                            <p class="mb-0">
+                                {{ 'ALREADY_HAVE_ACCOUNT_KEY'|trans }} <a href="{{ path('app_login') }}">{{ 'LOGIN_KEY'|trans }}</a>
+                            </p>
+                        </div>
 
-                        {{ form_start(registrationForm, {'attr': {'class': 'mt-4', 'id': 'registration_form'}}) }}
-                            <!-- Invitation Code -->
-                            <div class="mb-3">
-                                <label class="form-label">{{ 'INVITATION_CODE_KEY'|trans }}</label>
-                                {% set invitationCode = app.request.query.get('code') ?? app.request.query.get('invitation') %}
-                                {{ form_widget(registrationForm.parentCode, {
-                                    'attr': {
-                                        'class': 'form-control',
-                                        'readonly': invitationCode is not empty,
-                                        'value': invitationCode|default(''),
-                                        'placeholder': ''
-                                    }
-                                }) }}
-                                {{ form_errors(registrationForm.parentCode) }}
-                                {% if invitationCode is not empty %}
-                                    <small class="text-muted">{{ 'INVITATION_CODE_APPLIED_KEY'|trans }}</small>
-                                {% endif %}
-                            </div>
+                        <div class="card-body">
+                            {{ form_start(registrationForm, {'attr': {'class': 'mt-4', 'id': 'registration_form'}}) }}
+                                <!-- Invitation Code -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'INVITATION_CODE_KEY'|trans }}</label>
+                                    {% set invitationCode = app.request.query.get('code') ?? app.request.query.get('invitation') %}
+                                    {{ form_widget(registrationForm.parentCode, {
+                                        'attr': {
+                                            'class': 'form-control',
+                                            'readonly': invitationCode is not empty,
+                                            'value': invitationCode|default(''),
+                                            'placeholder': ''
+                                        }
+                                    }) }}
+                                    {{ form_errors(registrationForm.parentCode) }}
+                                    {% if invitationCode is not empty %}
+                                        <small class="text-muted">{{ 'INVITATION_CODE_APPLIED_KEY'|trans }}</small>
+                                    {% endif %}
+                                </div>
 
-                            <!-- Full Name -->
-                            <div class="mb-3">
-                                <label class="form-label">{{ 'FULL_NAME_KEY'|trans }}</label>
-                                {{ form_widget(registrationForm.fullName, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
-                                {{ form_errors(registrationForm.fullName) }}
-                            </div>
+                                <!-- Full Name -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'FULL_NAME_KEY'|trans }}</label>
+                                    {{ form_widget(registrationForm.fullName, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
+                                    {{ form_errors(registrationForm.fullName) }}
+                                </div>
 
-                            <!-- Username -->
-                            <div class="mb-3">
-                                <label class="form-label">{{ 'USERNAME_KEY'|trans }}</label>
-                                {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
-                                {{ form_errors(registrationForm.username) }}
-                            </div>
+                                <!-- Username -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'USERNAME_KEY'|trans }}</label>
+                                    {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
+                                    {{ form_errors(registrationForm.username) }}
+                                </div>
 
-                            <!-- Phone Number -->
-                            <div class="mb-3">
-                                <label class="form-label">{{ 'PHONE_NUMBER_KEY'|trans }}</label>
-                                {{ form_widget(registrationForm.phoneNumber, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
-                                {{ form_errors(registrationForm.phoneNumber) }}
-                            </div>
+                                <!-- Phone Number -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'PHONE_NUMBER_KEY'|trans }}</label>
+                                    {{ form_widget(registrationForm.phoneNumber, {'attr': {'class': 'form-control', 'placeholder': ''}}) }}
+                                    {{ form_errors(registrationForm.phoneNumber) }}
+                                </div>
 
-                            <!-- Password -->
-                            <div class="mb-3">
-                                <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
-                                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'id': 'password', 'placeholder': ''}}) }}
-                                {{ form_errors(registrationForm.plainPassword) }}
-                                <div class="password-strength mt-2">
-                                    <div class="progress" style="height: 5px;">
-                                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                <!-- Password -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
+                                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'id': 'password', 'placeholder': ''}}) }}
+                                    {{ form_errors(registrationForm.plainPassword) }}
+                                    <div class="password-strength mt-2">
+                                        <small class="text-muted">{{ 'PASSWORD_STRENGTH_KEY'|trans }}:</small>
+                                        <div class="progress" style="height: 5px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                        <small class="password-strength-text text-muted mt-1"></small>
                                     </div>
-                                    <small class="password-strength-text text-muted mt-1"></small>
+                                    <small class="text-muted">
+                                        {{ 'PASSWORD_REQUIREMENTS_KEY'|trans }}:
+                                        <ul class="mt-1 mb-0">
+                                            <li>{{ 'MIN_8_CHARS_KEY'|trans }}</li>
+                                            <li>{{ 'UPPERCASE_REQUIRED_KEY'|trans }}</li>
+                                            <li>{{ 'LOWERCASE_REQUIRED_KEY'|trans }}</li>
+                                            <li>{{ 'NUMBER_REQUIRED_KEY'|trans }}</li>
+                                        </ul>
+                                    </small>
                                 </div>
-                                <small class="text-muted">
-                                    {{ 'PASSWORD_REQUIREMENTS_KEY'|trans }}:
-                                    <ul class="mt-1 mb-0">
-                                        <li>{{ 'MIN_8_CHARS_KEY'|trans }}</li>
-                                        <li>{{ 'UPPERCASE_REQUIRED_KEY'|trans }}</li>
-                                        <li>{{ 'LOWERCASE_REQUIRED_KEY'|trans }}</li>
-                                        <li>{{ 'NUMBER_REQUIRED_KEY'|trans }}</li>
-                                    </ul>
-                                </small>
-                            </div>
 
-                            <!-- Password Confirmation -->
-                            <div class="mb-3">
-                                <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
-                                <input type="password" class="form-control" id="password_confirm" name="password_confirm" required placeholder="">
-                                <div class="text-danger mt-1" id="password-match-error" style="display: none;">
-                                    <i class="fas fa-exclamation-circle"></i> {{ 'PASSWORDS_DO_NOT_MATCH_KEY'|trans }}
+                                <!-- Password Confirmation -->
+                                <div class="mb-3">
+                                    <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
+                                    <input type="password" class="form-control" id="password_confirm" name="password_confirm" required placeholder="">
+                                    <div class="text-danger mt-1" id="password-match-error" style="display: none;">
+                                        <i class="fas fa-exclamation-circle"></i> {{ 'PASSWORDS_DO_NOT_MATCH_KEY'|trans }}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Terms -->
-                            <div class="mb-3">
-                                {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input me-2'}}) }}
-                                <label class="form-check-label">
-                                    {{ 'AGREE_TO_TERMS_KEY'|trans }} <a href="{{ path('app_terms') }}" target="_blank">{{ 'TERMS_KEY'|trans }}</a>
-                                </label>
-                            </div>
+                                <!-- Terms -->
+                                <div class="mb-3">
+                                    {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input me-2'}}) }}
+                                    <label class="form-check-label">
+                                        {{ 'AGREE_TO_TERMS_KEY'|trans }} <a href="{{ path('app_terms') }}" target="_blank">{{ 'TERMS_KEY'|trans }}</a>
+                                    </label>
+                                </div>
 
-                            <div class="align-items-center mt-0">
-                                <button class="btn btn-primary" type="submit" id="submit-button">{{ 'REGISTER_KEY'|trans }}</button>
-                            </div>
-                        {{ form_end(registrationForm) }}
+                                <div class="align-items-center mt-0">
+                                    <button class="btn btn-primary" type="submit" id="submit-button">{{ 'REGISTER_KEY'|trans }}</button>
+                                </div>
+                            {{ form_end(registrationForm) }}
+                        </div>
                     </div>
                 </div>
             </div>
