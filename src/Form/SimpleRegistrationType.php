@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -15,16 +16,22 @@ use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class SimpleRegistrationType extends AbstractType
 {
+    private $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('parentCode', TextType::class, [
-                'mapped' => false,
                 'required' => false,
-                'label' => 'Code d\'invitation',
                 'constraints' => [
                     new Regex([
                         'pattern' => '/^[A-Z0-9]{8}$/',
@@ -33,12 +40,7 @@ class SimpleRegistrationType extends AbstractType
                 ]
             ])
             ->add('fullName', TextType::class, [
-                'mapped' => false,
                 'required' => true,
-                'label' => 'Nom complet',
-                'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
-                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'
@@ -46,12 +48,7 @@ class SimpleRegistrationType extends AbstractType
                 ]
             ])
             ->add('username', TextType::class, [
-                'mapped' => true,
                 'required' => true,
-                'label' => 'Nom d\'utilisateur',
-                'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
-                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'
@@ -60,17 +57,11 @@ class SimpleRegistrationType extends AbstractType
                         'pattern' => '/^[a-zA-Z0-9_]+$/',
                         'message' => 'INVALID_USERNAME_KEY'
                     ]),
-                    new Callback([
-                        'callback' => [$this, 'validateUniqueUsername'],
-                        'message' => 'USERNAME_EXISTS_KEY'
-                    ])
+                    new Callback([$this, 'validateUniqueUsername'])
                 ]
             ])
             ->add('phoneNumber', TextType::class, [
                 'required' => true,
-                'attr' => [
-                    'class' => 'border-0 bg-light rounded-end ps-1',
-                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'
@@ -79,18 +70,11 @@ class SimpleRegistrationType extends AbstractType
                         'pattern' => '/^\+?[0-9]{8,15}$/',
                         'message' => 'INVALID_PHONE_KEY'
                     ]),
-                    new Callback([
-                        'callback' => [$this, 'validateUniquePhone'],
-                        'message' => 'PHONE_EXISTS_KEY'
-                    ])
+                    new Callback([$this, 'validateUniquePhone'])
                 ]
             ])
             ->add('plainPassword', PasswordType::class, [
-                'mapped' => false,
-                'attr' => [
-                    'autocomplete' => 'new-password',
-                    'class' => 'border-0 bg-light rounded-end ps-1'
-                ],
+                'required' => true,
                 'constraints' => [
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'
@@ -114,22 +98,43 @@ class SimpleRegistrationType extends AbstractType
                 ]
             ])
             ->add('agreeTerms', CheckboxType::class, [
-                'mapped' => false,
+                'required' => true,
                 'constraints' => [
                     new IsTrue([
                         'message' => 'TERMS_REQUIRED_KEY'
                     ])
-                ],
-                'label_html' => true,
-                'label' => 'By signing up, you agree to the <a href="">terms</a>'
+                ]
             ])
         ;
+    }
+
+    public function validateUniqueUsername($value, ExecutionContextInterface $context)
+    {
+        $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $value]);
+        
+        if ($existingUser) {
+            $context->buildViolation('USERNAME_EXISTS_KEY')
+                   ->addViolation();
+        }
+    }
+
+    public function validateUniquePhone($value, ExecutionContextInterface $context)
+    {
+        $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['phoneNumber' => $value]);
+        
+        if ($existingUser) {
+            $context->buildViolation('PHONE_EXISTS_KEY')
+                   ->addViolation();
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'csrf_protection' => true,
+            'csrf_field_name' => '_token',
+            'csrf_token_id' => 'registration_form',
         ]);
     }
 }
