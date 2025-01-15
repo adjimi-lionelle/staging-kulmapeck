@@ -66,7 +66,19 @@ FULL_NAME_KEY: Full name
 USERNAME_KEY: Username
 PHONE_NUMBER_KEY: Phone number
 CONFIRM_PASSWORD_KEY: Confirm password
-PASSWORDS_DO_NOT_MATCH_KEY: Passwords do not match
+PASSWORD_REQUIREMENTS_KEY: 'Password Requirements'
+MIN_16_CHARS_KEY: 'At least 16 characters'
+UPPERCASE_REQUIRED_KEY: 'At least one uppercase letter'
+LOWERCASE_REQUIRED_KEY: 'At least one lowercase letter'
+NUMBER_REQUIRED_KEY: 'At least one number'
+SPECIAL_CHAR_REQUIRED_KEY: 'At least one special character (@$!%*?&)'
+NON_ALPHANUMERIC_REQUIRED_KEY: 'At least one non-alphanumeric character'
+PASSWORDS_DO_NOT_MATCH_KEY: 'Passwords do not match'
+VERY_WEAK_KEY: 'Very Weak'
+WEAK_KEY: 'Weak'
+MEDIUM_KEY: 'Medium'
+STRONG_KEY: 'Strong'
+VERY_STRONG_KEY: 'Very Strong'
 REMEMBER_ME_KEY: Remember me
 FORGOT_PASSWORD_KEY: Forgot password?
 NO_ACCOUNT_KEY: Don't have an account?
@@ -152,7 +164,7 @@ ABOUTUSPAGE_OURGOAL_KEY: Be open to new ideas and approaches. Develop your probl
 ABOUTUSPAGE_ABOUTKULMAPECKTILE_KEY: About Eduport Portal
 ABOUTUSPAGE_ABOUTKULMAPECKDESCRIPTION1_KEY: How promotion excellent curiosity yet attempted happiness Gay prosperous impression had conviction For every delay death ask to style Me mean able my by in they Extremity now strangers contained.
 ABOUTUSPAGE_H4STUDENTS_KEY: 35,000+ happy students joined with us to achieve their goals
-ABOUTUSPAGE_H4STUDENTS1_KEY: How promotion excellent curiosity yet attempted happiness Gay prosperous impression had conviction For every delay death ask to style Me mean able  my by in they Extremity now strangers contained breakfast him discourse additions Sincerity collected contented led now perpetual extremely forfeited
+ABOUTUSPAGE_H4STUDENTS1_KEY: How promotion excellent curiosity yet attempted happiness Gay prosperous impression had conviction For every delay in they Extremity now strangers contained breakfast him discourse additions Sincerity collected contented led now perpetual extremely forfeited
 ABOUTUSPAGE_H4STUDENTS2_KEY: Happiness prosperous impression had conviction For every delay in they Extremity now strangers contained breakfast him discourse additions Sincerity collected contented led now perpetual extremely forfeited
 ABOUTUSPAGE_SETUPTIME_KEY: Setup and installation takes less time
 ABOUTUSPAGE_PROFESSIONAL_KEY: Professional and easy to use software

@@ -63,7 +63,19 @@ FULL_NAME_KEY: Nom complet
 USERNAME_KEY: Nom d'utilisateur
 PHONE_NUMBER_KEY: Numéro de téléphone
 CONFIRM_PASSWORD_KEY: Confirmer le mot de passe
-PASSWORDS_DO_NOT_MATCH_KEY: Les mots de passe ne correspondent pas
+PASSWORD_REQUIREMENTS_KEY: 'Exigences du mot de passe'
+MIN_16_CHARS_KEY: 'Au moins 16 caractères'
+UPPERCASE_REQUIRED_KEY: 'Au moins une lettre majuscule'
+LOWERCASE_REQUIRED_KEY: 'Au moins une lettre minuscule'
+NUMBER_REQUIRED_KEY: 'Au moins un chiffre'
+SPECIAL_CHAR_REQUIRED_KEY: 'Au moins un caractère spécial (@$!%*?&)'
+NON_ALPHANUMERIC_REQUIRED_KEY: 'Au moins un caractère non alphanumérique'
+PASSWORDS_DO_NOT_MATCH_KEY: 'Les mots de passe ne correspondent pas'
+VERY_WEAK_KEY: 'Très Faible'
+WEAK_KEY: 'Faible'
+MEDIUM_KEY: 'Moyen'
+STRONG_KEY: 'Fort'
+VERY_STRONG_KEY: 'Très Fort'
 REMEMBER_ME_KEY: Se souvenir de moi
 FORGOT_PASSWORD_KEY: Mot de passe oublié?
 NO_ACCOUNT_KEY: Vous n'avez pas de compte?

@@ -23,23 +23,43 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Security\Http\RateLimiter\RateLimiterFactory;
+use Symfony\Component\Security\Core\Exception\TooManyRequestsHttpException;
+use ReCaptcha\ReCaptcha;
+use ReCaptcha\RequestMethod\CurlPost;
+use PasswordBlacklist\Validator\PasswordBlacklistValidator;
 
 class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
     private InvitationCodeGenerator $invitationCodeGenerator;
+    private RateLimiterFactory $rateLimiter;
+    private ReCaptcha $recaptchaVerifier;
+    private PasswordBlacklistValidator $passwordBlacklist;
 
     public function __construct(
         EmailVerifier $emailVerifier,
-        InvitationCodeGenerator $invitationCodeGenerator
+        InvitationCodeGenerator $invitationCodeGenerator,
+        RateLimiterFactory $rateLimiter,
+        ReCaptcha $recaptchaVerifier,
+        PasswordBlacklistValidator $passwordBlacklist
     ) {
         $this->emailVerifier = $emailVerifier;
         $this->invitationCodeGenerator = $invitationCodeGenerator;
+        $this->rateLimiter = $rateLimiter;
+        $this->recaptchaVerifier = $recaptchaVerifier;
+        $this->passwordBlacklist = $passwordBlacklist;
     }
 
     #[Route('/register', name: 'app_front_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, FileUploader $fileUploader, UserRepository $userRepository, NetworkConfigRepository $networkConfigRepository, PersonneRepository $personneRepository): Response
     {
+        // Rate limiting check
+        $rateLimiter = $this->rateLimiter->create($request->getClientIp() . '_register');
+        if (false === $rateLimiter->consume(1)->isAccepted()) {
+            throw new TooManyRequestsHttpException();
+        }
+
         $userType = $request->query->get('type', 'student'); // Default to student if no type specified
         // Support both old and new invitation code syntax
         $invitationCode = $request->query->get('code') ?? $request->query->get('invitation');
@@ -60,11 +80,32 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Verify reCAPTCHA
+            $recaptcha = $form->get('recaptcha')->getData();
+            if (!$this->recaptchaVerifier->verify($recaptcha)) {
+                $this->addFlash('error', 'La vérification reCAPTCHA a échoué. Veuillez réessayer.');
+                return $this->redirectToRoute('app_front_register');
+            }
+
+            // Verify password confirmation matches
+            $plainPassword = $form->get('plainPassword')->getData();
+            $confirmPassword = $request->request->get('password_confirm');
+            if ($plainPassword !== $confirmPassword) {
+                $this->addFlash('error', 'Les mots de passe ne correspondent pas.');
+                return $this->redirectToRoute('app_front_register');
+            }
+
+            // Check for common passwords
+            if ($this->passwordBlacklist->isCommonPassword($plainPassword)) {
+                $this->addFlash('error', 'Ce mot de passe est trop commun. Veuillez en choisir un plus sécurisé.');
+                return $this->redirectToRoute('app_front_register');
+            }
+
             // encode the plain password
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,
-                    $form->get('plainPassword')->getData()
+                    $plainPassword
                 )
             );
 

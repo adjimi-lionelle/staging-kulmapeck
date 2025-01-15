@@ -6,6 +6,7 @@ use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -89,12 +90,24 @@ class SimpleRegistrationType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Please enter a password',
+                        'message' => 'Veuillez entrer un mot de passe',
                     ]),
                     new Length([
-                        'min' => 6,
-                        'minMessage' => 'Your password should be at least {{ limit }} characters',
+                        'min' => 16,
+                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
                         'max' => 4096,
+                    ]),
+                    new Regex([
+                        'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])(?=.*[^\w]).{16,}$/',
+                        'message' => 'Votre mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre, un caractère spécial et un caractère non-alphanumérique',
+                    ]),
+                ],
+            ])
+            ->add('recaptcha', HiddenType::class, [
+                'mapped' => false,
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Veuillez compléter le reCAPTCHA',
                     ]),
                 ],
             ])

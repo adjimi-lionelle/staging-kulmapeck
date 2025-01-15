@@ -66,15 +66,39 @@
                                 <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
                                 {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'id': 'password'}}) }}
                                 {{ form_errors(registrationForm.plainPassword) }}
+                                <div class="password-strength mt-2">
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <small class="password-strength-text text-muted mt-1"></small>
+                                </div>
+                                <small class="text-muted">
+                                    {{ 'PASSWORD_REQUIREMENTS_KEY'|trans }}:
+                                    <ul class="mt-1 mb-0">
+                                        <li>{{ 'MIN_16_CHARS_KEY'|trans }}</li>
+                                        <li>{{ 'UPPERCASE_REQUIRED_KEY'|trans }}</li>
+                                        <li>{{ 'LOWERCASE_REQUIRED_KEY'|trans }}</li>
+                                        <li>{{ 'NUMBER_REQUIRED_KEY'|trans }}</li>
+                                        <li>{{ 'SPECIAL_CHAR_REQUIRED_KEY'|trans }}</li>
+                                        <li>{{ 'NON_ALPHANUMERIC_REQUIRED_KEY'|trans }}</li>
+                                    </ul>
+                                </small>
                             </div>
 
                             <!-- Password Confirmation -->
                             <div class="mb-3">
                                 <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
-                                <input type="password" class="form-control" id="password_confirm" required>
+                                <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
                                 <div class="invalid-feedback">
                                     {{ 'PASSWORDS_DO_NOT_MATCH_KEY'|trans }}
                                 </div>
+                            </div>
+
+                            <!-- reCAPTCHA -->
+                            <div class="mb-3">
+                                <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                                {{ form_widget(registrationForm.recaptcha, {'id': 'recaptcha_response'}) }}
+                                {{ form_errors(registrationForm.recaptcha) }}
                             </div>
 
                             <!-- Terms -->
@@ -86,40 +110,87 @@
 
                             <button type="submit" class="btn btn-primary w-100 mb-0" id="submit_btn">{{ 'REGISTER_KEY'|trans }}</button>
                         {{ form_end(registrationForm) }}
-
-                        <!-- Password validation script -->
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const form = document.getElementById('registration_form');
-                                const password = document.getElementById('password');
-                                const passwordConfirm = document.getElementById('password_confirm');
-                                const submitBtn = document.getElementById('submit_btn');
-
-                                function validatePasswords() {
-                                    if (password.value !== passwordConfirm.value) {
-                                        passwordConfirm.classList.add('is-invalid');
-                                        submitBtn.disabled = true;
-                                        return false;
-                                    } else {
-                                        passwordConfirm.classList.remove('is-invalid');
-                                        submitBtn.disabled = false;
-                                        return true;
-                                    }
-                                }
-
-                                password.addEventListener('input', validatePasswords);
-                                passwordConfirm.addEventListener('input', validatePasswords);
-
-                                form.addEventListener('submit', function(e) {
-                                    if (!validatePasswords()) {
-                                        e.preventDefault();
-                                    }
-                                });
-                            });
-                        </script>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('password_confirm');
+    const strengthBar = document.querySelector('.password-strength .progress-bar');
+    const strengthText = document.querySelector('.password-strength-text');
+    const form = document.getElementById('registration_form');
+
+    // Password strength checker
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        const patterns = {
+            length: password.length >= 16,
+            lowercase: /[a-z]/.test(password),
+            uppercase: /[A-Z]/.test(password),
+            numbers: /\d/.test(password),
+            special: /[@$!%*?&]/.test(password),
+            nonAlphanumeric: /[^\w\s]/.test(password)
+        };
+
+        strength += patterns.length ? 20 : 0;
+        strength += patterns.lowercase ? 16 : 0;
+        strength += patterns.uppercase ? 16 : 0;
+        strength += patterns.numbers ? 16 : 0;
+        strength += patterns.special ? 16 : 0;
+        strength += patterns.nonAlphanumeric ? 16 : 0;
+
+        return {
+            score: strength,
+            patterns: patterns
+        };
+    }
+
+    // Update password strength indicator
+    passwordInput.addEventListener('input', function() {
+        const result = checkPasswordStrength(this.value);
+        strengthBar.style.width = result.score + '%';
+        
+        if (result.score <= 20) {
+            strengthBar.className = 'progress-bar bg-danger';
+            strengthText.textContent = '{{ 'VERY_WEAK_KEY'|trans }}';
+        } else if (result.score <= 40) {
+            strengthBar.className = 'progress-bar bg-warning';
+            strengthText.textContent = '{{ 'WEAK_KEY'|trans }}';
+        } else if (result.score <= 60) {
+            strengthBar.className = 'progress-bar bg-info';
+            strengthText.textContent = '{{ 'MEDIUM_KEY'|trans }}';
+        } else if (result.score <= 80) {
+            strengthBar.className = 'progress-bar bg-primary';
+            strengthText.textContent = '{{ 'STRONG_KEY'|trans }}';
+        } else {
+            strengthBar.className = 'progress-bar bg-success';
+            strengthText.textContent = '{{ 'VERY_STRONG_KEY'|trans }}';
+        }
+    });
+
+    // Check password confirmation
+    confirmInput.addEventListener('input', function() {
+        if (this.value !== passwordInput.value) {
+            this.classList.add('is-invalid');
+        } else {
+            this.classList.remove('is-invalid');
+        }
+    });
+
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        if (passwordInput.value !== confirmInput.value) {
+            e.preventDefault();
+            confirmInput.classList.add('is-invalid');
+        }
+    });
+});
+</script>
 {% endblock %}
