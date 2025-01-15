@@ -94,13 +94,6 @@
                                 </div>
                             </div>
 
-                            <!-- reCAPTCHA -->
-                            <div class="mb-3">
-                                <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
-                                {{ form_widget(registrationForm.recaptcha, {'id': 'recaptcha_response'}) }}
-                                {{ form_errors(registrationForm.recaptcha) }}
-                            </div>
-
                             <!-- Terms -->
                             <div class="mb-3">
                                 {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input me-2'}}) }}
@@ -118,79 +111,79 @@
 {% endblock %}
 
 {% block javascripts %}
-{{ parent() }}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const passwordInput = document.getElementById('password');
-    const confirmInput = document.getElementById('password_confirm');
-    const strengthBar = document.querySelector('.password-strength .progress-bar');
-    const strengthText = document.querySelector('.password-strength-text');
-    const form = document.getElementById('registration_form');
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            const confirmInput = document.getElementById('password_confirm');
+            const strengthBar = document.querySelector('.password-strength .progress-bar');
+            const strengthText = document.querySelector('.password-strength-text');
+            const form = document.getElementById('registration_form');
 
-    // Password strength checker
-    function checkPasswordStrength(password) {
-        let strength = 0;
-        const patterns = {
-            length: password.length >= 16,
-            lowercase: /[a-z]/.test(password),
-            uppercase: /[A-Z]/.test(password),
-            numbers: /\d/.test(password),
-            special: /[@$!%*?&]/.test(password),
-            nonAlphanumeric: /[^\w\s]/.test(password)
-        };
+            // Password strength checker
+            function checkPasswordStrength(password) {
+                let strength = 0;
+                const patterns = {
+                    length: password.length >= 16,
+                    lowercase: /[a-z]/.test(password),
+                    uppercase: /[A-Z]/.test(password),
+                    numbers: /\d/.test(password),
+                    special: /[@$!%*?&]/.test(password),
+                    nonAlphanumeric: /[^\w\s]/.test(password)
+                };
 
-        strength += patterns.length ? 20 : 0;
-        strength += patterns.lowercase ? 16 : 0;
-        strength += patterns.uppercase ? 16 : 0;
-        strength += patterns.numbers ? 16 : 0;
-        strength += patterns.special ? 16 : 0;
-        strength += patterns.nonAlphanumeric ? 16 : 0;
+                strength += patterns.length ? 20 : 0;
+                strength += patterns.lowercase ? 16 : 0;
+                strength += patterns.uppercase ? 16 : 0;
+                strength += patterns.numbers ? 16 : 0;
+                strength += patterns.special ? 16 : 0;
+                strength += patterns.nonAlphanumeric ? 16 : 0;
 
-        return {
-            score: strength,
-            patterns: patterns
-        };
-    }
+                return {
+                    score: strength,
+                    patterns: patterns
+                };
+            }
 
-    // Update password strength indicator
-    passwordInput.addEventListener('input', function() {
-        const result = checkPasswordStrength(this.value);
-        strengthBar.style.width = result.score + '%';
-        
-        if (result.score <= 20) {
-            strengthBar.className = 'progress-bar bg-danger';
-            strengthText.textContent = '{{ 'VERY_WEAK_KEY'|trans }}';
-        } else if (result.score <= 40) {
-            strengthBar.className = 'progress-bar bg-warning';
-            strengthText.textContent = '{{ 'WEAK_KEY'|trans }}';
-        } else if (result.score <= 60) {
-            strengthBar.className = 'progress-bar bg-info';
-            strengthText.textContent = '{{ 'MEDIUM_KEY'|trans }}';
-        } else if (result.score <= 80) {
-            strengthBar.className = 'progress-bar bg-primary';
-            strengthText.textContent = '{{ 'STRONG_KEY'|trans }}';
-        } else {
-            strengthBar.className = 'progress-bar bg-success';
-            strengthText.textContent = '{{ 'VERY_STRONG_KEY'|trans }}';
-        }
-    });
+            // Update password strength indicator
+            passwordInput.addEventListener('input', function() {
+                const result = checkPasswordStrength(this.value);
+                strengthBar.style.width = result.score + '%';
+                
+                if (result.score <= 20) {
+                    strengthBar.className = 'progress-bar bg-danger';
+                    strengthText.textContent = '{{ 'VERY_WEAK_KEY'|trans }}';
+                } else if (result.score <= 40) {
+                    strengthBar.className = 'progress-bar bg-warning';
+                    strengthText.textContent = '{{ 'WEAK_KEY'|trans }}';
+                } else if (result.score <= 60) {
+                    strengthBar.className = 'progress-bar bg-info';
+                    strengthText.textContent = '{{ 'MEDIUM_KEY'|trans }}';
+                } else if (result.score <= 80) {
+                    strengthBar.className = 'progress-bar bg-primary';
+                    strengthText.textContent = '{{ 'STRONG_KEY'|trans }}';
+                } else {
+                    strengthBar.className = 'progress-bar bg-success';
+                    strengthText.textContent = '{{ 'VERY_STRONG_KEY'|trans }}';
+                }
+            });
 
-    // Check password confirmation
-    confirmInput.addEventListener('input', function() {
-        if (this.value !== passwordInput.value) {
-            this.classList.add('is-invalid');
-        } else {
-            this.classList.remove('is-invalid');
-        }
-    });
+            // Check password confirmation
+            confirmInput.addEventListener('input', function() {
+                if (this.value !== passwordInput.value) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            });
 
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        if (passwordInput.value !== confirmInput.value) {
-            e.preventDefault();
-            confirmInput.classList.add('is-invalid');
-        }
-    });
-});
-</script>
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                if (passwordInput.value !== confirmInput.value) {
+                    e.preventDefault();
+                    confirmInput.classList.add('is-invalid');
+                }
+            });
+        });
+    </script>
 {% endblock %}

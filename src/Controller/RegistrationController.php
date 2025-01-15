@@ -27,8 +27,6 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\Security\Core\Exception\TooManyRequestsHttpException;
-use ReCaptcha\ReCaptcha;
-use ReCaptcha\RequestMethod\CurlPost;
 use PasswordBlacklist\Validator\PasswordBlacklistValidator;
 
 class RegistrationController extends AbstractController
@@ -91,13 +89,6 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Verify reCAPTCHA
-            $recaptcha = $form->get('recaptcha')->getData();
-            if (!$this->recaptchaVerifier->verify($recaptcha)) {
-                $this->addFlash('error', 'La vérification reCAPTCHA a échoué. Veuillez réessayer.');
-                return $this->redirectToRoute('app_front_register');
-            }
-
             // Verify password confirmation matches
             $plainPassword = $form->get('plainPassword')->getData();
             $confirmPassword = $request->request->get('password_confirm');
