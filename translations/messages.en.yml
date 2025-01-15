@@ -88,7 +88,6 @@ OR_SIGN_IN_WITH_KEY: Or sign in with
 
 # Registration form
 ALREADY_HAVE_ACCOUNT_KEY: 'Already have an account?'
-LOGIN_KEY: 'Login'
 INVITATION_CODE_KEY: 'Invitation code'
 INVITATION_CODE_APPLIED_KEY: 'Invitation code automatically applied'
 FULL_NAME_KEY: 'Full name'
