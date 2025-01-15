@@ -88,8 +88,8 @@
                             <div class="mb-3">
                                 <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
                                 <input type="password" class="form-control" id="password_confirm" name="password_confirm" required placeholder="">
-                                <div class="invalid-feedback" id="password-match-error">
-                                    {{ 'PASSWORDS_DO_NOT_MATCH_KEY'|trans }}
+                                <div class="text-danger mt-1" id="password-match-error" style="display: none;">
+                                    <i class="fas fa-exclamation-circle"></i> {{ 'PASSWORDS_DO_NOT_MATCH_KEY'|trans }}
                                 </div>
                             </div>
 
@@ -126,14 +126,14 @@
 
             function validatePasswords() {
                 const passwordsMatch = passwordInput.value === confirmInput.value;
-                if (!passwordsMatch) {
+                if (!passwordsMatch && confirmInput.value !== '') {
                     confirmInput.classList.add('is-invalid');
                     passwordMatchError.style.display = 'block';
                     submitButton.disabled = true;
                 } else {
                     confirmInput.classList.remove('is-invalid');
                     passwordMatchError.style.display = 'none';
-                    submitButton.disabled = false;
+                    submitButton.disabled = !passwordsMatch;
                 }
                 return passwordsMatch;
             }
@@ -177,7 +177,9 @@
                     strengthBar.className = 'progress-bar bg-primary';
                     strengthText.textContent = '{{ 'STRONG_KEY'|trans }}';
                 }
-                validatePasswords();
+                if (confirmInput.value !== '') {
+                    validatePasswords();
+                }
             });
 
             // Check password confirmation
@@ -185,8 +187,10 @@
 
             // Form submission
             form.addEventListener('submit', function(e) {
-                if (!validatePasswords()) {
+                const isValid = validatePasswords();
+                if (!isValid) {
                     e.preventDefault();
+                    confirmInput.focus();
                 }
             });
 
