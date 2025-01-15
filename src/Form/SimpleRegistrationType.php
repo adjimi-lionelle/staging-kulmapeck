@@ -36,8 +36,7 @@ class SimpleRegistrationType extends AbstractType
                 'constraints' => [
                     new Regex([
                         'pattern' => '/^[A-Z0-9]{8}$/',
-                        'message' => 'INVALID_INVITATION_CODE_KEY',
-                        'translation_domain' => 'messages'
+                        'message' => 'INVALID_INVITATION_CODE_KEY'
                     ])
                 ]
             ])
@@ -46,8 +45,7 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'REQUIRED_FIELD_KEY',
-                        'translation_domain' => 'messages'
+                        'message' => 'REQUIRED_FIELD_KEY'
                     ])
                 ]
             ])
@@ -56,13 +54,11 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'REQUIRED_FIELD_KEY',
-                        'translation_domain' => 'messages'
+                        'message' => 'REQUIRED_FIELD_KEY'
                     ]),
                     new Regex([
                         'pattern' => '/^[a-zA-Z0-9_]+$/',
-                        'message' => 'INVALID_USERNAME_KEY',
-                        'translation_domain' => 'messages'
+                        'message' => 'INVALID_USERNAME_KEY'
                     ]),
                     new Callback([$this, 'validateUniqueUsername'])
                 ]
@@ -72,13 +68,11 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'REQUIRED_FIELD_KEY',
-                        'translation_domain' => 'messages'
+                        'message' => 'REQUIRED_FIELD_KEY'
                     ]),
                     new Regex([
                         'pattern' => '/^\+?[0-9]{8,15}$/',
-                        'message' => 'INVALID_PHONE_KEY',
-                        'translation_domain' => 'messages'
+                        'message' => 'INVALID_PHONE_KEY'
                     ]),
                     new Callback([$this, 'validateUniquePhone'])
                 ]
@@ -88,28 +82,23 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'REQUIRED_FIELD_KEY',
-                        'translation_domain' => 'messages'
+                        'message' => 'REQUIRED_FIELD_KEY'
                     ]),
                     new Length([
                         'min' => 8,
-                        'minMessage' => 'MIN_8_CHARS_KEY',
-                        'translation_domain' => 'messages'
+                        'minMessage' => 'MIN_8_CHARS_KEY'
                     ]),
                     new Regex([
                         'pattern' => '/[A-Z]/',
-                        'message' => 'UPPERCASE_REQUIRED_KEY',
-                        'translation_domain' => 'messages'
+                        'message' => 'UPPERCASE_REQUIRED_KEY'
                     ]),
                     new Regex([
                         'pattern' => '/[a-z]/',
-                        'message' => 'LOWERCASE_REQUIRED_KEY',
-                        'translation_domain' => 'messages'
+                        'message' => 'LOWERCASE_REQUIRED_KEY'
                     ]),
                     new Regex([
                         'pattern' => '/[0-9]/',
-                        'message' => 'NUMBER_REQUIRED_KEY',
-                        'translation_domain' => 'messages'
+                        'message' => 'NUMBER_REQUIRED_KEY'
                     ])
                 ]
             ])
@@ -118,8 +107,7 @@ class SimpleRegistrationType extends AbstractType
                 'required' => true,
                 'constraints' => [
                     new IsTrue([
-                        'message' => 'TERMS_REQUIRED_KEY',
-                        'translation_domain' => 'messages'
+                        'message' => 'TERMS_REQUIRED_KEY'
                     ])
                 ]
             ])
