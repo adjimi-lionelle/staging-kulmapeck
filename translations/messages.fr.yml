@@ -43,6 +43,29 @@ ACCOUNTMODALDESCRIPTION_KEY: Prosperous understood Middletons in conviction an u
 TEACHER_KEY: Enseigant & Formateur
 STUDENT_KEY: Elève & Apprenant
 
+# COURSES AND LEARNING
+COURSESCATEGORY_KEY: Catégories de cours
+VIEWALLCATEGORIES_KEY: Toutes les catégories
+LASTCOURSES_KEY: Derniers cours
+VIEWMORECOURSES_KEY: Voir plus de cours
+DOWNLOADKULMAPECK_KEY: Télécharger Kulmapeck
+OONLINECOURSES_KEY: Online Courses
+EXPERTSTUTORS_KEY: Cours en ligne
+ONLINESTUDENTS_KEY: Étudiants en ligne
+CERTIFIEDCOURSES_KEY: Cours certifiés
+MOSTPOPULAR_KEY: Cours les plus populaires
+MOSTPOPULARDESCRIPTION_KEY: Choisissez parmi des centaines de cours d'organisations spécialisées
+LESSONS_KEY: Leçons
+ALLCOURSES_KEY: Tous les cours
+BECOMEINSTRUCTOR_KEY: Devenir formateur!
+BECOMEINSTRUCTORDESCRIPTION_KEY: Speedily say has suitable disposal add boy. On forth doubt miles of child. Exercise joy man children rejoiced. Yet uncommonly his ten who diminution astonished
+STARTTEACHINGTODAY_KEY: Commencez à enseigner aujourd'hui
+TRENDINGCOURSES_KEY: Nos cours tendances
+TRENDINGCOURSESDESCRIPTION_KEY: Découvrez la plupart des cours sur le marché
+VERIFIEDMENTOR_KEY: Mentors vérifiés
+FEEDBACK_KEY: Quelques précieux retours de nos étudiants
+FEEDBACKDESCRIPTION_KEY: Supposing so be resolving breakfast am or perfectly. It drew a hill from me. Valley by oh twenty direct me so. Departure defective arranging rapturous did believe him all had supported. Family months lasted simple set nature vulgar him. Picture for attempt joy excited ten carried manners talking how.
+
 # AUTH AND REGISTRATION
 CREATE_ACCOUNT_KEY: Créer un compte
 LOGIN_KEY: Se connecter
@@ -63,45 +86,7 @@ FORGOT_PASSWORD_KEY: Mot de passe oublié?
 NO_ACCOUNT_KEY: Vous n'avez pas de compte?
 REGISTER_NOW_KEY: S'inscrire maintenant
 
-# FICHIER templates/front/home/header/courses.html.twig
-COURSESCATEGORY_KEY: Catégories de cours
-VIEWALLCATEGORIES_KEY: Toutes les catégories
-LASTCOURSES_KEY: Derniers cours
-VIEWMORECOURSES_KEY: Voir plus de cours
-DOWNLOADKULMAPECK_KEY: Télécharger Kulmapeck
-
-# FICHIER template/front/home/_main_barner.html.twig
-MAINMESSAGE_KEY: Apprentissage illimité à portée
-FINGERSTIPS_KEY: de main
-MAINMESSAGEDESCRIPTION_KEY: Marché d'apprentissage et d'enseignement en ligne avec plus de 5 000 cours et 10 millions d'étudiants. Enseigné par des experts pour vous aider à acquérir de nouvelles compétences.
-LEARNEXPERT_KEY: Apprenez avec des experts
-GETCERTIFICATE_KEY: Obtenir un certificat
-GETMEMBERSHIP_KEY: Get membership
-GETSTARTED_KEY: Obtenir l'adhésion
-CREATE_ACCOUNT_KEY: Créer un compte
-CONGRATULATION_KEY: Félicitations
-ADMISSIONCOMPLETE_KEY: Votre admission terminée
-DAILYSTUDENT_KEY: Nos nouveaux étudiants quotidiens
-
-OONLINECOURSES_KEY: Online Courses
-EXPERTSTUTORS_KEY: Cours en ligne
-ONLINESTUDENTS_KEY: Étudiants en ligne
-CERTIFIEDCOURSES_KEY: Cours certifiés
-MOSTPOPULAR_KEY: Cours les plus populaires
-MOSTPOPULARDESCRIPTION_KEY: Choisissez parmi des centaines de cours d'organisations spécialisées
-LESSONS_KEY: Leçons
-ALLCOURSES_KEY: Tous les cours
-BECOMEINSTRUCTOR_KEY: Devenir formateur!
-BECOMEINSTRUCTORDESCRIPTION_KEY: Speedily say has suitable disposal add boy. On forth doubt miles of child. Exercise joy man children rejoiced. Yet uncommonly his ten who diminution astonished
-STARTTEACHINGTODAY_KEY: Commencez à enseigner aujourd'hui
-TRENDINGCOURSES_KEY: Nos cours tendances
-TRENDINGCOURSESDESCRIPTION_KEY: Découvrez la plupart des cours sur le marché
-VERIFIEDMENTOR_KEY: Mentors vérifiés
-FEEDBACK_KEY: Quelques précieux retours de nos étudiants
-FEEDBACKDESCRIPTION_KEY: Supposing so be resolving breakfast am or perfectly. It drew a hill from me. Valley by oh twenty direct me so. Departure defective arranging rapturous did believe him all had supported. Family months lasted simple set nature vulgar him. Picture for attempt joy excited ten carried manners talking how.
-CREATEANACCOUNT_KEY: Créer un compte
-CHOOSEACCOUNTTYPE_KEY: Choisir le type de compte
-
+# SEARCH AND FILTERS
 WHATDOYOUWATTOLEARN_KEY: Que voulez-vous apprendre?
 WHATDOYOUWATTOLEARNDESCRIPTION_KEY: Développez vos compétences avec les cours et certifications en ligne les plus fiables
 SEARCHCOURSES_KEY: Rechercher des cours
@@ -141,37 +126,16 @@ FILTERRESULTS_KEY: Filtrer les résultats
 SHOWANSWER_KEY: Montrer la réponse
 BACKTOSUBJECT_KEY: Retour au sujet
 
-APPLYASINSTRUCTOR_KEY: Postuler en tant qu'instructeur
-APPLYASINSTRUCTORDESCRIPTION_KEY: Satisfied conveying a dependent contented he gentleman agreeable do be. Delivered dejection necessary objection do Mr prevailed. Mr feeling does chiefly cordial in do.
-STARTITLE_KEY: You can be your guiding star with our help
-STARTITLEDESCRIPTION_KEY: As it so contrasted oh estimating instrument. Size like body someone had. Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted.
-STARCREATEACCOUNTDESCRIPTION_KEY: Satisfied conveying a dependent contented he gentleman agreeable do be. Delivered dejection necessary objection do Mr prevailed. Mr feeling does chiefly cordial in do
-STARADDYOURCOURSE_KEY: Ajoutez votre cours
-STARADDYOURCOURSEDESCRIPTION_KEY: Proceed how any engaged visitor. Explained propriety off out perpetual his you. Feel sold off felt nay rose met you. We so entreaties cultivated astonished is. Was sister for a few longer Mrs sudden talent become. Done may bore quit evil old mile. If likely am of beauty tastes.
-STAREARINGMONEY_KEY: Commencez à gagner de l'argent
-STAREARINGMONEYDESCRIPTITON_KEY: Insipidity the sufficient discretion imprudence resolution sir him decisively.  Delivered dejection necessary objection do Mr prevailed. Mr feeling does chiefly cordial in do
-TOTALSTUDENTS_KEY: Nombre total d'étudiants
-TOTALINSTRUCTORS_KEY: Nombre total d'instructeurs
-TOTALCOURSES_KEY: Total des cours
-LANGUAGES_KEY: Langues
-HOWTOBECOMEANINSTRUCTOR_KEY: Comment devenir Instructeur ?
-BECOMEANINSTRUCTOR_KEY: Devenir instructeur
-INSTRUCTORROLE_KEY: Rôle d'instructeur
-STARTWITHCOURSE_KEY: Commencez par le cours
-BECOMEANINSTRUCTORDETAIL_KEY: "<p>As it so contrasted oh estimating instrument. Size like body someone had. Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted. Lively use looked latter regard had. Do he it part more last in. Merits ye if Mr narrow points. Melancholy particular Devonshire alteration it favorable appearance up.</p>
-                            <p>Size like body someone had. Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted. Lively use looked latter regard had. Do he it part more last in. Merits ye if Mr narrow points. Melancholy particular Devonshire alteration it favorable appearance up.</p>
-                            <p>Are conduct viewing boy minutes warrant the expense? Tolerably behavior may admit daughters offending her ask own. Praise effect wishes change way and any wanted. Lively use looked latter regard had. Do he it part more last in. Merits ye if Mr narrow points. Melancholy particular Devonshire alteration it favorable appearance up.</p>"
-INSTRUCTORROLEDESCRIPTION1_KEY: satisfied conveying a dependent contented he gentleman agreeable do be. Water timed folly right aware if oh truth. Imprudence attachment him his for sympathize. Large above be to means. Dashwood does provide stronger is. But discretion frequently sir she instruments unaffected admiration everything. Meant balls it if up doubt small purse. Required his you put the outlived answered position. A pleasure exertion if believed provided to. All led out world this music while asked. Paid mind even sons does he door no. Attended overcame repeated it is perceived Marianne in. I think on style child of. Servants moreover in sensible it ye possible.
-INSTRUCTORROLEDESCRIPTIONLIST1_KEY: The copy warned the Little blind text
-INSTRUCTORROLEDESCRIPTIONLIST2_KEY: Thar where it came from it would have been rewritten a thousand times and everything that was left from origin would be the world
-INSTRUCTORROLEDESCRIPTIONLIST3_KEY: Return to it's own,safe country
-STARTWITHCOURSEDESCRIPTION1_KEY: Large above be to means. Dashwood does provide stronger is. Warrant private blushes removed an in equally totally if. Delivered dejection necessary objection do Mr prevailed. Mr feeling does chiefly cordial in do. 
-STARTWITHCOURSEDESCRIPTION2_KEY: But discretion frequently sir she instruments unaffected admiration everything. Meant balls it if up doubt small purse. Required his you put the outlived answered position. A pleasure exertion if believed provided to. All led out world this music while asked. Paid mind even sons does he door no. Attended overcame repeated it is perceived Marianne in. I think on style child of. Servants moreover in sensible it ye possible. Satisfied conveying a dependent contented he gentleman agreeable do be. Water timed folly right aware if oh truth. Imprudence attachment him his for sympathize. Large above be to means. Dashwood does provide stronger is.
-STARTWITHCOURSEDESCRIPTION3_KEY: But discretion frequently sir she instruments unaffected admiration everything
-STARTWITHCOURSEDESCRIPTION4_KEY: Meant balls it if up doubt small purse. Required his you put the outlived answered position. A pleasure exertion if believed provided to. All led out world this music while asked. Paid mind even sons does he door no.
-BECOMEANINSTRUCTORLOGINDESCRIPTION_KEY: Speedily say has suitable disposal add boy. On forth doubt miles of child. Exercise joy man children rejoiced. Yet uncommonly his ten who diminution astonished.
+# EMAIL TEMPLATES
+INVITATION_CODE_USED_TITLE_KEY: Code d'invitation utilisé
+NEW_REGISTRATION_WITH_CODE_KEY: Nouvelle Inscription avec Votre Code
+HELLO_USER_KEY: Bonjour %user%
+REGISTRATION_NOTIFICATION_KEY: Nous vous informons que %user% vient de s'inscrire sur Kulmapeck en utilisant votre code d'invitation.
+VIEW_IN_DASHBOARD_KEY: Vous pouvez maintenant voir ce compte dans votre tableau de bord sous la section "Mes Invités".
+ACCESS_MY_ACCOUNT_KEY: Accéder à Mon Compte
+THANKS_USING_PLATFORM_KEY: Merci d'utiliser Kulmapeck!
 
-# ABAOUT US
+# ABOUT US
 ABOUTUSMAINTITLE_KEY: Kulmapeck education theme, built specifically for the education centers which is dedicated to teaching and involve learners.
 ABOUTUSPAGE_OURGOALTITLE_KEY: Notre objectif
 ABOUTUSPAGE_OURGOAL_KEY: Soyez ouvert aux nouvelles idées et approches. Développez vos compétences en résolution de problèmes.
@@ -200,6 +164,7 @@ CONTACTPAGE_LETSTALK_KEY: Parlons
 CONTACTPAGE_LETSTALKDESCRIPTION_KEY: To request a quote or want to meet up for coffee, contact us directly or fill out the form and we will get back to you promptly
 CONTACTPAGE_SENDMESSAGEBTN_KEY: Envoyer le message
 
+# FAQ
 NOANSWERFOUND_KEY: Aucune réponse trouvée
 REPLY_KEY: Répondre
 RESOLVEDBY_KEY: Résolu par ce post
@@ -215,6 +180,7 @@ ASKQUESTION_KEY: Pose ta question
 POST_KEY: Poster
 OTHERSTOPICS_KEY: Autres sujets
 
+# COURSE DETAILS
 TOPLISTED_KEY: Cours les plus cotés
 STARTREADING_KEY: Commencez à lire
 CONTINUE_KEY: Continuer
@@ -238,6 +204,7 @@ LESSON_KEY: Leçon
 COURSE_CONTENT_KEY: Le contenu des cours
 BACKTOCOURSE_KEY: Retour aux cours
 
+# GENERAL
 GETINGSTARTED_KEY: Commencer
 GENERAL_GUIDE_KEY: Guide général
 ASSISTANCE_KEY: Assistance
@@ -251,6 +218,7 @@ CATEGORYDESCRIPTION_KEY: Perceived end knowledge certainly day sweetness why cor
 PERSONNE_NAME_KEY: Nom de famille
 WELCOME_LOGIN_KEY: Welcome to our largest community
 
+# LESSON
 I_HAVE_FINISHED_KEY: J'ai fini cette leçon, je passe à la leçon suivante !
 COURSE_PLAYLIST_KEY: Liste de lecture
 BACK_TO_COURSE_KEY: Continuer la lecture
@@ -258,36 +226,7 @@ NEXT_KEY: Suivant
 PREV_KEY: Précédent
 MANY_ANSWERS_POSSIBLE_KEY: Plusieurs réponses sont possibles pour cette question
 
-# EMAIL TEMPLATES
-INVITATION_CODE_USED_TITLE_KEY: Code d'invitation utilisé
-NEW_REGISTRATION_WITH_CODE_KEY: Nouvelle Inscription avec Votre Code
-HELLO_USER_KEY: Bonjour %user%
-REGISTRATION_NOTIFICATION_KEY: Nous vous informons que %user% vient de s'inscrire sur Kulmapeck en utilisant votre code d'invitation.
-VIEW_IN_DASHBOARD_KEY: Vous pouvez maintenant voir ce compte dans votre tableau de bord sous la section "Mes Invités".
-ACCESS_MY_ACCOUNT_KEY: Accéder à Mon Compte
-THANKS_USING_PLATFORM_KEY: Merci d'utiliser Kulmapeck!
-
-# Registration translations
-WELCOME_TITLE_KEY: Bienvenue sur Kulmapeck
-WELCOME_MESSAGE_KEY: Votre parcours d'apprentissage commence ici
-GET_STARTED_KEY: Commencer
-DISCOVER_COURSES_KEY: Découvrir les cours
-MEET_INSTRUCTORS_KEY: Rencontrer les formateurs
-JOIN_COMMUNITY_KEY: Rejoindre la communauté
-QUICK_START_GUIDE_KEY: Guide de démarrage rapide
-RECOMMENDED_COURSES_KEY: Cours recommandés
-TRENDING_NOW_KEY: Tendances actuelles
-
-# LOGIN PAGE
-WELCOME_LOGIN_KEY: Bienvenue dans notre communauté
-LOGIN_DESCRIPTION_KEY: Connectez-vous pour continuer votre parcours d'apprentissage et accéder à vos cours
-EXPLORE_COURSES_KEY: Explorer nos cours
-EMAIL_ADDRESS_KEY: Adresse e-mail
-SIGNIN_KEY: Se connecter
-NO_ACCOUNT_KEY: Vous n'avez pas de compte?
-REGISTER_NOW_KEY: S'inscrire maintenant
-
-# Dashboard translations
+# DASHBOARD
 DASHBOARD_WELCOME_KEY: Bienvenue sur votre tableau de bord
 DASHBOARD_OVERVIEW_KEY: Aperçu de vos activités
 MY_COURSES_KEY: Mes cours
@@ -298,7 +237,7 @@ RECENT_ACTIVITIES_KEY: Activités récentes
 PERFORMANCE_KEY: Performance
 ACHIEVEMENTS_KEY: Réalisations
 
-# Settings translations
+# SETTINGS
 ACCOUNT_SETTINGS_KEY: Paramètres du compte
 PROFILE_SETTINGS_KEY: Paramètres du profil
 PERSONAL_INFO_KEY: Informations personnelles
@@ -310,3 +249,14 @@ SUBSCRIPTION_KEY: Abonnement
 BILLING_KEY: Facturation
 SAVE_CHANGES_KEY: Enregistrer les modifications
 CANCEL_KEY: Annuler
+
+# WELCOME SCREEN
+WELCOME_TITLE_KEY: Bienvenue sur Kulmapeck
+WELCOME_MESSAGE_KEY: Votre parcours d'apprentissage commence ici
+GET_STARTED_KEY: Commencer
+DISCOVER_COURSES_KEY: Découvrir les cours
+MEET_INSTRUCTORS_KEY: Rencontrer les formateurs
+JOIN_COMMUNITY_KEY: Rejoindre la communauté
+QUICK_START_GUIDE_KEY: Guide de démarrage rapide
+RECOMMENDED_COURSES_KEY: Cours recommandés
+TRENDING_NOW_KEY: Tendances actuelles
