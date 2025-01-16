@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Categorie;
 use App\Entity\User;
+use App\Validator\InvitationCode;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -32,6 +33,9 @@ class RegistrationTeacherType extends AbstractType
             ->add('parentCode', TextType::class, [
                 'label' => "Invitation Code",
                 'required' => false,
+                'constraints' => [
+                    new InvitationCode()
+                ],
                 'attr' => [
                     'class' => 'border-0 bg-light rounded-end ps-1',
                     'placeholder' => "Insérer le code d'invitation ici si vous en avez un"
