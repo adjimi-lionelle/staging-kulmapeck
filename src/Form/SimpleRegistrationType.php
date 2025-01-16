@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Validator\InvitationCode;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -34,10 +35,7 @@ class SimpleRegistrationType extends AbstractType
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
-                    new Regex([
-                        'pattern' => '/^[A-Z0-9]{8}$/',
-                        'message' => 'INVALID_INVITATION_CODE_KEY'
-                    ])
+                    new InvitationCode()
                 ]
             ])
             ->add('fullName', TextType::class, [
