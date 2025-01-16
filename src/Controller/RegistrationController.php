@@ -68,8 +68,15 @@ class RegistrationController extends AbstractController
         }
 
         $userType = $request->query->get('type', 'student'); // Default to student if no type specified
+        
         // Support both old and new invitation code syntax
         $invitationCode = $request->query->get('code') ?? $request->query->get('invitation');
+        
+        // Validate invitation code format if provided
+        if ($invitationCode && !preg_match('/^[A-Z0-9]{8}$/', $invitationCode)) {
+            $invitationCode = null; // Invalid format, don't use it
+        }
+
         $user = new User();
         
         // Choose form type based on user type
@@ -79,7 +86,7 @@ class RegistrationController extends AbstractController
             $form = $this->createForm(SimpleRegistrationType::class, $user);
         }
 
-        // Set invitation code if provided
+        // Set invitation code if provided and form has the field
         if ($invitationCode && $form->has('parentCode')) {
             $form->get('parentCode')->setData($invitationCode);
         }
