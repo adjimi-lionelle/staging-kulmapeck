@@ -1,14 +1,12 @@
 {% set classNames = userType is defined and userType is same as 'trainer' ? 'needs-validation' : '' %}
-{{ form_start(registrationForm, {'attr': {'class': classNames, 'novalidate': 'novalidate'}}) }}
+{{ form_start(registrationForm, {'attr': {'class': 'mt-4', 'id': 'registration_form'}}) }}
 
     {% if registrationForm.parentCode is defined %}
-        {% if userType is defined and userType is same as 'trainer' %}
-            <div class="mb-4">
-                <label class="form-label">{{ form_label(registrationForm.parentCode) }}</label>
-                {{ form_widget(registrationForm.parentCode, {'attr': {'class': 'form-control', 'value': invitation|default('')}}) }}
-                <div class="form-text">Enter your invitation code if you have one</div>
-            </div>
-        {% endif %}
+        <div class="mb-3">
+            <label class="form-label">{{ form_label(registrationForm.parentCode) }}</label>
+            {{ form_widget(registrationForm.parentCode, {'attr': {'class': 'form-control', 'value': invitation|default('')}}) }}
+            {{ form_errors(registrationForm.parentCode) }}
+        </div>
     {% endif %}
 
     {% if userType is defined and userType is same as 'trainer' %}
@@ -96,49 +94,27 @@
         {% endif %}
     {% endif %}
 
-    {% if registrationForm.email is defined %}
-        <div class="mb-4">
-            <label class="form-label">{{ form_label(registrationForm.email) }}*</label>
-            <div class="input-group">
-                <span class="input-group-text bg-light border-0"><i class="bi bi-envelope-fill"></i></span>
-                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'required': true}}) }}
-            </div>
-            {% if form_errors(registrationForm.email) %}
-                <div class="invalid-feedback d-block">{{ form_errors(registrationForm.email) }}</div>
-            {% endif %}
-        </div>
-    {% endif %}
-
-    {% if registrationForm.plainPassword is defined %}
-        <div class="mb-4">
-            <label class="form-label">{{ form_label(registrationForm.plainPassword) }}*</label>
-            <div class="input-group">
-                <span class="input-group-text bg-light border-0"><i class="bi bi-key-fill"></i></span>
-                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'required': true}}) }}
-            </div>
-            {% if form_errors(registrationForm.plainPassword) %}
-                <div class="invalid-feedback d-block">{{ form_errors(registrationForm.plainPassword) }}</div>
-            {% endif %}
-            <div class="form-text">Password must be at least 6 characters long</div>
-        </div>
-    {% endif %}
-
-    {% if registrationForm.agreeTerms is defined %}
-        <div class="mb-4">
-            <div class="form-check">
-                {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
-                <label class="form-check-label">
-                    I agree to the <a href="#" class="text-primary">terms and conditions</a>
-                </label>
-            </div>
-            {% if form_errors(registrationForm.agreeTerms) %}
-                <div class="invalid-feedback d-block">{{ form_errors(registrationForm.agreeTerms) }}</div>
-            {% endif %}
-        </div>
-    {% endif %}
-
-    <div class="d-grid">
-        <button type="submit" class="btn btn-primary">Register</button>
+    <div class="mb-3">
+        <label class="form-label">{{ 'EMAIL_KEY'|trans }}</label>
+        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control' ~ (form_errors(registrationForm.email) ? ' is-invalid' : '')}}) }}
+        {{ form_errors(registrationForm.email) }}
     </div>
 
+    <div class="mb-3">
+        <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
+        {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control' ~ (form_errors(registrationForm.plainPassword) ? ' is-invalid' : '')}}) }}
+        {{ form_errors(registrationForm.plainPassword) }}
+    </div>
+
+    <div class="mb-3">
+        <div class="form-check">
+            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input' ~ (form_errors(registrationForm.agreeTerms) ? ' is-invalid' : '')}}) }}
+            <label class="form-check-label">
+                {{ 'AGREE_TERMS_KEY'|trans }}
+            </label>
+            {{ form_errors(registrationForm.agreeTerms) }}
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">{{ 'REGISTER_KEY'|trans }}</button>
 {{ form_end(registrationForm) }}
