@@ -21,7 +21,14 @@ class InvitationCodeValidator extends ConstraintValidator
             return;
         }
 
-        // Check if the code exists in the database
+        // First check if the format is valid (5-6 alphanumeric characters)
+        if (!preg_match('/^[A-Z0-9]{5,6}$/', $value)) {
+            $this->context->buildViolation('INVALID_INVITATION_CODE_KEY')
+                ->addViolation();
+            return;
+        }
+
+        // Then check if the code exists in the database
         $personne = $this->personneRepository->findOneBy(['invitationCode' => $value]);
         if (!$personne) {
             $this->context->buildViolation('INVALID_INVITATION_CODE_KEY')

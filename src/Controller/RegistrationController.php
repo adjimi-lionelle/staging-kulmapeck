@@ -74,7 +74,7 @@ class RegistrationController extends AbstractController
         $invitationCode = $request->query->get('code') ?? $request->query->get('invitation');
         
         // Validate invitation code format if provided
-        if ($invitationCode && !preg_match('/^[A-Z0-9]{6}$/', $invitationCode)) {
+        if ($invitationCode && !preg_match('/^[A-Z0-9]{5,6}$/', $invitationCode)) {
             $invitationCode = null; // Invalid format, don't use it
         }
 
