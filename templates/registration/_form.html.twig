@@ -4,8 +4,18 @@
     {% if registrationForm.parentCode is defined %}
         <div class="mb-3">
             <label class="form-label">{{ form_label(registrationForm.parentCode) }}</label>
-            {{ form_widget(registrationForm.parentCode, {'attr': {'class': 'form-control', 'value': invitation|default('')}}) }}
+            {% set invitationCode = app.request.query.get('code') ?? app.request.query.get('invitation') %}
+            {{ form_widget(registrationForm.parentCode, {
+                'attr': {
+                    'class': 'form-control' ~ (form_errors(registrationForm.parentCode) ? ' is-invalid' : ''),
+                    'readonly': invitationCode is not empty,
+                    'value': invitationCode|default('')
+                }
+            }) }}
             {{ form_errors(registrationForm.parentCode) }}
+            {% if invitationCode is not empty %}
+                <small class="text-muted">Code d'invitation appliqué automatiquement</small>
+            {% endif %}
         </div>
     {% endif %}
 
