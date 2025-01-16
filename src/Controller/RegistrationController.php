@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\Personne;
 use App\Entity\Eleve;
 use App\Form\SimpleRegistrationType;
+use App\Form\RegistrationTeacherType;
 use App\Repository\NetworkConfigRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\UserRepository;
