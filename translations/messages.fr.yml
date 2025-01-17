@@ -87,15 +87,20 @@ REGISTER_NOW_KEY: S'inscrire maintenant
 OR_SIGN_IN_WITH_KEY: Ou connectez-vous avec
 REGISTER_KEY: 'S''inscrire'
 PASSWORD_STRENGTH_KEY: 'Force du mot de passe'
+REGISTER_TITLE_KEY: S'inscrire
 
 # Form validation errors
 REQUIRED_FIELD_KEY: 'Ce champ est obligatoire'
+USERNAME_LENGTH_ERROR_KEY: 'Le nom d''utilisateur doit comporter au moins 3 caractères'
 INVALID_USERNAME_KEY: 'Le nom d''utilisateur ne peut contenir que des lettres, des chiffres et des tirets bas'
 INVALID_PHONE_KEY: 'Veuillez entrer un numéro de téléphone valide'
 USERNAME_EXISTS_KEY: 'Ce nom d''utilisateur est déjà pris'
 PHONE_EXISTS_KEY: 'Ce numéro de téléphone est déjà enregistré'
 TERMS_REQUIRED_KEY: 'Vous devez accepter les conditions d''utilisation'
 INVALID_INVITATION_CODE_KEY: 'Code d''invitation invalide'
+EMAIL_ALREADY_EXISTS_KEY: 'Cette adresse e-mail est déjà enregistrée'
+INVALID_EMAIL_FORMAT_KEY: 'Veuillez entrer une adresse e-mail valide'
+PASSWORD_TOO_SHORT_KEY: 'Le mot de passe doit comporter au moins 8 caractères'
 
 # SEARCH AND FILTERS
 WHATDOYOUWATTOLEARN_KEY: Que voulez-vous apprendre?
@@ -270,3 +275,6 @@ JOIN_COMMUNITY_KEY: Rejoindre la communauté
 QUICK_START_GUIDE_KEY: Guide de démarrage rapide
 RECOMMENDED_COURSES_KEY: Cours recommandés
 TRENDING_NOW_KEY: Tendances actuelles
+MAINMESSAGE_KEY: Bienvenue dans notre plus grande communauté
+FINGERSTIPS_KEY: À portée de main
+MAINMESSAGEDESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
