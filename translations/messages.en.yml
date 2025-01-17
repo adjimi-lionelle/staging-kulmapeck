@@ -101,6 +101,9 @@ USERNAME_EXISTS_KEY: 'This username is already taken'
 PHONE_EXISTS_KEY: 'This phone number is already registered'
 TERMS_REQUIRED_KEY: 'You must agree to the terms and conditions'
 INVALID_INVITATION_CODE_KEY: 'Invalid invitation code'
+EMAIL_ALREADY_EXISTS_KEY: 'This email address is already registered'
+INVALID_EMAIL_FORMAT_KEY: 'Please enter a valid email address'
+PASSWORD_TOO_SHORT_KEY: 'Password must be at least 8 characters long'
 
 # COURSES AND LEARNING
 COURSESCATEGORY_KEY: Courses categories
