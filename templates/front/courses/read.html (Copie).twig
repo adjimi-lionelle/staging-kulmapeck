@@ -4,46 +4,6 @@
 
 {% block mainContent %}
 
-    <style>
-        .offcanvas-lg {
-            display: block !important;
-            visibility: visible !important;
-            transform: none !important;
-            position: relative !important;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: auto;
-            background-color: #f8f9fa;
-            z-index: 1000;
-        }
-
-        @media (max-width: 768px) {
-            .offcanvas-lg {
-                width: 100%;
-                height: auto;
-                overflow-y: auto;
-            }
-
-            .offcanvas-lg.active {
-                transform: translateX(0);
-            }
-        }
-    </style>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const toggleSidebar = document.getElementById('toggleSidebar');
-            const sidebar = document.querySelector('.offcanvas-lg');
-
-            if (toggleSidebar) {
-                toggleSidebar.addEventListener('click', () => {
-                    sidebar.classList.toggle('active'); // Ajoute/retire une classe active
-                });
-            }
-        });
-    </script>
-
     <!-- =======================
     Page intro START -->
     <section class="bg-light py-0 py-sm-5">
@@ -101,7 +61,7 @@
                                                 <!-- Course video END -->
                                             <!-- Playlist responsive toggler START -->
                                             <div class="col-12 d-lg-none">
-                                                <button class="btn btn-primary mb-3" type="button" id="toggleSidebar">
+                                                <button class="btn btn-primary mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
                                                     <i class="bi bi-camera-video me-1"></i> {% trans %}PLAYLIST_KEY{% endtrans %}
                                                 </button>
                                             </div>
@@ -121,7 +81,11 @@
                         <!-- Tab contents END -->
                         {% if lecture and lecture.lesson is not same as null %}
                             <div class="card-footer p-4">
-                                <a href="{{ url("app_front_course_lecture_finished", {reference: lecture.reference}) }}" class="btn btn-success">Leçon suivante !</a>
+                                {# {% if not lecture.isFinished %} #}
+                                    <a href="{{ url("app_front_course_lecture_finished", {reference: lecture.reference}) }}" class="btn btn-success">Leçon suivante !</a>
+                                {# {% else %}
+                                    #<a href="{{ url("app_front_course_start", {'slug': lecture.lesson.chapitre.cours.slug}) }}" class="btn btn-success">Poursuivre la lecture !</a>
+                                {% endif %} #}
                             </div>
                         {% endif %}
                         
@@ -138,7 +102,7 @@
                                 <!-- Responsive offcanvas body START -->
                                 <div class="offcanvas-lg offcanvas-end" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
                                     <div class="offcanvas-header bg-dark">
-                                        <h5 class="offcanvas-title text-white" id="offcanvasSidebarLabel">Liste de lecture du cours</h5>
+                                        <h5 class="offcanvas-title text-white" id="offcanvasSidebarLabel">Course playlist</h5>
                                         <button type="button" class="btn btn-sm btn-light mb-0" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasSidebar" aria-label="Close"><i class="bi bi-x-lg"></i></button>
                                     </div>
                                     <div class="offcanvas-body p-3 p-lg-0">
@@ -156,6 +120,7 @@
                                                         <div id="collapse-{{ loop.index }}" class="accordion-collapse collapse">
                                                             <div class="accordion-body">
                                                                 {% for les in chapter.lessons|sort((c, d) => c.numero <=> d.numero) %}
+                                        
                                                                         <div class="d-flex justify-content-between align-items-center">
                                                                             <div class="position-relative d-flex align-items-center">
                                                                                     <a href="{{url("app_front_read_lesson", {slug: les.slug})  }}" class="btn btn-danger-soft btn-round btn-sm mb-0 stretched-link position-static">
@@ -178,7 +143,10 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        
                                                 {% endfor %}        
+
+
                                             </div>
                                             <!-- Accordion END -->
                                         </div>
@@ -186,7 +154,9 @@
                                 </div>
                                 <!-- Responsive offcanvas body END -->
                             </div>
+                            
                         </div>
+
                     </div><!-- Row End -->
                 </div>
                 <!-- Right sidebar END -->

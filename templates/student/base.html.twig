@@ -36,6 +36,31 @@
 {% endblock %}
 
 {% block script %}
+<style>
+        .bg-blue {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+            height: auto;
+        }
+
+        @media (max-width: 576px) {
+            .bg-blue h3 {
+                font-size: 8px;
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .bg-blue h3 {
+                font-size: 1.2rem; /* Taille réduite pour les écrans moyens */
+        }
+}
+
+    </style>
     
 {% endblock %}
 
@@ -46,21 +71,22 @@
         Page Banner START -->
         <section class="pt-0">
             <!-- Main banner background image -->
-            <div class="container-fluid px-0">
-                <div class="bg-blue h-100px h-md-200px rounded-0" style="background:url({{ asset('assets/images/pattern/04.png') }}) no-repeat center center; background-size:cover;">
-                               <br> <br> <br> <div class="text-center">
-                     
-                    {% if tempsRestant() > 0 %}
-                        <h3 class="text-white">
-                           Profitez de votre accès gratuit à tous nos cours avant la fin de la période d'essai dans :  <br>
-                            <span id="countdown" class="text-warning"></span>
-                        </h3>
-                    {% endif %}
-                
-                </div>
-
+            
+           <div class="container-fluid px-0">
+                <div class="bg-blue h-100px h-md-200px rounded-0 d-flex justify-content-center align-items-center" 
+                    style="background: url({{ asset('assets/images/pattern/04.png') }}) no-repeat center center; background-size: cover;">
+                    <div class="text-center w-100">
+                        {% if tempsRestant() > 0 %}
+                            <h3 class="text-white">
+                                La période d'accès gratuit prend fin dans : <br>
+                                <span id="countdown" class="text-warning"></span>
+                            </h3>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
+
+
             {% block profileBlock %}
                 <div class="container mt-n4">
                     <div class="row">
