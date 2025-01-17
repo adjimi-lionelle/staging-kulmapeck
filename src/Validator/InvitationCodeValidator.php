@@ -21,8 +21,8 @@ class InvitationCodeValidator extends ConstraintValidator
             return;
         }
 
-        // First check if the format is valid (5-6 alphanumeric characters)
-        if (!preg_match('/^[A-Z0-9]{5,6}$/', $value)) {
+        // First check if the format is valid (5-8 alphanumeric characters)
+        if (!preg_match('/^[A-Z0-9]{5,8}$/', $value)) {
             $this->context->buildViolation('INVALID_INVITATION_CODE_KEY')
                 ->addViolation();
             return;

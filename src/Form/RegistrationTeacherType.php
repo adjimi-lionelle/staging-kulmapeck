@@ -14,9 +14,11 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class RegistrationTeacherType extends AbstractType
 {
@@ -50,6 +52,26 @@ class RegistrationTeacherType extends AbstractType
                 ],
                 'label_html' => true,
                 'label' => "By signing up, you agree to the <a href=''>terms</a>"
+            ])
+            ->add('username', TextType::class, [
+                'mapped' => true,
+                'required' => true,
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'REQUIRED_FIELD_KEY'
+                    ]),
+                    new Length([
+                        'min' => 5,
+                        'max' => 8,
+                        'minMessage' => 'USERNAME_TOO_SHORT_KEY',
+                        'maxMessage' => 'USERNAME_TOO_LONG_KEY'
+                    ]),
+                    new Regex([
+                        'pattern' => '/^[a-zA-Z0-9_]+$/',
+                        'message' => 'INVALID_USERNAME_KEY'
+                    ]),
+                    new Callback([$this, 'validateUniqueUsername'])
+                ]
             ])
             ->add('plainPassword', RepeatedType::class, [
                 // instead of being set onto the object directly,

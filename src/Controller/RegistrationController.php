@@ -74,7 +74,7 @@ class RegistrationController extends AbstractController
         $invitationCode = $request->query->get('code') ?? $request->query->get('invitation');
         
         // Validate invitation code format if provided
-        if ($invitationCode && !preg_match('/^[A-Z0-9]{5,6}$/', $invitationCode)) {
+        if ($invitationCode && !preg_match('/^[A-Z0-9]{5,8}$/', $invitationCode)) {
             $invitationCode = null; // Invalid format, don't use it
         }
 
@@ -99,6 +99,22 @@ class RegistrationController extends AbstractController
                 'registrationForm' => $form->createView(),
                 'userType' => $userType,
                 'last_parent_code' => $invitationCode // Pass the invitation code to the template
+            ]);
+        }
+
+        // Validate username length
+        $username = $form->get('username')->getData();
+        if (strlen($username) < 5 || strlen($username) > 8) {
+            $form->get('username')->addError(new \Symfony\Component\Form\FormError('USERNAME_LENGTH_ERROR_KEY'));
+            return $this->render($userType === 'trainer' ? 'registration/register.html.twig' : 'registration/register_simple.html.twig', [
+                'registrationForm' => $form->createView(),
+                'userType' => $userType,
+                'last_parent_code' => $form->get('parentCode')->getData(),
+                'last_username' => $form->get('username')->getData(),
+                'last_fullname' => $form->get('fullName')->getData(),
+                'last_phone' => $form->get('phoneNumber')->getData(),
+                'last_password' => $form->get('plainPassword')->getData(),
+                'last_password_confirm' => $request->request->get('password_confirm'),
             ]);
         }
 
@@ -249,8 +265,8 @@ class RegistrationController extends AbstractController
             'last_fullname' => $form->get('fullName')->getData(),
             'last_phone' => $form->get('phoneNumber')->getData(),
             'last_parent_code' => $form->get('parentCode')->getData(),
-            'last_password' => $plainPassword,
-            'last_password_confirm' => $confirmPassword,
+            'last_password' => $form->get('plainPassword')->getData(),
+            'last_password_confirm' => $request->request->get('password_confirm'),
             'userType' => $userType
         ]);
     }

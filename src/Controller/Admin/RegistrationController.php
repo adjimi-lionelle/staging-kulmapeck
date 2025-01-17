@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
@@ -78,8 +79,8 @@ class RegistrationController extends AbstractController
 
             $codeInvitation = $this->generateInvitationCode($personneRepository);
             $invitationLink = json_encode([
-                'trainer' => $this->generateUrl('app_front_register', ['type' => 'trainer', 'invitation' => $codeInvitation]),
-                'student' => $this->generateUrl('app_front_register', ['type' => 'student', 'invitation' => $codeInvitation])
+                'trainer' => $this->generateUrl('app_front_register', ['type' => 'trainer', 'invitation' => $codeInvitation], UrlGeneratorInterface::ABSOLUTE_URL),
+                'student' => $this->generateUrl('app_front_register', ['type' => 'student', 'invitation' => $codeInvitation], UrlGeneratorInterface::ABSOLUTE_URL)
             ]);
             $user->getPersonne()->setInvitationCode($codeInvitation)
                 ->setInvitationLink($invitationLink);

@@ -21,7 +21,7 @@
 					{% block formBlock %}
 						<!-- Title -->
 						<h2 class="mb-0 h3">{{ 'WELCOME_BACK_KEY'|trans }}</h2>
-						<p class="mb-0">{{ 'NEW_HERE_KEY'|trans }}<a href="{{ path('app_front_register') }}"> {{ 'CREATE_ACCOUNT_KEY'|trans }}</a></p>
+						<p class="mb-0">{{ 'NEW_HERE_KEY'|trans }}<a href="#" data-bs-toggle="modal" data-bs-target="#coursePremium"> {{ 'CREATE_ACCOUNT_KEY'|trans }}</a></p>
 
                         {% for message in app.flashes('success') %}
                             <div class="alert alert-success">

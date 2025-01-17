@@ -82,11 +82,20 @@
                 <label class="form-label">{{ form_label(registrationForm.username) }}</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-0"><i class="fas fa-at"></i></span>
-                    {{ form_widget(registrationForm.username, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_widget(registrationForm.username, {
+                        'attr': {
+                            'class': 'form-control',
+                            'minlength': 5,
+                            'maxlength': 8,
+                            'pattern': '[a-zA-Z0-9_]+',
+                            'title': 'Username must be 5-8 characters long and can only contain letters, numbers, and underscores'
+                        }
+                    }) }}
                 </div>
                 {% if form_errors(registrationForm.username) %}
                     <div class="invalid-feedback d-block">{{ form_errors(registrationForm.username) }}</div>
                 {% endif %}
+                <small class="text-muted">Username must be 5-8 characters long</small>
             </div>
         {% endif %}
 
