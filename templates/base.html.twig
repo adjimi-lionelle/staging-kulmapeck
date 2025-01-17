@@ -11,7 +11,6 @@
 			{% endblock %}
 		</title>
 
-
 		<!-- Google Web Fonts -->
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,9 +34,7 @@
 		<!-- Template Stylesheet -->
 		<link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
 
-
 		<style>
-
 
 			.stepwizard-step p {
 				margin-top: 10px;
@@ -161,7 +158,6 @@
 
 							<a href="{{ path('app_investisseur_new') }}" active class="nav-item nav-link active">Investir</a>
 
-
 							<div class="nav-item dropdown">
 								<a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">Pages</a>
 								<div class="dropdown-menu rounded">
@@ -177,7 +173,7 @@
 
 								</div>
 							</div>
-							<a href="{{ path('app_contact') }}" class="nav-item nav-link">Contact</a>
+							<a href="{{ path('app_contact_index') }}" class="nav-item nav-link">Contact</a>
 
 						</div>
 
@@ -207,7 +203,6 @@
 				</nav>
 			</div>
 		</div>
-
 
 		{% block body %}{% endblock %}
 
@@ -249,7 +244,7 @@
 						<div class="mt-4 d-flex flex-column short-link">
 							<a href="{{ path('app_about') }}" class="mb-2 text-white">
 								<i class="fas fa-angle-right text-secondary me-2"></i>About</a>
-							<a href="{{ path('app_contact') }}" class="mb-2 text-white">
+							<a href="{{ path('app_contact_index') }}" class="mb-2 text-white">
 								<i class="fas fa-angle-right text-secondary me-2"></i>Contact</a>
 							<a href="{{ path('app_service') }}" class="mb-2 text-white">
 								<i class="fas fa-angle-right text-secondary me-2"></i>Our Services</a>
@@ -258,7 +253,6 @@
 							<a href="{{ path('app_blog') }}" class="mb-2 text-white">
 								<i class="fas fa-angle-right text-secondary me-2"></i>Latest Blog</a>
 						</div>
-
 
 					</div>
 					<div class="col-lg-3 col-md-6">
@@ -272,7 +266,7 @@
 								<i class="fas fa-angle-right text-secondary me-2"></i>Helps</a>
 							<a href="" class="mb-2 text-white">
 								<i class="fas fa-angle-right text-secondary me-2"></i>FQAs</a>
-							<a href="{{ path('app_contact') }}" class="mb-2 text-white">
+							<a href="{{ path('app_contact_index') }}" class="mb-2 text-white">
 								<i class="fas fa-angle-right text-secondary me-2"></i>Contact</a>
 						</div>
 					</div>
@@ -322,7 +316,6 @@
 			<i class="fa fa-arrow-up text-white"></i>
 		</a>
 
-
 		<!-- JavaScript Libraries -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -361,7 +354,7 @@ var curStep = $(this).closest(".setup-content"),
 curStepBtn = curStep.attr("id"),
 prevStepWizard = $('div.setup-panel div a[href="#' + curStepBtn + '"]').parent().prev().children("a");
 prevStepWizard.removeAttr('disabled').trigger('click');
-
+ 
 
 });
 
@@ -426,13 +419,10 @@ recapContent += '<li><strong>Desired Investment Type: </strong>' + desiredInvest
 $('#recap-content').html(recapContent);
 }
 
-
 $('div.setup-panel div a.btn-primary').trigger('click');
 });
 		</script>
 
-
 	</body>
-
 
 </html>
