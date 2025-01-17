@@ -43,8 +43,14 @@ ACCOUNTMODALDESCRIPTION_KEY: Prosperous understood Middletons in conviction an u
 TEACHER_KEY: Teacher & Trainer
 STUDENT_KEY: Student
 
+# WELCOME SCREEN
+MAINMESSAGE_KEY: Welcome to our largest community
+FINGERSTIPS_KEY: At your fingertips
+MAINMESSAGEDESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
+
 # AUTH AND REGISTRATION
 SIGN_IN_KEY: Sign In
+REGISTER_TITLE_KEY: Sign Up
 EMAIL_ADDRESS_KEY: Email address
 WELCOME_BACK_KEY: Welcome back
 NEW_HERE_KEY: New here?
@@ -88,6 +94,7 @@ REGISTER_KEY: 'Sign up'
 
 # Form validation errors
 REQUIRED_FIELD_KEY: 'This field is required'
+USERNAME_LENGTH_ERROR_KEY: 'Username must be at least 3 characters long'
 INVALID_USERNAME_KEY: 'Username can only contain letters, numbers, and underscores'
 INVALID_PHONE_KEY: 'Please enter a valid phone number'
 USERNAME_EXISTS_KEY: 'This username is already taken'
