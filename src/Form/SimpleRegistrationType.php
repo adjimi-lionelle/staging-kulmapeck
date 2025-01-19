@@ -68,13 +68,16 @@ class SimpleRegistrationType extends AbstractType
             ->add('phoneNumber', TextType::class, [
                 'mapped' => true,
                 'required' => true,
+                'attr' => [
+                    'placeholder' => 'PHONE_PLACEHOLDER_KEY'
+                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'
                     ]),
                     new Regex([
-                        'pattern' => '/^\+?[0-9]{8,15}$/',
-                        'message' => 'INVALID_PHONE_KEY'
+                        'pattern' => '/^\+?[0-9]+$/',
+                        'message' => 'PHONE_NO_SPACE_KEY'
                     ]),
                     new Callback([$this, 'validateUniquePhone'])
                 ]
@@ -82,6 +85,9 @@ class SimpleRegistrationType extends AbstractType
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
                 'required' => true,
+                'attr' => [
+                    'placeholder' => 'PASSWORD_PLACEHOLDER_KEY'
+                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'
@@ -89,19 +95,28 @@ class SimpleRegistrationType extends AbstractType
                     new Length([
                         'min' => 8,
                         'minMessage' => 'MIN_8_CHARS_KEY'
-                    ]),
-                    new Regex([
-                        'pattern' => '/[A-Z]/',
-                        'message' => 'UPPERCASE_REQUIRED_KEY'
-                    ]),
-                    new Regex([
-                        'pattern' => '/[a-z]/',
-                        'message' => 'LOWERCASE_REQUIRED_KEY'
-                    ]),
-                    new Regex([
-                        'pattern' => '/[0-9]/',
-                        'message' => 'NUMBER_REQUIRED_KEY'
                     ])
+                ]
+            ])
+            ->add('confirmPassword', PasswordType::class, [
+                'mapped' => false,
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'CONFIRM_PASSWORD_PLACEHOLDER_KEY'
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'REQUIRED_FIELD_KEY'
+                    ]),
+                    new Callback(function ($value, ExecutionContextInterface $context) {
+                        $form = $context->getRoot();
+                        $password = $form->get('plainPassword')->getData();
+                        
+                        if ($value !== $password) {
+                            $context->buildViolation('PASSWORD_MISMATCH_KEY')
+                                ->addViolation();
+                        }
+                    })
                 ]
             ])
             ->add('agreeTerms', CheckboxType::class, [

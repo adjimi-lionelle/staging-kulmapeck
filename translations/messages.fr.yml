@@ -89,6 +89,15 @@ REGISTER_KEY: 'S''inscrire'
 PASSWORD_STRENGTH_KEY: 'Force du mot de passe'
 REGISTER_TITLE_KEY: S'inscrire
 
+# Form placeholders
+PHONE_PLACEHOLDER_KEY: 'Entrez votre numéro de téléphone'
+PASSWORD_PLACEHOLDER_KEY: 'Entrez votre mot de passe (minimum 8 caractères)'
+CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Confirmez votre mot de passe'
+
+# Validation messages
+PHONE_NO_SPACE_KEY: 'Le numéro de téléphone ne doit pas contenir d''espaces'
+PASSWORD_MISMATCH_KEY: 'Les mots de passe ne correspondent pas'
+
 # Form validation errors
 REQUIRED_FIELD_KEY: 'Ce champ est obligatoire'
 USERNAME_LENGTH_ERROR_KEY: 'Le nom d''utilisateur doit comporter au moins 3 caractères'

@@ -92,6 +92,11 @@ REGISTER_NOW_KEY: Register now
 OR_SIGN_IN_WITH_KEY: Or sign in with
 REGISTER_KEY: 'Sign up'
 
+# Form placeholders
+PHONE_PLACEHOLDER_KEY: 'Enter your phone number'
+PASSWORD_PLACEHOLDER_KEY: 'Enter your password (minimum 8 characters)'
+CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Confirm your password'
+
 # Form validation errors
 REQUIRED_FIELD_KEY: 'This field is required'
 USERNAME_LENGTH_ERROR_KEY: 'Username must be at least 3 characters long'
@@ -106,6 +111,8 @@ INVALID_EMAIL_FORMAT_KEY: 'Please enter a valid email address'
 PASSWORD_TOO_SHORT_KEY: 'Password must be at least 8 characters long'
 USERNAME_TOO_LONG_KEY: 'Username must not exceed 15 characters'
 USERNAME_NO_SPACE_KEY: 'Username must contain only letters, numbers, and underscores (no spaces allowed)'
+PHONE_NO_SPACE_KEY: 'Phone number must not contain spaces'
+PASSWORD_MISMATCH_KEY: 'Passwords do not match'
 
 # COURSES AND LEARNING
 COURSESCATEGORY_KEY: Courses categories

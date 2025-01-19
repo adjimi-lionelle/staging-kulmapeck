@@ -78,46 +78,40 @@
                                 <!-- Password -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
-                                    {{ form_widget(registrationForm.plainPassword, {
-                                        'attr': {
-                                            'class': 'form-control' ~ (form_errors(registrationForm.plainPassword) ? ' is-invalid' : ''),
-                                            'id': 'password',
-                                            'value': last_password is defined ? last_password : ''
-                                        }
-                                    }) }}
-                                    {{ form_errors(registrationForm.plainPassword) }}
-                                    <div class="password-strength mt-2">
-                                        <small class="text-muted">{{ 'PASSWORD_STRENGTH_KEY'|trans }}:</small>
-                                        <div class="progress" style="height: 5px;">
-                                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                                        </div>
-                                        <small class="password-strength-text text-muted mt-1"></small>
+                                    <div class="position-relative">
+                                        {{ form_widget(registrationForm.plainPassword, {
+                                            'attr': {
+                                                'class': 'form-control' ~ (form_errors(registrationForm.plainPassword) ? ' is-invalid' : ''),
+                                                'id': 'password',
+                                                'placeholder': 'PASSWORD_PLACEHOLDER_KEY'|trans
+                                            }
+                                        }) }}
+                                        <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y pe-3 password-toggle">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
                                     </div>
+                                    {{ form_errors(registrationForm.plainPassword) }}
                                     <small class="text-muted">
-                                        {{ 'PASSWORD_REQUIREMENTS_KEY'|trans }}:
-                                        <ul class="mt-1 mb-0">
-                                            <li>{{ 'MIN_8_CHARS_KEY'|trans }}</li>
-                                            <li>{{ 'UPPERCASE_REQUIRED_KEY'|trans }}</li>
-                                            <li>{{ 'LOWERCASE_REQUIRED_KEY'|trans }}</li>
-                                            <li>{{ 'NUMBER_REQUIRED_KEY'|trans }}</li>
-                                        </ul>
+                                        {{ 'MIN_8_CHARS_KEY'|trans }}
                                     </small>
                                 </div>
 
                                 <!-- Password Confirmation -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
-                                    <input type="password" 
-                                           class="form-control {{ app.flashes('password_confirm_error') ? 'is-invalid' : '' }}" 
-                                           id="password_confirm" 
-                                           name="password_confirm" 
-                                           required 
-                                           value="{{ last_password_confirm is defined ? last_password_confirm : '' }}">
-                                    {% for message in app.flashes('password_confirm_error') %}
-                                        <div class="invalid-feedback">
-                                            {{ message|trans }}
-                                        </div>
-                                    {% endfor %}
+                                    <div class="position-relative">
+                                        {{ form_widget(registrationForm.confirmPassword, {
+                                            'attr': {
+                                                'class': 'form-control' ~ (form_errors(registrationForm.confirmPassword) ? ' is-invalid' : ''),
+                                                'id': 'password_confirm',
+                                                'placeholder': 'CONFIRM_PASSWORD_PLACEHOLDER_KEY'|trans
+                                            }
+                                        }) }}
+                                        <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y pe-3 password-toggle">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                    {{ form_errors(registrationForm.confirmPassword) }}
                                 </div>
 
                                 <!-- Terms -->
@@ -149,86 +143,30 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const passwordInput = document.getElementById('password');
-            const confirmInput = document.getElementById('password_confirm');
-            const strengthBar = document.querySelector('.password-strength .progress-bar');
-            const strengthText = document.querySelector('.password-strength-text');
-            const form = document.querySelector('form');
-            const submitButton = document.getElementById('submit-button');
-            const passwordMatchError = document.getElementById('password-match-error');
-
-            function validatePasswords() {
-                const passwordsMatch = passwordInput.value === confirmInput.value;
-                if (!passwordsMatch && confirmInput.value !== '') {
-                    confirmInput.classList.add('is-invalid');
-                    passwordMatchError.style.display = 'block';
-                    submitButton.disabled = true;
-                } else {
-                    confirmInput.classList.remove('is-invalid');
-                    passwordMatchError.style.display = 'none';
-                    submitButton.disabled = !passwordsMatch;
-                }
-                return passwordsMatch;
-            }
-
-            // Password strength checker
-            function checkPasswordStrength(password) {
-                let strength = 0;
-                const patterns = {
-                    length: password.length >= 8,
-                    lowercase: /[a-z]/.test(password),
-                    uppercase: /[A-Z]/.test(password),
-                    numbers: /\d/.test(password)
-                };
-
-                strength += patterns.length ? 25 : 0;
-                strength += patterns.lowercase ? 25 : 0;
-                strength += patterns.uppercase ? 25 : 0;
-                strength += patterns.numbers ? 25 : 0;
-
-                return {
-                    score: strength,
-                    patterns: patterns
-                };
-            }
-
-            // Update password strength indicator
-            passwordInput.addEventListener('input', function() {
-                const result = checkPasswordStrength(this.value);
-                strengthBar.style.width = result.score + '%';
-                
-                if (result.score <= 25) {
-                    strengthBar.className = 'progress-bar bg-danger';
-                    strengthText.textContent = '{{ 'VERY_WEAK_KEY'|trans }}';
-                } else if (result.score <= 50) {
-                    strengthBar.className = 'progress-bar bg-warning';
-                    strengthText.textContent = '{{ 'WEAK_KEY'|trans }}';
-                } else if (result.score <= 75) {
-                    strengthBar.className = 'progress-bar bg-info';
-                    strengthText.textContent = '{{ 'MEDIUM_KEY'|trans }}';
-                } else if (result.score <= 100) {
-                    strengthBar.className = 'progress-bar bg-primary';
-                    strengthText.textContent = '{{ 'STRONG_KEY'|trans }}';
-                }
-                if (confirmInput.value !== '') {
-                    validatePasswords();
-                }
+            // Password toggle visibility
+            document.querySelectorAll('.password-toggle').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const field = this.closest('.position-relative').querySelector('input');
+                    const icon = this.querySelector('i');
+                    
+                    if (field.type === 'password') {
+                        field.type = 'text';
+                        icon.classList.remove('bi-eye');
+                        icon.classList.add('bi-eye-slash');
+                    } else {
+                        field.type = 'password';
+                        icon.classList.remove('bi-eye-slash');
+                        icon.classList.add('bi-eye');
+                    }
+                });
             });
 
-            // Check password confirmation
-            confirmInput.addEventListener('input', validatePasswords);
-
-            // Form submission
-            form.addEventListener('submit', function(e) {
-                const isValid = validatePasswords();
-                if (!isValid) {
-                    e.preventDefault();
-                    confirmInput.focus();
-                }
-            });
-
-            // Initial validation
-            submitButton.disabled = true;
+            // Clear password fields on validation error
+            const form = document.getElementById('registration_form');
+            if (form.querySelector('.is-invalid')) {
+                const passwordFields = form.querySelectorAll('input[type="password"]');
+                passwordFields.forEach(field => field.value = '');
+            }
         });
     </script>
 {% endblock %}
