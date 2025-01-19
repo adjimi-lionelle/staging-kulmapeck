@@ -114,6 +114,14 @@ showActiveTheme(theme)
 				width: 70px;
 				height: auto;
 			}
+
+			@media (max-width: 1024px) { /* Cible les appareils avec une largeur maximale de 1024px (tablette et mobile) */
+				.left-content, 
+				.right-content,
+				.counter-block { 
+					display: none;
+				}
+            }
 		</style>
 		<!-- Theme CSS -->
 		<link
