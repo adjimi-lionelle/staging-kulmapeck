@@ -104,6 +104,8 @@ INVALID_INVITATION_CODE_KEY: 'Invalid invitation code'
 EMAIL_ALREADY_EXISTS_KEY: 'This email address is already registered'
 INVALID_EMAIL_FORMAT_KEY: 'Please enter a valid email address'
 PASSWORD_TOO_SHORT_KEY: 'Password must be at least 8 characters long'
+USERNAME_TOO_LONG_KEY: 'Username must not exceed 15 characters'
+USERNAME_NO_SPACE_KEY: 'Username must contain only letters, numbers, and underscores (no spaces allowed)'
 
 # COURSES AND LEARNING
 COURSESCATEGORY_KEY: Courses categories

@@ -54,9 +54,13 @@ class SimpleRegistrationType extends AbstractType
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'
                     ]),
+                    new Length([
+                        'max' => 15,
+                        'maxMessage' => 'USERNAME_TOO_LONG_KEY'
+                    ]),
                     new Regex([
                         'pattern' => '/^[a-zA-Z0-9_]+$/',
-                        'message' => 'INVALID_USERNAME_KEY'
+                        'message' => 'USERNAME_NO_SPACE_KEY'
                     ]),
                     new Callback([$this, 'validateUniqueUsername'])
                 ]
