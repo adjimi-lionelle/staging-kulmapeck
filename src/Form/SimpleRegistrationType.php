@@ -34,6 +34,7 @@ class SimpleRegistrationType extends AbstractType
             ->add('parentCode', TextType::class, [
                 'mapped' => false,
                 'required' => false,
+                'label' => 'INVITATION_CODE_KEY',
                 'attr' => [
                     'placeholder' => 'INVITATION_CODE_PLACEHOLDER_KEY'
                 ],
@@ -46,6 +47,7 @@ class SimpleRegistrationType extends AbstractType
             ->add('fullName', TextType::class, [
                 'mapped' => false,
                 'required' => true,
+                'label' => 'FULL_NAME_KEY',
                 'attr' => [
                     'placeholder' => 'FULL_NAME_PLACEHOLDER_KEY'
                 ],
@@ -58,6 +60,7 @@ class SimpleRegistrationType extends AbstractType
             ->add('username', TextType::class, [
                 'mapped' => true,
                 'required' => true,
+                'label' => 'USERNAME_KEY',
                 'attr' => [
                     'placeholder' => 'USERNAME_PLACEHOLDER_KEY'
                 ],
@@ -79,6 +82,7 @@ class SimpleRegistrationType extends AbstractType
             ->add('phoneNumber', TextType::class, [
                 'mapped' => true,
                 'required' => true,
+                'label' => 'PHONE_NUMBER_KEY',
                 'attr' => [
                     'placeholder' => 'PHONE_PLACEHOLDER_KEY'
                 ],
@@ -96,6 +100,7 @@ class SimpleRegistrationType extends AbstractType
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
                 'required' => true,
+                'label' => 'PASSWORD_KEY',
                 'attr' => [
                     'placeholder' => 'PASSWORD_PLACEHOLDER_KEY'
                 ],
@@ -112,6 +117,7 @@ class SimpleRegistrationType extends AbstractType
             ->add('confirmPassword', PasswordType::class, [
                 'mapped' => false,
                 'required' => true,
+                'label' => 'CONFIRM_PASSWORD_KEY',
                 'attr' => [
                     'placeholder' => 'CONFIRM_PASSWORD_PLACEHOLDER_KEY'
                 ],
@@ -133,6 +139,7 @@ class SimpleRegistrationType extends AbstractType
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
                 'required' => true,
+                'label' => 'AGREE_TO_TERMS_KEY',
                 'constraints' => [
                     new IsTrue([
                         'message' => 'TERMS_REQUIRED_KEY'

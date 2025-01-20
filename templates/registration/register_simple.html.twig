@@ -92,21 +92,20 @@
                                 <!-- Password -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
-                                    <div class="position-relative">
+                                    <div class="input-group">
                                         {{ form_widget(registrationForm.plainPassword, {
                                             'attr': {
                                                 'class': 'form-control' ~ (form_errors(registrationForm.plainPassword) ? ' is-invalid' : ''),
-                                                'id': 'password',
                                                 'placeholder': 'PASSWORD_PLACEHOLDER_KEY'|trans
                                             }
                                         }) }}
-                                        <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y pe-3 password-toggle">
+                                        <button type="button" class="btn btn-outline-secondary toggle-password">
                                             <i class="bi bi-eye"></i>
                                         </button>
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(registrationForm.plainPassword) }}
+                                        </div>
                                     </div>
-                                    {% for error in form_errors(registrationForm.plainPassword) %}
-                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
-                                    {% endfor %}
                                     <small class="text-muted">
                                         {{ 'MIN_8_CHARS_KEY'|trans }}
                                     </small>
@@ -115,21 +114,20 @@
                                 <!-- Password Confirmation -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
-                                    <div class="position-relative">
+                                    <div class="input-group">
                                         {{ form_widget(registrationForm.confirmPassword, {
                                             'attr': {
                                                 'class': 'form-control' ~ (form_errors(registrationForm.confirmPassword) ? ' is-invalid' : ''),
-                                                'id': 'password_confirm',
                                                 'placeholder': 'CONFIRM_PASSWORD_PLACEHOLDER_KEY'|trans
                                             }
                                         }) }}
-                                        <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y pe-3 password-toggle">
+                                        <button type="button" class="btn btn-outline-secondary toggle-password">
                                             <i class="bi bi-eye"></i>
                                         </button>
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(registrationForm.confirmPassword) }}
+                                        </div>
                                     </div>
-                                    {% for error in form_errors(registrationForm.confirmPassword) %}
-                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
-                                    {% endfor %}
                                 </div>
 
                                 <!-- Terms -->
@@ -164,14 +162,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Password toggle visibility
-            const toggleButtons = document.querySelectorAll('.password-toggle');
-            
-            toggleButtons.forEach(function(button) {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    const input = this.closest('.position-relative').querySelector('input');
+            document.querySelectorAll('.toggle-password').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const input = this.closest('.input-group').querySelector('input');
                     const icon = this.querySelector('i');
                     
                     if (input.type === 'password') {
