@@ -193,23 +193,27 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Password toggle visibility
-            document.querySelectorAll('.toggle-password').forEach(function(button) {
-                button.onclick = function(e) {
-                    e.preventDefault();
-                    const passwordField = this.closest('.input-group').querySelector('input');
+            // Get all password toggle buttons
+            const toggleButtons = document.querySelectorAll('.toggle-password');
+            
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Find the closest input group and get the password input
+                    const inputGroup = this.closest('.input-group');
+                    const passwordInput = inputGroup.querySelector('input');
                     const icon = this.querySelector('i');
                     
-                    if (passwordField.type === 'password') {
-                        passwordField.type = 'text';
+                    // Toggle password visibility
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
                         icon.classList.remove('bi-eye');
                         icon.classList.add('bi-eye-slash');
                     } else {
-                        passwordField.type = 'password';
+                        passwordInput.type = 'password';
                         icon.classList.remove('bi-eye-slash');
                         icon.classList.add('bi-eye');
                     }
-                };
+                });
             });
         });
     </script>
