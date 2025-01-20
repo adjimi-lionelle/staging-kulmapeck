@@ -27,6 +27,12 @@
 
                         <div class="card-body">
                             {{ form_start(registrationForm, {'attr': {'class': 'mt-4', 'id': 'registration_form'}}) }}
+                                {# Display form level errors #}
+                                {% if not registrationForm.vars.valid %}
+                                    <div class="alert alert-danger">
+                                        {{ form_errors(registrationForm) }}
+                                    </div>
+                                {% endif %}
                                 <!-- Invitation Code -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'INVITATION_CODE_KEY'|trans }}</label>
@@ -163,33 +169,22 @@
             toggleButtons.forEach(function(button) {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
-                    e.stopPropagation(); // Prevent event bubbling
+                    e.stopPropagation();
                     
-                    const field = this.closest('.position-relative').querySelector('input[type="password"], input[type="text"]');
+                    const input = this.closest('.position-relative').querySelector('input');
                     const icon = this.querySelector('i');
                     
-                    if (field.type === 'password') {
-                        field.type = 'text';
+                    if (input.type === 'password') {
+                        input.type = 'text';
                         icon.classList.remove('bi-eye');
                         icon.classList.add('bi-eye-slash');
                     } else {
-                        field.type = 'password';
+                        input.type = 'password';
                         icon.classList.remove('bi-eye-slash');
                         icon.classList.add('bi-eye');
                     }
                 });
             });
-
-            // Clear password fields on validation error
-            const form = document.getElementById('registration_form');
-            const hasErrors = form.querySelector('.is-invalid');
-            
-            if (hasErrors) {
-                const passwordFields = form.querySelectorAll('input[type="password"]');
-                passwordFields.forEach(function(field) {
-                    field.value = '';
-                });
-            }
         });
     </script>
 {% endblock %}

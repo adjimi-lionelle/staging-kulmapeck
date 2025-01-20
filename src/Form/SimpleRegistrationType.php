@@ -38,7 +38,9 @@ class SimpleRegistrationType extends AbstractType
                     'placeholder' => 'INVITATION_CODE_PLACEHOLDER_KEY'
                 ],
                 'constraints' => [
-                    new InvitationCode()
+                    new InvitationCode([
+                        'message' => 'INVALID_INVITATION_CODE_KEY'
+                    ])
                 ]
             ])
             ->add('fullName', TextType::class, [
@@ -103,7 +105,7 @@ class SimpleRegistrationType extends AbstractType
                     ]),
                     new Length([
                         'min' => 8,
-                        'minMessage' => 'MIN_8_CHARS_KEY'
+                        'minMessage' => 'PASSWORD_TOO_SHORT_KEY'
                     ])
                 ]
             ])
