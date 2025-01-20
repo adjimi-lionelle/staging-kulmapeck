@@ -34,6 +34,9 @@ class SimpleRegistrationType extends AbstractType
             ->add('parentCode', TextType::class, [
                 'mapped' => false,
                 'required' => false,
+                'attr' => [
+                    'placeholder' => 'INVITATION_CODE_PLACEHOLDER_KEY'
+                ],
                 'constraints' => [
                     new InvitationCode()
                 ]
@@ -41,6 +44,9 @@ class SimpleRegistrationType extends AbstractType
             ->add('fullName', TextType::class, [
                 'mapped' => false,
                 'required' => true,
+                'attr' => [
+                    'placeholder' => 'FULL_NAME_PLACEHOLDER_KEY'
+                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'
@@ -50,6 +56,9 @@ class SimpleRegistrationType extends AbstractType
             ->add('username', TextType::class, [
                 'mapped' => true,
                 'required' => true,
+                'attr' => [
+                    'placeholder' => 'USERNAME_PLACEHOLDER_KEY'
+                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'

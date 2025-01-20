@@ -144,8 +144,11 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Password toggle visibility
-            document.querySelectorAll('.password-toggle').forEach(function(button) {
-                button.addEventListener('click', function() {
+            const toggleButtons = document.querySelectorAll('.password-toggle');
+            
+            toggleButtons.forEach(function(button) {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent form submission
                     const field = this.closest('.position-relative').querySelector('input');
                     const icon = this.querySelector('i');
                     
@@ -163,9 +166,13 @@
 
             // Clear password fields on validation error
             const form = document.getElementById('registration_form');
-            if (form.querySelector('.is-invalid')) {
+            const hasErrors = form.querySelector('.is-invalid');
+            
+            if (hasErrors) {
                 const passwordFields = form.querySelectorAll('input[type="password"]');
-                passwordFields.forEach(field => field.value = '');
+                passwordFields.forEach(function(field) {
+                    field.value = '';
+                });
             }
         });
     </script>

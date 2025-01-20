@@ -90,6 +90,9 @@ PASSWORD_STRENGTH_KEY: 'Force du mot de passe'
 REGISTER_TITLE_KEY: S'inscrire
 
 # Form placeholders
+INVITATION_CODE_PLACEHOLDER_KEY: 'Entrez le code d''invitation (facultatif)'
+FULL_NAME_PLACEHOLDER_KEY: 'Entrez votre nom complet'
+USERNAME_PLACEHOLDER_KEY: 'Choisissez un nom d''utilisateur (sans espaces)'
 PHONE_PLACEHOLDER_KEY: 'Entrez votre numéro de téléphone'
 PASSWORD_PLACEHOLDER_KEY: 'Entrez votre mot de passe (minimum 8 caractères)'
 CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Confirmez votre mot de passe'

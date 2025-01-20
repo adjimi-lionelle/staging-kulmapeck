@@ -93,6 +93,9 @@ OR_SIGN_IN_WITH_KEY: Or sign in with
 REGISTER_KEY: 'Sign up'
 
 # Form placeholders
+INVITATION_CODE_PLACEHOLDER_KEY: 'Enter invitation code (optional)'
+FULL_NAME_PLACEHOLDER_KEY: 'Enter your full name'
+USERNAME_PLACEHOLDER_KEY: 'Choose a username (no spaces)'
 PHONE_PLACEHOLDER_KEY: 'Enter your phone number'
 PASSWORD_PLACEHOLDER_KEY: 'Enter your password (minimum 8 characters)'
 CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Confirm your password'
