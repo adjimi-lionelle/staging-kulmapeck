@@ -27,6 +27,12 @@
 
                         <div class="card-body">
                             {{ form_start(registrationForm, {'attr': {'class': 'mt-4', 'id': 'registration_form'}}) }}
+                                {# Display form level errors #}
+                                {% if not registrationForm.vars.valid %}
+                                    <div class="alert alert-danger">
+                                        {{ form_errors(registrationForm) }}
+                                    </div>
+                                {% endif %}
                                 <!-- Invitation Code -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'INVITATION_CODE_KEY'|trans }}</label>
@@ -36,7 +42,9 @@
                                             'value': last_parent_code is defined ? last_parent_code : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.parentCode) }}
+                                    {% for error in form_errors(registrationForm.parentCode) %}
+                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <!-- Full Name -->
@@ -48,7 +56,9 @@
                                             'value': last_fullname is defined ? last_fullname : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.fullName) }}
+                                    {% for error in form_errors(registrationForm.fullName) %}
+                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <!-- Username -->
@@ -60,7 +70,9 @@
                                             'value': last_username is defined ? last_username : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.username) }}
+                                    {% for error in form_errors(registrationForm.username) %}
+                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <!-- Phone Number -->
@@ -72,25 +84,34 @@
                                             'value': last_phone is defined ? last_phone : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.phoneNumber) }}
+                                    {% for error in form_errors(registrationForm.phoneNumber) %}
+                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <!-- Password -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
-                                    <div class="position-relative">
+                                    <div class="input-group">
                                         {{ form_widget(registrationForm.plainPassword, {
                                             'attr': {
                                                 'class': 'form-control' ~ (form_errors(registrationForm.plainPassword) ? ' is-invalid' : ''),
-                                                'id': 'password',
                                                 'placeholder': 'PASSWORD_PLACEHOLDER_KEY'|trans
                                             }
                                         }) }}
-                                        <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y pe-3 password-toggle">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
+                                        <span class="input-group-text p-0">
+                                            <button type="button" class="btn btn-outline-secondary h-100 toggle-password">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </span>
                                     </div>
-                                    {{ form_errors(registrationForm.plainPassword) }}
+                                    {% if form_errors(registrationForm.plainPassword) %}
+                                        <div class="text-danger mt-1">
+                                            {% for error in form_errors(registrationForm.plainPassword) %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                     <small class="text-muted">
                                         {{ 'MIN_8_CHARS_KEY'|trans }}
                                     </small>
@@ -99,19 +120,26 @@
                                 <!-- Password Confirmation -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
-                                    <div class="position-relative">
+                                    <div class="input-group">
                                         {{ form_widget(registrationForm.confirmPassword, {
                                             'attr': {
                                                 'class': 'form-control' ~ (form_errors(registrationForm.confirmPassword) ? ' is-invalid' : ''),
-                                                'id': 'password_confirm',
                                                 'placeholder': 'CONFIRM_PASSWORD_PLACEHOLDER_KEY'|trans
                                             }
                                         }) }}
-                                        <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y pe-3 password-toggle">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
+                                        <span class="input-group-text p-0">
+                                            <button type="button" class="btn btn-outline-secondary h-100 toggle-password">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </span>
                                     </div>
-                                    {{ form_errors(registrationForm.confirmPassword) }}
+                                    {% if form_errors(registrationForm.confirmPassword) %}
+                                        <div class="text-danger mt-1">
+                                            {% for error in form_errors(registrationForm.confirmPassword) %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Terms -->
@@ -124,7 +152,9 @@
                                     <label class="form-check-label">
                                         {{ 'AGREE_TO_TERMS_KEY'|trans }} <a href="{{ path('app_terms') }}" target="_blank">{{ 'TERMS_KEY'|trans }}</a>
                                     </label>
-                                    {{ form_errors(registrationForm.agreeTerms) }}
+                                    {% for error in form_errors(registrationForm.agreeTerms) %}
+                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <div class="align-items-center mt-0">
@@ -144,29 +174,23 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Password toggle visibility
-            document.querySelectorAll('.password-toggle').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    const field = this.closest('.position-relative').querySelector('input');
+            document.querySelectorAll('.toggle-password').forEach(function(button) {
+                button.onclick = function(e) {
+                    e.preventDefault();
+                    const passwordField = this.closest('.input-group').querySelector('input');
                     const icon = this.querySelector('i');
                     
-                    if (field.type === 'password') {
-                        field.type = 'text';
+                    if (passwordField.type === 'password') {
+                        passwordField.type = 'text';
                         icon.classList.remove('bi-eye');
                         icon.classList.add('bi-eye-slash');
                     } else {
-                        field.type = 'password';
+                        passwordField.type = 'password';
                         icon.classList.remove('bi-eye-slash');
                         icon.classList.add('bi-eye');
                     }
-                });
+                };
             });
-
-            // Clear password fields on validation error
-            const form = document.getElementById('registration_form');
-            if (form.querySelector('.is-invalid')) {
-                const passwordFields = form.querySelectorAll('input[type="password"]');
-                passwordFields.forEach(field => field.value = '');
-            }
         });
     </script>
 {% endblock %}

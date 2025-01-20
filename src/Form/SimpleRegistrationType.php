@@ -34,13 +34,25 @@ class SimpleRegistrationType extends AbstractType
             ->add('parentCode', TextType::class, [
                 'mapped' => false,
                 'required' => false,
+                'label' => 'INVITATION_CODE_KEY',
+                'translation_domain' => 'messages',
+                'attr' => [
+                    'placeholder' => 'INVITATION_CODE_PLACEHOLDER_KEY'
+                ],
                 'constraints' => [
-                    new InvitationCode()
+                    new InvitationCode([
+                        'message' => 'INVALID_INVITATION_CODE_KEY'
+                    ])
                 ]
             ])
             ->add('fullName', TextType::class, [
                 'mapped' => false,
                 'required' => true,
+                'label' => 'FULL_NAME_KEY',
+                'translation_domain' => 'messages',
+                'attr' => [
+                    'placeholder' => 'FULL_NAME_PLACEHOLDER_KEY'
+                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'
@@ -50,6 +62,11 @@ class SimpleRegistrationType extends AbstractType
             ->add('username', TextType::class, [
                 'mapped' => true,
                 'required' => true,
+                'label' => 'USERNAME_KEY',
+                'translation_domain' => 'messages',
+                'attr' => [
+                    'placeholder' => 'USERNAME_PLACEHOLDER_KEY'
+                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'
@@ -68,6 +85,8 @@ class SimpleRegistrationType extends AbstractType
             ->add('phoneNumber', TextType::class, [
                 'mapped' => true,
                 'required' => true,
+                'label' => 'PHONE_NUMBER_KEY',
+                'translation_domain' => 'messages',
                 'attr' => [
                     'placeholder' => 'PHONE_PLACEHOLDER_KEY'
                 ],
@@ -85,6 +104,8 @@ class SimpleRegistrationType extends AbstractType
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
                 'required' => true,
+                'label' => 'PASSWORD_KEY',
+                'translation_domain' => 'messages',
                 'attr' => [
                     'placeholder' => 'PASSWORD_PLACEHOLDER_KEY'
                 ],
@@ -94,13 +115,15 @@ class SimpleRegistrationType extends AbstractType
                     ]),
                     new Length([
                         'min' => 8,
-                        'minMessage' => 'MIN_8_CHARS_KEY'
+                        'minMessage' => 'PASSWORD_TOO_SHORT_KEY'
                     ])
                 ]
             ])
             ->add('confirmPassword', PasswordType::class, [
                 'mapped' => false,
                 'required' => true,
+                'label' => 'CONFIRM_PASSWORD_KEY',
+                'translation_domain' => 'messages',
                 'attr' => [
                     'placeholder' => 'CONFIRM_PASSWORD_PLACEHOLDER_KEY'
                 ],
@@ -122,6 +145,8 @@ class SimpleRegistrationType extends AbstractType
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
                 'required' => true,
+                'label' => 'AGREE_TO_TERMS_KEY',
+                'translation_domain' => 'messages',
                 'constraints' => [
                     new IsTrue([
                         'message' => 'TERMS_REQUIRED_KEY'
@@ -158,6 +183,7 @@ class SimpleRegistrationType extends AbstractType
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
             'csrf_token_id' => 'registration_form',
+            'translation_domain' => 'messages'
         ]);
     }
 }
