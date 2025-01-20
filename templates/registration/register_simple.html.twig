@@ -92,20 +92,22 @@
                                 <!-- Password -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
-                                    <div class="input-group">
+                                    <div class="position-relative">
                                         {{ form_widget(registrationForm.plainPassword, {
                                             'attr': {
                                                 'class': 'form-control' ~ (form_errors(registrationForm.plainPassword) ? ' is-invalid' : ''),
                                                 'placeholder': 'PASSWORD_PLACEHOLDER_KEY'|trans
                                             }
                                         }) }}
-                                        <button type="button" class="btn btn-outline-secondary toggle-password">
+                                        <button type="button" class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y pe-3 toggle-password">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <div class="invalid-feedback d-block">
-                                            {{ form_errors(registrationForm.plainPassword) }}
-                                        </div>
                                     </div>
+                                    {% if form_errors(registrationForm.plainPassword) %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(registrationForm.plainPassword)|trans }}
+                                        </div>
+                                    {% endif %}
                                     <small class="text-muted">
                                         {{ 'MIN_8_CHARS_KEY'|trans }}
                                     </small>
@@ -114,20 +116,22 @@
                                 <!-- Password Confirmation -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
-                                    <div class="input-group">
+                                    <div class="position-relative">
                                         {{ form_widget(registrationForm.confirmPassword, {
                                             'attr': {
                                                 'class': 'form-control' ~ (form_errors(registrationForm.confirmPassword) ? ' is-invalid' : ''),
                                                 'placeholder': 'CONFIRM_PASSWORD_PLACEHOLDER_KEY'|trans
                                             }
                                         }) }}
-                                        <button type="button" class="btn btn-outline-secondary toggle-password">
+                                        <button type="button" class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y pe-3 toggle-password">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <div class="invalid-feedback d-block">
-                                            {{ form_errors(registrationForm.confirmPassword) }}
-                                        </div>
                                     </div>
+                                    {% if form_errors(registrationForm.confirmPassword) %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(registrationForm.confirmPassword)|trans }}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Terms -->
@@ -164,15 +168,15 @@
             // Password toggle visibility
             document.querySelectorAll('.toggle-password').forEach(function(button) {
                 button.addEventListener('click', function() {
-                    const input = this.closest('.input-group').querySelector('input');
+                    const passwordInput = this.closest('.position-relative').querySelector('input');
                     const icon = this.querySelector('i');
                     
-                    if (input.type === 'password') {
-                        input.type = 'text';
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
                         icon.classList.remove('bi-eye');
                         icon.classList.add('bi-eye-slash');
                     } else {
-                        input.type = 'password';
+                        passwordInput.type = 'password';
                         icon.classList.remove('bi-eye-slash');
                         icon.classList.add('bi-eye');
                     }
