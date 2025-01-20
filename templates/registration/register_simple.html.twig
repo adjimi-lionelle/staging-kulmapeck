@@ -36,7 +36,9 @@
                                             'value': last_parent_code is defined ? last_parent_code : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.parentCode) }}
+                                    {% for error in form_errors(registrationForm.parentCode) %}
+                                        <div class="invalid-feedback">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <!-- Full Name -->
@@ -48,7 +50,9 @@
                                             'value': last_fullname is defined ? last_fullname : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.fullName) }}
+                                    {% for error in form_errors(registrationForm.fullName) %}
+                                        <div class="invalid-feedback">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <!-- Username -->
@@ -60,7 +64,9 @@
                                             'value': last_username is defined ? last_username : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.username) }}
+                                    {% for error in form_errors(registrationForm.username) %}
+                                        <div class="invalid-feedback">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <!-- Phone Number -->
@@ -72,7 +78,9 @@
                                             'value': last_phone is defined ? last_phone : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.phoneNumber) }}
+                                    {% for error in form_errors(registrationForm.phoneNumber) %}
+                                        <div class="invalid-feedback">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <!-- Password -->
@@ -90,7 +98,9 @@
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
-                                    {{ form_errors(registrationForm.plainPassword) }}
+                                    {% for error in form_errors(registrationForm.plainPassword) %}
+                                        <div class="invalid-feedback">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                     <small class="text-muted">
                                         {{ 'MIN_8_CHARS_KEY'|trans }}
                                     </small>
@@ -111,7 +121,9 @@
                                             <i class="bi bi-eye"></i>
                                         </button>
                                     </div>
-                                    {{ form_errors(registrationForm.confirmPassword) }}
+                                    {% for error in form_errors(registrationForm.confirmPassword) %}
+                                        <div class="invalid-feedback">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <!-- Terms -->
@@ -124,7 +136,9 @@
                                     <label class="form-check-label">
                                         {{ 'AGREE_TO_TERMS_KEY'|trans }} <a href="{{ path('app_terms') }}" target="_blank">{{ 'TERMS_KEY'|trans }}</a>
                                     </label>
-                                    {{ form_errors(registrationForm.agreeTerms) }}
+                                    {% for error in form_errors(registrationForm.agreeTerms) %}
+                                        <div class="invalid-feedback">{{ error.message|trans }}</div>
+                                    {% endfor %}
                                 </div>
 
                                 <div class="align-items-center mt-0">
@@ -148,8 +162,10 @@
             
             toggleButtons.forEach(function(button) {
                 button.addEventListener('click', function(e) {
-                    e.preventDefault(); // Prevent form submission
-                    const field = this.closest('.position-relative').querySelector('input');
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevent event bubbling
+                    
+                    const field = this.closest('.position-relative').querySelector('input[type="password"], input[type="text"]');
                     const icon = this.querySelector('i');
                     
                     if (field.type === 'password') {
