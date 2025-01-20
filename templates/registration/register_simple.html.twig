@@ -42,9 +42,13 @@
                                             'value': last_parent_code is defined ? last_parent_code : ''
                                         }
                                     }) }}
-                                    {% for error in form_errors(registrationForm.parentCode) %}
-                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
-                                    {% endfor %}
+                                    {% if form_errors(registrationForm.parentCode) %}
+                                        <div class="text-danger mt-1">
+                                            {% for error in form_errors(registrationForm.parentCode) %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Full Name -->
@@ -56,9 +60,13 @@
                                             'value': last_fullname is defined ? last_fullname : ''
                                         }
                                     }) }}
-                                    {% for error in form_errors(registrationForm.fullName) %}
-                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
-                                    {% endfor %}
+                                    {% if form_errors(registrationForm.fullName) %}
+                                        <div class="text-danger mt-1">
+                                            {% for error in form_errors(registrationForm.fullName) %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Username -->
@@ -70,9 +78,13 @@
                                             'value': last_username is defined ? last_username : ''
                                         }
                                     }) }}
-                                    {% for error in form_errors(registrationForm.username) %}
-                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
-                                    {% endfor %}
+                                    {% if form_errors(registrationForm.username) %}
+                                        <div class="text-danger mt-1">
+                                            {% for error in form_errors(registrationForm.username) %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Phone Number -->
@@ -84,9 +96,13 @@
                                             'value': last_phone is defined ? last_phone : ''
                                         }
                                     }) }}
-                                    {% for error in form_errors(registrationForm.phoneNumber) %}
-                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
-                                    {% endfor %}
+                                    {% if form_errors(registrationForm.phoneNumber) %}
+                                        <div class="text-danger mt-1">
+                                            {% for error in form_errors(registrationForm.phoneNumber) %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Password -->
@@ -152,9 +168,13 @@
                                     <label class="form-check-label">
                                         {{ 'AGREE_TO_TERMS_KEY'|trans }} <a href="{{ path('app_terms') }}" target="_blank">{{ 'TERMS_KEY'|trans }}</a>
                                     </label>
-                                    {% for error in form_errors(registrationForm.agreeTerms) %}
-                                        <div class="invalid-feedback d-block text-danger">{{ error.message|trans }}</div>
-                                    {% endfor %}
+                                    {% if form_errors(registrationForm.agreeTerms) %}
+                                        <div class="text-danger mt-1">
+                                            {% for error in form_errors(registrationForm.agreeTerms) %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="align-items-center mt-0">
