@@ -92,20 +92,24 @@
                                 <!-- Password -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
-                                    <div class="position-relative">
+                                    <div class="input-group">
                                         {{ form_widget(registrationForm.plainPassword, {
                                             'attr': {
                                                 'class': 'form-control' ~ (form_errors(registrationForm.plainPassword) ? ' is-invalid' : ''),
                                                 'placeholder': 'PASSWORD_PLACEHOLDER_KEY'|trans
                                             }
                                         }) }}
-                                        <button type="button" class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y pe-3 toggle-password">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
+                                        <span class="input-group-text p-0">
+                                            <button type="button" class="btn btn-outline-secondary h-100 toggle-password">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </span>
                                     </div>
                                     {% if form_errors(registrationForm.plainPassword) %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form_errors(registrationForm.plainPassword)|trans }}
+                                        <div class="text-danger mt-1">
+                                            {% for error in form_errors(registrationForm.plainPassword) %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
                                         </div>
                                     {% endif %}
                                     <small class="text-muted">
@@ -116,20 +120,24 @@
                                 <!-- Password Confirmation -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
-                                    <div class="position-relative">
+                                    <div class="input-group">
                                         {{ form_widget(registrationForm.confirmPassword, {
                                             'attr': {
                                                 'class': 'form-control' ~ (form_errors(registrationForm.confirmPassword) ? ' is-invalid' : ''),
                                                 'placeholder': 'CONFIRM_PASSWORD_PLACEHOLDER_KEY'|trans
                                             }
                                         }) }}
-                                        <button type="button" class="btn btn-outline-secondary position-absolute top-50 end-0 translate-middle-y pe-3 toggle-password">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
+                                        <span class="input-group-text p-0">
+                                            <button type="button" class="btn btn-outline-secondary h-100 toggle-password">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </span>
                                     </div>
                                     {% if form_errors(registrationForm.confirmPassword) %}
-                                        <div class="invalid-feedback d-block">
-                                            {{ form_errors(registrationForm.confirmPassword)|trans }}
+                                        <div class="text-danger mt-1">
+                                            {% for error in form_errors(registrationForm.confirmPassword) %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -167,20 +175,21 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Password toggle visibility
             document.querySelectorAll('.toggle-password').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    const passwordInput = this.closest('.position-relative').querySelector('input');
+                button.onclick = function(e) {
+                    e.preventDefault();
+                    const passwordField = this.closest('.input-group').querySelector('input');
                     const icon = this.querySelector('i');
                     
-                    if (passwordInput.type === 'password') {
-                        passwordInput.type = 'text';
+                    if (passwordField.type === 'password') {
+                        passwordField.type = 'text';
                         icon.classList.remove('bi-eye');
                         icon.classList.add('bi-eye-slash');
                     } else {
-                        passwordInput.type = 'password';
+                        passwordField.type = 'password';
                         icon.classList.remove('bi-eye-slash');
                         icon.classList.add('bi-eye');
                     }
-                });
+                };
             });
         });
     </script>

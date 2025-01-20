@@ -35,6 +35,7 @@ class SimpleRegistrationType extends AbstractType
                 'mapped' => false,
                 'required' => false,
                 'label' => 'INVITATION_CODE_KEY',
+                'translation_domain' => 'messages',
                 'attr' => [
                     'placeholder' => 'INVITATION_CODE_PLACEHOLDER_KEY'
                 ],
@@ -48,6 +49,7 @@ class SimpleRegistrationType extends AbstractType
                 'mapped' => false,
                 'required' => true,
                 'label' => 'FULL_NAME_KEY',
+                'translation_domain' => 'messages',
                 'attr' => [
                     'placeholder' => 'FULL_NAME_PLACEHOLDER_KEY'
                 ],
@@ -61,6 +63,7 @@ class SimpleRegistrationType extends AbstractType
                 'mapped' => true,
                 'required' => true,
                 'label' => 'USERNAME_KEY',
+                'translation_domain' => 'messages',
                 'attr' => [
                     'placeholder' => 'USERNAME_PLACEHOLDER_KEY'
                 ],
@@ -83,6 +86,7 @@ class SimpleRegistrationType extends AbstractType
                 'mapped' => true,
                 'required' => true,
                 'label' => 'PHONE_NUMBER_KEY',
+                'translation_domain' => 'messages',
                 'attr' => [
                     'placeholder' => 'PHONE_PLACEHOLDER_KEY'
                 ],
@@ -101,6 +105,7 @@ class SimpleRegistrationType extends AbstractType
                 'mapped' => false,
                 'required' => true,
                 'label' => 'PASSWORD_KEY',
+                'translation_domain' => 'messages',
                 'attr' => [
                     'placeholder' => 'PASSWORD_PLACEHOLDER_KEY'
                 ],
@@ -118,6 +123,7 @@ class SimpleRegistrationType extends AbstractType
                 'mapped' => false,
                 'required' => true,
                 'label' => 'CONFIRM_PASSWORD_KEY',
+                'translation_domain' => 'messages',
                 'attr' => [
                     'placeholder' => 'CONFIRM_PASSWORD_PLACEHOLDER_KEY'
                 ],
@@ -140,6 +146,7 @@ class SimpleRegistrationType extends AbstractType
                 'mapped' => false,
                 'required' => true,
                 'label' => 'AGREE_TO_TERMS_KEY',
+                'translation_domain' => 'messages',
                 'constraints' => [
                     new IsTrue([
                         'message' => 'TERMS_REQUIRED_KEY'
