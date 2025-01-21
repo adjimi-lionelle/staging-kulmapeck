@@ -103,7 +103,7 @@ PASSWORD_MISMATCH_KEY: 'Les mots de passe ne correspondent pas'
 
 # Form validation errors
 REQUIRED_FIELD_KEY: 'Ce champ est obligatoire'
-USERNAME_LENGTH_ERROR_KEY: 'Le nom d''utilisateur doit comporter au moins 3 caractères'
+USERNAME_LENGTH_ERROR_KEY: 'Le nom d''utilisateur doit comporter au moins 5 caractères'
 INVALID_USERNAME_KEY: 'Le nom d''utilisateur ne peut contenir que des lettres, des chiffres et des tirets bas'
 INVALID_PHONE_KEY: 'Veuillez entrer un numéro de téléphone valide'
 USERNAME_EXISTS_KEY: 'Ce nom d''utilisateur est déjà pris'

@@ -102,7 +102,7 @@ CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Confirm your password'
 
 # Form validation errors
 REQUIRED_FIELD_KEY: 'This field is required'
-USERNAME_LENGTH_ERROR_KEY: 'Username must be at least 3 characters long'
+USERNAME_LENGTH_ERROR_KEY: 'Username must be at least 5 characters long'
 INVALID_USERNAME_KEY: 'Username can only contain letters, numbers, and underscores'
 INVALID_PHONE_KEY: 'Please enter a valid phone number'
 USERNAME_EXISTS_KEY: 'This username is already taken'
