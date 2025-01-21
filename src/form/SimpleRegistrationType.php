@@ -107,7 +107,9 @@ class SimpleRegistrationType extends AbstractType
                 'label' => 'PASSWORD_KEY',
                 'translation_domain' => 'messages',
                 'attr' => [
-                    'placeholder' => 'PASSWORD_PLACEHOLDER_KEY'
+                    'placeholder' => 'PASSWORD_PLACEHOLDER_KEY',
+                    'autocomplete' => 'new-password',
+                    'data-password-toggle' => 'false'
                 ],
                 'constraints' => [
                     new NotBlank([

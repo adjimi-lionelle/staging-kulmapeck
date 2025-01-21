@@ -27,16 +27,30 @@
 
                         <div class="card-body">
                             {{ form_start(registrationForm, {'attr': {'class': 'mt-4', 'id': 'registration_form'}}) }}
+                                {# Display form level errors #}
+                                {% if not registrationForm.vars.valid %}
+                                    <div class="alert alert-danger">
+                                        {% for error in registrationForm.vars.errors %}
+                                            {{ error.message|trans }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                 <!-- Invitation Code -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'INVITATION_CODE_KEY'|trans }}</label>
                                     {{ form_widget(registrationForm.parentCode, {
                                         'attr': {
-                                            'class': 'form-control' ~ (form_errors(registrationForm.parentCode) ? ' is-invalid' : ''),
+                                            'class': 'form-control' ~ (registrationForm.parentCode.vars.errors|length > 0 ? ' is-invalid' : ''),
                                             'value': last_parent_code is defined ? last_parent_code : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.parentCode) }}
+                                    {% if registrationForm.parentCode.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in registrationForm.parentCode.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Full Name -->
@@ -44,11 +58,17 @@
                                     <label class="form-label">{{ 'FULL_NAME_KEY'|trans }}</label>
                                     {{ form_widget(registrationForm.fullName, {
                                         'attr': {
-                                            'class': 'form-control' ~ (form_errors(registrationForm.fullName) ? ' is-invalid' : ''),
+                                            'class': 'form-control' ~ (registrationForm.fullName.vars.errors|length > 0 ? ' is-invalid' : ''),
                                             'value': last_fullname is defined ? last_fullname : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.fullName) }}
+                                    {% if registrationForm.fullName.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in registrationForm.fullName.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Username -->
@@ -56,11 +76,17 @@
                                     <label class="form-label">{{ 'USERNAME_KEY'|trans }}</label>
                                     {{ form_widget(registrationForm.username, {
                                         'attr': {
-                                            'class': 'form-control' ~ (form_errors(registrationForm.username) ? ' is-invalid' : ''),
+                                            'class': 'form-control' ~ (registrationForm.username.vars.errors|length > 0 ? ' is-invalid' : ''),
                                             'value': last_username is defined ? last_username : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.username) }}
+                                    {% if registrationForm.username.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in registrationForm.username.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Phone Number -->
@@ -68,69 +94,89 @@
                                     <label class="form-label">{{ 'PHONE_NUMBER_KEY'|trans }}</label>
                                     {{ form_widget(registrationForm.phoneNumber, {
                                         'attr': {
-                                            'class': 'form-control' ~ (form_errors(registrationForm.phoneNumber) ? ' is-invalid' : ''),
+                                            'class': 'form-control' ~ (registrationForm.phoneNumber.vars.errors|length > 0 ? ' is-invalid' : ''),
                                             'value': last_phone is defined ? last_phone : ''
                                         }
                                     }) }}
-                                    {{ form_errors(registrationForm.phoneNumber) }}
+                                    {% if registrationForm.phoneNumber.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in registrationForm.phoneNumber.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <!-- Password -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'PASSWORD_KEY'|trans }}</label>
-                                    {{ form_widget(registrationForm.plainPassword, {
-                                        'attr': {
-                                            'class': 'form-control' ~ (form_errors(registrationForm.plainPassword) ? ' is-invalid' : ''),
-                                            'id': 'password',
-                                            'value': last_password is defined ? last_password : ''
-                                        }
-                                    }) }}
-                                    {{ form_errors(registrationForm.plainPassword) }}
-                                    <div class="password-strength mt-2">
-                                        <small class="text-muted">{{ 'PASSWORD_STRENGTH_KEY'|trans }}:</small>
-                                        <div class="progress" style="height: 5px;">
-                                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                                        </div>
-                                        <small class="password-strength-text text-muted mt-1"></small>
+                                    <div class="input-group">
+                                        {{ form_widget(registrationForm.plainPassword, {
+                                            'attr': {
+                                                'class': 'form-control' ~ (registrationForm.plainPassword.vars.errors|length > 0 ? ' is-invalid' : ''),
+                                                'placeholder': 'PASSWORD_PLACEHOLDER_KEY'|trans
+                                            }
+                                        }) }}
+                                        <span class="input-group-text p-0">
+                                            <button type="button" class="btn btn-outline-secondary h-100 toggle-password">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </span>
                                     </div>
+                                    {% if registrationForm.plainPassword.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in registrationForm.plainPassword.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                     <small class="text-muted">
-                                        {{ 'PASSWORD_REQUIREMENTS_KEY'|trans }}:
-                                        <ul class="mt-1 mb-0">
-                                            <li>{{ 'MIN_8_CHARS_KEY'|trans }}</li>
-                                            <li>{{ 'UPPERCASE_REQUIRED_KEY'|trans }}</li>
-                                            <li>{{ 'LOWERCASE_REQUIRED_KEY'|trans }}</li>
-                                            <li>{{ 'NUMBER_REQUIRED_KEY'|trans }}</li>
-                                        </ul>
+                                        {{ 'MIN_8_CHARS_KEY'|trans }}
                                     </small>
                                 </div>
 
                                 <!-- Password Confirmation -->
                                 <div class="mb-3">
                                     <label class="form-label">{{ 'CONFIRM_PASSWORD_KEY'|trans }}</label>
-                                    <input type="password" 
-                                           class="form-control {{ app.flashes('password_confirm_error') ? 'is-invalid' : '' }}" 
-                                           id="password_confirm" 
-                                           name="password_confirm" 
-                                           required 
-                                           value="{{ last_password_confirm is defined ? last_password_confirm : '' }}">
-                                    {% for message in app.flashes('password_confirm_error') %}
-                                        <div class="invalid-feedback">
-                                            {{ message|trans }}
+                                    <div class="input-group">
+                                        {{ form_widget(registrationForm.confirmPassword, {
+                                            'attr': {
+                                                'class': 'form-control' ~ (registrationForm.confirmPassword.vars.errors|length > 0 ? ' is-invalid' : ''),
+                                                'placeholder': 'CONFIRM_PASSWORD_PLACEHOLDER_KEY'|trans
+                                            }
+                                        }) }}
+                                        <span class="input-group-text p-0">
+                                            <button type="button" class="btn btn-outline-secondary h-100 toggle-password">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    {% if registrationForm.confirmPassword.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in registrationForm.confirmPassword.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
                                         </div>
-                                    {% endfor %}
+                                    {% endif %}
                                 </div>
 
                                 <!-- Terms -->
                                 <div class="mb-3">
                                     {{ form_widget(registrationForm.agreeTerms, {
                                         'attr': {
-                                            'class': 'form-check-input me-2' ~ (form_errors(registrationForm.agreeTerms) ? ' is-invalid' : '')
+                                            'class': 'form-check-input me-2' ~ (registrationForm.agreeTerms.vars.errors|length > 0 ? ' is-invalid' : '')
                                         }
                                     }) }}
                                     <label class="form-check-label">
                                         {{ 'AGREE_TO_TERMS_KEY'|trans }} <a href="{{ path('app_terms') }}" target="_blank">{{ 'TERMS_KEY'|trans }}</a>
                                     </label>
-                                    {{ form_errors(registrationForm.agreeTerms) }}
+                                    {% if registrationForm.agreeTerms.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in registrationForm.agreeTerms.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
                                 </div>
 
                                 <div class="align-items-center mt-0">
@@ -149,86 +195,28 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const passwordInput = document.getElementById('password');
-            const confirmInput = document.getElementById('password_confirm');
-            const strengthBar = document.querySelector('.password-strength .progress-bar');
-            const strengthText = document.querySelector('.password-strength-text');
-            const form = document.querySelector('form');
-            const submitButton = document.getElementById('submit-button');
-            const passwordMatchError = document.getElementById('password-match-error');
-
-            function validatePasswords() {
-                const passwordsMatch = passwordInput.value === confirmInput.value;
-                if (!passwordsMatch && confirmInput.value !== '') {
-                    confirmInput.classList.add('is-invalid');
-                    passwordMatchError.style.display = 'block';
-                    submitButton.disabled = true;
-                } else {
-                    confirmInput.classList.remove('is-invalid');
-                    passwordMatchError.style.display = 'none';
-                    submitButton.disabled = !passwordsMatch;
-                }
-                return passwordsMatch;
-            }
-
-            // Password strength checker
-            function checkPasswordStrength(password) {
-                let strength = 0;
-                const patterns = {
-                    length: password.length >= 8,
-                    lowercase: /[a-z]/.test(password),
-                    uppercase: /[A-Z]/.test(password),
-                    numbers: /\d/.test(password)
-                };
-
-                strength += patterns.length ? 25 : 0;
-                strength += patterns.lowercase ? 25 : 0;
-                strength += patterns.uppercase ? 25 : 0;
-                strength += patterns.numbers ? 25 : 0;
-
-                return {
-                    score: strength,
-                    patterns: patterns
-                };
-            }
-
-            // Update password strength indicator
-            passwordInput.addEventListener('input', function() {
-                const result = checkPasswordStrength(this.value);
-                strengthBar.style.width = result.score + '%';
-                
-                if (result.score <= 25) {
-                    strengthBar.className = 'progress-bar bg-danger';
-                    strengthText.textContent = '{{ 'VERY_WEAK_KEY'|trans }}';
-                } else if (result.score <= 50) {
-                    strengthBar.className = 'progress-bar bg-warning';
-                    strengthText.textContent = '{{ 'WEAK_KEY'|trans }}';
-                } else if (result.score <= 75) {
-                    strengthBar.className = 'progress-bar bg-info';
-                    strengthText.textContent = '{{ 'MEDIUM_KEY'|trans }}';
-                } else if (result.score <= 100) {
-                    strengthBar.className = 'progress-bar bg-primary';
-                    strengthText.textContent = '{{ 'STRONG_KEY'|trans }}';
-                }
-                if (confirmInput.value !== '') {
-                    validatePasswords();
-                }
+            // Get all password toggle buttons
+            const toggleButtons = document.querySelectorAll('.toggle-password');
+            
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Find the closest input group and get the password input
+                    const inputGroup = this.closest('.input-group');
+                    const passwordInput = inputGroup.querySelector('input');
+                    const icon = this.querySelector('i');
+                    
+                    // Toggle password visibility
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        icon.classList.remove('bi-eye');
+                        icon.classList.add('bi-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        icon.classList.remove('bi-eye-slash');
+                        icon.classList.add('bi-eye');
+                    }
+                });
             });
-
-            // Check password confirmation
-            confirmInput.addEventListener('input', validatePasswords);
-
-            // Form submission
-            form.addEventListener('submit', function(e) {
-                const isValid = validatePasswords();
-                if (!isValid) {
-                    e.preventDefault();
-                    confirmInput.focus();
-                }
-            });
-
-            // Initial validation
-            submitButton.disabled = true;
         });
     </script>
 {% endblock %}
