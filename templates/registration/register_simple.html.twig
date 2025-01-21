@@ -38,15 +38,13 @@
                                     <label class="form-label">{{ 'INVITATION_CODE_KEY'|trans }}</label>
                                     {{ form_widget(registrationForm.parentCode, {
                                         'attr': {
-                                            'class': 'form-control' ~ (form_errors(registrationForm.parentCode) ? ' is-invalid' : ''),
+                                            'class': 'form-control' ~ (registrationForm.parentCode.vars.errors|length > 0 ? ' is-invalid' : ''),
                                             'value': last_parent_code is defined ? last_parent_code : ''
                                         }
                                     }) }}
-                                    {% if form_errors(registrationForm.parentCode) %}
-                                        <div class="text-danger mt-1">
-                                            {% for error in form_errors(registrationForm.parentCode) %}
-                                                {{ error.message|trans }}
-                                            {% endfor %}
+                                    {% if registrationForm.parentCode.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(registrationForm.parentCode) }}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -56,15 +54,13 @@
                                     <label class="form-label">{{ 'FULL_NAME_KEY'|trans }}</label>
                                     {{ form_widget(registrationForm.fullName, {
                                         'attr': {
-                                            'class': 'form-control' ~ (form_errors(registrationForm.fullName) ? ' is-invalid' : ''),
+                                            'class': 'form-control' ~ (registrationForm.fullName.vars.errors|length > 0 ? ' is-invalid' : ''),
                                             'value': last_fullname is defined ? last_fullname : ''
                                         }
                                     }) }}
-                                    {% if form_errors(registrationForm.fullName) %}
-                                        <div class="text-danger mt-1">
-                                            {% for error in form_errors(registrationForm.fullName) %}
-                                                {{ error.message|trans }}
-                                            {% endfor %}
+                                    {% if registrationForm.fullName.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(registrationForm.fullName) }}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -74,15 +70,13 @@
                                     <label class="form-label">{{ 'USERNAME_KEY'|trans }}</label>
                                     {{ form_widget(registrationForm.username, {
                                         'attr': {
-                                            'class': 'form-control' ~ (form_errors(registrationForm.username) ? ' is-invalid' : ''),
+                                            'class': 'form-control' ~ (registrationForm.username.vars.errors|length > 0 ? ' is-invalid' : ''),
                                             'value': last_username is defined ? last_username : ''
                                         }
                                     }) }}
-                                    {% if form_errors(registrationForm.username) %}
-                                        <div class="text-danger mt-1">
-                                            {% for error in form_errors(registrationForm.username) %}
-                                                {{ error.message|trans }}
-                                            {% endfor %}
+                                    {% if registrationForm.username.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(registrationForm.username) }}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -92,15 +86,13 @@
                                     <label class="form-label">{{ 'PHONE_NUMBER_KEY'|trans }}</label>
                                     {{ form_widget(registrationForm.phoneNumber, {
                                         'attr': {
-                                            'class': 'form-control' ~ (form_errors(registrationForm.phoneNumber) ? ' is-invalid' : ''),
+                                            'class': 'form-control' ~ (registrationForm.phoneNumber.vars.errors|length > 0 ? ' is-invalid' : ''),
                                             'value': last_phone is defined ? last_phone : ''
                                         }
                                     }) }}
-                                    {% if form_errors(registrationForm.phoneNumber) %}
-                                        <div class="text-danger mt-1">
-                                            {% for error in form_errors(registrationForm.phoneNumber) %}
-                                                {{ error.message|trans }}
-                                            {% endfor %}
+                                    {% if registrationForm.phoneNumber.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(registrationForm.phoneNumber) }}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -111,7 +103,7 @@
                                     <div class="input-group">
                                         {{ form_widget(registrationForm.plainPassword, {
                                             'attr': {
-                                                'class': 'form-control' ~ (form_errors(registrationForm.plainPassword) ? ' is-invalid' : ''),
+                                                'class': 'form-control' ~ (registrationForm.plainPassword.vars.errors|length > 0 ? ' is-invalid' : ''),
                                                 'placeholder': 'PASSWORD_PLACEHOLDER_KEY'|trans
                                             }
                                         }) }}
@@ -121,11 +113,9 @@
                                             </button>
                                         </span>
                                     </div>
-                                    {% if form_errors(registrationForm.plainPassword) %}
-                                        <div class="text-danger mt-1">
-                                            {% for error in form_errors(registrationForm.plainPassword) %}
-                                                {{ error.message|trans }}
-                                            {% endfor %}
+                                    {% if registrationForm.plainPassword.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(registrationForm.plainPassword) }}
                                         </div>
                                     {% endif %}
                                     <small class="text-muted">
@@ -139,7 +129,7 @@
                                     <div class="input-group">
                                         {{ form_widget(registrationForm.confirmPassword, {
                                             'attr': {
-                                                'class': 'form-control' ~ (form_errors(registrationForm.confirmPassword) ? ' is-invalid' : ''),
+                                                'class': 'form-control' ~ (registrationForm.confirmPassword.vars.errors|length > 0 ? ' is-invalid' : ''),
                                                 'placeholder': 'CONFIRM_PASSWORD_PLACEHOLDER_KEY'|trans
                                             }
                                         }) }}
@@ -149,11 +139,9 @@
                                             </button>
                                         </span>
                                     </div>
-                                    {% if form_errors(registrationForm.confirmPassword) %}
-                                        <div class="text-danger mt-1">
-                                            {% for error in form_errors(registrationForm.confirmPassword) %}
-                                                {{ error.message|trans }}
-                                            {% endfor %}
+                                    {% if registrationForm.confirmPassword.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(registrationForm.confirmPassword) }}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -162,17 +150,15 @@
                                 <div class="mb-3">
                                     {{ form_widget(registrationForm.agreeTerms, {
                                         'attr': {
-                                            'class': 'form-check-input me-2' ~ (form_errors(registrationForm.agreeTerms) ? ' is-invalid' : '')
+                                            'class': 'form-check-input me-2' ~ (registrationForm.agreeTerms.vars.errors|length > 0 ? ' is-invalid' : '')
                                         }
                                     }) }}
                                     <label class="form-check-label">
                                         {{ 'AGREE_TO_TERMS_KEY'|trans }} <a href="{{ path('app_terms') }}" target="_blank">{{ 'TERMS_KEY'|trans }}</a>
                                     </label>
-                                    {% if form_errors(registrationForm.agreeTerms) %}
-                                        <div class="text-danger mt-1">
-                                            {% for error in form_errors(registrationForm.agreeTerms) %}
-                                                {{ error.message|trans }}
-                                            {% endfor %}
+                                    {% if registrationForm.agreeTerms.vars.errors|length > 0 %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form_errors(registrationForm.agreeTerms) }}
                                         </div>
                                     {% endif %}
                                 </div>
