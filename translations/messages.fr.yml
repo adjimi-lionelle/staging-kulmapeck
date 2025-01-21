@@ -2,10 +2,10 @@
 NUMERO_REGISTRE_COMMERCE_KEY: Numéro du registre du commerce
 LOCALISATION_KEY: Localisation
 HOME_KEY: Accueil
-COURSESFORMATION_KEY: Cours & formations
+COURSESFORMATION_KEY: Cours
 EXAM_KEY: Examens
 FORUM_KEY: Forum
-BECOME_PREMIUM_KEY: Devenir Premium
+BECOME_PREMIUM_KEY: S'abonner
 SEARCH_KEY: Rechercher
 ENGLISH_KEY: Anglais
 FRENCH_KEY: Français
@@ -289,6 +289,9 @@ JOIN_COMMUNITY_KEY: Rejoindre la communauté
 QUICK_START_GUIDE_KEY: Guide de démarrage rapide
 RECOMMENDED_COURSES_KEY: Cours recommandés
 TRENDING_NOW_KEY: Tendances actuelles
-MAINMESSAGE_KEY: Bienvenue dans notre plus grande communauté
+MAINMESSAGE_KEY: BIENVENUE SUR 
 FINGERSTIPS_KEY: À portée de main
 MAINMESSAGEDESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
+
+MOSTPOPULAR_KEY: Cours les plus populaires
+MOSTPOPULARDESCRIPTION_KEY: Choisissez parmi des centaines de cours proposés par des organisations spécialisées
