@@ -30,7 +30,9 @@
                                 {# Display form level errors #}
                                 {% if not registrationForm.vars.valid %}
                                     <div class="alert alert-danger">
-                                        {{ form_errors(registrationForm) }}
+                                        {% for error in registrationForm.vars.errors %}
+                                            {{ error.message|trans }}
+                                        {% endfor %}
                                     </div>
                                 {% endif %}
                                 <!-- Invitation Code -->
@@ -44,7 +46,9 @@
                                     }) }}
                                     {% if registrationForm.parentCode.vars.errors|length > 0 %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form_errors(registrationForm.parentCode) }}
+                                            {% for error in registrationForm.parentCode.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -60,7 +64,9 @@
                                     }) }}
                                     {% if registrationForm.fullName.vars.errors|length > 0 %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form_errors(registrationForm.fullName) }}
+                                            {% for error in registrationForm.fullName.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -76,7 +82,9 @@
                                     }) }}
                                     {% if registrationForm.username.vars.errors|length > 0 %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form_errors(registrationForm.username) }}
+                                            {% for error in registrationForm.username.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -92,7 +100,9 @@
                                     }) }}
                                     {% if registrationForm.phoneNumber.vars.errors|length > 0 %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form_errors(registrationForm.phoneNumber) }}
+                                            {% for error in registrationForm.phoneNumber.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -115,7 +125,9 @@
                                     </div>
                                     {% if registrationForm.plainPassword.vars.errors|length > 0 %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form_errors(registrationForm.plainPassword) }}
+                                            {% for error in registrationForm.plainPassword.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
                                         </div>
                                     {% endif %}
                                     <small class="text-muted">
@@ -141,7 +153,9 @@
                                     </div>
                                     {% if registrationForm.confirmPassword.vars.errors|length > 0 %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form_errors(registrationForm.confirmPassword) }}
+                                            {% for error in registrationForm.confirmPassword.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -158,7 +172,9 @@
                                     </label>
                                     {% if registrationForm.agreeTerms.vars.errors|length > 0 %}
                                         <div class="invalid-feedback d-block">
-                                            {{ form_errors(registrationForm.agreeTerms) }}
+                                            {% for error in registrationForm.agreeTerms.vars.errors %}
+                                                {{ error.message|trans }}
+                                            {% endfor %}
                                         </div>
                                     {% endif %}
                                 </div>
