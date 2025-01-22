@@ -136,16 +136,37 @@ showActiveTheme(theme)
 				color: white;
 			}
 
+			.main-message {
+				font-size: 50px; /* Taille par défaut pour PC */
+				margin-bottom: 1.5rem;
+				font-weight: bold;
+			}
+
+			.sub-message {
+				font-size: 35px; /* Taille par défaut pour PC */
+				margin-bottom: 1.5rem;
+				font-weight: bold;
+				color: #f7c32e;
+			}
+
 			/* Styles spécifiques pour mobile et tablette (écrans max 1024px) */
 			@media (max-width: 1024px) {
-				.banner-with-background  {
+				.banner-with-background {
 					background-image: none; /* Retire l'image en arrière-plan */
 					background-color: #066ac9 !important; /* Bleu du site */
 					height: 500px;
-			    }
+				}
 
 				.banner-with-background::before {
 					display: none; /* Désactive la couche noire semi-transparente */
+				}
+
+				.main-message {
+					font-size: 40px; /* Taille réduite pour mobile */
+				}
+
+				.sub-message {
+					font-size: 30px; /* Taille réduite pour mobile */
 				}
 			}
 
@@ -165,6 +186,7 @@ showActiveTheme(theme)
 				position: relative;
 				z-index: 2; /* Assure que le texte est visible au-dessus de la couche floue */
 			}
+
 		/* End secton barner */
 		</style>
 		<!-- Theme CSS -->
