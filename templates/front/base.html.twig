@@ -122,47 +122,50 @@ showActiveTheme(theme)
 			
 				}
 			}
+        /* Start secton barner */
+			.banner-with-background {
+				position: relative;
+				background-image: url("{{ asset('assets/images/about/barner2.png') }}");
+				background-size: cover;
+				background-position: center;
+				background-repeat: no-repeat;
+				height: 100vh; /* Occupe toute la hauteur de la fenêtre */
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: white;
+			}
 
-.banner-with-background {
-    position: relative;
-    background-image: url("{{ asset('assets/images/about/baener2.png') }}");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 100vh; /* Occupe toute la hauteur de la fenêtre */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-}
+			/* Styles spécifiques pour mobile et tablette (écrans max 1024px) */
+			@media (max-width: 1024px) {
+				.banner-with-background  {
+					background-image: none; /* Retire l'image en arrière-plan */
+					background-color: #066ac9 !important; /* Bleu du site */
+					height: 500px;
+			    }
 
-/* Styles spécifiques pour mobile (écran max 768px) */
-@media (max-width: 1024px) {
-    .banner-with-background  {
-        background-image: none; /* Retire l'image en arrière-plan */
-        background-color: #066ac9 !important; /* Bleu du site */
-		 height: 500px;
-    }
-}
+				.banner-with-background::before {
+					display: none; /* Désactive la couche noire semi-transparente */
+				}
+			}
 
-.banner-with-background::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Couche semi-transparente noire */
-    backdrop-filter: blur(2px); /* Applique un effet de flou */
-    z-index: 1;
-}
+			.banner-with-background::before {
+				content: '';
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.5); /* Couche semi-transparente noire */
+				backdrop-filter: blur(2px); /* Applique un effet de flou */
+				z-index: 1;
+			}
 
-.banner-with-background .container {
-    position: relative;
-    z-index: 2; /* Assure que le texte est visible au-dessus de la couche floue */
-}
-
-		
+			.banner-with-background .container {
+				position: relative;
+				z-index: 2; /* Assure que le texte est visible au-dessus de la couche floue */
+			}
+		/* End secton barner */
 		</style>
 		<!-- Theme CSS -->
 		<link
@@ -188,20 +191,7 @@ gtag('config', 'G-7N7LGGGWT1');
 		{% block header %}
 			<!-- Header START -->
 			<header class="navbar-light navbar-sticky header-static">
-				<nav class="navbar navbar-expand">
-					<div class="container-fluid px-3 px-xl-5">
-						<p class="pt-3 text-center d-block text-primary" style="width: 100%; margin-bottom: 0;">
-							{% if not app.user %}
-
-    <span style="font-size:20px">
-        Profitez d'un accès gratuit à tous nos cours pendant 1 semaine dès votre inscription sur notre plateforme!
-    </span >
-
-{% endif %}
-						</p>
-
-					</div>
-				</nav>
+				
 				<!-- Nav START -->
 				<nav class="navbar navbar-expand-xl">
 					<div
