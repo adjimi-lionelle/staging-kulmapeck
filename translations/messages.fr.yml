@@ -92,10 +92,10 @@ REGISTER_TITLE_KEY: S'inscrire
 # Form placeholders
 INVITATION_CODE_PLACEHOLDER_KEY: 'Entrez le code d''invitation (facultatif)'
 FULL_NAME_PLACEHOLDER_KEY: 'Entrez votre nom complet'
-USERNAME_PLACEHOLDER_KEY: 'Choisissez un nom d''utilisateur (sans espaces)'
-PHONE_PLACEHOLDER_KEY: 'Entrez votre numéro de téléphone'
-PASSWORD_PLACEHOLDER_KEY: 'Entrez votre mot de passe (minimum 8 caractères)'
-CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Confirmez votre mot de passe'
+USERNAME_PLACEHOLDER_KEY: '5-15 caractères, saisir sans espacer'
+PHONE_PLACEHOLDER_KEY: 'Saisir sans espacer'
+PASSWORD_PLACEHOLDER_KEY: 'Minimum 8 caractères'
+CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Doit etre identique au mot de passe'
 
 # Validation messages
 PHONE_NO_SPACE_KEY: 'Le numéro de téléphone ne doit pas contenir d''espaces'
@@ -103,7 +103,7 @@ PASSWORD_MISMATCH_KEY: 'Les mots de passe ne correspondent pas'
 
 # Form validation errors
 REQUIRED_FIELD_KEY: 'Ce champ est obligatoire'
-USERNAME_LENGTH_ERROR_KEY: 'Le nom d''utilisateur doit comporter au moins 5 caractères'
+USERNAME_LENGTH_ERROR_KEY: 'Le nom d''utilisateur doit comporter au moins 4 caractères'
 INVALID_USERNAME_KEY: 'Le nom d''utilisateur ne peut contenir que des lettres, des chiffres et des tirets bas'
 INVALID_PHONE_KEY: 'Veuillez entrer un numéro de téléphone valide'
 USERNAME_EXISTS_KEY: 'Ce nom d''utilisateur est déjà pris'
@@ -112,7 +112,7 @@ TERMS_REQUIRED_KEY: 'Vous devez accepter les conditions d''utilisation'
 INVALID_INVITATION_CODE_KEY: 'Code d''invitation invalide'
 EMAIL_ALREADY_EXISTS_KEY: 'Cette adresse e-mail est déjà enregistrée'
 INVALID_EMAIL_FORMAT_KEY: 'Veuillez entrer une adresse e-mail valide'
-PASSWORD_TOO_SHORT_KEY: 'Le mot de passe doit comporter au moins 8 caractères'
+PASSWORD_TOO_SHORT_KEY: 'Le mot de passe doit comporter au moins 4 caractères'
 USERNAME_TOO_LONG_KEY: 'Le nom d''utilisateur ne doit pas dépasser 15 caractères'
 USERNAME_NO_SPACE_KEY: 'Le nom d''utilisateur ne doit contenir que des lettres, des chiffres et des tirets bas (saisir sans espacer)'
 

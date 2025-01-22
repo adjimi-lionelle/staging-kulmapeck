@@ -73,7 +73,7 @@ class SimpleRegistrationType extends AbstractType
                     ]),
                     new Length([
                         'max' => 15,
-                        'min' => 5,
+                        'min' => 4,
                         'maxMessage' => 'USERNAME_TOO_LONG_KEY',
                         'minMessage' => 'USERNAME_LENGTH_ERROR_KEY'
                     ]),
@@ -116,7 +116,7 @@ class SimpleRegistrationType extends AbstractType
                         'message' => 'REQUIRED_FIELD_KEY'
                     ]),
                     new Length([
-                        'min' => 8,
+                        'min' => 4,
                         'minMessage' => 'PASSWORD_TOO_SHORT_KEY'
                     ])
                 ]
