@@ -9,6 +9,7 @@
 /var/
 /vendor/
 /public/uploads/
+/scripts/ssh_config.ini
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
