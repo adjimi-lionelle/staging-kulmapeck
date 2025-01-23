@@ -33,13 +33,16 @@ class RegistrationController extends AbstractController
     private EmailVerifier $emailVerifier;
     private InvitationCodeGenerator $invitationCodeGenerator;
     private ?RateLimiterFactory $rateLimiter = null;
+    private TranslatorInterface $translator;
 
     public function __construct(
         EmailVerifier $emailVerifier,
-        InvitationCodeGenerator $invitationCodeGenerator
+        InvitationCodeGenerator $invitationCodeGenerator,
+        TranslatorInterface $translator
     ) {
         $this->emailVerifier = $emailVerifier;
         $this->invitationCodeGenerator = $invitationCodeGenerator;
+        $this->translator = $translator;
         
         // Initialize rate limiter with in-memory storage
         $storage = new InMemoryStorage();
@@ -213,7 +216,7 @@ class RegistrationController extends AbstractController
                 $entityManager->persist($user);
                 $entityManager->flush();
 
-                $this->addFlash('success', 'Your account has been created successfully. You can now log in.');
+                $this->addFlash('success', $this->translator->trans('ACCOUNT_CREATED_SUCCESS_KEY'));
                 return $this->redirectToRoute('app_login');
             } else {
                 // Store the submitted values to repopulate the form

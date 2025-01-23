@@ -39,7 +39,7 @@ GOTOFORUM_KEY: Consulter le forum
 BACKTOCOURSEDETAILS_KEY: Revenir sur le cours
 ADDCOMMENT_KEY: Ajouter un commentaire...
 CHOOSETYPEUSERACCOUNT_KEY: 'Choisir le type de <span class="text-success">compte</span>'
-ACCOUNTMODALDESCRIPTION_KEY: Prosperous understood Middletons in conviction an uncommonly do. Supposing so be resolving breakfast am or perfectly.
+ACCOUNTMODALDESCRIPTION_KEY: Choisissez le type de compte qui correspond le mieux à vos besoins d'apprentissage ou d'enseignement.
 TEACHER_KEY: Enseigant & Formateur
 STUDENT_KEY: Elève & Apprenant
 
@@ -49,12 +49,13 @@ EMAIL_ADDRESS_KEY: Adresse e-mail
 WELCOME_BACK_KEY: Bienvenue
 NEW_HERE_KEY: Nouveau ici?
 CREATE_ACCOUNT_KEY: 'Créer un compte'
+ACCOUNT_CREATED_SUCCESS_KEY: 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.'
 LOGIN_CREDENTIALS_KEY: Entrez email, nom d'utilisateur ou numéro de téléphone
 PASSWORD_KEY: 'Mot de passe'
 LOGIN_KEY: 'Se connecter'
 WELCOME_LOGIN_KEY: Bienvenue dans notre communauté d'apprentissage
 WELCOME_LARGEST_COMMUNITY_KEY: Bienvenue dans notre plus grande communauté
-LOGIN_DESCRIPTION_KEY: Les enfants se réjouissaient de manière inhabituelle de ses dix qui. Pourtant, ses dix qui diminuaient étonnamment. Pourtant, ses dix qui diminuaient étonnamment.
+LOGIN_DESCRIPTION_KEY: Rejoignez notre communauté dynamique d'apprenants et profitez d'une expérience d'apprentissage enrichissante et personnalisée.
 EXPLORE_COURSES_KEY: Explorer nos cours
 WELCOME_COMMUNITY_KEY: Bienvenue dans notre communauté
 JOIN_COMMUNITY_DESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éducateurs. Créez votre compte pour commencer votre parcours d'apprentissage.
@@ -66,7 +67,7 @@ USERNAME_KEY: 'Nom d''utilisateur'
 PHONE_NUMBER_KEY: 'Numéro de téléphone'
 CONFIRM_PASSWORD_KEY: 'Confirmer le mot de passe'
 PASSWORD_REQUIREMENTS_KEY: 'Exigences du mot de passe'
-MIN_8_CHARS_KEY: 'Au moins 8 caractères'
+MIN_4_CHARS_KEY: 'Au moins 4 caractères'
 UPPERCASE_REQUIRED_KEY: 'Au moins une lettre majuscule'
 LOWERCASE_REQUIRED_KEY: 'Au moins une lettre minuscule'
 NUMBER_REQUIRED_KEY: 'Au moins un chiffre'
@@ -92,10 +93,10 @@ REGISTER_TITLE_KEY: S'inscrire
 # Form placeholders
 INVITATION_CODE_PLACEHOLDER_KEY: 'Entrez le code d''invitation (facultatif)'
 FULL_NAME_PLACEHOLDER_KEY: 'Entrez votre nom complet'
-USERNAME_PLACEHOLDER_KEY: 'Choisissez un nom d''utilisateur (sans espaces)'
-PHONE_PLACEHOLDER_KEY: 'Entrez votre numéro de téléphone'
-PASSWORD_PLACEHOLDER_KEY: 'Entrez votre mot de passe (minimum 8 caractères)'
-CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Confirmez votre mot de passe'
+USERNAME_PLACEHOLDER_KEY: '4-15 caractères, saisir sans espacer'
+PHONE_PLACEHOLDER_KEY: 'Saisir sans espacer'
+PASSWORD_PLACEHOLDER_KEY: 'Au moins 4 caractères'
+CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Doit etre identique au mot de passe'
 
 # Validation messages
 PHONE_NO_SPACE_KEY: 'Le numéro de téléphone ne doit pas contenir d''espaces'
@@ -103,7 +104,7 @@ PASSWORD_MISMATCH_KEY: 'Les mots de passe ne correspondent pas'
 
 # Form validation errors
 REQUIRED_FIELD_KEY: 'Ce champ est obligatoire'
-USERNAME_LENGTH_ERROR_KEY: 'Le nom d''utilisateur doit comporter au moins 3 caractères'
+USERNAME_LENGTH_ERROR_KEY: 'Le nom d''utilisateur doit comporter au moins 4 caractères'
 INVALID_USERNAME_KEY: 'Le nom d''utilisateur ne peut contenir que des lettres, des chiffres et des tirets bas'
 INVALID_PHONE_KEY: 'Veuillez entrer un numéro de téléphone valide'
 USERNAME_EXISTS_KEY: 'Ce nom d''utilisateur est déjà pris'
@@ -112,7 +113,7 @@ TERMS_REQUIRED_KEY: 'Vous devez accepter les conditions d''utilisation'
 INVALID_INVITATION_CODE_KEY: 'Code d''invitation invalide'
 EMAIL_ALREADY_EXISTS_KEY: 'Cette adresse e-mail est déjà enregistrée'
 INVALID_EMAIL_FORMAT_KEY: 'Veuillez entrer une adresse e-mail valide'
-PASSWORD_TOO_SHORT_KEY: 'Le mot de passe doit comporter au moins 8 caractères'
+PASSWORD_TOO_SHORT_KEY: 'Le mot de passe doit comporter au moins 4 caractères'
 USERNAME_TOO_LONG_KEY: 'Le nom d''utilisateur ne doit pas dépasser 15 caractères'
 USERNAME_NO_SPACE_KEY: 'Le nom d''utilisateur ne doit contenir que des lettres, des chiffres et des tirets bas (saisir sans espacer)'
 
@@ -166,14 +167,14 @@ ACCESS_MY_ACCOUNT_KEY: Accéder à Mon Compte
 THANKS_USING_PLATFORM_KEY: Merci d'utiliser Kulmapeck!
 
 # ABOUT US
-ABOUTUSMAINTITLE_KEY: Kulmapeck education theme, built specifically for the education centers which is dedicated to teaching and involve learners.
+ABOUTUSMAINTITLE_KEY: Kulmapeck est une plateforme éducative spécialement conçue pour les centres d'enseignement dédiés à l'apprentissage et à l'engagement des étudiants.
 ABOUTUSPAGE_OURGOALTITLE_KEY: Notre objectif
 ABOUTUSPAGE_OURGOAL_KEY: Soyez ouvert aux nouvelles idées et approches. Développez vos compétences en résolution de problèmes.
 ABOUTUSPAGE_ABOUTKULMAPECKTILE_KEY: À propos du portail Kulmapeck
-ABOUTUSPAGE_ABOUTKULMAPECKDESCRIPTION1_KEY: How promotion excellent curiosity yet attempted happiness Gay prosperous impression had conviction For every delay death ask to style Me mean able my by in they Extremity now strangers contained.
+ABOUTUSPAGE_ABOUTKULMAPECKDESCRIPTION1_KEY: Notre mission est de fournir une éducation de qualité accessible à tous. Nous nous efforçons d'offrir une expérience d'apprentissage enrichissante et interactive pour tous nos utilisateurs.
 ABOUTUSPAGE_H4STUDENTS_KEY: Plus de 35 000 étudiants heureux se sont joints à nous pour atteindre leurs objectifs
-ABOUTUSPAGE_H4STUDENTS1_KEY: How promotion excellent curiosity yet attempted happiness Gay prosperous impression had conviction For every delay in they Extremity now strangers contained breakfast him discourse additions Sincerity collected contented led now perpetual extremely forfeited
-ABOUTUSPAGE_H4STUDENTS2_KEY: Happiness prosperous impression had conviction For every delay in they Extremity now strangers contained breakfast him discourse additions Sincerity collected contented led now perpetual extremely forfeited
+ABOUTUSPAGE_H4STUDENTS1_KEY: Nous nous engageons à offrir une expérience d'apprentissage exceptionnelle avec des cours de haute qualité et un support pédagogique personnalisé pour garantir votre réussite.
+ABOUTUSPAGE_H4STUDENTS2_KEY: Notre plateforme met l'accent sur l'excellence pédagogique et l'engagement des étudiants, offrant un environnement d'apprentissage optimal pour atteindre vos objectifs éducatifs.
 ABOUTUSPAGE_SETUPTIME_KEY: Setup and installation takes less time
 ABOUTUSPAGE_PROFESSIONAL_KEY: Professional and easy to use software
 ABOUTUSPAGE_PERFECT_KEY: Perfect for any device with pixel-perfect design
@@ -191,7 +192,7 @@ CONTACTPAGE_ORANGE_KEY: Assistance Orange
 CONTACTPAGE_MTN_KEY: Assistance MTN
 CONTACTPAGE_FOLLOWUS_KEY: Suivez-nous sur
 CONTACTPAGE_LETSTALK_KEY: Parlons
-CONTACTPAGE_LETSTALKDESCRIPTION_KEY: To request a quote or want to meet up for coffee, contact us directly or fill out the form and we will get back to you promptly
+CONTACTPAGE_LETSTALKDESCRIPTION_KEY: Pour demander un devis ou pour nous rencontrer, contactez-nous directement ou remplissez le formulaire et nous vous répondrons dans les plus brefs délais.
 CONTACTPAGE_SENDMESSAGEBTN_KEY: Envoyer le message
 
 # FAQ
@@ -244,7 +245,7 @@ NOTOPICFOUND_KEY: Aucune question trouvée
 RELATEDTOPIC_KEY: Rubrique connexe
 SUBMIT_KEY: Soumettre
 HELLOHELP_KEY: Bonjour, comment pouvons-nous vous aider ?
-CATEGORYDESCRIPTION_KEY: Perceived end knowledge certainly day sweetness why cordially
+CATEGORYDESCRIPTION_KEY: Découvrez nos différentes catégories de cours pour trouver celle qui correspond le mieux à vos objectifs d'apprentissage.
 PERSONNE_NAME_KEY: Nom de famille
 
 # LESSON

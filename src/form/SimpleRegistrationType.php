@@ -73,7 +73,9 @@ class SimpleRegistrationType extends AbstractType
                     ]),
                     new Length([
                         'max' => 15,
-                        'maxMessage' => 'USERNAME_TOO_LONG_KEY'
+                        'min' => 4,
+                        'maxMessage' => 'USERNAME_TOO_LONG_KEY',
+                        'minMessage' => 'USERNAME_LENGTH_ERROR_KEY'
                     ]),
                     new Regex([
                         'pattern' => '/^[a-zA-Z0-9_]+$/',
@@ -107,16 +109,14 @@ class SimpleRegistrationType extends AbstractType
                 'label' => 'PASSWORD_KEY',
                 'translation_domain' => 'messages',
                 'attr' => [
-                    'placeholder' => 'PASSWORD_PLACEHOLDER_KEY',
-                    'autocomplete' => 'new-password',
-                    'data-password-toggle' => 'false'
+                    'placeholder' => 'PASSWORD_PLACEHOLDER_KEY'
                 ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'REQUIRED_FIELD_KEY'
                     ]),
                     new Length([
-                        'min' => 8,
+                        'min' => 4,
                         'minMessage' => 'PASSWORD_TOO_SHORT_KEY'
                     ])
                 ]
