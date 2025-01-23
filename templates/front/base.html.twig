@@ -157,13 +157,13 @@ showActiveTheme(theme)
 				.sub-message {
 					font-size: 25px; /* Taille réduite pour mobile */
 				}
+				
 				.btn-custom {
 					padding: 0.5rem 1rem; /* Ajuste la taille interne */
-					font-size: 16px; /* Taille du texte */
+					font-size: 10px; /* Taille du texte */
 					width: auto; /* Adapte la largeur au texte */
 				}
-
-
+	
 				.barnner,
 				.image-barner,
 				.counter-block { 
@@ -298,6 +298,25 @@ gtag('config', 'G-7N7LGGGWT1');
 										</a>
 									</li>
 								{% endif %}
+
+                               <!-- Nav item 3 Account -->
+								{% if not app.user or (app.user.eleve and not app.user.eleve.isPremium) %}
+									<li class="nav-item">
+										<a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#coursePremium" aria-haspopup="true" aria-expanded="false">
+											<b class="badge bg-success">Créer un compte</b>
+										</a>
+									</li>
+								{% endif %}
+
+								<!-- Nav item 3 Account -->
+								{% if not app.user or (app.user.eleve and not app.user.eleve.isPremium) %}
+									<li class="nav-item ">
+										<a class="nav-link" href="{{ path('app_login') }}" aria-haspopup="true" aria-expanded="false">
+										   <b class="badge bg-success">{% trans %}SIGNIN_KEY{% endtrans %}</b>
+										</a>
+									</li>
+								{% endif %}
+
 
 							</ul>
 							<!-- Nav Main menu END -->
