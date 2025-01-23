@@ -114,14 +114,7 @@ showActiveTheme(theme)
 				width: 70px;
 				height: auto;
 			}
-			@media (max-width: 1024px) { /* Cible les appareils avec une largeur maximale de 1024px (tablette et mobile) */
-				.barnner,
-				.image-barner,
-				.counter-block { 
-					display: none;
 			
-				}
-			}
         /* Start secton barner */
 			.banner-with-background {
 				position: relative;
@@ -157,14 +150,27 @@ showActiveTheme(theme)
 					height: 500px;
 				}
 
-				
-
 				.main-message {
 					font-size: 35px; /* Taille réduite pour mobile */
 				}
 
 				.sub-message {
 					font-size: 25px; /* Taille réduite pour mobile */
+				}
+
+				.barnner,
+				.image-barner,
+				.counter-block { 
+					display: none;
+			
+				}
+				
+				.counter-box {
+					display: none;
+				}
+
+				.login-mobile {
+					display: none;
 				}
 			}
 
@@ -415,10 +421,10 @@ gtag('config', 'G-7N7LGGGWT1');
 								</ul>
 							</div>
 						{% else %}
-							<div class="navbar-nav">
+							<div class="navbar-nav d-none d-md-inline">
 								<a href="{{ path('app_login') }}" class="btn btn-sm btn-dark mb-0">
 									<i class="bi bi-power me-2"></i>
-									{% trans %}SIGNIN_KEY{% endtrans %}</a>
+									{% trans %}SIGNIN_KEY{% endtrans %} a</a>
 							</div>
 						{% endif %}
 
