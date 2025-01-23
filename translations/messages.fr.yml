@@ -92,7 +92,7 @@ REGISTER_TITLE_KEY: S'inscrire
 # Form placeholders
 INVITATION_CODE_PLACEHOLDER_KEY: 'Entrez le code d''invitation (facultatif)'
 FULL_NAME_PLACEHOLDER_KEY: 'Entrez votre nom complet'
-USERNAME_PLACEHOLDER_KEY: '5-15 caractères, saisir sans espacer'
+USERNAME_PLACEHOLDER_KEY: '4-15 caractères, saisir sans espacer'
 PHONE_PLACEHOLDER_KEY: 'Saisir sans espacer'
 PASSWORD_PLACEHOLDER_KEY: 'Au moins 4 caractères'
 CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Doit etre identique au mot de passe'
