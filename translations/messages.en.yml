@@ -91,6 +91,7 @@ NO_ACCOUNT_KEY: Don't have an account?
 REGISTER_NOW_KEY: Register now
 OR_SIGN_IN_WITH_KEY: Or sign in with
 REGISTER_KEY: 'Sign up'
+ACCOUNT_CREATED_SUCCESS_KEY: 'Your account has been created successfully. You can now log in.'
 
 # Form placeholders
 INVITATION_CODE_PLACEHOLDER_KEY: 'Enter invitation code (optional)'
