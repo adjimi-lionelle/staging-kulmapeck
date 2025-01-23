@@ -95,7 +95,7 @@ REGISTER_KEY: 'Sign up'
 # Form placeholders
 INVITATION_CODE_PLACEHOLDER_KEY: 'Enter invitation code (optional)'
 FULL_NAME_PLACEHOLDER_KEY: 'Enter your full name'
-USERNAME_PLACEHOLDER_KEY: '5-15 characters and no space'
+USERNAME_PLACEHOLDER_KEY: '4-15 characters and no space'
 PHONE_PLACEHOLDER_KEY: 'No space allowed'
 PASSWORD_PLACEHOLDER_KEY: 'At least 4 characters'
 CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Must be identical to the password'
