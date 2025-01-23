@@ -3,19 +3,64 @@
 {% block title %} - Accueil{% endblock %}
 
 
-{% block mainBarnner %}
-
-    {{ include('front/home/_main_barnner.html.twig') }}
-    
-{% endblock %}
 
 
 {% block mainContent %}
+{% if not app.user %}
+<section class="text-white py-3" style="background-color:rgba(var(--bs-info-rgb))">
+    <div class="container text-center">
+        <p class="mb-0">
+            <strong class="d-block d-md-none">Créer votre compte pour obtenir un accès gratuit à tous nos cours pendant 7 jours</strong>
+            <strong class="d-none d-md-block" style="font-size: 1.5rem;">Créer votre compte pour obtenir un accès gratuit à tous nos cours pendant 7 jours</strong>
+        </p>
+    </div>
+</section>
+
+{% endif %}
+
+<!-- =======================
+    Custom Banner START -->
+<section class="banner-with-background">
+    <div class="container">
+        <div class="row align-items-center text-center">
+            <!-- Texte de la bannière -->
+            <div class="col-md-12">
+                <p class="mb-4 fw-bold main-message">{% trans %}MAINMESSAGE_KEY{% endtrans %} KULMAPECK</p>
+                <p class="mb-4 fw-bold sub-message">L'éducation à la portée de tous.</p>
+                <a href="{{ path('app_front_courses_category') }}" class="btn btn-lg" style="background-color:#fd7e14; color:white">Voir tous nos cours</a>
+                <div class="row justify-content-center mt-4">
+                    <div class="col-5 col-md-6 d-flex justify-content-end">
+                        <a class="btn btn-lg" style="background-color:white; color:#09139f" href="#" data-bs-toggle="modal" data-bs-target="#coursePremium">Créer un compte</a>
+                    </div>
+                    <div class="col-5 col-md-6 d-flex justify-content-start">
+                        <a href="{{ path('app_login') }}" class="btn btn-lg" style="background-color:white; color:#09139f">Se connecter</a>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<!-- =======================
+ 
+<!-- =======================
+    Custom Banner END -->
+
+<!-- =======================
+    Custom Banner END -->
+
+
 <div id="quizNotification" class="btn btn-success">Quiz is available!</div>
 
     <!-- =======================
     Counter START -->
-    <section class="py-0 py-xl-5">
+    <section class="py-0 py-xl-5 counter-block">
         <div class="container">
             <div class="row g-4">
                 <!-- Counter item -->

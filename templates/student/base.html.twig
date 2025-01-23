@@ -60,6 +60,11 @@
         }
 }
 
+        @media (max-width: 1024px) { /* Cible les appareils avec une largeur maximale de 1024px (tablette et mobile) */
+			.counter-box {
+				display: none;
+			}
+		}
     </style>
     
 {% endblock %}
@@ -166,13 +171,14 @@
                                             <a class="list-group-item bg-success" href="{{ path('app_plan') }}"><i class="fas fa-id-card me-2"></i>S'ABONNER</a>
                                         {% endif %}
                                         <a class="list-group-item {{ studentHome is defined ? 'active' : '' }}" href="{{ path('app_student_home') }}"><i class="bi bi-ui-checks-grid fa-fw me-2"></i>Dashboard</a>
-                                        <a class="list-group-item {{ isSubscriptions is defined ? 'active' : '' }}" href="{{ path('app_student_subscriptions') }}"><i class="bi bi-basket fa-fw me-2"></i>My Subscriptions</a>
-                                        <a class="list-group-item {{ studentCourses is defined ? 'active' : '' }}" href="{{ path('app_student_courses') }}"><i class="bi bi-basket fa-fw me-2"></i>My Courses</a>
-                                        <a class="list-group-item {{ isEvaluations is defined ? 'active' : '' }}" href="{{ path('app_student_evaluation') }}"><i class="bi bi-file fa-fw me-2"></i>My Tests</a>
-                                        <a class="list-group-item {{ isPayments is defined ? 'active' : '' }}" href="{{ url("app_student_payments") }}"><i class="bi bi-credit-card-2-front fa-fw me-2"></i>Payments</a>
-                                        <a class="list-group-item {{ isNetWork is defined ? 'active' : '' }}" href="{{ url("app_student_network") }}"><i class="bi bi-people fa-fw me-2"></i>Network</a>
-                                        <a class="list-group-item {{ isProfile is defined ? 'active' : '' }}" href="{{ url("app_student_profile") }}"><i class="bi bi-pencil-square fa-fw me-2"></i>My Profile</a>
-                                        <a class="list-group-item text-danger bg-danger-soft-hover" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt fa-fw me-2"></i>Sign Out</a>
+                                        <a class="list-group-item {{ isSubscriptions is defined ? 'active' : '' }}" href="{{ path('app_front_courses_category') }}"><i class="bi bi-basket fa-fw me-2"></i>Voir tous nos cours</a>
+                                        <a class="list-group-item {{ isSubscriptions is defined ? 'active' : '' }}" href="{{ path('app_student_subscriptions') }}"><i class="bi bi-basket fa-fw me-2"></i>Mes subscriptions</a>
+                                        <a class="list-group-item {{ studentCourses is defined ? 'active' : '' }}" href="{{ path('app_student_courses') }}"><i class="bi bi-basket fa-fw me-2"></i>Mes cours</a>
+                                        <!-- a class="list-group-item {{ isEvaluations is defined ? 'active' : '' }}" href="{{ path('app_student_evaluation') }}"><i class="bi bi-file fa-fw me-2"></i>Mes tests</a -->
+                                        <a class="list-group-item {{ isPayments is defined ? 'active' : '' }}" href="{{ url("app_student_payments") }}"><i class="bi bi-credit-card-2-front fa-fw me-2"></i>Mes paiements</a>
+                                        <a class="list-group-item {{ isNetWork is defined ? 'active' : '' }}" href="{{ url("app_student_network") }}"><i class="bi bi-people fa-fw me-2"></i>Mon réseau</a>
+                                        <a class="list-group-item {{ isProfile is defined ? 'active' : '' }}" href="{{ url("app_student_profile") }}"><i class="bi bi-pencil-square fa-fw me-2"></i>Mon Profile</a>
+                                        <a class="list-group-item text-danger bg-danger-soft-hover" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt fa-fw me-2"></i>Se déconnecter</a>
                                     </div>
                                 </div>
                             </div>
