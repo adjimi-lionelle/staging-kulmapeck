@@ -60,24 +60,26 @@
 							<tr>
 								<!-- Table data -->
 								<td>
-									<div class="d-flex align-items-center">
-										<!-- Image -->
-										<div class="w-100px">
-											<img src="{{asset('uploads/media/courses/' ~ course.media.imageFile)}}" class="rounded" alt="">
-										</div>
-										<div class="mb-0 ms-2">
-											<!-- Title -->
-											<h6><a href="{{ url("app_front_course_start", {slug: course.slug}, "http", false) }}">{{ course.intitule }}</a></h6>
-											<!-- Info -->
-											<div class="overflow-hidden">
-												<h6 class="mb-0 text-end">{{ percent|number_format(0) }}%</h6>
-												<div class="progress progress-sm bg-primary bg-opacity-10">
-													<div class="progress-bar bg-primary aos" role="progressbar" data-aos="slide-right" data-aos-delay="200" data-aos-duration="1000" data-aos-easing="ease-in-out" style="width: {{ percent|number_format(0) }}%" aria-valuenow="{{ percent|number_format(0) }}" aria-valuemin="0" aria-valuemax="100">
+									<a href="{{ url("app_front_course_start", {slug: course.slug}, "http", false) }}" class="text-decoration-none text-dark">
+													<div class="d-flex align-items-center">
+														<!-- Image -->
+														<div class="w-100px">
+															<img src="{{asset('uploads/media/courses/' ~ course.media.imageFile)}}" class="rounded" alt="">
+														</div>
+														<div class="mb-0 ms-2">
+															<!-- Title -->
+															<h6 class="mb-2">{{ course.intitule }}</h6>
+															<!-- Info -->
+															<div class="overflow-hidden">
+																<h6 class="mb-0 text-end">{{ percent|number_format(0) }}%</h6>
+																<div class="progress progress-sm bg-primary bg-opacity-10">
+																	<div class="progress-bar bg-primary aos" role="progressbar" data-aos="slide-right" data-aos-delay="200" data-aos-duration="1000" data-aos-easing="ease-in-out" style="width: {{ percent|number_format(0) }}%" aria-valuenow="{{ percent|number_format(0) }}" aria-valuemin="0" aria-valuemax="100">
+																	</div>
+																</div>
+															</div>
+														</div>
 													</div>
-												</div>
-											</div>
-										</div>
-									</div>
+										</a>
 								</td>
 
 								<!-- Table data -->
