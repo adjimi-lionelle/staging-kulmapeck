@@ -142,6 +142,13 @@ showActiveTheme(theme)
 				color: #fd7e14;
 			}
 
+			@media (max-width: 1024) {
+				.hide-login,
+				.hide-btn {
+					display: none;
+				}
+			}	
+
 			/* Styles spécifiques pour mobile et tablette (écrans max 1024px) */
 			@media (max-width: 1024px) {
 				.banner-with-background {
@@ -310,7 +317,7 @@ gtag('config', 'G-7N7LGGGWT1');
 
 								<!-- Nav item 3 Account -->
 								{% if not app.user or (app.user.eleve and not app.user.eleve.isPremium) %}
-									<li class="nav-item ">
+									<li class="nav-item  hide-login">
 										<a class="nav-link" href="{{ path('app_login') }}" aria-haspopup="true" aria-expanded="false">
 										   <b class="badge bg-success">{% trans %}SIGNIN_KEY{% endtrans %}</b>
 										</a>
