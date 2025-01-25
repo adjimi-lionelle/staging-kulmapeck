@@ -307,7 +307,7 @@ gtag('config', 'G-7N7LGGGWT1');
 								{% endif %}
 
                                <!-- Nav item 3 Account -->
-								{% if not app.user or (app.user.eleve and not app.user.eleve.isPremium) %}
+								{% if not app.user %}
 									<li class="nav-item">
 										<a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#coursePremium" aria-haspopup="true" aria-expanded="false">
 											<b class="badge bg-success">Créer un compte</b>
@@ -316,7 +316,7 @@ gtag('config', 'G-7N7LGGGWT1');
 								{% endif %}
 
 								<!-- Nav item 3 Account -->
-								{% if not app.user or (app.user.eleve and not app.user.eleve.isPremium) %}
+								{% if not app.user %}
 									<li class="nav-item  hide-login">
 										<a class="nav-link" href="{{ path('app_login') }}" aria-haspopup="true" aria-expanded="false">
 										   <b class="badge bg-success">{% trans %}SIGNIN_KEY{% endtrans %}</b>
