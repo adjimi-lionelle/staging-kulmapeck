@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Categorie;
 use App\Entity\Eleve;
-use App\Entity\Matiere;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -18,11 +18,11 @@ class AIService
         $this->pythonApiUrl = $params->get('app.python_api_url');
     }
 
-    public function generateResponse(string $message, Matiere $subject, Eleve $student): string
+    public function generateResponse(string $message, Categorie $subject, Eleve $student): string
     {
         try {
             $response = $this->client->request('POST', 
-                $this->pythonApiUrl . '/chat/' . urlencode($subject->getNom()),
+                $this->pythonApiUrl . '/chat/' . urlencode($subject->getName()),
                 [
                     'json' => [
                         'message' => $message,

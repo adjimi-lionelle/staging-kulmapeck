@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Categorie;
 use App\Entity\ChatMessage;
 use App\Entity\Eleve;
-use App\Entity\Matiere;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -26,7 +26,7 @@ class ChatMessageRepository extends ServiceEntityRepository
     /**
      * Get student's chat messages for a specific subject
      */
-    public function findStudentMessages(Eleve $student, Matiere $subject): array
+    public function findStudentMessages(Eleve $student, Categorie $subject): array
     {
         return $this->createQueryBuilder('m')
             ->andWhere('m.student = :student')
@@ -39,23 +39,20 @@ class ChatMessageRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get daily message count for a student
+     * Get student's daily message count
      */
     public function getDailyMessageCount(Eleve $student): int
     {
-        $today = new \DateTime('today');
-        $tomorrow = new \DateTime('tomorrow');
+        $today = new \DateTime();
+        $today->setTime(0, 0);
 
         return $this->createQueryBuilder('m')
             ->select('COUNT(m.id)')
             ->andWhere('m.student = :student')
             ->andWhere('m.createdAt >= :today')
-            ->andWhere('m.createdAt < :tomorrow')
-            ->andWhere('m.isFromAI = :isFromAI')
+            ->andWhere('m.isFromAI = false')
             ->setParameter('student', $student)
             ->setParameter('today', $today)
-            ->setParameter('tomorrow', $tomorrow)
-            ->setParameter('isFromAI', false)
             ->getQuery()
             ->getSingleScalarResult();
     }

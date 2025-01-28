@@ -2,12 +2,12 @@
 
 namespace App\Controller\Student;
 
+use App\Entity\Categorie;
 use App\Entity\ChatMessage;
 use App\Entity\Eleve;
-use App\Entity\Matiere;
+use App\Repository\CategorieRepository;
 use App\Repository\ChatMessageRepository;
 use App\Repository\ClasseRepository;
-use App\Repository\MatiereRepository;
 use App\Repository\SpecialiteRepository;
 use App\Service\AIService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,7 +27,7 @@ class ChatController extends AbstractController
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ChatMessageRepository $chatMessageRepository,
-        private MatiereRepository $matiereRepository,
+        private CategorieRepository $categorieRepository,
         private ClasseRepository $classeRepository,
         private SpecialiteRepository $specialiteRepository,
         private AIService $aiService
@@ -49,7 +49,7 @@ class ChatController extends AbstractController
         }
 
         // Get student's subjects based on class and specialization
-        $subjects = $this->matiereRepository->findByClasseAndSpecialite(
+        $subjects = $this->categorieRepository->findByClasseAndSpecialite(
             $student->getClasse(),
             $student->getSpecialite()
         );
@@ -106,8 +106,8 @@ class ChatController extends AbstractController
         }
 
         // Get current subject
-        /** @var Matiere|null $subject */
-        $subject = $this->matiereRepository->find($data['subject']);
+        /** @var Categorie|null $subject */
+        $subject = $this->categorieRepository->find($data['subject']);
         if (!$subject) {
             return new JsonResponse(['success' => false], Response::HTTP_BAD_REQUEST);
         }
@@ -144,7 +144,7 @@ class ChatController extends AbstractController
     }
 
     #[Route('/messages/{subject}', name: 'app_student_chat_messages', methods: ['GET'])]
-    public function getMessages(Matiere $subject): JsonResponse
+    public function getMessages(Categorie $subject): JsonResponse
     {
         /** @var Eleve $student */
         $student = $this->getUser()->getPersonne();

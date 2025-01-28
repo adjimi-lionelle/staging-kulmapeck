@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ChatMessageRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class ChatMessage
 {
     #[ORM\Id]
@@ -29,7 +30,7 @@ class ChatMessage
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Matiere $subject = null;
+    private ?Categorie $subject = null;
 
     public function __construct()
     {
@@ -80,18 +81,19 @@ class ChatMessage
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    #[ORM\PrePersist]
+    public function setCreatedAt(): self
     {
-        $this->createdAt = $createdAt;
+        $this->createdAt = new \DateTimeImmutable();
         return $this;
     }
 
-    public function getSubject(): ?Matiere
+    public function getSubject(): ?Categorie
     {
         return $this->subject;
     }
 
-    public function setSubject(?Matiere $subject): self
+    public function setSubject(?Categorie $subject): self
     {
         $this->subject = $subject;
         return $this;
