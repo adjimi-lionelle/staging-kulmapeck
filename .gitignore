@@ -10,6 +10,8 @@
 /vendor/
 /public/uploads/
 /scripts
+/deploy.py
+
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
