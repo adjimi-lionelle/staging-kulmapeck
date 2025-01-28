@@ -1,0 +1,154 @@
+{% extends "student/base.html.twig" %}
+
+{% block pageContent %}
+    {% if needsSetup %}
+        {{ include('student/chat/_setup_modal.html.twig') }}
+    {% else %}
+        <div class="card bg-transparent border rounded-3">
+            <!-- Card header START -->
+            <div class="card-header bg-transparent border-bottom">
+                <div class="d-sm-flex justify-content-between align-items-center">
+                    <h3 class="mb-2 mb-sm-0">{% trans %}CHAT_WITH_TEACHERS_KEY{% endtrans %}</h3>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-info me-2">
+                            {{ dailyCount }}/{{ maxMessages }} messages
+                        </span>
+                        <select id="subjectSelect" class="form-select">
+                            {% for subject in subjects %}
+                                <option value="{{ subject.id }}" {% if subject.id == currentSubject.id %}selected{% endif %}>
+                                    {{ subject.nom }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!-- Card header END -->
+
+            <!-- Card body START -->
+            <div class="card-body">
+                <!-- Chat container -->
+                <div class="chat-container bg-light rounded-3 p-3" style="height: 600px; overflow-y: auto;">
+                    <div class="messages" id="chat-messages">
+                        {% for message in messages %}
+                            <div class="message {% if message.isFromAI %}ai{% else %}student{% endif %}-message mb-3">
+                                <div class="d-flex">
+                                    {% if not message.isFromAI %}
+                                        <div class="avatar avatar-xs me-2">
+                                            <img class="avatar-img rounded-circle" src="{{ asset(app.user.personne.avatarPath) }}" alt="avatar">
+                                        </div>
+                                    {% else %}
+                                        <div class="avatar avatar-xs me-2">
+                                            <img class="avatar-img rounded-circle" src="{{ asset('assets/images/ai-avatar.png') }}" alt="AI avatar">
+                                        </div>
+                                    {% endif %}
+                                    <div class="message-content p-3 rounded {% if message.isFromAI %}bg-light{% else %}bg-primary text-white{% endif %}">
+                                        {{ message.content }}
+                                    </div>
+                                </div>
+                                <small class="ms-2 text-muted">{{ message.createdAt|date('H:i') }}</small>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Message input -->
+                <div class="message-input mt-3">
+                    <form id="chat-form" class="d-flex">
+                        <input type="text" id="message-text" class="form-control me-2" placeholder="{% trans %}TYPE_YOUR_MESSAGE_KEY{% endtrans %}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <!-- Card body END -->
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-text');
+        const messagesContainer = document.getElementById('chat-messages');
+        const subjectSelect = document.getElementById('subjectSelect');
+
+        // Scroll to bottom of messages
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        scrollToBottom();
+
+        // Load messages for selected subject
+        function loadMessages(subjectId) {
+            fetch(`/student/chat/messages/${subjectId}`)
+                .then(response => response.json())
+                .then(data => {
+                    messagesContainer.innerHTML = '';
+                    data.messages.forEach(msg => {
+                        const messageHtml = `
+                            <div class="message ${msg.isFromAI ? 'ai' : 'student'}-message mb-3">
+                                <div class="d-flex">
+                                    <div class="avatar avatar-xs me-2">
+                                        <img class="avatar-img rounded-circle" 
+                                             src="${msg.isFromAI ? '{{ asset('assets/images/ai-avatar.png') }}' : '{{ asset(app.user.personne.avatarPath) }}'}" 
+                                             alt="${msg.isFromAI ? 'AI' : 'User'} avatar">
+                                    </div>
+                                    <div class="message-content p-3 rounded ${msg.isFromAI ? 'bg-light' : 'bg-primary text-white'}">
+                                        ${msg.content}
+                                    </div>
+                                </div>
+                                <small class="ms-2 text-muted">${new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                            </div>
+                        `;
+                        messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+                    });
+                    scrollToBottom();
+                });
+        }
+
+        // Handle subject change
+        subjectSelect.addEventListener('change', function() {
+            loadMessages(this.value);
+        });
+
+        // Handle form submission
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Send message to server
+            fetch('{{ path("app_student_chat_send") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token("chat") }}'
+                },
+                body: JSON.stringify({
+                    message: message,
+                    subject: subjectSelect.value
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Clear input
+                    messageInput.value = '';
+                    
+                    // Reload messages to show both student message and AI response
+                    loadMessages(subjectSelect.value);
+                } else {
+                    alert(data.error || 'Failed to send message');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to send message');
+            });
+        });
+    });
+</script>
+{% endblock %}

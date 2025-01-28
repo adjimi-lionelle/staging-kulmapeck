@@ -1,0 +1,80 @@
+<!-- Modal START -->
+<div class="modal fade" id="chatSetupModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="chatSetupModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chatSetupModalLabel">{% trans %}SETUP_YOUR_PROFILE_KEY{% endtrans %}</h5>
+            </div>
+            <div class="modal-body">
+                <form id="chatSetupForm">
+                    <!-- Class selection -->
+                    <div class="mb-3">
+                        <label for="classe" class="form-label">{% trans %}SELECT_YOUR_CLASS_KEY{% endtrans %}</label>
+                        <select class="form-select" id="classe" name="classe" required>
+                            <option value="">{% trans %}CHOOSE_CLASS_KEY{% endtrans %}</option>
+                            {% for classe in classes %}
+                                <option value="{{ classe.id }}">{{ classe.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Specialization selection -->
+                    <div class="mb-3">
+                        <label for="specialite" class="form-label">{% trans %}SELECT_YOUR_SPECIALIZATION_KEY{% endtrans %}</label>
+                        <select class="form-select" id="specialite" name="specialite" required>
+                            <option value="">{% trans %}CHOOSE_SPECIALIZATION_KEY{% endtrans %}</option>
+                            {% for specialite in specialites %}
+                                <option value="{{ specialite.id }}">{{ specialite.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {% trans %}PROFILE_SETUP_INFO_KEY{% endtrans %}
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check me-2"></i>
+                            {% trans %}SAVE_AND_CONTINUE_KEY{% endtrans %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal END -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const setupForm = document.getElementById('chatSetupForm');
+    
+    setupForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(setupForm);
+        fetch('{{ path("app_student_chat_setup") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token("chat_setup") }}'
+            },
+            body: JSON.stringify({
+                classe: formData.get('classe'),
+                specialite: formData.get('specialite')
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Close modal and reload page
+                const modal = bootstrap.Modal.getInstance(document.getElementById('chatSetupModal'));
+                modal.hide();
+                window.location.reload();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});</script>

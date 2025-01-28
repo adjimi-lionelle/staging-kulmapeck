@@ -296,3 +296,14 @@ MAINMESSAGEDESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éduca
 
 MOSTPOPULAR_KEY: Cours les plus populaires
 MOSTPOPULARDESCRIPTION_KEY: Choisissez parmi des centaines de cours proposés par des organisations spécialisées
+
+# Chat translations
+CHAT_WITH_TEACHERS_KEY: "Échanger avec nos profs"
+SETUP_YOUR_PROFILE_KEY: "Configurer votre profil"
+SELECT_YOUR_CLASS_KEY: "Sélectionnez votre classe"
+SELECT_YOUR_SPECIALIZATION_KEY: "Sélectionnez votre filière"
+CHOOSE_CLASS_KEY: "Choisissez une classe"
+CHOOSE_SPECIALIZATION_KEY: "Choisissez une filière"
+PROFILE_SETUP_INFO_KEY: "Ces informations nous aident à personnaliser vos conversations avec nos professeurs."
+SAVE_AND_CONTINUE_KEY: "Enregistrer et continuer"
+TYPE_YOUR_MESSAGE_KEY: "Tapez votre message..."
