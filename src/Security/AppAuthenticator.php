@@ -87,11 +87,13 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
         $user = $token->getUser();
         
         // Redirect based on user role
-        if ($user->hasRole('ROLE_ADMIN')) {
+        $roles = $user->getRoles();
+                
+        if (in_array('ROLE_ADMIN', $roles)) {
             return new RedirectResponse($this->urlGenerator->generate('admin_dashboard'));
-        } elseif ($user->hasRole('ROLE_INSTRUCTOR')) {
+        } elseif (in_array('ROLE_INSTRUCTOR', $roles)) {
             return new RedirectResponse($this->urlGenerator->generate('instructor_dashboard'));
-        } elseif ($user->hasRole('ROLE_STUDENT')) {
+        } elseif (in_array('ROLE_STUDENT', $roles)) {
             return new RedirectResponse($this->urlGenerator->generate('student_dashboard'));
         }
 
