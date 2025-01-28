@@ -142,6 +142,13 @@ showActiveTheme(theme)
 				color: #fd7e14;
 			}
 
+			@media (max-width: 1024) {
+				.hide-login,
+				.hide-btn {
+					display: none;
+				}
+			}	
+
 			/* Styles spécifiques pour mobile et tablette (écrans max 1024px) */
 			@media (max-width: 1024px) {
 				.banner-with-background {
@@ -158,6 +165,12 @@ showActiveTheme(theme)
 					font-size: 25px; /* Taille réduite pour mobile */
 				}
 
+				.btn-custom {
+					padding: 0.5rem 1rem; /* Ajuste la taille interne */
+					font-size: 10px; /* Taille du texte */
+					width: 150px; /* Adapte la largeur au texte */
+				}
+	
 				.barnner,
 				.image-barner,
 				.counter-block { 
@@ -166,10 +179,6 @@ showActiveTheme(theme)
 				}
 				
 				.counter-box {
-					display: none;
-				}
-
-				.login-mobile {
 					display: none;
 				}
 			}
@@ -296,6 +305,25 @@ gtag('config', 'G-7N7LGGGWT1');
 										</a>
 									</li>
 								{% endif %}
+
+                               <!-- Nav item 3 Account -->
+								{% if not app.user %}
+									<li class="nav-item">
+										<a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#coursePremium" aria-haspopup="true" aria-expanded="false">
+											<b class="badge bg-success">Créer un compte</b>
+										</a>
+									</li>
+								{% endif %}
+
+								<!-- Nav item 3 Account -->
+								{% if not app.user %}
+									<li class="nav-item  hide-login">
+										<a class="nav-link" href="{{ path('app_login') }}" aria-haspopup="true" aria-expanded="false">
+										   <b class="badge bg-success">{% trans %}SIGNIN_KEY{% endtrans %}</b>
+										</a>
+									</li>
+								{% endif %}
+
 
 							</ul>
 							<!-- Nav Main menu END -->
