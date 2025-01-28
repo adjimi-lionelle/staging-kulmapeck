@@ -90,11 +90,11 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
         $roles = $user->getRoles();
                 
         if (in_array('ROLE_ADMIN', $roles)) {
-            return new RedirectResponse($this->urlGenerator->generate('admin_dashboard'));
+            return new RedirectResponse($this->urlGenerator->generate('app_admin_dashboard'));
         } elseif (in_array('ROLE_INSTRUCTOR', $roles)) {
-            return new RedirectResponse($this->urlGenerator->generate('instructor_dashboard'));
+            return new RedirectResponse($this->urlGenerator->generate('app_instructor_dashboard'));
         } elseif (in_array('ROLE_STUDENT', $roles)) {
-            return new RedirectResponse($this->urlGenerator->generate('student_dashboard'));
+            return new RedirectResponse($this->urlGenerator->generate('app_student_dashboard'));
         }
 
         // Default redirect
