@@ -11,27 +11,27 @@
                 <div class="col-lg-8">
                     <!-- Title -->
                     <h1 class="text-white">{{ course.intitule }}</h1>
-                    <p class="text-white">{{ course.description }}</p>
+                    <!-- p class="text-white">{{ course.description }}</p -->
                     <!-- Content -->
                     <ul class="list-inline mb-5">
                         <li class="list-inline-item h6 me-4 mb-1 mb-sm-0 text-white"><span class="fw-light">{% trans %}BY_KEY{% endtrans %}</span> {{ course.enseignant.utilisateur.personne.nomComplet }}</li>
                         <li class="list-inline-item me-4 mb-1 mb-sm-0">
-                            <ul class="list-inline mb-0">
+                            <!-- ul class="list-inline mb-0">
                                 <li class="list-inline-item me-0 small"><i class="fas fa-star text-warning"></i></li>
                                 <li class="list-inline-item me-0 small"><i class="fas fa-star text-warning"></i></li>
                                 <li class="list-inline-item me-0 small"><i class="fas fa-star text-warning"></i></li>
                                 <li class="list-inline-item me-0 small"><i class="fas fa-star text-warning"></i></li>
                                 <li class="list-inline-item me-0 small"><i class="fas fa-star-half-alt text-warning"></i></li>
                                 <li class="list-inline-item ms-2 h6 text-white">4.5/5.0</li>
-                                <li class="list-inline-item text-white">(1,586 reviews)</li>
-                            </ul>
+                                <!-- li class="list-inline-item text-white">(1,586 reviews)</li -->
+                            </ul -->
                         </li>
-                        <li class="list-inline-item h6 mb-0 text-white"><i class="fas fa-globe text-info me-2"></i>{{ course.language }}</li>
+                        <!-- li class="list-inline-item h6 mb-0 text-white"><i class="fas fa-globe text-info me-2"></i>{{ course.language }}</li -->
                     </ul>
                 </div>
 
                 <div class="col-lg-3">
-                    <h6 class="text-white lead fw-light mb-3"><i class="fas fa-user-graduate text-orange me-2"></i>{{ course.eleves|length }} {% trans %}ALLREADYENROLLED_KEY{% endtrans %}</h6>
+                    <!-- h6 class="text-white lead fw-light mb-3"><i class="fas fa-user-graduate text-orange me-2"></i>{{ course.eleves|length }} {% trans %}ALLREADYENROLLED_KEY{% endtrans %}</h6 -->
                     
                     <!-- Button -->
                     <a href="{{ url("app_front_course_start", {slug: course.slug}, "http", false) }}" class="btn btn-warning mb-3 w-100">
@@ -41,6 +41,9 @@
                             {% trans %}CONTINUE_READING_KEY{% endtrans %} 
                         {% endif %} 
                     </a>
+                    {% if not app.user or (app.user.eleve and not app.user.eleve.isPremium) %}
+                         <a href="{{ path('app_plan') }}" class="btn btn-warning mb-3 w-100">S'abonner et accéder à tous les cours</a>
+                    {% endif %}
                     
                     <!-- Progress item -->
                     <div class="overflow-hidden mb-4">
@@ -49,7 +52,7 @@
                         <div class="progress progress-sm bg-white bg-opacity-10 mb-1">
                             <div class="progress-bar bg-white aos" role="progressbar" data-aos="slide-right" data-aos-delay="200" data-aos-duration="1000" data-aos-easing="ease-in-out" style="width: {{ percent }}%;" aria-valuenow="{{ percent }}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
-                        <small class="text-white">{{ lectures|length }} of {{ lessons|length }} {% trans %}COMPLETED_KEY{% endtrans %}</small>
+                        <small class="text-white">{{ lectures|length }} sur {{ lessons|length }} {% trans %}COMPLETED_KEY{% endtrans %}</small>
                     </div>
                 </div>
 
@@ -71,18 +74,6 @@
                                 <!-- Tab item -->
                                 <li class="nav-item me-2 me-sm-4" role="presentation">
                                     <button class="nav-link mb-2 mb-md-0 active" id="course-pills-tab-1" data-bs-toggle="pill" data-bs-target="#course-pills-1" type="button" role="tab" aria-controls="course-pills-1" aria-selected="true">{% trans %}COURSEDESCRIPTION_KEY{% endtrans %}</button>
-                                </li>
-                                <!-- Tab item -->
-                                <li class="nav-item me-2 me-sm-4" role="presentation">
-                                    <button class="nav-link mb-2 mb-md-0" id="course-pills-tab-2" data-bs-toggle="pill" data-bs-target="#course-pills-2" type="button" role="tab" aria-controls="course-pills-2" aria-selected="false">{% trans %}CHAPTERS_KEY{% endtrans %}</button>
-                                </li>
-                                <!-- Tab item -->
-                                <li class="nav-item me-2 me-sm-4" role="presentation">
-                                    <button class="nav-link mb-2 mb-md-0" id="course-pills-tab-4" data-bs-toggle="pill" data-bs-target="#course-pills-4" type="button" role="tab" aria-controls="course-pills-4" aria-selected="false">Reviews</button>
-                                </li>
-                                <!-- Tab item -->
-                                <li class="nav-item me-2 me-sm-4" role="presentation">
-                                    <button class="nav-link mb-2 mb-md-0" id="course-pills-tab-3" data-bs-toggle="pill" data-bs-target="#course-pills-3" type="button" role="tab" aria-controls="course-pills-3" aria-selected="false">Discussions</button>
                                 </li>
                             </ul>
                         </div>
@@ -186,81 +177,7 @@
                                 </div>
                                 <!-- Content END -->
 
-                                <!-- Content START -->
-                                <div class="tab-pane fade" id="course-pills-2" role="tabpanel" aria-labelledby="course-pills-tab-2">
-                                    <div class="card">
-                                        <!-- Card header -->
-                                        <div class="card-header border-bottom p-0 pb-3">
-                                            <!-- Title and select -->
-                                            <div class="d-sm-flex justify-content-between align-items-center">
-                                                <h4 class="mb-0">{% trans %}ALLCHAPTERS_KEY{% endtrans %}</h4>
-                                            </div>
-                                        </div>
-
-                                        <!-- Card body -->
-                                        <div class="card-body p-0 pt-3">
-                                            {% for chap in course.chapitres|sort((a, b) => a.numero <=> b.numero) %}
-                                                <!-- Note item -->
-                                                <div class="row g-4">
-                                                    <!-- Content -->
-                                                    <div class="col-sm-12 col-xl-12">
-                                                        <h5>{{ chap.title }}</h5>
-                                                        <p>{{ chap.description|raw }}</p>
-                                                        <!-- Buttons -->
-                                                        <div class="hstack gap-3 flex-wrap">
-                                                            <a href="{{ url("app_front_course_start", {slug: course.slug}, "http", false) }}" class="btn btn-sm btn-primary mb-0"><i class="bi bi-play-fill me-2"></i> 
-                                                            {% if not exist %}
-                                                                {% trans %}STARTREADING_KEY{% endtrans %}
-                                                            {% else %}
-                                                                {% trans %}CONTINUE_KEY{% endtrans %}
-                                                            {% endif %}
-                                                        </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {% if not loop.last %}
-                                                    <hr> <!-- Divider -->
-                                                {% endif %}
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Content END -->
-
-                                <!-- Content START -->
-                                <div class="tab-pane fade" id="course-pills-3" role="tabpanel" aria-labelledby="course-pills-tab-3">    
-                                    <div class="card">
-                                        <!-- Card header -->
-                                        <div class="card-header border-bottom p-0 pb-3">
-                                            <!-- Title -->
-                                            <h4 class="mb-3">Discussions</h4>
-                                        </div>
-
-                                        <!-- Card body -->
-                                        <div class="card-body p-0 pt-3">
-                                            <div class="vstack gap-3">
-                                                {{ include('front/includes/courses/forum.html.twig') }}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <!-- Content END -->
-
-                                <!-- Content START -->
-                                <div class="tab-pane fade" id="course-pills-4" role="tabpanel" aria-labelledby="course-pills-tab-4">    
-                                    <div class="card">
-                                        <!-- Card body -->
-                                        <div class="card-body p-0 pt-3">
-                                            <div class="vstack gap-3">
-                                                {{ include('front/includes/courses/_course_reviews.html.twig') }}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <!-- Content END -->
+                                
 
                             </div>
                         </div>
