@@ -290,6 +290,7 @@ CHOOSE_SPECIALIZATION_KEY: "Choose a specialization"
 PROFILE_SETUP_INFO_KEY: "This information helps us personalize your conversations with our teachers."
 SAVE_AND_CONTINUE_KEY: "Save and continue"
 TYPE_YOUR_MESSAGE_KEY: "Type your message..."
+SEE_ALL_COURSES_KEY: 'See all courses'
 
 # Authentication messages
 CREDENTIALS_REQUIRED_KEY: 'Please provide both identifier and password'
