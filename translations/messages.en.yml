@@ -282,15 +282,24 @@ MANY_ANSWERS_POSSIBLE_KEY: Many answers are possible for this question
 
 # Chat translations
 CHAT_WITH_TEACHERS_KEY: "Chat with our teachers"
-SETUP_YOUR_PROFILE_KEY: "Set up your profile"
-SELECT_YOUR_CLASS_KEY: "Select your class"
-SELECT_YOUR_SPECIALIZATION_KEY: "Select your specialization"
+SETUP_YOUR_PROFILE_KEY: "Setup Your Profile"
+SELECT_YOUR_CLASS_KEY: "Select Your Class"
+SELECT_YOUR_SPECIALIZATION_KEY: "Select Your Specialization"
 CHOOSE_CLASS_KEY: "Choose a class"
 CHOOSE_SPECIALIZATION_KEY: "Choose a specialization"
 PROFILE_SETUP_INFO_KEY: "This information helps us personalize your conversations with our teachers."
-SAVE_AND_CONTINUE_KEY: "Save and continue"
+SAVE_AND_CONTINUE_KEY: "Save and Continue"
 TYPE_YOUR_MESSAGE_KEY: "Type your message..."
 SEE_ALL_COURSES_KEY: 'See all courses'
+
+# Chat setup translations
+SETUP_YOUR_PROFILE_KEY: 'Setup Your Profile'
+SELECT_YOUR_CLASS_KEY: 'Select Your Class'
+CHOOSE_CLASS_KEY: 'Choose a class'
+SELECT_YOUR_SPECIALIZATION_KEY: 'Select Your Specialization'
+CHOOSE_SPECIALIZATION_KEY: 'Choose a specialization'
+PROFILE_SETUP_INFO_KEY: 'This information helps us personalize your conversations with our teachers.'
+SAVE_AND_CONTINUE_KEY: 'Save and Continue'
 
 # Authentication messages
 CREDENTIALS_REQUIRED_KEY: 'Please provide both identifier and password'

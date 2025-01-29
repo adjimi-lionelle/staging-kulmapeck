@@ -13,7 +13,7 @@
                         <select class="form-select" id="classe" name="classe" required>
                             <option value="">{% trans %}CHOOSE_CLASS_KEY{% endtrans %}</option>
                             {% for classe in classes %}
-                                <option value="{{ classe.id }}">{{ classe.nom }}</option>
+                                <option value="{{ classe.id }}">{{ classe.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -24,7 +24,7 @@
                         <select class="form-select" id="specialite" name="specialite" required>
                             <option value="">{% trans %}CHOOSE_SPECIALIZATION_KEY{% endtrans %}</option>
                             {% for specialite in specialites %}
-                                <option value="{{ specialite.id }}">{{ specialite.nom }}</option>
+                                <option value="{{ specialite.id }}">{{ specialite.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -49,32 +49,32 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const setupForm = document.getElementById('chatSetupForm');
+    const form = document.getElementById('chatSetupForm');
     
-    setupForm.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const formData = new FormData(setupForm);
-        fetch('{{ path("app_student_chat_setup") }}', {
+        const formData = {
+            classe: document.getElementById('classe').value,
+            specialite: document.getElementById('specialite').value
+        };
+        
+        fetch('{{ path('app_student_chat_setup') }}', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token("chat_setup") }}'
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                classe: formData.get('classe'),
-                specialite: formData.get('specialite')
-            })
+            body: JSON.stringify(formData)
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Close modal and reload page
-                const modal = bootstrap.Modal.getInstance(document.getElementById('chatSetupModal'));
-                modal.hide();
                 window.location.reload();
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+        });
     });
-});</script>
+});
+</script>
