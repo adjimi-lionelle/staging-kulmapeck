@@ -8,6 +8,7 @@ use App\Entity\Eleve;
 use App\Repository\CategorieRepository;
 use App\Repository\ChatMessageRepository;
 use App\Repository\ClasseRepository;
+use App\Repository\EleveRepository;
 use App\Repository\SpecialiteRepository;
 use App\Service\AIService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,14 +31,22 @@ class ChatController extends AbstractController
         private CategorieRepository $categorieRepository,
         private ClasseRepository $classeRepository,
         private SpecialiteRepository $specialiteRepository,
+        private EleveRepository $eleveRepository,
         private AIService $aiService
     ) {}
 
     #[Route('', name: 'app_student_chat')]
     public function index(): Response
     {
-        /** @var Eleve $student */
-        $student = $this->getUser()->getPersonne();
+        $user = $this->getUser();
+        $personne = $user->getPersonne();
+        
+        /** @var Eleve|null $student */
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        
+        if (!$student) {
+            throw $this->createAccessDeniedException('Student account not found.');
+        }
 
         // Check if student has class and specialization set
         if (!$student->getClasse() || !$student->getSpecialite()) {
@@ -71,8 +80,14 @@ class ChatController extends AbstractController
     #[Route('/setup', name: 'app_student_chat_setup', methods: ['POST'])]
     public function setup(Request $request): JsonResponse
     {
-        /** @var Eleve $student */
-        $student = $this->getUser()->getPersonne();
+        $user = $this->getUser();
+        /** @var Eleve|null $student */
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        
+        if (!$student) {
+            throw $this->createAccessDeniedException('Student account not found.');
+        }
+
         $data = json_decode($request->getContent(), true);
 
         $classe = $this->classeRepository->find($data['classe']);
@@ -92,8 +107,14 @@ class ChatController extends AbstractController
     #[Route('/send', name: 'app_student_chat_send', methods: ['POST'])]
     public function send(Request $request): JsonResponse
     {
-        /** @var Eleve $student */
-        $student = $this->getUser()->getPersonne();
+        $user = $this->getUser();
+        /** @var Eleve|null $student */
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        
+        if (!$student) {
+            throw $this->createAccessDeniedException('Student account not found.');
+        }
+
         $data = json_decode($request->getContent(), true);
 
         // Check daily message limit
@@ -146,8 +167,13 @@ class ChatController extends AbstractController
     #[Route('/messages/{subject}', name: 'app_student_chat_messages', methods: ['GET'])]
     public function getMessages(Categorie $subject): JsonResponse
     {
-        /** @var Eleve $student */
-        $student = $this->getUser()->getPersonne();
+        $user = $this->getUser();
+        /** @var Eleve|null $student */
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        
+        if (!$student) {
+            throw $this->createAccessDeniedException('Student account not found.');
+        }
         
         $messages = $this->chatMessageRepository->findStudentMessages($student, $subject);
         
