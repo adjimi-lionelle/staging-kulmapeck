@@ -88,7 +88,7 @@ class CategorieRepository extends ServiceEntityRepository
             ->leftJoin('c.classes', 'cl')
             ->leftJoin('c.specialites', 'sp')
             ->where('cl.id = :classe')
-            ->orWhere('sp.id = :specialite')
+            ->andWhere('sp.id = :specialite')
             ->setParameter('classe', $classe->getId())
             ->setParameter('specialite', $specialite->getId())
             ->orderBy('c.name', 'ASC')

@@ -42,6 +42,7 @@ class Categorie
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[ORM\Index(name: "idx_categorie_name")]
     #[Groups(['read:course:collection', 'read:category:collection', 'read:evaluation:collection'])]
     private ?string $name = null;
 
