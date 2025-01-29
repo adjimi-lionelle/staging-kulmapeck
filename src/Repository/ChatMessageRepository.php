@@ -29,7 +29,7 @@ class ChatMessageRepository extends ServiceEntityRepository
     public function findStudentMessages(Eleve $student, Categorie $subject): array
     {
         return $this->createQueryBuilder('m')
-            ->andWhere('m.student = :student')
+            ->where('m.student = :student')
             ->andWhere('m.subject = :subject')
             ->setParameter('student', $student)
             ->setParameter('subject', $subject)
@@ -43,16 +43,34 @@ class ChatMessageRepository extends ServiceEntityRepository
      */
     public function getDailyMessageCount(Eleve $student): int
     {
-        $today = new \DateTime();
-        $today->setTime(0, 0);
+        $today = new \DateTime('today');
+        $tomorrow = new \DateTime('tomorrow');
 
         return $this->createQueryBuilder('m')
             ->select('COUNT(m.id)')
-            ->andWhere('m.student = :student')
-            ->andWhere('m.createdAt >= :today')
+            ->where('m.student = :student')
             ->andWhere('m.isFromAI = false')
+            ->andWhere('m.createdAt >= :today')
+            ->andWhere('m.createdAt < :tomorrow')
             ->setParameter('student', $student)
             ->setParameter('today', $today)
+            ->setParameter('tomorrow', $tomorrow)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Get student's unread message count for a specific subject
+     */
+    public function getUnreadCount(Eleve $student, Categorie $subject): int
+    {
+        return $this->createQueryBuilder('m')
+            ->select('COUNT(m.id)')
+            ->where('m.student = :student')
+            ->andWhere('m.subject = :subject')
+            ->andWhere('m.isRead = false')
+            ->setParameter('student', $student)
+            ->setParameter('subject', $subject)
             ->getQuery()
             ->getSingleScalarResult();
     }

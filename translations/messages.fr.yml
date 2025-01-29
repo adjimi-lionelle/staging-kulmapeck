@@ -101,6 +101,9 @@ CHOOSE_SPECIALIZATION_KEY: 'Choisissez une spécialisation'
 PROFILE_SETUP_INFO_KEY: 'Ces informations nous aident à personnaliser vos conversations avec nos professeurs.'
 SAVE_AND_CONTINUE_KEY: 'Enregistrer et continuer'
 TYPE_YOUR_MESSAGE_KEY: 'Tapez votre message...'
+CHAT_ABOUT_SUBJECT_KEY: 'Discutez avec nos professeurs à propos de cette matière'
+START_CHAT_KEY: 'Démarrer la discussion'
+BACK_TO_SUBJECTS_KEY: 'Retour aux matières'
 
 # Authentication messages
 CREDENTIALS_REQUIRED_KEY: 'Veuillez fournir l''identifiant et le mot de passe'

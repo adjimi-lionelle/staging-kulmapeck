@@ -61,6 +61,9 @@ CHOOSE_SPECIALIZATION_KEY: 'Choose a specialization'
 PROFILE_SETUP_INFO_KEY: 'This information helps us personalize your conversations with our teachers.'
 SAVE_AND_CONTINUE_KEY: 'Save and Continue'
 TYPE_YOUR_MESSAGE_KEY: 'Type your message...'
+CHAT_ABOUT_SUBJECT_KEY: 'Chat with our teachers about this subject'
+START_CHAT_KEY: 'Start Chat'
+BACK_TO_SUBJECTS_KEY: 'Back to Subjects'
 
 # WELCOME SCREEN
 MAINMESSAGE_KEY: WELCOME TO 

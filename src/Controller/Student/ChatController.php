@@ -64,15 +64,16 @@ class ChatController extends AbstractController
             $student->getSpecialite()
         );
 
-        // Get messages for the first subject (default)
-        $currentSubject = $subjects[0] ?? null;
-        $messages = $currentSubject ? $this->chatMessageRepository->findStudentMessages($student, $currentSubject) : [];
+        // Add unread count for each subject
+        foreach ($subjects as $subject) {
+            $unreadCount = $this->chatMessageRepository->getUnreadCount($student, $subject);
+            $subject->unreadCount = $unreadCount;
+        }
 
         return $this->render('student/chat/index.html.twig', [
             'needsSetup' => false,
             'subjects' => $subjects,
-            'currentSubject' => $currentSubject,
-            'messages' => $messages,
+            'messages' => [],
             'dailyCount' => $this->chatMessageRepository->getDailyMessageCount($student),
             'maxMessages' => self::MAX_DAILY_MESSAGES,
             'student' => $student,
@@ -139,7 +140,8 @@ class ChatController extends AbstractController
         $message = new ChatMessage();
         $message->setStudent($student)
             ->setContent($data['message'])
-            ->setSubject($subject);
+            ->setSubject($subject)
+            ->setIsRead(true);
         
         $this->entityManager->persist($message);
 
@@ -155,7 +157,8 @@ class ChatController extends AbstractController
         $aiMessage->setStudent($student)
             ->setContent($aiResponse)
             ->setIsFromAI(true)
-            ->setSubject($subject);
+            ->setSubject($subject)
+            ->setIsRead(false);
         
         $this->entityManager->persist($aiMessage);
         $this->entityManager->flush();
@@ -178,6 +181,14 @@ class ChatController extends AbstractController
         }
         
         $messages = $this->chatMessageRepository->findStudentMessages($student, $subject);
+        
+        // Mark messages as read
+        foreach ($messages as $message) {
+            if (!$message->isRead()) {
+                $message->setIsRead(true);
+            }
+        }
+        $this->entityManager->flush();
         
         return new JsonResponse([
             'messages' => array_map(function(ChatMessage $message) {
