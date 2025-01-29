@@ -1,122 +1,71 @@
 # FRONT BASE TEMPLATE
-NUMERO_REGISTRE_COMMERCE_KEY: Company number authorization
-LOCALISATION_KEY: Localisation
+NUMERO_REGISTRE_COMMERCE_KEY: Business registration number
+LOCALISATION_KEY: Location
 HOME_KEY: Home
-COURSESFORMATION_KEY: Courses & formations
-EXAM_KEY: Exam
+COURSESFORMATION_KEY: Courses
+EXAM_KEY: Exams
 FORUM_KEY: Forum
-BECOME_PREMIUM_KEY: Become Premium
+BECOME_PREMIUM_KEY: Subscribe
 SEARCH_KEY: Search
 ENGLISH_KEY: English
 FRENCH_KEY: French
 DASHBOARD_KEY: Dashboard
-EDIT_PROFILE_KEY: Edit Profile 
+EDIT_PROFILE_KEY: Edit Profile
 SIGNOUT_KEY: Sign Out
-HELP_KEY: Help 
-LIGHT_KEY: Light 
+HELP_KEY: Help
+LIGHT_KEY: Light
 DARK_KEY: Dark
 AUTO_KEY: Auto
 SIGNIN_KEY: Sign In
-COMPANY_KEY: Company 
-COURSES_KEY: Courses 
+COMPANY_KEY: Company
+COURSES_KEY: Courses
 ABOUTUS_KEY: About Us
 CONTACTUS_KEY: Contact Us
-COMMUNITY_KEY: Community 
-FAQ_KEY: Faq 
-SITEMAP_KEY: Sitemap 
-TEACHING_KEY: Teaching 
-BECOMEATEACKER_KEY: Become a teacher
+COMMUNITY_KEY: Community
+FAQ_KEY: FAQ
+SITEMAP_KEY: Sitemap
+TEACHING_KEY: Teaching
+BECOMEATEACKER_KEY: Become a Teacher
 HOWTOGUIDE_KEY: How to Guide
-TERMSANDCONDITIONS_KEY: Terms &amp; Conditions
-CONTACT_KEY: Contact 
-TOLLFREE_KEY: Toll free 
+TERMSANDCONDITIONS_KEY: Terms & Conditions
+CONTACT_KEY: Contact
+TOLLFREE_KEY: Toll Free
 EMAIL_KEY: Email
 LANGUAGE_KEY: Language
 APPARANCE_KEY: Appearance
-TERMSOFUSE_KEY: Terms of use
-PRIVACYPOLICY_KEY: Privacy Policy 
-GOTOFORUM_KEY: Go to forum 
-BACKTOCOURSEDETAILS_KEY: Back to course details
+TERMSOFUSE_KEY: Terms of Use
+PRIVACYPOLICY_KEY: Privacy Policy
+GOTOFORUM_KEY: Go to Forum
+BACKTOCOURSEDETAILS_KEY: Back to Course Details
 ADDCOMMENT_KEY: Add a comment...
-CHOOSETYPEUSERACCOUNT_KEY: 'Choose a type of <span class="text-success">user account</span>'
-ACCOUNTMODALDESCRIPTION_KEY: Prosperous understood Middletons in conviction an uncommonly do. Supposing so be resolving breakfast am or perfectly.
+
+# AUTH AND REGISTRATION
+SIGN_IN_KEY: Sign In
+EMAIL_ADDRESS_KEY: Email Address
+WELCOME_BACK_KEY: Welcome Back
+NEW_HERE_KEY: New Here?
+CREATE_ACCOUNT_KEY: 'Create Account'
+CHOOSETYPEUSERACCOUNT_KEY: 'Choose your <span class="text-success">account</span> type'
+ACCOUNTMODALDESCRIPTION_KEY: Choose the type of account that best matches your learning or teaching needs.
 TEACHER_KEY: Teacher & Trainer
-STUDENT_KEY: Student
+STUDENT_KEY: Student & Learner
+
+# Chat and Student Dashboard
+CHAT_WITH_TEACHERS_KEY: 'Chat with our teachers'
+SEE_ALL_COURSES_KEY: 'See all courses'
+SETUP_YOUR_PROFILE_KEY: 'Setup Your Profile'
+SELECT_YOUR_CLASS_KEY: 'Select Your Class'
+CHOOSE_CLASS_KEY: 'Choose a class'
+SELECT_YOUR_SPECIALIZATION_KEY: 'Select Your Specialization'
+CHOOSE_SPECIALIZATION_KEY: 'Choose a specialization'
+PROFILE_SETUP_INFO_KEY: 'This information helps us personalize your conversations with our teachers.'
+SAVE_AND_CONTINUE_KEY: 'Save and Continue'
+TYPE_YOUR_MESSAGE_KEY: 'Type your message...'
 
 # WELCOME SCREEN
 MAINMESSAGE_KEY: WELCOME TO 
 FINGERSTIPS_KEY: At your fingertips
 MAINMESSAGEDESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
-
-# AUTH AND REGISTRATION
-SIGN_IN_KEY: Sign In
-REGISTER_TITLE_KEY: Sign Up
-EMAIL_ADDRESS_KEY: Email address
-WELCOME_BACK_KEY: Welcome back
-NEW_HERE_KEY: New here?
-CREATE_ACCOUNT_KEY: 'Create an account'
-LOGIN_CREDENTIALS_KEY: Enter email, username, or phone number
-PASSWORD_KEY: 'Password'
-LOGIN_KEY: 'Login'
-WELCOME_LOGIN_KEY: Welcome back to our learning community
-WELCOME_LARGEST_COMMUNITY_KEY: Welcome to our largest community
-LOGIN_DESCRIPTION_KEY: Man children rejoiced yet uncommonly his ten who. Yet uncommonly his ten who diminution astonished. Yet uncommonly his ten who diminution astonished.
-EXPLORE_COURSES_KEY: Explore our courses
-WELCOME_COMMUNITY_KEY: Welcome to our community
-JOIN_COMMUNITY_DESCRIPTION_KEY: Join our community of learners and educators. Create your account to start your learning journey.
-ALREADY_HAVE_ACCOUNT_KEY: 'Already have an account?'
-INVITATION_CODE_KEY: 'Invitation code'
-INVITATION_CODE_APPLIED_KEY: Invitation code automatically applied
-FULL_NAME_KEY: 'Full name'
-USERNAME_KEY: 'Username'
-PHONE_NUMBER_KEY: 'Phone number'
-CONFIRM_PASSWORD_KEY: 'Confirm password'
-PASSWORD_REQUIREMENTS_KEY: 'Password Requirements'
-MIN_4_CHARS_KEY: 'At least 4 characters'
-UPPERCASE_REQUIRED_KEY: 'At least one uppercase letter'
-LOWERCASE_REQUIRED_KEY: 'At least one lowercase letter'
-NUMBER_REQUIRED_KEY: 'At least one number'
-PASSWORDS_DO_NOT_MATCH_KEY: 'Passwords do not match'
-AGREE_TO_TERMS_KEY: 'By signing up, you agree to the'
-TERMS_KEY: 'terms'
-PASSWORD_STRENGTH_KEY: 'Password Strength'
-VERY_WEAK_KEY: 'Very Weak'
-WEAK_KEY: 'Weak'
-MEDIUM_KEY: 'Medium'
-STRONG_KEY: 'Strong'
-VERY_STRONG_KEY: 'Very Strong'
-REMEMBER_ME_KEY: Remember me
-FORGOT_PASSWORD_KEY: Forgot password?
-NO_ACCOUNT_KEY: Don't have an account?
-REGISTER_NOW_KEY: Register now
-OR_SIGN_IN_WITH_KEY: Or sign in with
-REGISTER_KEY: 'Sign up'
-ACCOUNT_CREATED_SUCCESS_KEY: 'Your account has been created successfully. You can now log in.'
-
-# Form placeholders
-INVITATION_CODE_PLACEHOLDER_KEY: 'Enter invitation code (optional)'
-FULL_NAME_PLACEHOLDER_KEY: 'Enter your full name'
-USERNAME_PLACEHOLDER_KEY: '4-15 characters and no space'
-PHONE_PLACEHOLDER_KEY: 'No space allowed'
-PASSWORD_PLACEHOLDER_KEY: 'At least 4 characters'
-CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Must be identical to the password'
-
-# Form validation errors
-REQUIRED_FIELD_KEY: 'This field is required'
-USERNAME_LENGTH_ERROR_KEY: 'Username must be at least 4 characters long'
-INVALID_USERNAME_KEY: 'Username can only contain letters, numbers, and underscores'
-INVALID_PHONE_KEY: 'Please enter a valid phone number'
-USERNAME_EXISTS_KEY: 'This username is already taken'
-PHONE_EXISTS_KEY: 'This phone number is already registered'
-TERMS_REQUIRED_KEY: 'You must agree to the terms and conditions'
-INVALID_INVITATION_CODE_KEY: 'Invalid invitation code'
-EMAIL_ALREADY_EXISTS_KEY: 'This email address is already registered'
-INVALID_EMAIL_FORMAT_KEY: 'Please enter a valid email address'
-PASSWORD_TOO_SHORT_KEY: 'Password must be at least 4 characters long'
-USERNAME_TOO_LONG_KEY: 'Username must not exceed 15 characters'
-USERNAME_NO_SPACE_KEY: 'Username must contain only letters, numbers, and underscores (no spaces allowed)'
-PHONE_NO_SPACE_KEY: 'Phone number must not contain spaces'
-PASSWORD_MISMATCH_KEY: 'Passwords do not match'
 
 # COURSES AND LEARNING
 COURSESCATEGORY_KEY: Courses categories
@@ -280,27 +229,39 @@ NEXT_KEY: Next
 PREV_KEY: Prev
 MANY_ANSWERS_POSSIBLE_KEY: Many answers are possible for this question
 
-# Chat translations
-CHAT_WITH_TEACHERS_KEY: "Chat with our teachers"
-SETUP_YOUR_PROFILE_KEY: "Setup Your Profile"
-SELECT_YOUR_CLASS_KEY: "Select Your Class"
-SELECT_YOUR_SPECIALIZATION_KEY: "Select Your Specialization"
-CHOOSE_CLASS_KEY: "Choose a class"
-CHOOSE_SPECIALIZATION_KEY: "Choose a specialization"
-PROFILE_SETUP_INFO_KEY: "This information helps us personalize your conversations with our teachers."
-SAVE_AND_CONTINUE_KEY: "Save and Continue"
-TYPE_YOUR_MESSAGE_KEY: "Type your message..."
-SEE_ALL_COURSES_KEY: 'See all courses'
-
-# Chat setup translations
-SETUP_YOUR_PROFILE_KEY: 'Setup Your Profile'
-SELECT_YOUR_CLASS_KEY: 'Select Your Class'
-CHOOSE_CLASS_KEY: 'Choose a class'
-SELECT_YOUR_SPECIALIZATION_KEY: 'Select Your Specialization'
-CHOOSE_SPECIALIZATION_KEY: 'Choose a specialization'
-PROFILE_SETUP_INFO_KEY: 'This information helps us personalize your conversations with our teachers.'
-SAVE_AND_CONTINUE_KEY: 'Save and Continue'
-
 # Authentication messages
 CREDENTIALS_REQUIRED_KEY: 'Please provide both identifier and password'
 USER_NOT_FOUND_KEY: 'User not found'
+
+# Form placeholders
+INVITATION_CODE_PLACEHOLDER_KEY: 'Enter invitation code (optional)'
+FULL_NAME_PLACEHOLDER_KEY: 'Enter your full name'
+USERNAME_PLACEHOLDER_KEY: '4-15 characters and no space'
+PHONE_PLACEHOLDER_KEY: 'No space allowed'
+PASSWORD_PLACEHOLDER_KEY: 'At least 4 characters'
+CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Must be identical to the password'
+
+# Form validation errors
+REQUIRED_FIELD_KEY: 'This field is required'
+USERNAME_LENGTH_ERROR_KEY: 'Username must be at least 4 characters long'
+INVALID_USERNAME_KEY: 'Username can only contain letters, numbers, and underscores'
+INVALID_PHONE_KEY: 'Please enter a valid phone number'
+USERNAME_EXISTS_KEY: 'This username is already taken'
+PHONE_EXISTS_KEY: 'This phone number is already registered'
+TERMS_REQUIRED_KEY: 'You must agree to the terms and conditions'
+INVALID_INVITATION_CODE_KEY: 'Invalid invitation code'
+EMAIL_ALREADY_EXISTS_KEY: 'This email address is already registered'
+INVALID_EMAIL_FORMAT_KEY: 'Please enter a valid email address'
+PASSWORD_TOO_SHORT_KEY: 'Password must be at least 4 characters long'
+USERNAME_TOO_LONG_KEY: 'Username must not exceed 15 characters'
+USERNAME_NO_SPACE_KEY: 'Username must contain only letters, numbers, and underscores (no spaces allowed)'
+PHONE_NO_SPACE_KEY: 'Phone number must not contain spaces'
+PASSWORD_MISMATCH_KEY: 'Passwords do not match'
+
+# Password strength
+PASSWORD_STRENGTH_KEY: 'Password Strength'
+VERY_WEAK_KEY: 'Very Weak'
+WEAK_KEY: 'Weak'
+MEDIUM_KEY: 'Medium'
+STRONG_KEY: 'Strong'
+VERY_STRONG_KEY: 'Very Strong'
