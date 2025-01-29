@@ -54,6 +54,7 @@ class ChatController extends AbstractController
                 'needsSetup' => true,
                 'classes' => $this->classeRepository->findAll(),
                 'specialites' => $this->specialiteRepository->findAll(),
+                'student' => $student,
             ]);
         }
 
@@ -73,7 +74,8 @@ class ChatController extends AbstractController
             'currentSubject' => $currentSubject,
             'messages' => $messages,
             'dailyCount' => $this->chatMessageRepository->getDailyMessageCount($student),
-            'maxMessages' => self::MAX_DAILY_MESSAGES
+            'maxMessages' => self::MAX_DAILY_MESSAGES,
+            'student' => $student,
         ]);
     }
 
