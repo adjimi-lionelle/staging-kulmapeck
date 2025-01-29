@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CategorieRepository::class)]
+#[ORM\Table(name: 'categorie')]
+#[ORM\Index(columns: ['name'], name: 'idx_categorie_name')]
 #[ApiResource(
     operations: [
         new Get(
@@ -42,7 +44,6 @@ class Categorie
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[ORM\Index(name: "idx_categorie_name")]
     #[Groups(['read:course:collection', 'read:category:collection', 'read:evaluation:collection'])]
     private ?string $name = null;
 
