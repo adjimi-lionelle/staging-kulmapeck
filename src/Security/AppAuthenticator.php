@@ -86,6 +86,9 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
 
         $user = $token->getUser();
         
+        // Ensure we have fresh roles from the database
+        $user = $this->userRepository->find($user->getId());
+        
         // Redirect based on user role
         $roles = $user->getRoles();
                 
