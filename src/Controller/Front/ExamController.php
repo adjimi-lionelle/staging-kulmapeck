@@ -83,13 +83,18 @@ class ExamController extends AbstractController
         $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/media/exams/files/' . $filename;
 
         if (!file_exists($filePath)) {
-            throw $this->createNotFoundException('File not found.');
+            // Try alternative path without public directory
+            $altPath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
+            if (!file_exists($altPath)) {
+                throw $this->createNotFoundException('File not found.');
+            }
+            $filePath = $altPath;
         }
 
         // Verify file is within allowed directory
         $realPath = realpath($filePath);
-        $uploadsDir = realpath($this->getParameter('kernel.project_dir') . '/public/uploads/media/exams/files');
-        if (!$realPath || !str_starts_with($realPath, $uploadsDir)) {
+        $baseDir = dirname($filePath); // Use the same directory as the file
+        if (!$realPath || !str_starts_with($realPath, $baseDir)) {
             throw $this->createNotFoundException('Invalid file path.');
         }
 
