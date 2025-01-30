@@ -23,7 +23,7 @@
                                 <div class="position-relative">
                                     <!-- Avatar -->
                                     <div class="avatar avatar-xxl">
-                                        <img class="avatar-img rounded-circle" src="{{ asset('uploads/media/personnes/' ~ exam.user.personne.avatarPath) }}" alt="avatar">
+                                        <img class="avatar-img rounded-circle" src="{{ asset(exam.user.personne.avatarPath) }}" alt="avatar">
                                     </div>
                                     <a href="#" class="h5 stretched-link mt-2 mb-0 d-block">{{ exam.user.personne.nomComplet }}</a>
                                     <p class="mb-2">Editor at kulmapeck</p>
@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <!-- Title and Info END -->
-
+                    
                     <!-- Video START -->
                     <div class="row mt-4">
                         <div class="col-xl-10 mx-auto">
@@ -61,26 +61,30 @@
                                 <!-- Card Image overlay -->
                                 <div class="bg-overlay bg-dark opacity-4"></div>
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
-                                    <div class="w-100 my-auto">
-                                        <div class="row justify-content-center">
-                                            <iframe src="{{ path('app_exam_file', {'filename': exam.sujet}) }}" height="800px" frameborder="0" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" style="pointer-events: none;"></iframe>
-                                        </div>
-                                    </div>
+                                    {% if data ends with '.pdf' %}
+            <!-- Afficher le PDF dans un iframe -->
+            <div class="card overflow-hidden h-700px rounded-3 text-center">
+                <div class="w-100 my-auto">
+                    <div class="row justify-content-center">
+                        <iframe src="{{ url('app_exam_file', {'filename': data}) }}" height="800px" frameborder="0" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" style="pointer-events: none;"></iframe>
+                    </div>
+                </div>
+            </div>
                                 </div>
                             </div>
                             <!-- Card item END -->
                         </div>
                     </div>
                     <!-- Video END -->
-
+                    
                 </div>
             </div> <!-- Row END -->
         </div>
     </section>
     <!-- Main Content END -->
-
+    
     {{ include('front/includes/_newsletterorange.html.twig') }}
-
+    
     {% if courses is defined and courses is not empty %}
         <!-- Related blog START -->
         <section class="pt-0">

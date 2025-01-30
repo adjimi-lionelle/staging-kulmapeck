@@ -14,42 +14,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
-#[Route('/exam')]
 class ExamController extends AbstractController
 {
-    #[Route('/file/{filename}', name: 'app_exam_file')]
-    public function servePdfFile(Request $request, string $filename): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        
-        // Get the upload directory path from parameters
-        $uploadDir = $this->getParameter('upload_directory');
-        
-        $filePath = $uploadDir . 'media/exams/files/' . $filename;
-
-        if (!file_exists($filePath)) {
-            throw $this->createNotFoundException('File not found: ' . $filePath);
-        }
-
-        // Verify file is within allowed directory
-        $realPath = realpath($filePath);
-        $baseDir = realpath($uploadDir . 'media/exams/files');
-        if (!$realPath || !str_starts_with($realPath, $baseDir)) {
-            throw $this->createNotFoundException('Invalid file path.');
-        }
-
-        return new Response(file_get_contents($filePath), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . basename($filename) . '"',
-            'X-Content-Type-Options' => 'nosniff',
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma' => 'no-cache',
-            'Content-Security-Policy' => "default-src 'self'; object-src 'none'",
-        ]);
-    }
-
     #[Route('/exams', name: 'app_front_exam_index')]
     public function index(Request $request, CategorieRepository $categorieRepository, SkillLevelRepository $skillLevelRepository, ClasseRepository $classeRepository, ExamRepository $examRepository, PaginatorInterface $paginatorInterface): Response
     {
@@ -73,12 +40,10 @@ class ExamController extends AbstractController
             'sClasse' => $classe,
             'language' => $language,
             'skillLevel' => $skillLevel,
-            
         ]);
     }
 
-    #[Route('/{reference}/show', name: 'app_front_exam_show', methods: ['GET'])]
-    #[ParamConverter('exam', options: ['mapping' => ['reference' => 'reference']])]
+    #[Route('/exam/{reference}/show', name: 'app_front_exam_show')]
     public function show(Request $request, Exam $exam, PersonneRepository $personneRepository): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -94,12 +59,39 @@ class ExamController extends AbstractController
             throw $this->createAccessDeniedException("Vous devez être premium!");
         }
 
-        return $this->render('front/exam/show.html.twig', [
+        $response = $this->render('front/exam/show.html.twig', [
             'exam' => $exam,
             'isExamPage' => true,
             'display' => $request->query->get('display', 'subject'),
             'data' => $request->query->get('display', 'subject') === 'correction' ? $exam->getCorrection() : $exam->getSujet(),
-            
         ]);
+
+        // Add security headers to prevent downloads
+        $response->headers->set('Content-Security-Policy', "default-src 'self'; frame-src 'self'; object-src 'none'");
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        
+        return $response;
+    }
+    
+    #[Route('/exam/file/{filename}', name: 'app_exam_file')]
+    public function servePdfFile(string $filename): Response
+    {
+        $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException("Fichier introuvable.");
+        }
+
+        $response = new Response(file_get_contents($filePath), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline', // Force display instead of download
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Content-Security-Policy' => "default-src 'self'; object-src 'none'",
+        ]);
+
+        return $response;
     }
 }
