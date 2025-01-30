@@ -11,7 +11,7 @@
 /public/uploads/
 /scripts
 /deploy.py
-
+/docs
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
