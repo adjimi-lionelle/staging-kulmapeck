@@ -53,19 +53,14 @@
                     <!-- Video START -->
                     <div class="row mt-4">
                         <div class="col-xl-10 mx-auto">
-                            {% if data ends with '.pdf' %}
-                                <!-- PDF viewer -->
-                                <div class="card overflow-hidden rounded-3">
-                                    <div class="ratio ratio-16x9" style="min-height: 700px;">
-                                        <iframe src="{{ url('app_exam_file', {'filename': data}) }}" 
-                                                class="w-100 h-100"
-                                                frameborder="0" 
-                                                sandbox="allow-same-origin allow-scripts allow-popups allow-forms" 
-                                                style="pointer-events: none;">
-                                        </iframe>
-                                    </div>
-                                </div>
-                            {% endif %}
+                            <div class="card">
+                                {% if data ends with '.pdf' %}
+                                    <iframe src="{{ url('app_exam_file', {'filename': data}) }}" 
+                                            style="width: 100%; height: 800px; border: 0;"
+                                            sandbox="allow-same-origin allow-scripts allow-popups allow-forms">
+                                    </iframe>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     <!-- Video END -->
