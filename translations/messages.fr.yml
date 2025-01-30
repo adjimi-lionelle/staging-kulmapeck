@@ -237,12 +237,12 @@ CONTINUE_KEY: Continuer
 ALLCHAPTERS_KEY: Description des chapitres
 CHAPTER_KEY: Chapitre
 CHAPTERS_KEY: Chapitres
-COURSEDESCRIPTION_KEY: Matériel de cours
+COURSEDESCRIPTION_KEY: Structure cours
 YOURPROGRESS_KEY: Votre progression
 COMPLETED_KEY: Complété
 NOTCOMPLETED_KEY: Pas achevé
 CONTINUE_READING_KEY: Continuer la lecture
-ENROLLANDSTART_KEY: S'inscrire au cours et commencer
+ENROLLANDSTART_KEY: Payez et accéder au cours
 ALLREADYENROLLED_KEY: déjà inscrit
 BY_KEY: Par
 PLAYLIST_KEY: Playlist
