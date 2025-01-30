@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route('/exam')]
 class ExamController extends AbstractController
 {
     #[Route('/exams', name: 'app_front_exam_index')]
@@ -44,7 +45,7 @@ class ExamController extends AbstractController
         ]);
     }
 
-    #[Route('/exam/{reference}/show', name: 'app_front_exam_show')]
+    #[Route('/{id}/show', name: 'app_front_exam_show', methods: ['GET'])]
     public function show(Request $request, Exam $exam, PersonneRepository $personneRepository): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -69,36 +70,28 @@ class ExamController extends AbstractController
         ]);
     }
     
-    #[Route('/exam/file/{filename}', name: 'app_exam_file')]
+    #[Route('/file/{filename}', name: 'app_exam_file')]
     public function servePdfFile(Request $request, string $filename): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         
-        // Validate file extension
-        if (!str_ends_with(strtolower($filename), '.pdf')) {
-            throw $this->createNotFoundException('Invalid file type.');
-        }
-
-        // Construct file path using kernel.project_dir parameter
-        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/media/exams/files/' . $filename;
+        // Get the upload directory path from parameters
+        $uploadDir = $this->getParameter('upload_directory');
+        
+        $filePath = $uploadDir . 'media/exams/files/' . $filename;
 
         if (!file_exists($filePath)) {
-            // Try alternative path without public directory
-            $altPath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
-            if (!file_exists($altPath)) {
-                throw $this->createNotFoundException('File not found.');
-            }
-            $filePath = $altPath;
+            throw $this->createNotFoundException('File not found: ' . $filePath);
         }
 
         // Verify file is within allowed directory
         $realPath = realpath($filePath);
-        $baseDir = dirname($filePath); // Use the same directory as the file
+        $baseDir = realpath($uploadDir . 'media/exams/files');
         if (!$realPath || !str_starts_with($realPath, $baseDir)) {
             throw $this->createNotFoundException('Invalid file path.');
         }
 
-        $response = new Response(file_get_contents($filePath), 200, [
+        return new Response(file_get_contents($filePath), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . basename($filename) . '"',
             'X-Content-Type-Options' => 'nosniff',
@@ -106,7 +99,5 @@ class ExamController extends AbstractController
             'Pragma' => 'no-cache',
             'Content-Security-Policy' => "default-src 'self'; object-src 'none'",
         ]);
-
-        return $response;
     }
 }
