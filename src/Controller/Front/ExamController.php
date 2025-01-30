@@ -85,11 +85,12 @@ class ExamController extends AbstractController
 
         $response = new Response(file_get_contents($filePath), 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline', // Force display instead of download
+            'Content-Disposition' => 'inline',
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
             'Pragma' => 'no-cache',
-            'Content-Security-Policy' => "default-src 'self'; object-src 'none'",
+            'Content-Security-Policy' => "default-src 'self'; frame-ancestors 'self'; object-src 'none'; frame-src 'self'",
+            'X-Frame-Options' => 'SAMEORIGIN'
         ]);
 
         return $response;
