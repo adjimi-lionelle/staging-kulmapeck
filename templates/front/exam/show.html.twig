@@ -23,7 +23,7 @@
                                 <div class="position-relative">
                                     <!-- Avatar -->
                                     <div class="avatar avatar-xxl">
-                                        <img class="avatar-img rounded-circle" src="{{ asset(exam.user.personne.avatarPath) }}" alt="avatar">
+                                        <img class="avatar-img rounded-circle" src="{{ asset('uploads/media/personnes/' ~ exam.user.personne.avatarPath) }}" alt="avatar">
                                     </div>
                                     <a href="#" class="h5 stretched-link mt-2 mb-0 d-block">{{ exam.user.personne.nomComplet }}</a>
                                     <p class="mb-2">Editor at kulmapeck</p>
@@ -101,7 +101,7 @@
                                 <div class="row g-0">
                                     <!-- Image -->
                                     <div class="col-md-4">
-                                        <img src="{{ asset('/public/uploads/media/exams/files/' ~ course.media.imageFile) }}" class="img-fluid rounded-start" alt="...">
+                                        <img src="{{ asset('uploads/media/courses/' ~ course.media.imageFile) }}" class="img-fluid rounded-start" alt="...">
                                     </div>
                                     <!-- Card body -->
                                     <div class="col-md-8">
