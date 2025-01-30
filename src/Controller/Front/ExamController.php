@@ -83,23 +83,14 @@ class ExamController extends AbstractController
             throw $this->createNotFoundException("Fichier introuvable.");
         }
 
-        $fileContent = file_get_contents($filePath);
-        
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/pdf');
-        $response->headers->set('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
-        $response->headers->set('Content-Length', strlen($fileContent));
-        $response->headers->set('Accept-Ranges', 'none');
-        $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('Content-Security-Policy', "default-src 'self'; frame-ancestors 'self'");
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-        $response->setContent($fileContent);
-        $response->setPrivate();
-        $response->setMaxAge(0);
-        $response->setSharedMaxAge(0);
-        $response->headers->addCacheControlDirective('no-store', true);
-        $response->headers->addCacheControlDirective('must-revalidate', true);
-        $response->headers->set('Pragma', 'no-cache');
+        $response = new Response(file_get_contents($filePath), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline', // Force display instead of download
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+            'Content-Security-Policy' => "default-src 'self'; object-src 'none'",
+        ]);
 
         return $response;
     }
