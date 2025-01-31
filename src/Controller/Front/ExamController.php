@@ -74,7 +74,7 @@ class ExamController extends AbstractController
         return $response;
     }
     
-    #[Route('/public/uploads/media/exams/files/{filename}', name: 'app_exam_file')]
+    #[Route('/exam/file/{filename}', name: 'app_exam_file')]
     public function servePdfFile(string $filename): Response
     {
         // Construct the file path - check both possible locations
@@ -114,20 +114,26 @@ class ExamController extends AbstractController
 
         error_log("Successfully read file, size: " . strlen($content));
 
-        $response = new Response($content, 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . basename($filename) . '"',
-            'Content-Length' => filesize($finalPath),
-            'X-Content-Type-Options' => 'nosniff',
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma' => 'no-cache',
-            'Content-Security-Policy' => "default-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; object-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; frame-ancestors 'self'",
-            'X-Frame-Options' => 'SAMEORIGIN',
-            'Access-Control-Allow-Origin' => '*',
-            'Access-Control-Allow-Methods' => 'GET',
-            'Access-Control-Allow-Headers' => 'Content-Type, Range',
-            'Accept-Ranges' => 'bytes',
-        ]);
+        $response = new Response($content);
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Length', filesize($finalPath));
+        $response->headers->set('Accept-Ranges', 'bytes');
+        
+        // Security headers
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('Content-Security-Policy', "default-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; object-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; frame-ancestors 'self'; worker-src blob:;");
+        
+        // CORS headers
+        $response->headers->set('Access-Control-Allow-Origin', '*');
+        $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Range');
+        $response->headers->set('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range');
+        
+        // Cache control
+        $response->headers->set('Cache-Control', 'private, no-transform');
+        
+        // Important: Remove Content-Disposition to prevent download
+        // $response->headers->set('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
 
         return $response;
     }
