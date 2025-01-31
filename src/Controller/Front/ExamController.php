@@ -82,7 +82,7 @@ class ExamController extends AbstractController
             $response = new Response();
             $response->headers->set('Access-Control-Allow-Origin', '*');
             $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
-            $response->headers->set('Access-Control-Allow-Headers', 'Range, Content-Type, Accept');
+            $response->headers->set('Access-Control-Allow-Headers', 'Range, Content-Type, Accept, Origin');
             $response->headers->set('Access-Control-Max-Age', '3600');
             return $response;
         }
@@ -105,30 +105,32 @@ class ExamController extends AbstractController
         error_log("File exists in alternative path: " . (file_exists($alternativePath) ? 'yes' : 'no'));
         error_log("File readable in alternative path: " . (is_readable($alternativePath) ? 'yes' : 'no'));
         
-        // Try both paths
-        if (file_exists($filePath) && is_readable($filePath)) {
-            $finalPath = $filePath;
-        } elseif (file_exists($alternativePath) && is_readable($alternativePath)) {
-            $finalPath = $alternativePath;
-        } else {
-            error_log("File not found or not readable in either location: " . $filename);
-            return new Response('File not found or not readable', Response::HTTP_NOT_FOUND);
-        }
-
-        // Verify file is actually a PDF
-        $mimeType = mime_content_type($finalPath);
-        error_log("File mime type: " . $mimeType);
-        if ($mimeType !== 'application/pdf') {
-            error_log("Invalid mime type: " . $mimeType);
-            return new Response('Invalid file type', Response::HTTP_UNSUPPORTED_MEDIA_TYPE);
-        }
-
-        $fileSize = filesize($finalPath);
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/pdf');
-        $response->headers->set('Accept-Ranges', 'bytes');
-
         try {
+            // Try both paths
+            if (file_exists($filePath) && is_readable($filePath)) {
+                $finalPath = $filePath;
+            } elseif (file_exists($alternativePath) && is_readable($alternativePath)) {
+                $finalPath = $alternativePath;
+            } else {
+                error_log("File not found or not readable in either location: " . $filename);
+                throw new \Exception('File not found or not readable');
+            }
+
+            // Verify file is actually a PDF using finfo
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $mimeType = $finfo->file($finalPath);
+            error_log("File mime type (finfo): " . $mimeType);
+            
+            if ($mimeType !== 'application/pdf') {
+                error_log("Invalid mime type: " . $mimeType);
+                throw new \Exception('Invalid file type: ' . $mimeType);
+            }
+
+            $fileSize = filesize($finalPath);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/pdf');
+            $response->headers->set('Accept-Ranges', 'bytes');
+
             // Handle range requests
             if ($request->headers->has('Range')) {
                 $range = $request->headers->get('Range');
@@ -161,24 +163,23 @@ class ExamController extends AbstractController
             }
 
             if ($content === false) {
-                error_log("Failed to read file contents: " . $finalPath);
-                return new Response('Failed to read file', Response::HTTP_INTERNAL_SERVER_ERROR);
+                throw new \Exception('Failed to read file contents');
             }
 
             $response->setContent($content);
             
-            // Security headers
+            // Security headers - Allow PDF.js to work
             $response->headers->set('X-Content-Type-Options', 'nosniff');
+            $response->headers->set('Content-Security-Policy', "default-src 'self' https://cdnjs.cloudflare.com blob:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; worker-src blob:; frame-ancestors 'self'");
             
             // Force inline viewing
-            $response->headers->set('Content-Disposition', 'inline');
-            $response->headers->set('Content-Security-Policy', "default-src 'self'; object-src 'none';");
+            $response->headers->set('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
             
             // CORS headers
             $response->headers->set('Access-Control-Allow-Origin', '*');
             $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
-            $response->headers->set('Access-Control-Allow-Headers', 'Range, Content-Type, Accept');
-            $response->headers->set('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range');
+            $response->headers->set('Access-Control-Allow-Headers', 'Range, Content-Type, Accept, Origin');
+            $response->headers->set('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range, Content-Disposition');
             
             // Cache control
             $response->headers->set('Cache-Control', 'no-store, must-revalidate');
@@ -191,7 +192,7 @@ class ExamController extends AbstractController
         } catch (\Exception $e) {
             error_log("Error serving PDF: " . $e->getMessage());
             error_log("Stack trace: " . $e->getTraceAsString());
-            return new Response('Internal server error', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new Response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
