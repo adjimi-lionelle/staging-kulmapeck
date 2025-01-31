@@ -77,6 +77,9 @@ class ExamController extends AbstractController
     #[Route('/exam/file/{filename}', name: 'app_exam_file', methods: ['GET', 'OPTIONS'])]
     public function servePdfFile(string $filename, Request $request): Response
     {
+        error_log("=== Starting PDF file request ===");
+        error_log("Filename requested: " . $filename);
+        
         // Handle OPTIONS request for CORS preflight
         if ($request->getMethod() === 'OPTIONS') {
             $response = new Response();
@@ -87,112 +90,54 @@ class ExamController extends AbstractController
             return $response;
         }
 
-        // Log request details
-        error_log("Request Method: " . $request->getMethod());
-        error_log("Request Headers: " . json_encode($request->headers->all()));
-        
-        // Construct the file path - check both possible locations
-        $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
-        $alternativePath = $this->getParameter('kernel.project_dir') . '/public/uploads/media/exams/files/' . $filename;
-        
-        // Debug logging
-        error_log("Attempting to serve PDF file: " . $filename);
-        error_log("Project Dir: " . $this->getParameter('kernel.project_dir'));
-        error_log("Checking primary path: " . $filePath);
-        error_log("File exists in primary path: " . (file_exists($filePath) ? 'yes' : 'no'));
-        error_log("File readable in primary path: " . (is_readable($filePath) ? 'yes' : 'no'));
-        error_log("Checking alternative path: " . $alternativePath);
-        error_log("File exists in alternative path: " . (file_exists($alternativePath) ? 'yes' : 'no'));
-        error_log("File readable in alternative path: " . (is_readable($alternativePath) ? 'yes' : 'no'));
-        
         try {
+            // Construct the file path - check both possible locations
+            $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
+            $alternativePath = $this->getParameter('kernel.project_dir') . '/public/uploads/media/exams/files/' . $filename;
+            
+            error_log("Checking paths:");
+            error_log("Primary path: " . $filePath . " (exists: " . (file_exists($filePath) ? 'yes' : 'no') . ")");
+            error_log("Alternative path: " . $alternativePath . " (exists: " . (file_exists($alternativePath) ? 'yes' : 'no') . ")");
+            
             // Try both paths
             if (file_exists($filePath) && is_readable($filePath)) {
                 $finalPath = $filePath;
             } elseif (file_exists($alternativePath) && is_readable($alternativePath)) {
                 $finalPath = $alternativePath;
             } else {
-                error_log("File not found or not readable in either location: " . $filename);
-                throw new \Exception('File not found or not readable');
+                throw new \Exception('PDF file not found or not readable');
             }
 
-            // Verify file is actually a PDF using finfo
-            $finfo = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->file($finalPath);
-            error_log("File mime type (finfo): " . $mimeType);
+            error_log("Using file: " . $finalPath);
             
-            if ($mimeType !== 'application/pdf') {
-                error_log("Invalid mime type: " . $mimeType);
-                throw new \Exception('Invalid file type: ' . $mimeType);
-            }
-
-            $fileSize = filesize($finalPath);
-            $response = new Response();
-            $response->headers->set('Content-Type', 'application/pdf');
-            $response->headers->set('Accept-Ranges', 'bytes');
-
-            // Handle range requests
-            if ($request->headers->has('Range')) {
-                $range = $request->headers->get('Range');
-                error_log("Range header present: " . $range);
-                
-                if (preg_match('/bytes=(\d+)-(\d+)?/', $range, $matches)) {
-                    $start = intval($matches[1]);
-                    $end = isset($matches[2]) ? intval($matches[2]) : $fileSize - 1;
-                    
-                    error_log("Range request: $start-$end of $fileSize bytes");
-                    
-                    $length = $end - $start + 1;
-                    $response->headers->set('Content-Length', $length);
-                    $response->headers->set('Content-Range', sprintf('bytes %d-%d/%d', $start, $end, $fileSize));
-                    $response->setStatusCode(206);
-                    
-                    $handle = fopen($finalPath, 'rb');
-                    fseek($handle, $start);
-                    $content = fread($handle, $length);
-                    fclose($handle);
-                    
-                    error_log("Successfully read range request: " . strlen($content) . " bytes");
-                }
-            } else {
-                // Full file request
-                error_log("Full file request for: " . $fileSize . " bytes");
-                $response->headers->set('Content-Length', $fileSize);
-                $content = file_get_contents($finalPath);
-                error_log("Successfully read full file: " . strlen($content) . " bytes");
-            }
-
+            // Read file content
+            $content = file_get_contents($finalPath);
             if ($content === false) {
-                throw new \Exception('Failed to read file contents');
+                throw new \Exception('Failed to read PDF file');
             }
 
-            $response->setContent($content);
+            // Create response
+            $response = new Response($content);
+            $response->headers->set('Content-Type', 'application/pdf');
+            $response->headers->set('Content-Length', strlen($content));
             
-            // Security headers - Allow PDF.js to work
-            $response->headers->set('X-Content-Type-Options', 'nosniff');
-            $response->headers->set('Content-Security-Policy', "default-src 'self' https://cdnjs.cloudflare.com blob:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; worker-src blob:; frame-ancestors 'self'");
-            
-            // Force inline viewing
+            // Essential headers for PDF viewing
+            $response->headers->set('Accept-Ranges', 'bytes');
             $response->headers->set('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
             
             // CORS headers
             $response->headers->set('Access-Control-Allow-Origin', '*');
             $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
             $response->headers->set('Access-Control-Allow-Headers', 'Range, Content-Type, Accept, Origin');
-            $response->headers->set('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range, Content-Disposition');
-            
-            // Cache control
-            $response->headers->set('Cache-Control', 'no-store, must-revalidate');
-            $response->headers->set('Pragma', 'no-cache');
-            
-            error_log("Successfully prepared response with headers: " . json_encode($response->headers->all()));
-            
+            $response->headers->set('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range');
+
+            error_log("=== Successfully prepared PDF response ===");
             return $response;
-            
+
         } catch (\Exception $e) {
             error_log("Error serving PDF: " . $e->getMessage());
             error_log("Stack trace: " . $e->getTraceAsString());
-            return new Response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            throw $this->createNotFoundException($e->getMessage());
         }
     }
 }

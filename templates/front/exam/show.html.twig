@@ -136,12 +136,19 @@
                             <div class="card">
                                 <div class="card-body">
                                     <div id="pdfViewerContainer" style="height: 800px; position: relative;">
-                                        <iframe
-                                            id="pdfViewer"
-                                            src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/web/viewer.html?file={{ url('app_exam_file', {'filename': data}) | url_encode }}"
-                                            style="width: 100%; height: 100%; border: none;"
-                                            allowfullscreen
-                                        ></iframe>
+                                        <canvas id="pdfViewer"></canvas>
+                                        <div id="loadingMessage" class="text-center p-3">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <p class="mt-2">Loading PDF...</p>
+                                        </div>
+                                        <div id="errorMessage" class="alert alert-danger m-3" style="display: none;">
+                                            <h4>Error loading PDF</h4>
+                                            <p id="errorText"></p>
+                                            <p>Please try refreshing the page. If the problem persists, contact support.</p>
+                                            <small id="errorDetails"></small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -150,20 +157,104 @@
                     <!-- PDF Viewer END -->
 
                     <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            // Prevent right-click on the iframe
-                            document.getElementById('pdfViewer').addEventListener('contextmenu', function(e) {
-                                e.preventDefault();
-                            });
+                        // Initialize PDF viewer
+                        async function initPdfViewer() {
+                            const loadingMessage = document.getElementById('loadingMessage');
+                            const errorMessage = document.getElementById('errorMessage');
+                            const errorText = document.getElementById('errorText');
+                            const errorDetails = document.getElementById('errorDetails');
+                            const pdfUrl = "{{ url('app_exam_file', {'filename': data}) }}";
 
-                            // Add message listener for PDF.js viewer
-                            window.addEventListener('message', function(e) {
-                                if (e.data && e.data.type === 'pdfLoaded') {
-                                    console.log('PDF loaded successfully');
-                                }
-                            });
+                            try {
+                                console.log('Loading PDF from:', pdfUrl);
+                                loadingMessage.style.display = 'block';
+                                errorMessage.style.display = 'none';
+
+                                // Load the PDF document
+                                const loadingTask = pdfjsLib.getDocument({
+                                    url: pdfUrl,
+                                    withCredentials: true
+                                });
+
+                                // Add loading progress
+                                loadingTask.onProgress = function(progress) {
+                                    const percent = (progress.loaded / progress.total) * 100;
+                                    console.log(`Loading: ${Math.round(percent)}%`);
+                                };
+
+                                const pdf = await loadingTask.promise;
+                                console.log('PDF loaded successfully');
+
+                                // Get the first page
+                                const page = await pdf.getPage(1);
+                                const canvas = document.getElementById('pdfViewer');
+                                const context = canvas.getContext('2d');
+
+                                // Calculate scale to fit width
+                                const container = canvas.parentElement;
+                                const desiredWidth = container.clientWidth - 40; // 20px padding on each side
+                                const viewport = page.getViewport({ scale: 1 });
+                                const scale = desiredWidth / viewport.width;
+                                const scaledViewport = page.getViewport({ scale });
+
+                                // Set canvas size
+                                canvas.width = scaledViewport.width;
+                                canvas.height = scaledViewport.height;
+                                canvas.style.width = '100%';
+                                canvas.style.height = 'auto';
+
+                                // Render PDF page
+                                await page.render({
+                                    canvasContext: context,
+                                    viewport: scaledViewport
+                                }).promise;
+
+                                console.log('PDF rendered successfully');
+                                loadingMessage.style.display = 'none';
+
+                            } catch (error) {
+                                console.error('Error loading PDF:', error);
+                                loadingMessage.style.display = 'none';
+                                errorMessage.style.display = 'block';
+                                errorText.textContent = error.message;
+                                errorDetails.textContent = `Technical details: ${error.name}`;
+
+                                // Log additional details
+                                const response = await fetch(pdfUrl);
+                                console.log('Response status:', response.status);
+                                console.log('Response headers:', response.headers);
+                                const contentType = response.headers.get('content-type');
+                                console.log('Content-Type:', contentType);
+                            }
+                        }
+
+                        // Initialize when document is ready
+                        document.addEventListener('DOMContentLoaded', initPdfViewer);
+
+                        // Prevent right-click
+                        document.getElementById('pdfViewerContainer').addEventListener('contextmenu', function(e) {
+                            e.preventDefault();
                         });
                     </script>
+
+                    <style>
+                        #pdfViewerContainer {
+                            background: #f8f9fa;
+                            border-radius: 4px;
+                            overflow: auto;
+                        }
+                        #pdfViewer {
+                            display: block;
+                            margin: 20px auto;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                        }
+                        [data-bs-theme="dark"] #pdfViewerContainer {
+                            background: #2b2b2b;
+                        }
+                        [data-bs-theme="dark"] #pdfViewer {
+                            filter: invert(1) hue-rotate(180deg);
+                        }
+                    </style>
                 </div>
             </div>
         </div>
