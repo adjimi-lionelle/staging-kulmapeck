@@ -136,16 +136,12 @@
                             <div class="card">
                                 <div class="card-body">
                                     <div id="pdfViewerContainer" style="height: 800px; position: relative;">
-                                        <object
+                                        <iframe
                                             id="pdfViewer"
-                                            data="{{ url('app_exam_file', {'filename': data}) }}"
-                                            type="application/pdf"
-                                            style="width: 100%; height: 100%;"
-                                        >
-                                            <div class="alert alert-warning">
-                                                <p>It appears you don't have a PDF plugin for this browser. No worries! You can still <a href="{{ url('app_exam_file', {'filename': data}) }}" target="_blank">click here to view the PDF</a>.</p>
-                                            </div>
-                                        </object>
+                                            src="/pdfjs/web/viewer.html?file={{ url('app_exam_file', {'filename': data}) | url_encode }}"
+                                            style="width: 100%; height: 100%; border: none;"
+                                            allowfullscreen
+                                        ></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -155,17 +151,37 @@
 
                     <script>
                         document.addEventListener('DOMContentLoaded', function() {
+                            const viewer = document.getElementById('pdfViewer');
+                            
                             // Prevent right-click
-                            document.getElementById('pdfViewerContainer').addEventListener('contextmenu', function(e) {
+                            viewer.addEventListener('contextmenu', function(e) {
                                 e.preventDefault();
                             });
 
-                            // Prevent keyboard shortcuts
+                            // Handle viewer messages
+                            window.addEventListener('message', function(e) {
+                                if (e.data && e.data.type === 'webviewerloaded') {
+                                    // PDF.js viewer is loaded
+                                    const contentWindow = viewer.contentWindow;
+                                    
+                                    // Disable download button
+                                    contentWindow.postMessage({
+                                        type: 'hideDownloadButton',
+                                        value: true
+                                    }, '*');
+                                    
+                                    // Disable print button
+                                    contentWindow.postMessage({
+                                        type: 'hidePrintButton',
+                                        value: true
+                                    }, '*');
+                                }
+                            });
+
+                            // Add keyboard shortcut prevention
                             document.addEventListener('keydown', function(e) {
-                                if (e.target.closest('#pdfViewerContainer')) {
-                                    if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || e.key === 'P')) {
-                                        e.preventDefault();
-                                    }
+                                if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || e.key === 'P')) {
+                                    e.preventDefault();
                                 }
                             });
                         });
@@ -179,9 +195,6 @@
                         }
                         [data-bs-theme="dark"] #pdfViewerContainer {
                             background: #2b2b2b;
-                        }
-                        #pdfViewer {
-                            border: none;
                         }
                     </style>
                 </div>

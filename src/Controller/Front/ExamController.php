@@ -110,30 +110,31 @@ class ExamController extends AbstractController
 
             error_log("Using file: " . $finalPath);
             
-            // Create BinaryFileResponse
-            $response = new \Symfony\Component\HttpFoundation\BinaryFileResponse($finalPath);
+            // Create StreamedResponse to prevent full file download
+            $response = new \Symfony\Component\HttpFoundation\StreamedResponse(function() use ($finalPath) {
+                $handle = fopen($finalPath, 'rb');
+                fpassthru($handle);
+                fclose($handle);
+            });
+
+            // Set headers
             $response->headers->set('Content-Type', 'application/pdf');
+            $response->headers->set('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
+            $response->headers->set('Accept-Ranges', 'bytes');
             
-            // Force inline display
-            $response->setContentDisposition(
-                \Symfony\Component\HttpFoundation\ResponseHeaderBag::DISPOSITION_INLINE,
-                basename($filename)
-            );
-            
-            // Essential security headers
+            // Security headers
             $response->headers->set('X-Content-Type-Options', 'nosniff');
-            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-            $response->headers->set('Content-Security-Policy', "default-src 'self'; object-src 'self'; frame-ancestors 'self';");
-            
-            // Prevent caching
-            $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-            $response->headers->set('Pragma', 'no-cache');
-            $response->headers->set('Expires', '0');
+            $response->headers->set('Content-Security-Policy', "default-src 'self' blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; worker-src blob:; frame-ancestors 'self';");
             
             // CORS headers
             $response->headers->set('Access-Control-Allow-Origin', '*');
             $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
             $response->headers->set('Access-Control-Allow-Headers', 'Range, Content-Type, Accept, Origin');
+            $response->headers->set('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range');
+            
+            // Cache control
+            $response->headers->set('Cache-Control', 'no-store, must-revalidate');
+            $response->headers->set('Pragma', 'no-cache');
             
             error_log("=== Successfully prepared PDF response ===");
             return $response;
