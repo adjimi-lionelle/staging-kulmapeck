@@ -83,14 +83,24 @@ class ExamController extends AbstractController
             throw $this->createNotFoundException("Fichier introuvable.");
         }
 
+        // Verify file is actually a PDF
+        $mimeType = mime_content_type($filePath);
+        if ($mimeType !== 'application/pdf') {
+            throw $this->createAccessDeniedException("Invalid file type.");
+        }
+
         $response = new Response(file_get_contents($filePath), 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline',
+            'Content-Disposition' => 'inline; filename="' . basename($filename) . '"',
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
             'Pragma' => 'no-cache',
-            'Content-Security-Policy' => "default-src 'self'; frame-ancestors 'self'; object-src 'none'; frame-src 'self'",
-            'X-Frame-Options' => 'SAMEORIGIN'
+            'Content-Security-Policy' => "default-src 'self'; object-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; frame-ancestors 'self'",
+            'X-Frame-Options' => 'SAMEORIGIN',
+            'Access-Control-Allow-Origin' => '*',  // Needed for PDF.js to load the file
+            'Access-Control-Allow-Methods' => 'GET',
+            'Access-Control-Allow-Headers' => 'Content-Type, Range',  // Required for PDF.js chunked loading
+            'Accept-Ranges' => 'bytes',  // Enable partial content for large PDFs
         ]);
 
         return $response;

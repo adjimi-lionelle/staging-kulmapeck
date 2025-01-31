@@ -3,7 +3,82 @@
 {% block title %} - Courses{% endblock %}
 
 {% block script %}
-	
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Set worker path for PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        // Disable right-click
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.closest('#pdfViewer')) {
+                e.preventDefault();
+            }
+        });
+
+        // Disable keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.target.closest('#pdfViewer')) {
+                if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || e.key === 'P')) {
+                    e.preventDefault();
+                }
+            }
+        });
+
+        // Apply theme to PDF viewer
+        function applyThemeToPdfViewer() {
+            const theme = document.documentElement.getAttribute('data-bs-theme');
+            const viewer = document.getElementById('pdfViewer');
+            if (viewer) {
+                viewer.classList.toggle('dark-theme', theme === 'dark');
+            }
+        }
+
+        // Listen for theme changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.attributeName === 'data-bs-theme') {
+                    applyThemeToPdfViewer();
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-bs-theme']
+        });
+    </script>
+    <style>
+        #pdfViewer {
+            width: 100%;
+            height: 800px;
+            border: none;
+            background-color: #f8f9fa;
+        }
+        #pdfViewer.dark-theme {
+            background-color: #2b2b2b;
+            filter: invert(1) hue-rotate(180deg);
+        }
+        #pdfViewer.dark-theme:hover {
+            cursor: not-allowed;
+        }
+        .pdf-container {
+            position: relative;
+            width: 100%;
+            height: 800px;
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+        .pdf-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+    </style>
 {% endblock %}
 
 {% block mainContent %}
@@ -49,72 +124,66 @@
                         </div>
                     </div>
                     <!-- Title and Info END -->
-                    
-                    <!-- Video START -->
+
+                    <!-- PDF Viewer START -->
                     <div class="row mt-4">
                         <div class="col-xl-10 mx-auto">
-                            {% if data ends with '.pdf' %}
-                                <!-- PDF viewer -->
-                                <div class="card overflow-hidden rounded-3">
-                                    <div class="ratio ratio-16x9" style="min-height: 700px;">
-                                        <iframe src="{{ url('app_exam_file', {'filename': data}) }}" 
-                                                class="w-100 h-100"
-                                                frameborder="0" 
-                                                sandbox="allow-same-origin allow-scripts allow-popups allow-forms" 
-                                                style="pointer-events: none;">
-                                        </iframe>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <!-- Video END -->
-                </div>
-            </div> <!-- Row END -->
-        </div>
-    </section>
-    <!-- Main Content END -->
-    
-    {{ include('front/includes/_newsletterorange.html.twig') }}
-    
-    {% if courses is defined and courses is not empty %}
-        <!-- Related blog START -->
-        <section class="pt-0">
-            <div class="container">
-                <!-- Title -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h2 class="mb-0">{% trans %}MOSTPOPULAR_KEY{% endtrans %}</h2>
-                    </div>
-                </div>
-                
-                <!-- Slider START -->
-                <div class="tiny-slider arrow-round arrow-hover arrow-dark">
-                    <div class="tiny-slider-inner" data-autoplay="false" data-arrow="true" data-edge="2" data-dots="false" data-items="3" data-items-lg="2" data-items-sm="1">
-                        {% for course in courses %}
-                            <!-- Slider item -->
-                            <div class="card bg-transparent">
-                                <div class="row g-0">
-                                    <!-- Image -->
-                                    <div class="col-md-4">
-                                        <img src="{{ asset('uploads/media/courses/' ~ course.media.imageFile) }}" class="img-fluid rounded-start" alt="...">
-                                    </div>
-                                    <!-- Card body -->
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <!-- Title -->
-                                            <h6 class="card-title"><a href="{{ url("app_front_course_details", {slug: course.slug}) }}">{{ course.intitule }}</a></h6>
-                                            <span class="small">{{ course.createdAt|date('d/m/Y') }}</span>
-                                        </div>
-                                    </div>
+                            <div class="card overflow-hidden h-800px rounded-3">
+                                <div class="pdf-container">
+                                    <canvas id="pdfViewer"></canvas>
+                                    <div class="pdf-overlay"></div>
                                 </div>
                             </div>
-                        {% endfor %}
+                        </div>
                     </div>
+                    <!-- PDF Viewer END -->
                 </div>
-                <!-- Slider END -->
             </div>
-        </section>
-        <!-- Related blog END -->
+        </div>
+    </section>
+
+    <script>
+        // Load and render PDF
+        async function loadPDF() {
+            const url = "{{ url('app_exam_file', {'filename': data}) }}";
+            try {
+                const loadingTask = pdfjsLib.getDocument(url);
+                const pdf = await loadingTask.promise;
+                
+                // Get the first page
+                const page = await pdf.getPage(1);
+                
+                // Prepare canvas for rendering
+                const canvas = document.getElementById('pdfViewer');
+                const context = canvas.getContext('2d');
+                
+                // Set scale for good resolution
+                const viewport = page.getViewport({ scale: 1.5 });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                // Render PDF page
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                await page.render(renderContext);
+                
+                // Apply current theme
+                applyThemeToPdfViewer();
+                
+            } catch (error) {
+                console.error('Error loading PDF:', error);
+            }
+        }
+        
+        // Load PDF when document is ready
+        document.addEventListener('DOMContentLoaded', loadPDF);
+    </script>
+
+    {{ include('front/includes/_newsletterorange.html.twig') }}
+
+    {% if courses is defined and courses is not empty %}
+        {{ include('front/exam/_related_courses.html.twig') }}
     {% endif %}
 {% endblock %}
