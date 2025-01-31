@@ -77,10 +77,6 @@ class ExamController extends AbstractController
     #[Route('/exam/file/{filename}', name: 'app_exam_file', methods: ['GET', 'OPTIONS'])]
     public function servePdfFile(string $filename, Request $request): Response
     {
-        error_log("=== Starting PDF file request ===");
-        error_log("Filename requested: " . $filename);
-        
-        // Handle OPTIONS request for CORS preflight
         if ($request->getMethod() === 'OPTIONS') {
             $response = new Response();
             $response->headers->set('Access-Control-Allow-Origin', '*');
@@ -91,15 +87,9 @@ class ExamController extends AbstractController
         }
 
         try {
-            // Construct the file path - check both possible locations
             $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
             $alternativePath = $this->getParameter('kernel.project_dir') . '/public/uploads/media/exams/files/' . $filename;
             
-            error_log("Checking paths:");
-            error_log("Primary path: " . $filePath . " (exists: " . (file_exists($filePath) ? 'yes' : 'no') . ")");
-            error_log("Alternative path: " . $alternativePath . " (exists: " . (file_exists($alternativePath) ? 'yes' : 'no') . ")");
-            
-            // Try both paths
             if (file_exists($filePath) && is_readable($filePath)) {
                 $finalPath = $filePath;
             } elseif (file_exists($alternativePath) && is_readable($alternativePath)) {
@@ -108,23 +98,43 @@ class ExamController extends AbstractController
                 throw new \Exception('PDF file not found or not readable');
             }
 
-            error_log("Using file: " . $finalPath);
+            $size = filesize($finalPath);
+            $response = new Response();
             
-            // Create StreamedResponse to prevent full file download
-            $response = new \Symfony\Component\HttpFoundation\StreamedResponse(function() use ($finalPath) {
-                $handle = fopen($finalPath, 'rb');
-                fpassthru($handle);
-                fclose($handle);
-            });
+            // Handle range requests
+            $start = 0;
+            $end = $size - 1;
+            
+            if ($request->headers->has('Range')) {
+                $range = $request->headers->get('Range');
+                list(, $range) = explode('=', $range);
+                
+                if (strpos($range, ',') !== false) {
+                    $response->setStatusCode(416); // Requested range not satisfiable
+                    return $response;
+                }
+                
+                if ($range == '-') {
+                    $start = $size - substr($range, 1);
+                } else {
+                    $range = explode('-', $range);
+                    $start = $range[0];
+                    $end = (isset($range[1]) && is_numeric($range[1])) ? $range[1] : $size - 1;
+                }
+                
+                if ($start > $end || $start > $size - 1 || $end >= $size) {
+                    $response->setStatusCode(416); // Requested range not satisfiable
+                    return $response;
+                }
+                
+                $response->setStatusCode(206); // Partial content
+                $response->headers->set('Content-Range', sprintf('bytes %d-%d/%d', $start, $end, $size));
+            }
 
-            // Set headers
+            $response->headers->set('Content-Length', $end - $start + 1);
+            $response->headers->set('Accept-Ranges', 'bytes');
             $response->headers->set('Content-Type', 'application/pdf');
             $response->headers->set('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
-            $response->headers->set('Accept-Ranges', 'bytes');
-            
-            // Security headers
-            $response->headers->set('X-Content-Type-Options', 'nosniff');
-            $response->headers->set('Content-Security-Policy', "default-src 'self' blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; worker-src blob:; frame-ancestors 'self';");
             
             // CORS headers
             $response->headers->set('Access-Control-Allow-Origin', '*');
@@ -132,16 +142,30 @@ class ExamController extends AbstractController
             $response->headers->set('Access-Control-Allow-Headers', 'Range, Content-Type, Accept, Origin');
             $response->headers->set('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range');
             
-            // Cache control
-            $response->headers->set('Cache-Control', 'no-store, must-revalidate');
-            $response->headers->set('Pragma', 'no-cache');
+            // Security headers
+            $response->headers->set('X-Content-Type-Options', 'nosniff');
             
-            error_log("=== Successfully prepared PDF response ===");
+            // Stream the file in chunks
+            $response->setCallback(function () use ($finalPath, $start, $end) {
+                $handle = fopen($finalPath, 'rb');
+                fseek($handle, $start);
+                $remaining = $end - $start + 1;
+                $chunkSize = 8192;
+                
+                while (!feof($handle) && $remaining > 0) {
+                    $readSize = min($chunkSize, $remaining);
+                    $data = fread($handle, $readSize);
+                    $remaining -= strlen($data);
+                    echo $data;
+                    flush();
+                }
+                
+                fclose($handle);
+            });
+
             return $response;
 
         } catch (\Exception $e) {
-            error_log("Error serving PDF: " . $e->getMessage());
-            error_log("Stack trace: " . $e->getTraceAsString());
             throw $this->createNotFoundException($e->getMessage());
         }
     }
