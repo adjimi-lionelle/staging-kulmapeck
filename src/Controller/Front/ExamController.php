@@ -74,7 +74,7 @@ class ExamController extends AbstractController
         return $response;
     }
     
-    #[Route('/exam/file/{filename}', name: 'app_exam_file')]
+    #[Route('/uploads/media/exams/file/{filename}', name: 'app_exam_file')]
     public function servePdfFile(string $filename): Response
     {
         // Construct the file path - check both possible locations
