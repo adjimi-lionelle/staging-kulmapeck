@@ -80,20 +80,30 @@ class ExamController extends AbstractController
         // Construct the file path
         $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
         
+        // Debug logging
+        error_log("Attempting to serve PDF file: " . $filePath);
+        error_log("File exists: " . (file_exists($filePath) ? 'yes' : 'no'));
+        
         if (!file_exists($filePath)) {
+            error_log("File not found: " . $filePath);
             throw $this->createNotFoundException("Fichier introuvable: " . $filename);
         }
 
         // Verify file is actually a PDF
         $mimeType = mime_content_type($filePath);
+        error_log("File mime type: " . $mimeType);
         if ($mimeType !== 'application/pdf') {
+            error_log("Invalid mime type: " . $mimeType);
             throw $this->createAccessDeniedException("Invalid file type: " . $mimeType);
         }
 
         $content = file_get_contents($filePath);
         if ($content === false) {
+            error_log("Failed to read file contents: " . $filePath);
             throw new \RuntimeException("Failed to read file contents");
         }
+
+        error_log("Successfully read file, size: " . strlen($content));
 
         $response = new Response($content, 200, [
             'Content-Type' => 'application/pdf',
