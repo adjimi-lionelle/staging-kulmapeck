@@ -125,17 +125,7 @@
                     </div>
                     <!-- Title and Info END -->
 
-                    <!-- Debug info (only visible in dev) -->
-                    {% if app.environment == 'dev' %}
-                        <div class="alert alert-info m-3">
-                            <h5>Debug Information:</h5>
-                            <pre>
-                                data variable: {{ dump(data) }}
-                                display mode: {{ dump(display) }}
-                                exam info: {{ dump(exam) }}
-                            </pre>
-                        </div>
-                    {% endif %}
+
 
                     <!-- PDF Viewer START -->
                     <div class="row mt-4">
