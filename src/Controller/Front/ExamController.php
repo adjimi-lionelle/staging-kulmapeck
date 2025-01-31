@@ -83,24 +83,36 @@ class ExamController extends AbstractController
             throw $this->createNotFoundException("Fichier introuvable.");
         }
 
+        // Debug: Log file info
+        error_log("Serving PDF file: " . $filePath);
+        error_log("File exists: " . (file_exists($filePath) ? 'yes' : 'no'));
+        error_log("File size: " . filesize($filePath));
+
         // Verify file is actually a PDF
         $mimeType = mime_content_type($filePath);
+        error_log("File mime type: " . $mimeType);
         if ($mimeType !== 'application/pdf') {
-            throw $this->createAccessDeniedException("Invalid file type.");
+            throw $this->createAccessDeniedException("Invalid file type: " . $mimeType);
         }
 
-        $response = new Response(file_get_contents($filePath), 200, [
+        $content = file_get_contents($filePath);
+        if ($content === false) {
+            throw new \RuntimeException("Failed to read file contents");
+        }
+
+        $response = new Response($content, 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . basename($filename) . '"',
+            'Content-Length' => filesize($filePath),
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
             'Pragma' => 'no-cache',
-            'Content-Security-Policy' => "default-src 'self'; object-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; frame-ancestors 'self'",
+            'Content-Security-Policy' => "default-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; object-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; frame-ancestors 'self'",
             'X-Frame-Options' => 'SAMEORIGIN',
-            'Access-Control-Allow-Origin' => '*',  // Needed for PDF.js to load the file
+            'Access-Control-Allow-Origin' => '*',
             'Access-Control-Allow-Methods' => 'GET',
-            'Access-Control-Allow-Headers' => 'Content-Type, Range',  // Required for PDF.js chunked loading
-            'Accept-Ranges' => 'bytes',  // Enable partial content for large PDFs
+            'Access-Control-Allow-Headers' => 'Content-Type, Range',
+            'Accept-Ranges' => 'bytes',
         ]);
 
         return $response;

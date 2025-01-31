@@ -125,6 +125,18 @@
                     </div>
                     <!-- Title and Info END -->
 
+                    <!-- Debug info (only visible in dev) -->
+                    {% if app.environment == 'dev' %}
+                        <div class="alert alert-info m-3">
+                            <h5>Debug Information:</h5>
+                            <pre>
+                                data variable: {{ dump(data) }}
+                                display mode: {{ dump(display) }}
+                                exam info: {{ dump(exam) }}
+                            </pre>
+                        </div>
+                    {% endif %}
+
                     <!-- PDF Viewer START -->
                     <div class="row mt-4">
                         <div class="col-xl-10 mx-auto">
@@ -146,12 +158,16 @@
         // Load and render PDF
         async function loadPDF() {
             const url = "{{ url('app_exam_file', {'filename': data}) }}";
+            console.log('Loading PDF from:', url); 
             try {
                 const loadingTask = pdfjsLib.getDocument(url);
+                console.log('PDF loading task created');
                 const pdf = await loadingTask.promise;
+                console.log('PDF loaded successfully');
                 
                 // Get the first page
                 const page = await pdf.getPage(1);
+                console.log('First page retrieved');
                 
                 // Prepare canvas for rendering
                 const canvas = document.getElementById('pdfViewer');
@@ -167,18 +183,32 @@
                     canvasContext: context,
                     viewport: viewport
                 };
+                console.log('Starting PDF render');
                 await page.render(renderContext);
+                console.log('PDF rendered successfully');
                 
                 // Apply current theme
                 applyThemeToPdfViewer();
                 
             } catch (error) {
                 console.error('Error loading PDF:', error);
+                // Display error message to user
+                const canvas = document.getElementById('pdfViewer');
+                const container = canvas.parentElement;
+                container.innerHTML = `
+                    <div class="alert alert-danger m-3">
+                        Error loading PDF: ${error.message}
+                    </div>
+                `;
             }
         }
         
         // Load PDF when document is ready
-        document.addEventListener('DOMContentLoaded', loadPDF);
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadPDF);
+        } else {
+            loadPDF();
+        }
     </script>
 
     {{ include('front/includes/_newsletterorange.html.twig') }}
