@@ -9,16 +9,9 @@
         // Set worker path for PDF.js
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         
-        // Disable right-click
-        document.addEventListener('contextmenu', function(e) {
-            if (e.target.closest('#pdfViewer')) {
-                e.preventDefault();
-            }
-        });
-
         // Disable keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            if (e.target.closest('#pdfViewer')) {
+            if (e.target.closest('#pdfViewerContainer')) {
                 if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || e.key === 'P')) {
                     e.preventDefault();
                 }
@@ -28,7 +21,7 @@
         // Apply theme to PDF viewer
         function applyThemeToPdfViewer() {
             const theme = document.documentElement.getAttribute('data-bs-theme');
-            const viewer = document.getElementById('pdfViewer');
+            const viewer = document.getElementById('pdfViewerContainer');
             if (viewer) {
                 viewer.classList.toggle('dark-theme', theme === 'dark');
             }
@@ -49,17 +42,17 @@
         });
     </script>
     <style>
-        #pdfViewer {
+        #pdfViewerContainer {
             width: 100%;
             height: 800px;
             border: none;
             background-color: #f8f9fa;
         }
-        #pdfViewer.dark-theme {
+        #pdfViewerContainer.dark-theme {
             background-color: #2b2b2b;
             filter: invert(1) hue-rotate(180deg);
         }
-        #pdfViewer.dark-theme:hover {
+        #pdfViewerContainer.dark-theme:hover {
             cursor: not-allowed;
         }
         .pdf-container {
@@ -139,94 +132,42 @@
 
                     <!-- PDF Viewer START -->
                     <div class="row mt-4">
-                        <div class="col-xl-10 mx-auto">
-                            <div class="card overflow-hidden h-800px rounded-3">
-                                <div class="pdf-container">
-                                    <canvas id="pdfViewer"></canvas>
-                                    <div class="pdf-overlay"></div>
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div id="pdfViewerContainer" style="height: 800px; position: relative;">
+                                        <iframe
+                                            id="pdfViewer"
+                                            src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/web/viewer.html?file={{ url('app_exam_file', {'filename': data}) | url_encode }}"
+                                            style="width: 100%; height: 100%; border: none;"
+                                            allowfullscreen
+                                        ></iframe>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <!-- PDF Viewer END -->
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            // Prevent right-click on the iframe
+                            document.getElementById('pdfViewer').addEventListener('contextmenu', function(e) {
+                                e.preventDefault();
+                            });
+
+                            // Add message listener for PDF.js viewer
+                            window.addEventListener('message', function(e) {
+                                if (e.data && e.data.type === 'pdfLoaded') {
+                                    console.log('PDF loaded successfully');
+                                }
+                            });
+                        });
+                    </script>
                 </div>
             </div>
         </div>
     </section>
-
-    <script>
-        // Load and render PDF
-        async function loadPDF() {
-            const url = "{{ url('app_exam_file', {'filename': data}) }}";
-            console.log('Attempting to load PDF from:', url); 
-            
-            try {
-                // Create loading task
-                const loadingTask = pdfjsLib.getDocument({
-                    url: url,
-                    withCredentials: true
-                });
-                console.log('PDF loading task created');
-                
-                // Add progress callback
-                loadingTask.onProgress = function(progress) {
-                    console.log('Loading progress:', Math.round(progress.loaded / progress.total * 100), '%');
-                };
-                
-                // Load document
-                const pdf = await loadingTask.promise;
-                console.log('PDF loaded successfully, number of pages:', pdf.numPages);
-                
-                // Get the first page
-                const page = await pdf.getPage(1);
-                console.log('First page retrieved');
-                
-                // Prepare canvas
-                const canvas = document.getElementById('pdfViewer');
-                const context = canvas.getContext('2d');
-                
-                // Calculate optimal scale based on container width
-                const container = canvas.parentElement;
-                const containerWidth = container.clientWidth;
-                const viewport = page.getViewport({ scale: 1.0 });
-                const scale = containerWidth / viewport.width;
-                const scaledViewport = page.getViewport({ scale: scale });
-                
-                // Set canvas dimensions
-                canvas.height = scaledViewport.height;
-                canvas.width = scaledViewport.width;
-                
-                // Render PDF page
-                const renderContext = {
-                    canvasContext: context,
-                    viewport: scaledViewport
-                };
-                
-                console.log('Starting PDF render');
-                await page.render(renderContext);
-                console.log('PDF rendered successfully');
-                
-                // Apply current theme
-                applyThemeToPdfViewer();
-                
-            } catch (error) {
-                console.error('Error loading PDF:', error);
-                const canvas = document.getElementById('pdfViewer');
-                const container = canvas.parentElement;
-                container.innerHTML = `
-                    <div class="alert alert-danger m-3">
-                        <h4>Error loading PDF</h4>
-                        <p>${error.message}</p>
-                        <p>Please try refreshing the page. If the problem persists, contact support.</p>
-                        <small>Technical details: ${error.name}</small>
-                    </div>
-                `;
-            }
-        }
-
-        // Call loadPDF when document is ready
-        document.addEventListener('DOMContentLoaded', loadPDF);
-    </script>
 
     {{ include('front/includes/_newsletterorange.html.twig') }}
 

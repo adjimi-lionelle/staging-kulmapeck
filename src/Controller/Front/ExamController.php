@@ -170,6 +170,10 @@ class ExamController extends AbstractController
             // Security headers
             $response->headers->set('X-Content-Type-Options', 'nosniff');
             
+            // Force inline viewing
+            $response->headers->set('Content-Disposition', 'inline');
+            $response->headers->set('Content-Security-Policy', "default-src 'self'; object-src 'none';");
+            
             // CORS headers
             $response->headers->set('Access-Control-Allow-Origin', '*');
             $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -177,7 +181,8 @@ class ExamController extends AbstractController
             $response->headers->set('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range');
             
             // Cache control
-            $response->headers->set('Cache-Control', 'private, must-revalidate');
+            $response->headers->set('Cache-Control', 'no-store, must-revalidate');
+            $response->headers->set('Pragma', 'no-cache');
             
             error_log("Successfully prepared response with headers: " . json_encode($response->headers->all()));
             
