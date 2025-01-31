@@ -77,29 +77,38 @@ class ExamController extends AbstractController
     #[Route('/exam/file/{filename}', name: 'app_exam_file')]
     public function servePdfFile(string $filename): Response
     {
-        // Construct the file path
-        $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
+        // Construct the file path - check both possible locations
+        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/media/exams/files/' . $filename;
+        $alternativePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
         
         // Debug logging
-        error_log("Attempting to serve PDF file: " . $filePath);
-        error_log("File exists: " . (file_exists($filePath) ? 'yes' : 'no'));
+        error_log("Attempting to serve PDF file");
+        error_log("Checking primary path: " . $filePath);
+        error_log("File exists in primary path: " . (file_exists($filePath) ? 'yes' : 'no'));
+        error_log("Checking alternative path: " . $alternativePath);
+        error_log("File exists in alternative path: " . (file_exists($alternativePath) ? 'yes' : 'no'));
         
-        if (!file_exists($filePath)) {
-            error_log("File not found: " . $filePath);
+        // Try both paths
+        if (file_exists($filePath)) {
+            $finalPath = $filePath;
+        } elseif (file_exists($alternativePath)) {
+            $finalPath = $alternativePath;
+        } else {
+            error_log("File not found in either location: " . $filename);
             throw $this->createNotFoundException("Fichier introuvable: " . $filename);
         }
 
         // Verify file is actually a PDF
-        $mimeType = mime_content_type($filePath);
+        $mimeType = mime_content_type($finalPath);
         error_log("File mime type: " . $mimeType);
         if ($mimeType !== 'application/pdf') {
             error_log("Invalid mime type: " . $mimeType);
             throw $this->createAccessDeniedException("Invalid file type: " . $mimeType);
         }
 
-        $content = file_get_contents($filePath);
+        $content = file_get_contents($finalPath);
         if ($content === false) {
-            error_log("Failed to read file contents: " . $filePath);
+            error_log("Failed to read file contents: " . $finalPath);
             throw new \RuntimeException("Failed to read file contents");
         }
 
@@ -108,7 +117,7 @@ class ExamController extends AbstractController
         $response = new Response($content, 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . basename($filename) . '"',
-            'Content-Length' => filesize($filePath),
+            'Content-Length' => filesize($finalPath),
             'X-Content-Type-Options' => 'nosniff',
             'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
             'Pragma' => 'no-cache',
