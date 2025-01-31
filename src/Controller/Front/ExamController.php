@@ -77,20 +77,15 @@ class ExamController extends AbstractController
     #[Route('/exam/file/{filename}', name: 'app_exam_file')]
     public function servePdfFile(string $filename): Response
     {
+        // Construct the file path
         $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
-
+        
         if (!file_exists($filePath)) {
-            throw $this->createNotFoundException("Fichier introuvable.");
+            throw $this->createNotFoundException("Fichier introuvable: " . $filename);
         }
-
-        // Debug: Log file info
-        error_log("Serving PDF file: " . $filePath);
-        error_log("File exists: " . (file_exists($filePath) ? 'yes' : 'no'));
-        error_log("File size: " . filesize($filePath));
 
         // Verify file is actually a PDF
         $mimeType = mime_content_type($filePath);
-        error_log("File mime type: " . $mimeType);
         if ($mimeType !== 'application/pdf') {
             throw $this->createAccessDeniedException("Invalid file type: " . $mimeType);
         }
