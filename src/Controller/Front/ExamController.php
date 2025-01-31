@@ -74,12 +74,12 @@ class ExamController extends AbstractController
         return $response;
     }
     
-    #[Route('/uploads/media/exams/file/{filename}', name: 'app_exam_file')]
+    #[Route('/uploads/media/exams/files/{filename}', name: 'app_exam_file')]
     public function servePdfFile(string $filename): Response
     {
         // Construct the file path - check both possible locations
-        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/media/exams/files/' . $filename;
-        $alternativePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
+        $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
+        $alternativePath = $this->getParameter('kernel.project_dir') . '/public/uploads/media/exams/files/' . $filename;
         
         // Debug logging
         error_log("Attempting to serve PDF file");
