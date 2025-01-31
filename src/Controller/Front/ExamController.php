@@ -110,27 +110,31 @@ class ExamController extends AbstractController
 
             error_log("Using file: " . $finalPath);
             
-            // Read file content
-            $content = file_get_contents($finalPath);
-            if ($content === false) {
-                throw new \Exception('Failed to read PDF file');
-            }
-
-            // Create response
-            $response = new Response($content);
+            // Create BinaryFileResponse
+            $response = new \Symfony\Component\HttpFoundation\BinaryFileResponse($finalPath);
             $response->headers->set('Content-Type', 'application/pdf');
-            $response->headers->set('Content-Length', strlen($content));
             
-            // Essential headers for PDF viewing
-            $response->headers->set('Accept-Ranges', 'bytes');
-            $response->headers->set('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
+            // Force inline display
+            $response->setContentDisposition(
+                \Symfony\Component\HttpFoundation\ResponseHeaderBag::DISPOSITION_INLINE,
+                basename($filename)
+            );
+            
+            // Essential security headers
+            $response->headers->set('X-Content-Type-Options', 'nosniff');
+            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+            $response->headers->set('Content-Security-Policy', "default-src 'self'; object-src 'self'; frame-ancestors 'self';");
+            
+            // Prevent caching
+            $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
             
             // CORS headers
             $response->headers->set('Access-Control-Allow-Origin', '*');
             $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
             $response->headers->set('Access-Control-Allow-Headers', 'Range, Content-Type, Accept, Origin');
-            $response->headers->set('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range');
-
+            
             error_log("=== Successfully prepared PDF response ===");
             return $response;
 
