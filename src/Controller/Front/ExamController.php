@@ -75,7 +75,7 @@ class ExamController extends AbstractController
     }
     
     #[Route('/exam/file/{filename}', name: 'app_exam_file')]
-    public function servePdfFile(string $filename): Response
+    public function servePdfFile(string $filename, Request $request): Response
     {
         // Construct the file path - check both possible locations
         $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
@@ -106,18 +106,42 @@ class ExamController extends AbstractController
             throw $this->createAccessDeniedException("Invalid file type: " . $mimeType);
         }
 
-        $content = file_get_contents($finalPath);
+        $fileSize = filesize($finalPath);
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Accept-Ranges', 'bytes');
+
+        // Handle range requests
+        if ($request->headers->has('Range')) {
+            $range = $request->headers->get('Range');
+            if (preg_match('/bytes=(\d+)-(\d+)?/', $range, $matches)) {
+                $start = intval($matches[1]);
+                $end = isset($matches[2]) ? intval($matches[2]) : $fileSize - 1;
+                
+                error_log("Range request: $start-$end");
+                
+                $length = $end - $start + 1;
+                $response->headers->set('Content-Length', $length);
+                $response->headers->set('Content-Range', sprintf('bytes %d-%d/%d', $start, $end, $fileSize));
+                $response->setStatusCode(206);
+                
+                $handle = fopen($finalPath, 'rb');
+                fseek($handle, $start);
+                $content = fread($handle, $length);
+                fclose($handle);
+            }
+        } else {
+            // Full file request
+            $response->headers->set('Content-Length', $fileSize);
+            $content = file_get_contents($finalPath);
+        }
+
         if ($content === false) {
             error_log("Failed to read file contents: " . $finalPath);
             throw new \RuntimeException("Failed to read file contents");
         }
 
-        error_log("Successfully read file, size: " . strlen($content));
-
-        $response = new Response($content);
-        $response->headers->set('Content-Type', 'application/pdf');
-        $response->headers->set('Content-Length', filesize($finalPath));
-        $response->headers->set('Accept-Ranges', 'bytes');
+        $response->setContent($content);
         
         // Security headers
         $response->headers->set('X-Content-Type-Options', 'nosniff');
@@ -126,14 +150,11 @@ class ExamController extends AbstractController
         // CORS headers
         $response->headers->set('Access-Control-Allow-Origin', '*');
         $response->headers->set('Access-Control-Allow-Methods', 'GET, OPTIONS');
-        $response->headers->set('Access-Control-Allow-Headers', 'Content-Type, Range');
+        $response->headers->set('Access-Control-Allow-Headers', 'Range, Content-Type, Accept');
         $response->headers->set('Access-Control-Expose-Headers', 'Accept-Ranges, Content-Length, Content-Range');
         
         // Cache control
-        $response->headers->set('Cache-Control', 'private, no-transform');
-        
-        // Important: Remove Content-Disposition to prevent download
-        // $response->headers->set('Content-Disposition', 'inline; filename="' . basename($filename) . '"');
+        $response->headers->set('Cache-Control', 'private, must-revalidate');
 
         return $response;
     }
