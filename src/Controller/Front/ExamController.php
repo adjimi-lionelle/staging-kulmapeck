@@ -40,6 +40,7 @@ class ExamController extends AbstractController
             'sClasse' => $classe,
             'language' => $language,
             'skillLevel' => $skillLevel,
+            
         ]);
     }
 
@@ -66,32 +67,15 @@ class ExamController extends AbstractController
             'data' => $request->query->get('display', 'subject') === 'correction' ? $exam->getCorrection() : $exam->getSujet(),
         ]);
 
-        // Add security headers to prevent downloads
-        $response->headers->set('Content-Security-Policy', "default-src 'self'; frame-src 'self'; object-src 'none'");
+        // Add comprehensive security headers to prevent downloads and protect content
+        $response->headers->set('Content-Security-Policy', "default-src 'self'; frame-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        $response->headers->set('X-Download-Options', 'noopen');
+        $response->headers->set('Content-Disposition', 'inline');
+        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+        $response->headers->set('Pragma', 'no-cache');
         
-        return $response;
-    }
-    
-    #[Route('/exam/file/{filename}', name: 'app_exam_file')]
-    public function servePdfFile(string $filename): Response
-    {
-        $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
-
-        if (!file_exists($filePath)) {
-            throw $this->createNotFoundException("Fichier introuvable.");
-        }
-
-        $response = new Response(file_get_contents($filePath), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline', // Force display instead of download
-            'X-Content-Type-Options' => 'nosniff',
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma' => 'no-cache',
-            'Content-Security-Policy' => "default-src 'self'; object-src 'none'",
-        ]);
-
         return $response;
     }
 }

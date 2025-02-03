@@ -61,15 +61,19 @@
                                 <!-- Card Image overlay -->
                                 <div class="bg-overlay bg-dark opacity-4"></div>
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
-                                    {% if data ends with '.pdf' %}
-            <!-- Afficher le PDF dans un iframe -->
-            <div class="card overflow-hidden h-700px rounded-3 text-center">
-                <div class="w-100 my-auto">
-                    <div class="row justify-content-center">
-                        <iframe src="{{ url('app_exam_file', {'filename': data}) }}" height="800px" frameborder="0" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" style="pointer-events: none;"></iframe>
-                    </div>
-                </div>
-            </div>
+                                    <div class="w-100 my-auto">
+                                        <div class="row justify-content-center">
+                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}" 
+                                                height="800px" 
+                                                frameborder="0" 
+                                                sandbox="allow-same-origin allow-scripts allow-forms" 
+                                                style="pointer-events: none; user-select: none; -webkit-user-select: none;"
+                                                oncontextmenu="return false;"
+                                                onselectstart="return false;"
+                                                ondragstart="return false;">
+                                            </iframe>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <!-- Card item END -->
