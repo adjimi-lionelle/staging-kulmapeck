@@ -68,6 +68,25 @@ class ExamController extends AbstractController
             
         ]);
     }
+
+
+#[Route('/protected-pdf/{filename}', name: 'app_protected_pdf')]
+public function protectedPdf(string $filename): Response
+{
+    // Définir le chemin exact du fichier PDF
+    $filePath = $this->getParameter('kernel.project_dir') . 'uploads/media/exams/files/' . $filename;
+
+    // DEBUG: Log pour voir si le fichier est bien cherché
+    dump("Chemin du fichier: " . $filePath); die();
+    if (!file_exists($filePath)) {
+        throw new NotFoundHttpException('Fichier introuvable: ' . $filePath);
+    }
+
+    return new BinaryFileResponse($filePath);
+}
+
+    
+
     
     #[Route('/exam/file/{filename}', name: 'app_exam_file')]
 public function servePdfFile(string $filename): Response
