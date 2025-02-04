@@ -9,7 +9,9 @@
 /var/
 /vendor/
 /public/uploads/
-/scripts/ssh_config.ini
+/scripts
+/deploy.py
+/docs
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###

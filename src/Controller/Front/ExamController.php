@@ -60,49 +60,22 @@ class ExamController extends AbstractController
             throw $this->createAccessDeniedException("Vous devez être premium!");
         }
 
-        return $this->render('front/exam/show.html.twig', [
+        $response = $this->render('front/exam/show.html.twig', [
             'exam' => $exam,
             'isExamPage' => true,
             'display' => $request->query->get('display', 'subject'),
             'data' => $request->query->get('display', 'subject') === 'correction' ? $exam->getCorrection() : $exam->getSujet(),
-            
         ]);
+
+        // Add comprehensive security headers to prevent downloads and protect content
+        $response->headers->set('Content-Security-Policy', "default-src 'self'; frame-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        $response->headers->set('X-Download-Options', 'noopen');
+        $response->headers->set('Content-Disposition', 'inline');
+        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+        $response->headers->set('Pragma', 'no-cache');
+        
+        return $response;
     }
-
-
-#[Route('/protected-pdf/{filename}', name: 'app_protected_pdf')]
-public function protectedPdf(string $filename): Response
-{
-    // Définir le chemin exact du fichier PDF
-    $filePath = $this->getParameter('kernel.project_dir') . 'uploads/media/exams/files/' . $filename;
-
-    // DEBUG: Log pour voir si le fichier est bien cherché
-    dump("Chemin du fichier: " . $filePath); die();
-    if (!file_exists($filePath)) {
-        throw new NotFoundHttpException('Fichier introuvable: ' . $filePath);
-    }
-
-    return new BinaryFileResponse($filePath);
-}
-
-    
-
-    
-    #[Route('/exam/file/{filename}', name: 'app_exam_file')]
-public function servePdfFile(string $filename): Response
-{
-    $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
-
-    if (!file_exists($filePath)) {
-        throw $this->createNotFoundException("Fichier introuvable.");
-    }
-
-    return new Response(file_get_contents($filePath), 200, [
-        'Content-Type' => 'application/pdf',
-        'Content-Disposition' => 'inline', // Empêche le téléchargement en forçant l'affichage
-        'X-Content-Type-Options' => 'nosniff',
-        'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-        'Pragma' => 'no-cache',
-    ]);
-}
 }

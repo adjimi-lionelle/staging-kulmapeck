@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Categorie;
+use App\Entity\Classe;
+use App\Entity\Specialite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -78,6 +80,20 @@ class CategorieRepository extends ServiceEntityRepository
             ->andWhere('c.isSubCategory = :isSub')
             ->setParameter('isSub', $isSub)
             ->orderBy('c.name', 'ASC');
+    }
+
+    public function findByClasseAndSpecialite(Classe $classe, Specialite $specialite): array
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.classes', 'cl')
+            ->leftJoin('c.specialites', 'sp')
+            ->where('cl.id = :classe')
+            ->andWhere('sp.id = :specialite')
+            ->setParameter('classe', $classe->getId())
+            ->setParameter('specialite', $specialite->getId())
+            ->orderBy('c.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
 //    public function findOneBySomeField($value): ?Categorie

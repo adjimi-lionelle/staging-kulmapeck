@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <!-- Title and Info END -->
-
+                    
                     <!-- Video START -->
                     <div class="row mt-4">
                         <div class="col-xl-10 mx-auto">
@@ -63,9 +63,15 @@
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
-                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}" height="800px" frameborder="0"></iframe>
-                                            <!-- iframe src="{{ path('app_protected_pdf', { filename: data }) }}" height="800px" frameborder="0"></iframe -->
-
+                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}" 
+                                                height="800px" 
+                                                frameborder="0" 
+                                                sandbox="allow-same-origin allow-scripts allow-forms" 
+                                                style="pointer-events: none; user-select: none; -webkit-user-select: none;"
+                                                oncontextmenu="return false;"
+                                                onselectstart="return false;"
+                                                ondragstart="return false;">
+                                            </iframe>
                                         </div>
                                     </div>
                                 </div>
@@ -74,15 +80,15 @@
                         </div>
                     </div>
                     <!-- Video END -->
-
+                    
                 </div>
             </div> <!-- Row END -->
         </div>
     </section>
     <!-- Main Content END -->
-
+    
     {{ include('front/includes/_newsletterorange.html.twig') }}
-
+    
     {% if courses is defined and courses is not empty %}
         <!-- Related blog START -->
         <section class="pt-0">

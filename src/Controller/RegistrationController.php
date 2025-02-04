@@ -173,6 +173,10 @@ class RegistrationController extends AbstractController
                     $entityManager->persist($eleve);
                 }
 
+                // Persist user first to ensure roles are saved
+                $entityManager->persist($user);
+                $entityManager->flush();
+
                 // Handle invitation code for both types
                 if ($form->has('parentCode') && $form->get('parentCode')->getData()) {
                     $parentPerson = $personneRepository->findOneBy(['invitationCode' => $form->get('parentCode')->getData()]);
@@ -212,9 +216,6 @@ class RegistrationController extends AbstractController
 
                 $personne->setInvitationCode($codeInvitation)
                         ->setInvitationLink(json_encode($invitationLinks));
-
-                $entityManager->persist($user);
-                $entityManager->flush();
 
                 $this->addFlash('success', $this->translator->trans('ACCOUNT_CREATED_SUCCESS_KEY'));
                 return $this->redirectToRoute('app_login');

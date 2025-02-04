@@ -1,0 +1,219 @@
+{% extends "student/base.html.twig" %}
+
+{% block pageContent %}
+    {% if needsSetup %}
+        {{ include('student/chat/_setup_modal.html.twig') }}
+    {% else %}
+        <div class="card bg-transparent border rounded-3">
+            <!-- Card header START -->
+            <div class="card-header bg-transparent border-bottom">
+                <div class="d-sm-flex justify-content-between align-items-center">
+                    <h3 class="mb-2 mb-sm-0">{% trans %}CHAT_WITH_TEACHERS_KEY{% endtrans %}</h3>
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-info me-2">
+                            {{ dailyCount }}/{{ maxMessages }} messages
+                        </span>
+                        <div class="row g-4 mb-4" id="subject-grid">
+                            {% for subject in subjects %}
+                                <div class="col-sm-6 col-lg-4">
+                                    <div class="card card-hover h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <div class="icon-lg bg-primary bg-opacity-10 text-primary rounded-circle flex-shrink-0">
+                                                    <i class="fas fa-book"></i>
+                                                </div>
+                                                <div class="ms-3">
+                                                    <h5 class="mb-1">{{ subject.name }}</h5>
+                                                    <span class="text-body small">
+                                                        {% if subject.description %}
+                                                            {{ subject.description }}
+                                                        {% else %}
+                                                            {% trans %}CHAT_ABOUT_SUBJECT_KEY{% endtrans %}
+                                                        {% endif %}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <a href="#" class="btn btn-sm btn-primary-soft start-chat" data-subject-id="{{ subject.id }}">
+                                                    <i class="fas fa-comments me-2"></i>{% trans %}START_CHAT_KEY{% endtrans %}
+                                                </a>
+                                                {% if subject.unreadCount > 0 %}
+                                                    <span class="badge bg-danger">{{ subject.unreadCount }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card header END -->
+
+            <!-- Card body START -->
+            <div class="card-body">
+                <div id="chat-interface" style="display: none;">
+                    <h4 id="current-subject-name"></h4>
+                    <button id="back-to-subjects" class="btn btn-sm btn-secondary mb-3">
+                        <i class="fas fa-arrow-left me-2"></i>{% trans %}BACK_TO_SUBJECTS_KEY{% endtrans %}
+                    </button>
+                    <!-- Chat container -->
+                    <div class="chat-container bg-light rounded-3 p-3" style="height: 600px; overflow-y: auto;">
+                        <div class="messages" id="chat-messages">
+                        </div>
+                    </div>
+
+                    <!-- Message input -->
+                    <div class="message-input mt-3">
+                        <form id="chat-form" class="d-flex">
+                            <input type="text" id="message-text" class="form-control me-2" placeholder="{% trans %}TYPE_YOUR_MESSAGE_KEY{% endtrans %}">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Card body END -->
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatInterface = document.getElementById('chat-interface');
+    const subjectGrid = document.querySelector('.row.g-4');
+    const backButton = document.getElementById('back-to-subjects');
+    const currentSubjectName = document.getElementById('current-subject-name');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-text');
+    const messagesContainer = document.getElementById('chat-messages');
+    let currentSubjectId = null;
+
+    // Handle subject selection
+    document.querySelectorAll('.start-chat').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const subjectId = this.dataset.subjectId;
+            const subjectName = this.closest('.card').querySelector('h5').textContent;
+            
+            // Load messages for selected subject
+            loadMessages(subjectId);
+            
+            // Update UI
+            currentSubjectId = subjectId;
+            currentSubjectName.textContent = subjectName;
+            subjectGrid.style.display = 'none';
+            chatInterface.style.display = 'block';
+            
+            // Scroll to bottom of messages
+            scrollToBottom();
+        });
+    });
+
+    // Handle back button
+    backButton.addEventListener('click', function() {
+        chatInterface.style.display = 'none';
+        subjectGrid.style.display = 'flex';
+        currentSubjectId = null;
+    });
+
+    // Load messages for a subject
+    function loadMessages(subjectId) {
+        fetch(`{{ path('app_student_chat_messages', {'subject': '__ID__'}) }}`.replace('__ID__', subjectId))
+            .then(response => response.json())
+            .then(data => {
+                messagesContainer.innerHTML = '';
+                data.messages.forEach(message => {
+                    const messageHtml = createMessageElement(message);
+                    messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+                });
+                scrollToBottom();
+            });
+    }
+
+    // Handle message submission
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!currentSubjectId) return;
+
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        // Disable form while sending
+        messageInput.disabled = true;
+        
+        fetch('{{ path('app_student_chat_send') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: message,
+                subject: currentSubjectId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Add student message
+                const studentMessage = createMessageElement({
+                    content: message,
+                    isFromAI: false,
+                    createdAt: new Date().toISOString()
+                });
+                messagesContainer.insertAdjacentHTML('beforeend', studentMessage);
+                
+                // Add AI response
+                const aiMessage = createMessageElement({
+                    content: data.response,
+                    isFromAI: true,
+                    createdAt: new Date().toISOString()
+                });
+                messagesContainer.insertAdjacentHTML('beforeend', aiMessage);
+                
+                // Clear input and scroll
+                messageInput.value = '';
+                scrollToBottom();
+            }
+        })
+        .finally(() => {
+            messageInput.disabled = false;
+            messageInput.focus();
+        });
+    });
+
+    // Create message HTML element
+    function createMessageElement(message) {
+        const time = new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const isAI = message.isFromAI;
+        
+        return `
+            <div class="message ${isAI ? 'ai' : 'student'}-message mb-3">
+                <div class="d-flex">
+                    <div class="avatar avatar-xs me-2">
+                        <img class="avatar-img rounded-circle" 
+                             src="${isAI ? '{{ asset('assets/images/ai-avatar.png') }}' : '{{ asset(app.user.personne.avatarPath) }}'}" 
+                             alt="${isAI ? 'AI' : 'User'} avatar">
+                    </div>
+                    <div class="message-content p-3 rounded ${isAI ? 'bg-light' : 'bg-primary text-white'}">
+                        ${message.content.replace(/\n/g, '<br>')}
+                        <div class="small mt-2 ${isAI ? 'text-muted' : 'text-white-50'}">
+                            ${time}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Scroll chat to bottom
+    function scrollToBottom() {
+        const container = document.querySelector('.chat-container');
+        container.scrollTop = container.scrollHeight;
+    }
+});
+</script>
+{% endblock %}

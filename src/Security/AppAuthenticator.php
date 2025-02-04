@@ -18,6 +18,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AppAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -27,15 +28,25 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
     public const HOME_ROUTE = 'app_home';
 
     private $userRepository;
+    private $translator;
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator, UserRepository $userRepository)
-    {
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator, 
+        UserRepository $userRepository,
+        TranslatorInterface $translator
+    ) {
         $this->userRepository = $userRepository;
+        $this->translator = $translator;
     }
 
     public function authenticate(Request $request): Passport
     {
-        $identifier = $request->request->get('identifier', ''); // This can be username, phone number, or email
+        $identifier = $request->request->get('identifier', '');
+        $password = $request->request->get('password', '');
+
+        if (empty($identifier) || empty($password)) {
+            throw new AuthenticationException($this->translator->trans('CREDENTIALS_REQUIRED_KEY'));
+        }
 
         $request->getSession()->set(Security::LAST_USERNAME, $identifier);
 
@@ -55,12 +66,12 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
                 }
                 
                 if (!$user) {
-                    throw new UserNotFoundException();
+                    throw new UserNotFoundException($this->translator->trans('USER_NOT_FOUND_KEY'));
                 }
                 
                 return $user;
             }),
-            new PasswordCredentials($request->request->get('password', '')),
+            new PasswordCredentials($password),
             [
                 new CsrfTokenBadge('authenticate', $request->request->get('_csrf_token')),
             ]
@@ -73,6 +84,23 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
+        $user = $token->getUser();
+        
+        // Ensure we have fresh roles from the database
+        $user = $this->userRepository->find($user->getId());
+        
+        // Redirect based on user role
+        $roles = $user->getRoles();
+                
+        if (in_array('ROLE_ADMIN', $roles)) {
+            return new RedirectResponse($this->urlGenerator->generate('app_admin_dashboard'));
+        } elseif (in_array('ROLE_INSTRUCTOR', $roles)) {
+            return new RedirectResponse($this->urlGenerator->generate('app_instructor_home'));
+        } elseif (in_array('ROLE_STUDENT', $roles)) {
+            return new RedirectResponse($this->urlGenerator->generate('app_student_home'));
+        }
+
+        // Default redirect
         return new RedirectResponse($this->urlGenerator->generate(self::HOME_ROUTE));
     }
 

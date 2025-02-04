@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CategorieRepository::class)]
+#[ORM\Table(name: 'categorie')]
+#[ORM\Index(columns: ['name'], name: 'idx_categorie_name')]
 #[ApiResource(
     operations: [
         new Get(
