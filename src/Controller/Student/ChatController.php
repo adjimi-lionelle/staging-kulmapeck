@@ -4,10 +4,12 @@ namespace App\Controller\Student;
 
 use App\Entity\Categorie;
 use App\Entity\ChatMessage;
+use App\Entity\Classe;
 use App\Entity\Eleve;
 use App\Entity\SkillLevel;
 use App\Repository\CategorieRepository;
 use App\Repository\ChatMessageRepository;
+use App\Repository\ClasseRepository;
 use App\Repository\EleveRepository;
 use App\Repository\SkillLevelRepository;
 use App\Service\AIService;
@@ -29,6 +31,7 @@ class ChatController extends AbstractController
         private EntityManagerInterface $entityManager,
         private ChatMessageRepository $chatMessageRepository,
         private CategorieRepository $categorieRepository,
+        private ClasseRepository $classeRepository,
         private EleveRepository $eleveRepository,
         private SkillLevelRepository $skillLevelRepository,
         private AIService $aiService
@@ -47,8 +50,19 @@ class ChatController extends AbstractController
             throw $this->createAccessDeniedException('Student account not found.');
         }
 
-        // Check if student has skill level set
-        if (!$student->getSkillLevel()) {
+        // Check if student has class set
+        if (!$student->getClasse()) {
+            return $this->render('student/chat/index.html.twig', [
+                'needsSetup' => true,
+                'classes' => $this->classeRepository->findAll(),
+                'student' => $student,
+            ]);
+        }
+
+        // Get student's skill level from class
+        $skillLevel = $student->getClasse()->getSkillLevel();
+
+        if (!$skillLevel) {
             return $this->render('student/chat/index.html.twig', [
                 'needsSetup' => true,
                 'skillLevels' => $this->skillLevelRepository->findAll(),
@@ -57,9 +71,7 @@ class ChatController extends AbstractController
         }
 
         // Get student's subjects based on skill level
-        $subjects = $this->categorieRepository->findBySkillLevel(
-            $student->getSkillLevel()
-        );
+        $subjects = $this->categorieRepository->findBySkillLevel($skillLevel);
 
         // Add unread count for each subject
         foreach ($subjects as $subject) {
@@ -90,13 +102,13 @@ class ChatController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        $skillLevel = $this->skillLevelRepository->find($data['skillLevel']);
+        $classe = $this->classeRepository->find($data['classe']);
 
-        if (!$skillLevel) {
+        if (!$classe) {
             return new JsonResponse(['success' => false], Response::HTTP_BAD_REQUEST);
         }
 
-        $student->setSkillLevel($skillLevel);
+        $student->setClasse($classe);
         $this->entityManager->persist($student);
         $this->entityManager->flush();
 
