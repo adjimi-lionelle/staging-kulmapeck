@@ -63,7 +63,21 @@
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
-                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0" height="800px" frameborder="0" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" oncontextmenu="return false;"></iframe>
+                                            <div id="exam-iframe-container" class="w-100"></div>
+                                            <script>
+                                                document.addEventListener('DOMContentLoaded', function() {
+                                                    var container = document.getElementById('exam-iframe-container');
+                                                    var iframe = document.createElement('iframe');
+                                                    iframe.height = "800px";
+                                                    iframe.frameBorder = "0";
+                                                    iframe.sandbox = "allow-same-origin allow-scripts allow-popups allow-forms";
+                                                    iframe.setAttribute("oncontextmenu", "return false;");
+                                                    var baseUrl = "{{ asset('uploads/media/exams/files/') }}";
+                                                    var filePath = "{{ data }}";
+                                                    iframe.src = baseUrl + filePath + "#toolbar=0";
+                                                    container.appendChild(iframe);
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                 </div>
