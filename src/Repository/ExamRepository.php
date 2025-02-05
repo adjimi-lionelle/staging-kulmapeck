@@ -45,31 +45,30 @@ class ExamRepository extends ServiceEntityRepository
     /**
         * @return Exam[] Returns an array of Exam objects
         */
-    public function findByFilter(?string $language, ?Categorie $category, ?Classe $classe, ?SkillLevel $skillLevel): array
+    public function findByFilter(?string $language, ?Categorie $category, ?Classe $classe): array
     {
         $query = $this->createQueryBuilder('e');
-        
+
         if ($language) {
             $query->andWhere('e.language = :language')
-                ->setParameter('language', $language);
+                  ->setParameter('language', $language);
         }
 
         if ($category) {
-            $query->join('e.category', 'cat')
-                ->andWhere('e.category = :category')
-                ->setParameter('category', $category);
+            $query->andWhere('e.category = :category')
+                  ->setParameter('category', $category);
         }
 
         if ($classe) {
-            $query->join('e.classe', 'cls')
-            ->andWhere('e.classe = :classe')
-            ->setParameter('classe', $classe);
-        }
-
-        if ($skillLevel) {
-            $query->join('e.classe', 'cl')
-            ->andWhere('cl.skillLevel = :skillLevel')
-            ->setParameter('skillLevel', $skillLevel);
+            $query->andWhere('e.classe = :classe')
+                  ->setParameter('classe', $classe);
+            
+            // Use skillLevel from classe
+            $skillLevel = $classe->getSkillLevel();
+            if ($skillLevel) {
+                $query->andWhere('e.skillLevel = :skillLevel')
+                      ->setParameter('skillLevel', $skillLevel);
+            }
         }
         
         return $query
