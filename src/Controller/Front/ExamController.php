@@ -60,22 +60,12 @@ class ExamController extends AbstractController
             throw $this->createAccessDeniedException("Vous devez être premium!");
         }
 
-        $response = $this->render('front/exam/show.html.twig', [
+        return $this->render('front/exam/show.html.twig', [
             'exam' => $exam,
             'isExamPage' => true,
             'display' => $request->query->get('display', 'subject'),
             'data' => $request->query->get('display', 'subject') === 'correction' ? $exam->getCorrection() : $exam->getSujet(),
+            
         ]);
-
-        // Add comprehensive security headers to prevent downloads and protect content
-        $response->headers->set('Content-Security-Policy', "default-src 'self'; frame-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'");
-        $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-        $response->headers->set('X-Download-Options', 'noopen');
-        $response->headers->set('Content-Disposition', 'inline');
-        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-        $response->headers->set('Pragma', 'no-cache');
-        
-        return $response;
     }
 }
