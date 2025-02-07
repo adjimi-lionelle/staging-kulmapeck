@@ -22,12 +22,13 @@ class ExamController extends AbstractController
     {
         $categoryName = $request->query->get('category') === 'all' ? null : $request->query->get('category');
         $classeName = $request->query->get('classe') === 'all' ? null : $request->query->get('classe');
+        $skillName = $request->query->get('skill') === 'all' ? null : $request->query->get('skill');
         $language = $request->query->get('language') === 'all' ? null : $request->query->get('language');
         $category = $categorieRepository->findOneBy(['slug' => $categoryName]);
         $classe = $classeRepository->findOneBy(['slug' => $classeName]);
-        $skillLevel = $classe ? $classe->getSkillLevel() : null;
+        $skillLevel = $skillLevelRepository->findOneBy(['slug' => $skillName]);
 
-        $exams = $examRepository->findByFilter($language, $category, $classe);
+        $exams = $examRepository->findByFilter($language, $category, $classe, $skillLevel);
 
         return $this->render('front/exam/index.html.twig', [
             'isExamPage' => true,

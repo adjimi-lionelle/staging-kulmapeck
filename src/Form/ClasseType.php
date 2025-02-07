@@ -33,8 +33,7 @@ class ClasseType extends AbstractType
                 'attr' => [
                     'class' => 'border-0 js-choice bg-light rounded-end ps-1'
                 ],
-                'label' => 'Level',
-                'required' => true,
+                'label' => 'Level'
             ])
             ->add('specialite', EntityType::class, [
                 'class' => Specialite::class,
