@@ -32,6 +32,15 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <script src="{{ asset('assets/js/chat/websocket.js') }}"></script>
+    <script>
+        // Initialize WebSocket configuration
+        window.WS_CONFIG = {
+            reconnectAttempts: 5,
+            reconnectDelay: 3000,
+            messageQueueSize: 100
+        };
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize tooltips

@@ -125,6 +125,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const backToForums = document.getElementById('backToForums');
     const forumSearch = document.getElementById('forumSearch');
     let currentForumId = null;
+    let websocket = null;
+
+    // Initialize chat for a forum
+    function initializeForumChat(forumId) {
+        currentForumId = forumId;
+        
+        // Disconnect existing WebSocket if any
+        if (websocket) {
+            websocket.disconnect();
+        }
+
+        // Create new WebSocket connection
+        websocket = new ForumWebSocket(forumId);
+
+        // Listen for WebSocket events
+        document.addEventListener(`forum:message`, handleWebSocketMessage);
+        document.addEventListener(`forum:typing`, handleTypingStatus);
+        document.addEventListener(`forum:presence`, handlePresenceUpdate);
+        document.addEventListener(`forum:connected`, handleWebSocketConnected);
+        document.addEventListener(`forum:disconnected`, handleWebSocketDisconnected);
+    }
 
     // Forum card click handler
     forumsGrid.addEventListener('click', function(e) {
@@ -132,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!forumCard) return;
 
         const forumId = forumCard.dataset.forumId;
-        currentForumId = forumId;
+        initializeForumChat(forumId);
 
         // Hide grid, show chat
         document.querySelector('.forum-grid').style.display = 'none';
@@ -177,6 +198,90 @@ document.addEventListener('DOMContentLoaded', function() {
                 const messagesContainer = document.querySelector('.chat-messages-container');
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             });
+    }
+
+    // WebSocket event handlers
+    function handleWebSocketMessage(event) {
+        const { message } = event.detail;
+        if (message && event.detail.forumId === currentForumId) {
+            const messageHtml = createMessageElement(message);
+            document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+            scrollToBottom();
+        }
+    }
+
+    function handleTypingStatus(event) {
+        const { userId, isTyping } = event.detail;
+        const typingIndicator = document.querySelector('.typing-indicator');
+        
+        if (event.detail.forumId === currentForumId) {
+            if (isTyping) {
+                typingIndicator.textContent = 'Someone is typing...';
+                typingIndicator.classList.remove('d-none');
+            } else {
+                typingIndicator.classList.add('d-none');
+            }
+        }
+    }
+
+    function handlePresenceUpdate(event) {
+        const { onlineTeachers, onlineStudents } = event.detail;
+        if (event.detail.forumId === currentForumId) {
+            updateOnlineUsers(onlineTeachers, onlineStudents);
+        }
+    }
+
+    function handleWebSocketConnected(event) {
+        if (event.detail.forumId === currentForumId) {
+            console.log('Connected to chat server');
+            document.querySelector('.connection-status').classList.add('d-none');
+        }
+    }
+
+    function handleWebSocketDisconnected(event) {
+        if (event.detail.forumId === currentForumId) {
+            console.log('Disconnected from chat server');
+            document.querySelector('.connection-status').classList.remove('d-none');
+        }
+    }
+
+    // Update message sending to use WebSocket
+    document.querySelector('.chat-input-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const input = this.querySelector('input[type="text"]');
+        const message = input.value.trim();
+        
+        if (message && websocket) {
+            const success = websocket.sendMessage(message);
+            if (success) {
+                input.value = '';
+            }
+        }
+    });
+
+    // Add typing indicator
+    let typingTimeout;
+    document.querySelector('.chat-input').addEventListener('input', function() {
+        if (websocket) {
+            clearTimeout(typingTimeout);
+            websocket.sendTypingStatus(true);
+            
+            typingTimeout = setTimeout(() => {
+                websocket.sendTypingStatus(false);
+            }, 1000);
+        }
+    });
+
+    // Cleanup function
+    function cleanup() {
+        if (websocket) {
+            websocket.disconnect();
+        }
+        document.removeEventListener(`forum:message`, handleWebSocketMessage);
+        document.removeEventListener(`forum:typing`, handleTypingStatus);
+        document.removeEventListener(`forum:presence`, handlePresenceUpdate);
+        document.removeEventListener(`forum:connected`, handleWebSocketConnected);
+        document.removeEventListener(`forum:disconnected`, handleWebSocketDisconnected);
     }
 
     // Initialize tooltips
