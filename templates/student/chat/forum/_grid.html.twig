@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load forum messages
     function loadForumMessages(forumId) {
-        fetch(`{{ path('app_student_chat_messages', {'forum': '__ID__'}) }}`.replace('__ID__', forumId))
+        fetch(`{{ path('app_student_chat_messages', {'subject': '__ID__'}) }}`.replace('__ID__', forumId))
             .then(response => response.json())
             .then(data => {
                 // Update chat interface with forum data
