@@ -75,9 +75,6 @@ class Eleve
     #[ ORM\OneToMany( mappedBy: 'eleve', targetEntity: EvaluationResultat::class, orphanRemoval: true ) ]
     private Collection $evaluationResultats;
 
-    #[ ORM\ManyToOne ]
-    private ?SkillLevel $skillLevel = null;
-
     public function __construct()
  {
         $this->cours = new ArrayCollection();
@@ -471,12 +468,6 @@ class Eleve
 
     public function getSkillLevel(): ?SkillLevel
     {
-        return $this->skillLevel;
-    }
-
-    public function setSkillLevel(?SkillLevel $skillLevel): self
-    {
-        $this->skillLevel = $skillLevel;
-        return $this;
+        return $this->classe ? $this->classe->getSkillLevel() : null;
     }
 }
