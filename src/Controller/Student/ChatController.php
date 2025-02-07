@@ -12,6 +12,7 @@ use App\Repository\ChatMessageRepository;
 use App\Repository\ClasseRepository;
 use App\Repository\EleveRepository;
 use App\Repository\SkillLevelRepository;
+use App\Repository\SpecialiteRepository;
 use App\Service\AIService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,6 +35,7 @@ class ChatController extends AbstractController
         private ClasseRepository $classeRepository,
         private EleveRepository $eleveRepository,
         private SkillLevelRepository $skillLevelRepository,
+        private SpecialiteRepository $specialiteRepository,
         private AIService $aiService
     ) {}
 
@@ -55,6 +57,7 @@ class ChatController extends AbstractController
             return $this->render('student/chat/index.html.twig', [
                 'needsSetup' => true,
                 'classes' => $this->classeRepository->findAll(),
+                'specialites' => $this->specialiteRepository->findAll(),
                 'student' => $student,
             ]);
         }
@@ -65,7 +68,8 @@ class ChatController extends AbstractController
         if (!$skillLevel) {
             return $this->render('student/chat/index.html.twig', [
                 'needsSetup' => true,
-                'skillLevels' => $this->skillLevelRepository->findAll(),
+                'classes' => $this->classeRepository->findAll(),
+                'specialites' => $this->specialiteRepository->findAll(),
                 'student' => $student,
             ]);
         }
