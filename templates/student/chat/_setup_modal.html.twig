@@ -1,19 +1,20 @@
-<!-- Modal START -->
-<div class="modal fade" id="chatSetupModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="chatSetupModalLabel" aria-hidden="true">
+<!-- Setup Modal -->
+<div class="modal fade" id="setupModal" tabindex="-1" aria-labelledby="setupModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="chatSetupModalLabel">{% trans %}SETUP_YOUR_PROFILE_KEY{% endtrans %}</h5>
+                <h5 class="modal-title" id="setupModalLabel">{% trans %}SETUP_YOUR_PROFILE_KEY{% endtrans %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="chatSetupForm">
-                    <!-- Class selection -->
+                <form id="setupForm">
+                    <!-- Class/Skill Level selection -->
                     <div class="mb-3">
                         <label for="classe" class="form-label">{% trans %}SELECT_YOUR_CLASS_KEY{% endtrans %}</label>
                         <select class="form-select" id="classe" name="classe" required>
                             <option value="">{% trans %}CHOOSE_CLASS_KEY{% endtrans %}</option>
-                            {% for classe in classes %}
-                                <option value="{{ classe.id }}">{{ classe.name }}</option>
+                            {% for class in classes %}
+                                <option value="{{ class.id }}">{{ class.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -30,51 +31,49 @@
                     </div>
 
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        {% trans %}PROFILE_SETUP_INFO_KEY{% endtrans %}
-                    </div>
-
-                    <div class="text-end">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-check me-2"></i>
-                            {% trans %}SAVE_AND_CONTINUE_KEY{% endtrans %}
-                        </button>
+                        {% trans %}SETUP_INFO_MESSAGE_KEY{% endtrans %}
                     </div>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}CANCEL_KEY{% endtrans %}</button>
+                <button type="button" class="btn btn-primary" id="saveSetup">{% trans %}SAVE_SETUP_KEY{% endtrans %}</button>
             </div>
         </div>
     </div>
 </div>
-<!-- Modal END -->
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('chatSetupForm');
-    
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const formData = {
-            classe: document.getElementById('classe').value,
-            specialite: document.getElementById('specialite').value
-        };
-        
-        fetch('{{ path('app_student_chat_setup') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
+document.getElementById('saveSetup').addEventListener('click', function() {
+    const form = document.getElementById('setupForm');
+    const classe = document.getElementById('classe').value;
+    const specialite = document.getElementById('specialite').value;
+
+    if (!classe || !specialite) {
+        alert("{% trans %}PLEASE_FILL_ALL_FIELDS_KEY{% endtrans %}");
+        return;
+    }
+
+    fetch('{{ path('app_student_chat_setup') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            classe: classe,
+            specialite: specialite
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert("{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}");
     });
-});
-</script>
+});</script>

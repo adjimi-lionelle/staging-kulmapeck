@@ -107,13 +107,17 @@ class ChatController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         $classe = $this->classeRepository->find($data['classe']);
+        $specialite = $this->specialiteRepository->find($data['specialite']);
 
-        if (!$classe) {
-            return new JsonResponse(['success' => false], Response::HTTP_BAD_REQUEST);
+        if (!$classe || !$specialite) {
+            return new JsonResponse(['success' => false, 'message' => 'Invalid class or specialization'], Response::HTTP_BAD_REQUEST);
         }
 
         $student->setClasse($classe);
+        $classe->setSpecialite($specialite);
+        
         $this->entityManager->persist($student);
+        $this->entityManager->persist($classe);
         $this->entityManager->flush();
 
         return new JsonResponse(['success' => true]);
