@@ -28,8 +28,6 @@ class ChatController extends AbstractController
 {
     private const MAX_DAILY_MESSAGES = 500;
 
-    private $mockDataProvider;
-
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ChatMessageRepository $chatMessageRepository,
@@ -39,9 +37,7 @@ class ChatController extends AbstractController
         private SkillLevelRepository $skillLevelRepository,
         private SpecialiteRepository $specialiteRepository,
         private MockChatDataProvider $mockDataProvider
-    ) {
-        $this->mockDataProvider = $mockDataProvider;
-    }
+    ) {}
 
     #[Route('', name: 'app_student_chat')]
     public function index(): Response

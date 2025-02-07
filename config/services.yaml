@@ -50,4 +50,12 @@ services:
             $eleveRepository: '@App\Repository\EleveRepository'
             $security: '@security.helper'
         tags:
-            - { name: twig.extension }        
+            - { name: twig.extension }
+
+    # Mock service for frontend testing
+    App\Service\MockChatDataProvider:
+        autowire: true
+    App\Service\FileUploader:
+        arguments:
+            $targetDirectory: '%upload_directory%'
+            $publicDirectory: '%public_directory%'
