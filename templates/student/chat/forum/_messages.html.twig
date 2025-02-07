@@ -40,7 +40,6 @@
     {% endfor %}
 </div>
 
-<!-- Add necessary styles -->
 <style>
 .message {
     display: flex;
@@ -74,11 +73,15 @@
     display: inline-block;
     max-width: 100%;
     word-wrap: break-word;
+    border-radius: 1rem;
+}
+
+.message-in .message-bubble {
+    border-top-left-radius: 0.25rem;
 }
 
 .message-out .message-bubble {
-    background-color: var(--bs-primary);
-    color: white;
+    border-top-right-radius: 0.25rem;
 }
 
 .message-meta {
@@ -87,5 +90,16 @@
 
 .message-out .message-meta {
     text-align: right;
+}
+
+.avatar-xs {
+    width: 32px;
+    height: 32px;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 </style>

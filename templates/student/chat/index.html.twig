@@ -10,22 +10,173 @@
             });
         </script>
     {% else %}
-        <!-- Include the forum grid -->
-        {{ include('student/chat/forum/_grid.html.twig', {
-            forums: forums,
-            categories: categories
-        }) }}
+        <div class="chat-container">
+            <!-- Sidebar -->
+            <div class="chat-sidebar">
+                <!-- Search header -->
+                <div class="sidebar-header p-3 border-bottom">
+                    <button class="btn btn-light btn-sm d-lg-none me-2" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="search-bar flex-grow-1">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-0">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control border-0 bg-light" id="forumSearch" 
+                                   placeholder="{% trans %}SEARCH_FORUMS_KEY{% endtrans %}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forums list -->
+                <div class="forums-list">
+                    {% for forum in forums %}
+                        <div class="forum-item d-flex align-items-center p-3 border-bottom {% if forum.unreadCount > 0 %}unread{% endif %}"
+                             data-forum-id="{{ forum.id }}"
+                             data-subject="{{ forum.subject|lower }}">
+                            <!-- Subject avatar -->
+                            <div class="avatar avatar-md me-3">
+                                <div class="subject-icon rounded-circle bg-light d-flex align-items-center justify-content-center">
+                                    <i class="fas {{ forum.icon|default('fa-book') }} text-primary"></i>
+                                </div>
+                            </div>
+                            <!-- Forum info -->
+                            <div class="forum-info flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="mb-0">{{ forum.subject }}</h6>
+                                    <small class="text-muted">{{ forum.lastActivity|ago }}</small>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ forum.teacherName }}</small>
+                                    {% if forum.unreadCount > 0 %}
+                                        <span class="badge bg-primary rounded-pill">{{ forum.unreadCount }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Main chat area -->
+            <div class="chat-main">
+                <!-- Initial state -->
+                <div class="chat-welcome d-flex align-items-center justify-content-center">
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-comments fa-4x text-primary"></i>
+                        </div>
+                        <h4>{% trans %}WELCOME_TO_CHAT_KEY{% endtrans %}</h4>
+                        <p class="text-muted">{% trans %}SELECT_FORUM_TO_START_KEY{% endtrans %}</p>
+                    </div>
+                </div>
+
+                <!-- Active chat interface -->
+                {{ include('student/chat/forum/_chat.html.twig', {
+                    forum: null,
+                    messages: [],
+                    onlineTeachers: [],
+                    onlineStudents: []
+                }) }}
+            </div>
+        </div>
     {% endif %}
 {% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        /* Additional styles for the chat interface */
-        .page-content {
+        /* Chat container */
+        .chat-container {
+            display: flex;
+            height: calc(100vh - 70px);
+            background: var(--bs-light);
+        }
+
+        /* Sidebar */
+        .chat-sidebar {
+            width: 350px;
+            background: #fff;
+            border-right: 1px solid var(--bs-border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .forums-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .forum-item {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .forum-item:hover {
             background-color: var(--bs-light);
-            min-height: calc(100vh - 70px); /* Adjust based on your header height */
-            padding: 1.5rem;
+        }
+
+        .forum-item.active {
+            background-color: var(--bs-primary-bg-subtle);
+        }
+
+        .forum-item.unread h6 {
+            font-weight: 600;
+        }
+
+        /* Main chat area */
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+
+        .chat-welcome {
+            flex: 1;
+        }
+
+        /* Avatar sizes */
+        .avatar-md {
+            width: 48px;
+            height: 48px;
+        }
+
+        .subject-icon {
+            width: 100%;
+            height: 100%;
+            font-size: 1.5rem;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 991.98px) {
+            .chat-sidebar {
+                position: fixed;
+                left: -350px;
+                top: 0;
+                bottom: 0;
+                z-index: 1040;
+                transition: left 0.3s ease;
+            }
+
+            .chat-sidebar.show {
+                left: 0;
+            }
+
+            .chat-main {
+                width: 100%;
+            }
+        }
+
+        /* Search bar */
+        .search-bar .form-control:focus {
+            box-shadow: none;
+        }
+
+        .search-bar .input-group {
+            background: var(--bs-light);
+            border-radius: var(--bs-border-radius);
         }
     </style>
 {% endblock %}
@@ -34,6 +185,55 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.chat-sidebar');
+            const menuToggle = document.getElementById('menuToggle');
+            const forumItems = document.querySelectorAll('.forum-item');
+            const chatInterface = document.getElementById('chatInterface');
+            const chatWelcome = document.querySelector('.chat-welcome');
+            let currentForumId = null;
+
+            // Menu toggle for mobile
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                });
+            }
+
+            // Forum selection
+            forumItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const forumId = this.dataset.forumId;
+                    
+                    // Update UI
+                    forumItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    chatWelcome.style.display = 'none';
+                    chatInterface.style.display = 'flex';
+                    
+                    // Hide sidebar on mobile
+                    if (window.innerWidth < 992) {
+                        sidebar.classList.remove('show');
+                    }
+
+                    // Load messages
+                    if (currentForumId !== forumId) {
+                        currentForumId = forumId;
+                        loadForumMessages(forumId);
+                    }
+                });
+            });
+
+            // Back button handler
+            const backButton = document.getElementById('backToForums');
+            if (backButton) {
+                backButton.addEventListener('click', function() {
+                    chatInterface.style.display = 'none';
+                    chatWelcome.style.display = 'flex';
+                    forumItems.forEach(i => i.classList.remove('active'));
+                    currentForumId = null;
+                });
+            }
+
             // Initialize tooltips
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (tooltipTriggerEl) {
