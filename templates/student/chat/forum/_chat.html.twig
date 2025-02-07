@@ -10,6 +10,7 @@
                         <button class="btn btn-light btn-sm me-2 d-lg-none" id="toggleUserList">
                             <i class="fas fa-users"></i>
                         </button>
+                        {% if forum %}
                         <div class="d-flex align-items-center">
                             <div class="avatar avatar-sm me-2">
                                 <img src="{{ forum.teacherAvatar }}" class="avatar-img rounded-circle" alt="">
@@ -24,6 +25,7 @@
                                 <small class="text-muted">{{ forum.teacherName }}</small>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                     <div>
                         <button class="btn btn-light btn-sm" id="backToForums">
