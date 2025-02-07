@@ -239,6 +239,19 @@ NEXT_KEY: Next
 PREV_KEY: Prev
 MANY_ANSWERS_POSSIBLE_KEY: Many answers are possible for this question
 
+# Forum Grid
+SEARCH_FORUMS_KEY: 'Search forums...'
+FILTER_KEY: 'Filter'
+SORT_KEY: 'Sort'
+MOST_RECENT_KEY: 'Most Recent'
+MOST_PARTICIPANTS_KEY: 'Most Participants'
+ALPHABETICAL_KEY: 'Alphabetical'
+HIGH_ACTIVITY_KEY: 'High Activity'
+MEDIUM_ACTIVITY_KEY: 'Medium Activity'
+LOW_ACTIVITY_KEY: 'Low Activity'
+ONLINE_KEY: 'online'
+TEACHER_ONLINE_KEY: 'Teacher is online'
+
 # Authentication messages
 CREDENTIALS_REQUIRED_KEY: 'Please provide both identifier and password'
 USER_NOT_FOUND_KEY: 'User not found'

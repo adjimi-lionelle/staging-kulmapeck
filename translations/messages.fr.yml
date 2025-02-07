@@ -319,3 +319,16 @@ MAINMESSAGEDESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éduca
 
 MOSTPOPULAR_KEY: Cours les plus populaires
 MOSTPOPULARDESCRIPTION_KEY: Choisissez parmi des centaines de cours proposés par des organisations spécialisées
+
+# Forum Grid
+SEARCH_FORUMS_KEY: 'Rechercher des forums...'
+FILTER_KEY: 'Filtrer'
+SORT_KEY: 'Trier'
+MOST_RECENT_KEY: 'Plus Récent'
+MOST_PARTICIPANTS_KEY: 'Plus de Participants'
+ALPHABETICAL_KEY: 'Alphabétique'
+HIGH_ACTIVITY_KEY: 'Activité Élevée'
+MEDIUM_ACTIVITY_KEY: 'Activité Moyenne'
+LOW_ACTIVITY_KEY: 'Activité Faible'
+ONLINE_KEY: 'en ligne'
+TEACHER_ONLINE_KEY: 'Professeur en ligne'

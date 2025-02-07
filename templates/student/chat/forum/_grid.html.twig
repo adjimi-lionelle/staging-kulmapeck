@@ -1,0 +1,178 @@
+<!-- Forum Grid START -->
+<div class="forum-grid">
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-transparent"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" id="forumSearch" placeholder="{% trans %}SEARCH_FORUMS_KEY{% endtrans %}">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="d-flex gap-2 justify-content-md-end">
+                <!-- Filter Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-filter me-2"></i>{% trans %}FILTER_KEY{% endtrans %}
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                        <li><h6 class="dropdown-header">{% trans %}CATEGORIES_KEY{% endtrans %}</h6></li>
+                        {% for category in categories %}
+                            <li>
+                                <a class="dropdown-item" href="#" data-category="{{ category.id }}">
+                                    {{ category.name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">{% trans %}ACTIVITY_KEY{% endtrans %}</h6></li>
+                        <li>
+                            <a class="dropdown-item" href="#" data-activity="high">
+                                {% trans %}HIGH_ACTIVITY_KEY{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" data-activity="medium">
+                                {% trans %}MEDIUM_ACTIVITY_KEY{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" data-activity="low">
+                                {% trans %}LOW_ACTIVITY_KEY{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Sort Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-sort me-2"></i>{% trans %}SORT_KEY{% endtrans %}
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                        <li>
+                            <a class="dropdown-item" href="#" data-sort="recent">
+                                <i class="fas fa-clock me-2"></i>{% trans %}MOST_RECENT_KEY{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" data-sort="participants">
+                                <i class="fas fa-users me-2"></i>{% trans %}MOST_PARTICIPANTS_KEY{% endtrans %}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="#" data-sort="alphabetical">
+                                <i class="fas fa-sort-alpha-down me-2"></i>{% trans %}ALPHABETICAL_KEY{% endtrans %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forums Grid -->
+    <div class="row g-4" id="forumsContainer">
+        {% for forum in forums %}
+            <div class="col-sm-6 col-lg-4">
+                {{ include('student/chat/forum/_card.html.twig', { forum: forum }) }}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add necessary styles -->
+<style>
+.forum-grid {
+    padding: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .forum-grid .d-flex {
+        margin-top: 1rem;
+    }
+}
+</style>
+
+<!-- Add necessary scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize variables for filtering and sorting
+    let currentFilters = {
+        search: '',
+        category: null,
+        activity: null,
+        sort: 'recent'
+    };
+
+    // Search functionality
+    const searchInput = document.getElementById('forumSearch');
+    searchInput.addEventListener('input', debounce(function(e) {
+        currentFilters.search = e.target.value;
+        updateForums();
+    }, 300));
+
+    // Filter functionality
+    document.querySelectorAll('[data-category]').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentFilters.category = this.dataset.category;
+            updateForums();
+        });
+    });
+
+    document.querySelectorAll('[data-activity]').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentFilters.activity = this.dataset.activity;
+            updateForums();
+        });
+    });
+
+    // Sort functionality
+    document.querySelectorAll('[data-sort]').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentFilters.sort = this.dataset.sort;
+            updateForums();
+        });
+    });
+
+    // Debounce helper function
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Function to update forums based on filters
+    function updateForums() {
+        // In a real implementation, this would make an AJAX call to the server
+        // For now, we'll just console.log the filters
+        console.log('Updating forums with filters:', currentFilters);
+        
+        // Mock API call structure for backend team
+        /*
+        fetch('/api/forums/filter', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(currentFilters)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Update forums container with new data
+            const container = document.getElementById('forumsContainer');
+            container.innerHTML = data.html;
+        });
+        */
+    }
+});
+</script>
