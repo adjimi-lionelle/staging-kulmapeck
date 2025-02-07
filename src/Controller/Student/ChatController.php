@@ -70,8 +70,8 @@ class ChatController extends AbstractController
             ]);
         }
 
-        // Get student's subjects based on skill level
-        $subjects = $this->categorieRepository->findBySkillLevel($skillLevel->getId());
+        // Get student's subjects based on skill level (passing the SkillLevel entity)
+        $subjects = $this->categorieRepository->findBySkillLevel($skillLevel);
 
         // Add unread count for each subject
         foreach ($subjects as $subject) {
