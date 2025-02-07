@@ -3,7 +3,15 @@
 {% block pageContent %}
     {% if needsSetup %}
         {{ include('student/chat/_setup_modal.html.twig') }}
-    {% else %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const setupModal = new bootstrap.Modal(document.getElementById('setupModal'));
+                setupModal.show();
+            });
+        </script>
+    {% endif %}
+
+    {% if not needsSetup %}
         <div class="card bg-transparent border rounded-3">
             <!-- Card header START -->
             <div class="card-header bg-transparent border-bottom">

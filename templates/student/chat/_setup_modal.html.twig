@@ -1,10 +1,9 @@
 <!-- Setup Modal -->
-<div class="modal fade" id="setupModal" tabindex="-1" aria-labelledby="setupModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="setupModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header border-0">
                 <h5 class="modal-title" id="setupModalLabel">{% trans %}SETUP_YOUR_PROFILE_KEY{% endtrans %}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="setupForm">
@@ -31,49 +30,67 @@
                     </div>
 
                     <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
                         {% trans %}SETUP_INFO_MESSAGE_KEY{% endtrans %}
                     </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check me-2"></i>
+                            {% trans %}SAVE_SETUP_KEY{% endtrans %}
+                        </button>
+                    </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}CANCEL_KEY{% endtrans %}</button>
-                <button type="button" class="btn btn-primary" id="saveSetup">{% trans %}SAVE_SETUP_KEY{% endtrans %}</button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-document.getElementById('saveSetup').addEventListener('click', function() {
+document.addEventListener('DOMContentLoaded', function() {
+    {% if needsSetup %}
+    // Show modal automatically when page loads
+    const setupModal = new bootstrap.Modal(document.getElementById('setupModal'), {
+        backdrop: 'static',
+        keyboard: false
+    });
+    setupModal.show();
+    {% endif %}
+
     const form = document.getElementById('setupForm');
-    const classe = document.getElementById('classe').value;
-    const specialite = document.getElementById('specialite').value;
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const classe = document.getElementById('classe').value;
+        const specialite = document.getElementById('specialite').value;
 
-    if (!classe || !specialite) {
-        alert("{% trans %}PLEASE_FILL_ALL_FIELDS_KEY{% endtrans %}");
-        return;
-    }
-
-    fetch('{{ path('app_student_chat_setup') }}', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            classe: classe,
-            specialite: specialite
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            window.location.reload();
-        } else {
-            alert("{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}");
+        if (!classe || !specialite) {
+            alert("{% trans %}PLEASE_FILL_ALL_FIELDS_KEY{% endtrans %}");
+            return;
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}");
+
+        fetch('{{ path('app_student_chat_setup') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                classe: classe,
+                specialite: specialite
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert("{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}");
+        });
     });
 });</script>
