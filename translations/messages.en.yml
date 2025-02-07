@@ -66,16 +66,11 @@ START_CHAT_KEY: 'Start Chat'
 BACK_TO_SUBJECTS_KEY: 'Back to Subjects'
 
 # Chat Setup Modal
-SETUP_YOUR_PROFILE_KEY: 'Setup Your Profile'
-SELECT_YOUR_CLASS_KEY: 'Select Your Class'
-CHOOSE_CLASS_KEY: 'Choose a class...'
-SELECT_YOUR_SPECIALIZATION_KEY: 'Select Your Specialization'
-CHOOSE_SPECIALIZATION_KEY: 'Choose a specialization...'
 SETUP_INFO_MESSAGE_KEY: 'Please select your class and specialization to continue. This will help us provide you with relevant content and chat options.'
-CANCEL_KEY: 'Cancel'
 SAVE_SETUP_KEY: 'Save'
 PLEASE_FILL_ALL_FIELDS_KEY: 'Please fill in all required fields'
 SETUP_ERROR_MESSAGE_KEY: 'An error occurred while saving your settings. Please try again.'
+CANCEL_KEY: 'Cancel'
 
 # WELCOME SCREEN
 MAINMESSAGE_KEY: WELCOME TO 
