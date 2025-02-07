@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Categorie;
 use App\Entity\Classe;
+use App\Entity\SkillLevel;
 use App\Entity\Specialite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -41,22 +42,41 @@ class CategorieRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * Find categories that have courses for a given skill level
+     * @param SkillLevel $skillLevel
+     * @return Categorie[]
+     */
+    public function findBySkillLevel(SkillLevel $skillLevel): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.cours', 'co')
+            ->join('co.classe', 'cl')
+            ->andWhere('cl.skillLevel = :skillLevel')
+            ->andWhere('co.isValidated = :isValidated')
+            ->setParameter('skillLevel', $skillLevel)
+            ->setParameter('isValidated', true)
+            ->distinct()
+            ->getQuery()
+            ->getResult();
+    }
+
    /**
     * @return Categorie[] Returns an array of Categorie objects
     */
     public function findBCategories(int $maxResult = null): array
     {
-        return $this->createQueryBuilder('c')
+        $qb = $this->createQueryBuilder('c')
             ->join('c.cours', 'co')
             ->andWhere('co.isValidated = :isValidated')
-            ->andWhere('c.isSubCategory = :isSubCategory')
             ->setParameter('isValidated', true)
-            ->setParameter('isSubCategory', false)
-            ->orderBy('c.name', 'ASC')
-            ->setMaxResults($maxResult)
-            ->getQuery()
-            ->getResult()
-        ;
+            ->distinct();
+
+        if ($maxResult) {
+            $qb->setMaxResults($maxResult);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     public function findBCategoriesForum(int $maxResult = null): array
@@ -95,14 +115,4 @@ class CategorieRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
-//    public function findOneBySomeField($value): ?Categorie
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

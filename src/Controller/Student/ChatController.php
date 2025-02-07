@@ -71,7 +71,7 @@ class ChatController extends AbstractController
         }
 
         // Get student's subjects based on skill level
-        $subjects = $this->categorieRepository->findBySkillLevel($skillLevel);
+        $subjects = $this->categorieRepository->findBySkillLevel($skillLevel->getId());
 
         // Add unread count for each subject
         foreach ($subjects as $subject) {
