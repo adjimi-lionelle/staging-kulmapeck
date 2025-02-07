@@ -52,6 +52,10 @@ services:
         tags:
             - { name: twig.extension }
 
+    # Custom Twig extensions
+    App\Twig\TimeExtension:
+        tags: ['twig.extension']
+
     # Mock service for frontend testing
     App\Service\MockChatDataProvider:
         autowire: true
