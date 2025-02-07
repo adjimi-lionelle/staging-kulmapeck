@@ -13,7 +13,7 @@ use App\Repository\ClasseRepository;
 use App\Repository\EleveRepository;
 use App\Repository\SkillLevelRepository;
 use App\Repository\SpecialiteRepository;
-use App\Service\AIService;
+use App\Service\MockChatDataProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,6 +28,8 @@ class ChatController extends AbstractController
 {
     private const MAX_DAILY_MESSAGES = 500;
 
+    private $mockDataProvider;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ChatMessageRepository $chatMessageRepository,
@@ -36,8 +38,10 @@ class ChatController extends AbstractController
         private EleveRepository $eleveRepository,
         private SkillLevelRepository $skillLevelRepository,
         private SpecialiteRepository $specialiteRepository,
-        private AIService $aiService
-    ) {}
+        private MockChatDataProvider $mockDataProvider
+    ) {
+        $this->mockDataProvider = $mockDataProvider;
+    }
 
     #[Route('', name: 'app_student_chat')]
     public function index(): Response
@@ -74,21 +78,11 @@ class ChatController extends AbstractController
             ]);
         }
 
-        // Get student's subjects based on skill level (passing the SkillLevel entity)
-        $subjects = $this->categorieRepository->findBySkillLevel($skillLevel);
-
-        // Add unread count for each subject
-        foreach ($subjects as $subject) {
-            $unreadCount = $this->chatMessageRepository->getUnreadCount($student, $subject);
-            $subject->unreadCount = $unreadCount;
-        }
-
+        // Use mock data for testing the frontend
         return $this->render('student/chat/index.html.twig', [
             'needsSetup' => false,
-            'subjects' => $subjects,
-            'messages' => [],
-            'dailyCount' => $this->chatMessageRepository->getDailyMessageCount($student),
-            'maxMessages' => self::MAX_DAILY_MESSAGES,
+            'forums' => $this->mockDataProvider->getMockForums(),
+            'categories' => $this->mockDataProvider->getMockCategories(),
             'student' => $student,
         ]);
     }
