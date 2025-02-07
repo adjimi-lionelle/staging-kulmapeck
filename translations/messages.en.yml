@@ -240,7 +240,6 @@ PREV_KEY: Prev
 MANY_ANSWERS_POSSIBLE_KEY: Many answers are possible for this question
 
 # Chat Interface
-CHAT_WITH_TEACHERS_KEY: 'Chat with our teachers'
 TYPE_YOUR_MESSAGE_KEY: 'Type your message...'
 ADD_EMOJI_KEY: 'Add emoji'
 SOMEONE_IS_TYPING_KEY: 'Someone is typing...'
