@@ -109,6 +109,15 @@ CHAT_ABOUT_SUBJECT_KEY: 'Discutez avec nos professeurs à propos de cette matiè
 START_CHAT_KEY: 'Démarrer la discussion'
 BACK_TO_SUBJECTS_KEY: 'Retour aux matières'
 
+# Chat Interface
+ADD_EMOJI_KEY: 'Ajouter un emoji'
+SOMEONE_IS_TYPING_KEY: 'Quelqu''un est en train d''écrire...'
+ONLINE_USERS_KEY: 'Utilisateurs en ligne'
+TEACHERS_KEY: 'Professeurs'
+STUDENTS_KEY: 'Étudiants'
+READ_KEY: 'Lu'
+SENT_KEY: 'Envoyé'
+
 # Authentication messages
 CREDENTIALS_REQUIRED_KEY: 'Veuillez fournir l''identifiant et le mot de passe'
 USER_NOT_FOUND_KEY: 'Utilisateur non trouvé'
