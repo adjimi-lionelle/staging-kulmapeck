@@ -12,6 +12,7 @@
 /scripts
 /deploy.py
 /docs
+/git_push.bat
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###
