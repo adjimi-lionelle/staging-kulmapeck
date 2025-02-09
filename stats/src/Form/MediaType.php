@@ -7,6 +7,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class MediaType extends AbstractType
 {
@@ -29,7 +30,7 @@ class MediaType extends AbstractType
                 'label' => 'Choisir un fichier vidéo MP4',
                 'attr' => [
                     'class' => 'form-control',
-                    'accept' => 'vdeo/mp4'
+                    'accept' => 'video/mp4'
                 ],
             ])
             ->add('webMFileUpload',  FileType::class, [
@@ -37,7 +38,7 @@ class MediaType extends AbstractType
                 'label' => 'Choisir un fichier vidéo webM',
                 'attr' => [
                     'class' => 'form-control',
-                    'accept' => 'vdeo/webM'
+                    'accept' => 'video/webm'
                 ],
             ])
             ->add('oggFileUpload',  FileType::class, [
@@ -45,11 +46,23 @@ class MediaType extends AbstractType
                 'label' => 'Choisir un fichier vidéo OGG',
                 'attr' => [
                     'class' => 'form-control',
-                    'accept' => 'vdeo/ogg'
+                    'accept' => 'video/ogg'
                 ],
             ])
             ->add('imageFileUpload', FileType::class, [
                 'label' => 'Choisir un fichier Image',
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '10M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                            'image/gif',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid image file (JPEG, PNG, GIF)',
+                    ])
+                ],
                 'attr' => [
                     'class' => 'form-control stretched-link', 
                     'accept' => 'image/gif, image/jpeg, image/png'

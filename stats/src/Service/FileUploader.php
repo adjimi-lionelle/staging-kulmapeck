@@ -24,21 +24,54 @@ class FileUploader
         if ($file === null) {
             return;
         }
+
+        // Validate the file
+        if (!$file->isValid()) {
+            throw new FileException($file->getErrorMessage());
+        }
+
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $safeFilename = $this->slugger->slug($originalFilename);
         $fileName = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
 
         try {
             $targetPath = rtrim($this->getTargetDirectory(), '/') . '/' . trim($path, '/');
-            if (!is_dir($targetPath)) {
-                mkdir($targetPath, 0775, true);
+            
+            // Create directory if it doesn't exist
+            if (!file_exists($targetPath)) {
+                if (!mkdir($targetPath, 0775, true)) {
+                    throw new FileException(sprintf(
+                        'Unable to create directory "%s". Error: %s',
+                        $targetPath,
+                        error_get_last()['message'] ?? 'Unknown error'
+                    ));
+                }
             }
-            $file->move($targetPath, $fileName);
-        } catch (FileException $e) {
-            throw $e; // Re-throw to see the actual error
-        }
 
-        return $fileName;
+            // Check directory permissions
+            if (!is_writable($targetPath)) {
+                throw new FileException(sprintf(
+                    'Directory "%s" is not writable. Current permissions: %s',
+                    $targetPath,
+                    substr(sprintf('%o', fileperms($targetPath)), -4)
+                ));
+            }
+
+            // Move the file
+            $file->move($targetPath, $fileName);
+
+            // Verify the file was moved successfully
+            if (!file_exists($targetPath . '/' . $fileName)) {
+                throw new FileException('File was not moved to the target location');
+            }
+
+            return $fileName;
+        } catch (FileException $e) {
+            error_log('File upload failed: ' . $e->getMessage());
+            error_log('Target path: ' . $targetPath);
+            error_log('Original filename: ' . $originalFilename);
+            throw $e;
+        }
     }
 
     public function getTargetDirectory()
