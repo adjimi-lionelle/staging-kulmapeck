@@ -20,7 +20,6 @@ class FileUploader
     }
 
     public function upload(?UploadedFile $file, string $path=null)
-
     {
         if ($file === null) {
             return;
@@ -30,9 +29,13 @@ class FileUploader
         $fileName = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
 
         try {
-            $file->move($this->getTargetDirectory().$path, $fileName);
+            $targetPath = rtrim($this->getTargetDirectory(), '/') . '/' . trim($path, '/');
+            if (!is_dir($targetPath)) {
+                mkdir($targetPath, 0775, true);
+            }
+            $file->move($targetPath, $fileName);
         } catch (FileException $e) {
-            // ... handle exception if something happens during file upload
+            throw $e; // Re-throw to see the actual error
         }
 
         return $fileName;
