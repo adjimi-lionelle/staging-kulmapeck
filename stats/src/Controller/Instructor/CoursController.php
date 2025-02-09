@@ -82,14 +82,39 @@ class CoursController extends AbstractController
                 $cours->setUpdatedAt( new \DateTimeImmutable() );
                 $entityManager->flush();
                 
+                if ($request->isXmlHttpRequest()) {
+                    return $this->json([
+                        'success' => true,
+                        'message' => 'Course updated successfully'
+                    ]);
+                }
+                
                 $this->addFlash('success', 'Course updated successfully');
                 return $this->redirectToRoute( 'app_instructor_courses', [], Response::HTTP_SEE_OTHER );
             } catch (\Exception $e) {
+                if ($request->isXmlHttpRequest()) {
+                    return $this->json([
+                        'success' => false,
+                        'errors' => [$e->getMessage()]
+                    ], Response::HTTP_BAD_REQUEST);
+                }
                 $this->addFlash('error', 'Error uploading file: ' . $e->getMessage());
             }
         } elseif ($form->isSubmitted()) {
+            $errors = [];
             foreach ($form->getErrors(true) as $error) {
-                $this->addFlash('error', $error->getMessage());
+                $errors[] = $error->getMessage();
+            }
+            
+            if ($request->isXmlHttpRequest()) {
+                return $this->json([
+                    'success' => false,
+                    'errors' => $errors
+                ], Response::HTTP_BAD_REQUEST);
+            }
+            
+            foreach ($errors as $error) {
+                $this->addFlash('error', $error);
             }
         }
 

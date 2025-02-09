@@ -463,6 +463,118 @@ document.querySelectorAll('.edit-lesson-btn').forEach(btn => {
 btn.addEventListener("click", showEditLessonModal)
 });
 })
+
+// Initialize stepper
+var stepper = new Stepper(document.querySelector('#stepper'), {
+linear: true,
+animation: true
+});
+
+// Form validation
+function validateStep(step) {
+let isValid = true;
+const currentStep = document.querySelector('#step-' + step);
+const requiredFields = currentStep.querySelectorAll('[required]');
+	
+requiredFields.forEach(field => {
+if (!field.value) {
+isValid = false;
+field.classList.add('is-invalid');
+} else {
+field.classList.remove('is-invalid');
+}
+});
+
+return isValid;
+}
+
+// Handle next button clicks
+document.querySelectorAll('.next-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+const currentStep = stepper._currentIndex + 1;
+if (validateStep(currentStep)) {
+stepper.next();
+}
+});
+});
+
+// Handle previous button clicks
+document.querySelectorAll('.prev-btn').forEach(btn => {
+btn.addEventListener('click', function(e) {
+stepper.previous();
+});
+});
+
+// Handle form submission
+const form = document.querySelector('#course-form');
+form.addEventListener('submit', async function(e) {
+e.preventDefault();
+	
+// Clear previous errors
+document.querySelector('#form-errors').classList.add('d-none');
+document.querySelector('#form-errors').innerHTML = '';
+	
+// Validate all steps
+let isValid = true;
+for (let i = 1; i <= 4; i++) {
+if (!validateStep(i)) {
+isValid = false;
+stepper.to(i);
+break;
+}
+}
+
+if (isValid) {
+try {
+const formData = new FormData(this);
+	
+// Log form data for debugging
+for (let pair of formData.entries()) {
+console.log(pair[0] + ': ' + pair[1]);
+}
+
+const response = await fetch(this.action, {
+method: 'POST',
+body: formData,
+headers: {
+'X-Requested-With': 'XMLHttpRequest'
+}
+});
+
+const result = await response.json();
+	
+if (response.ok) {
+// Show success message
+window.location.href = '{{ path('app_instructor_courses') }}';
+} else {
+// Show error message
+const errorDiv = document.querySelector('#form-errors');
+errorDiv.classList.remove('d-none');
+if (result.errors) {
+result.errors.forEach(error => {
+errorDiv.innerHTML += `<div>${error}</div>`;
+});
+} else {
+errorDiv.innerHTML = 'An error occurred while submitting the form. Please try again.';
+}
+}
+} catch (error) {
+console.error('Error:', error);
+const errorDiv = document.querySelector('#form-errors');
+errorDiv.classList.remove('d-none');
+errorDiv.innerHTML = 'An error occurred while submitting the form. Please try again.';
+}
+}
+});
+
+// Debug form submission
+document.querySelector('form').addEventListener('submit', function(e) {
+console.log('Form submitted');
+const formData = new FormData(this);
+for (let pair of formData.entries()) {
+console.log(pair[0] + ': ' + pair[1]);
+}
+});
 	</script>
 {% endblock %}
 
@@ -568,7 +680,9 @@ btn.addEventListener("click", showEditLessonModal)
 						class="card-body">
 						<!-- Step content START -->
 						<div class="bs-stepper-content">
-							{{ form_start(form) }}
+							{{ form_start(form, {'attr': {'id': 'course-form', 'novalidate': 'novalidate'}}) }}
+							{{ form_errors(form) }}
+							<div class="alert alert-danger d-none" id="form-errors"></div>
 
 							<!-- Step 1 content START -->
 							<div
