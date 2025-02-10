@@ -77,51 +77,30 @@ class CoursController extends AbstractController
         $form->handleRequest( $request );
 
         if ( $form->isSubmitted() && $form->isValid() ) {
-            try {
-                CoursUtils::uploadCourseMedia( $cours, $fileUploader );
-                $cours->setUpdatedAt( new \DateTimeImmutable() );
-                $entityManager->flush();
-                
-                if ($request->isXmlHttpRequest()) {
-                    return $this->json([
-                        'success' => true,
-                        'message' => 'Course updated successfully'
-                    ]);
+            CoursUtils::uploadCourseMedia( $cours, $fileUploader );
+            $cours->setUpdatedAt( new \DateTimeImmutable() );
+
+            $entityManager->flush();
+
+            return $this->redirectToRoute( 'app_instructor_courses', [], Response::HTTP_SEE_OTHER );
+
+        } else {
+            // Dump form errors to the console
+            foreach ($form->getErrors(true, false) as $error) {
+                if ($error instanceof FormError) {
+                    // Collect errors for displaying in the browser console or other logs
+                    $errorMessage = 'Form error: ' . $error->getMessage();
+                    $this->container->get('session')->getFlashBag()->add('error', $errorMessage);
+                    // Using dump to display in the Symfony Profiler or console
+                    dump($errorMessage);
+                    var_dump($errorMessage);
                 }
-                
-                $this->addFlash('success', 'Course updated successfully');
-                return $this->redirectToRoute( 'app_instructor_courses', [], Response::HTTP_SEE_OTHER );
-            } catch (\Exception $e) {
-                if ($request->isXmlHttpRequest()) {
-                    return $this->json([
-                        'success' => false,
-                        'errors' => [$e->getMessage()]
-                    ], Response::HTTP_BAD_REQUEST);
-                }
-                $this->addFlash('error', 'Error uploading file: ' . $e->getMessage());
-            }
-        } elseif ($form->isSubmitted()) {
-            $errors = [];
-            foreach ($form->getErrors(true) as $error) {
-                $errors[] = $error->getMessage();
-            }
-            
-            if ($request->isXmlHttpRequest()) {
-                return $this->json([
-                    'success' => false,
-                    'errors' => $errors
-                ], Response::HTTP_BAD_REQUEST);
-            }
-            
-            foreach ($errors as $error) {
-                $this->addFlash('error', $error);
             }
         }
 
         return $this->render( 'instructor/cours/edit.html.twig', [
             'cours' => $cours,
             'form' => $form,
-            'isEditionMode' => true
         ] );
     }
 

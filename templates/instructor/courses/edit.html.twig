@@ -18,31 +18,9 @@
 	<script src="{{ asset('assets/vendor/stepper/js/bs-stepper.min.js') }}"></script>
 
 	<script>
-		// Initialize Stepper
-		document.addEventListener('DOMContentLoaded', function () {
-			var stepperEl = document.querySelector('#stepper')
-			var stepper = new Stepper(stepperEl, {
-				linear: true,
-				animation: true
-			})
-
-			// Handle next button clicks
-			document.querySelectorAll('.next-btn').forEach(button => {
-				button.addEventListener('click', () => {
-					stepper.next()
-				})
-			})
-
-			// Handle previous button clicks 
-			document.querySelectorAll('.prev-btn').forEach(button => {
-				button.addEventListener('click', () => {
-					stepper.previous()
-				})
-			})
-		})
 
 		$(function (){ {% if isEditionMode %}
-			$('#cours_media_imageFileUpload').attr('required', false);{% endif %}
+$('#cours_media_imageFileUpload').attr('required', false);{% endif %}
 let faq_question = document.getElementById('faq_question');
 let faq_answer = document.getElementById('faq_answer');
 
