@@ -77,24 +77,17 @@ class CoursController extends AbstractController
         $form->handleRequest( $request );
 
         if ( $form->isSubmitted() && $form->isValid() ) {
-            CoursUtils::uploadCourseMedia( $cours, $fileUploader );
-            $cours->setUpdatedAt( new \DateTimeImmutable() );
-
-            $entityManager->flush();
-
-            return $this->redirectToRoute( 'app_instructor_courses', [], Response::HTTP_SEE_OTHER );
-
-        } else {
-            // Dump form errors to the console
-            foreach ($form->getErrors(true, false) as $error) {
-                if ($error instanceof FormError) {
-                    // Collect errors for displaying in the browser console or other logs
-                    $errorMessage = 'Form error: ' . $error->getMessage();
-                    $this->container->get('session')->getFlashBag()->add('error', $errorMessage);
-                    // Using dump to display in the Symfony Profiler or console
-                    dump($errorMessage);
-                    var_dump($errorMessage);
-                }
+            try {
+                CoursUtils::uploadCourseMedia( $cours, $fileUploader );
+                $cours->setUpdatedAt( new \DateTimeImmutable() );
+                $entityManager->flush();
+                
+                $this->addFlash('success', 'Course updated successfully!');
+                return $this->redirectToRoute( 'app_instructor_courses', [], Response::HTTP_SEE_OTHER );
+            } catch (FileException $e) {
+                $this->addFlash('error', $e->getMessage());
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'An error occurred while updating the course.');
             }
         }
 
