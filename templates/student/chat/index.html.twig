@@ -1,134 +1,53 @@
-{% extends 'base.html.twig' %}
+{% extends "student/base.html.twig" %}
+
+{% block pageContent %}
+    {% if needsSetup %}
+        {{ include('student/chat/_setup_modal.html.twig') }}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const setupModal = new bootstrap.Modal(document.getElementById('setupModal'));
+                setupModal.show();
+            });
+        </script>
+    {% else %}
+        <!-- Include the forum grid -->
+        {{ include('student/chat/forum/_grid.html.twig', {
+            forums: forums,
+            categories: categories
+        }) }}
+    {% endif %}
+{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
-    <link href="{{ asset('assets/css/chat.css') }}" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-{% endblock %}
-
-{% block body %}
-<div class="chat-app">
-    <div class="flex h-screen bg-white">
-        {# Left Sidebar - Forum List #}
-        <div class="w-[400px] border-r flex flex-col">
-            {# Search Header #}
-            <div class="p-4 border-b">
-                <div class="relative">
-                    <i class="fas fa-search absolute left-3 top-2.5 h-4 w-4 text-gray-500"></i>
-                    <input type="text" 
-                           placeholder="{% trans %}Rechercher{% endtrans %}" 
-                           class="w-full pl-9 pr-4 py-2 rounded-lg bg-gray-100 border-0 focus:ring-2 focus:ring-primary">
-                </div>
-            </div>
-
-            {# Tabs #}
-            <div class="px-4 pt-4 border-b">
-                <div class="flex space-x-1 rounded-lg bg-gray-100 p-1">
-                    <button class="flex-1 px-3 py-1.5 text-sm font-medium rounded-md bg-white shadow">
-                        {% trans %}Tout{% endtrans %}
-                    </button>
-                    <button class="flex-1 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800">
-                        {% trans %}Non lues{% endtrans %}
-                    </button>
-                    <button class="flex-1 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800">
-                        {% trans %}Favoris{% endtrans %}
-                    </button>
-                    <button class="flex-1 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-800">
-                        {% trans %}Groupes{% endtrans %}
-                    </button>
-                </div>
-            </div>
-
-            {# Forums List #}
-            <div class="flex-1 overflow-y-auto">
-                {% for forum in forums %}
-                    <div class="flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer" 
-                         data-forum-id="{{ forum.id }}">
-                        <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white">
-                            {{ forum.subject|slice(0, 1)|upper }}
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-start">
-                                <p class="font-medium truncate">{{ forum.subject }}</p>
-                                <span class="text-xs text-gray-500">{{ forum.lastActivity|ago }}</span>
-                            </div>
-                            <p class="text-sm text-gray-500 truncate">
-                                {{ forum.teacherName }} • {{ forum.onlineCount }} en ligne
-                            </p>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        {# Main Chat Area #}
-        <div class="flex-1 flex flex-col">
-            {# Initial State - No Forum Selected #}
-            <div class="flex-1 flex items-center justify-center bg-gray-50" id="noForumSelected">
-                <div class="text-center">
-                    <i class="fas fa-comments text-6xl text-gray-300 mb-4"></i>
-                    <h2 class="text-xl font-medium text-gray-600">{% trans %}Sélectionnez un forum pour commencer{% endtrans %}</h2>
-                    <p class="text-gray-500 mt-2">{% trans %}Choisissez un forum dans la liste à gauche{% endtrans %}</p>
-                </div>
-            </div>
-
-            {# Chat Interface - Hidden Initially #}
-            <div class="hidden flex-1 flex flex-col" id="chatInterface">
-                {# Chat Header #}
-                <div class="flex items-center justify-between p-4 border-b bg-white">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
-                            <span class="forum-initial"></span>
-                        </div>
-                        <div>
-                            <h2 class="font-medium forum-title"></h2>
-                            <p class="text-sm text-gray-500 forum-subtitle"></p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button class="p-2 hover:bg-gray-100 rounded-full">
-                            <i class="fas fa-search"></i>
-                        </button>
-                        <button class="p-2 hover:bg-gray-100 rounded-full">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                    </div>
-                </div>
-
-                {# Messages Area #}
-                <div class="flex-1 overflow-y-auto p-4 bg-gray-100" id="messagesContainer">
-                    <div class="space-y-4 messages-list">
-                        {# Messages will be inserted here #}
-                    </div>
-                </div>
-
-                {# Message Input #}
-                <div class="p-4 border-t bg-white">
-                    <div class="flex items-center gap-2">
-                        <button class="p-2 hover:bg-gray-100 rounded-full">
-                            <i class="far fa-smile"></i>
-                        </button>
-                        <button class="p-2 hover:bg-gray-100 rounded-full">
-                            <i class="fas fa-paperclip"></i>
-                        </button>
-                        <input type="text" 
-                               class="flex-1 rounded-full border-0 bg-gray-100 px-4 py-2 focus:ring-2 focus:ring-primary"
-                               placeholder="{% trans %}Entrez un message{% endtrans %}">
-                        <button class="p-2 hover:bg-gray-100 rounded-full">
-                            <i class="fas fa-microphone"></i>
-                        </button>
-                        <button class="p-2 hover:bg-gray-100 rounded-full" id="sendMessage">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <style>
+        /* Additional styles for the chat interface */
+        .page-content {
+            background-color: var(--bs-light);
+            min-height: calc(100vh - 70px); /* Adjust based on your header height */
+            padding: 1.5rem;
+        }
+    </style>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('assets/js/chat/websocket.js') }}"></script>
+    <script>
+        // Initialize WebSocket configuration
+        window.WS_CONFIG = {
+            reconnectAttempts: 5,
+            reconnectDelay: 3000,
+            messageQueueSize: 100
+        };
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
 {% endblock %}
