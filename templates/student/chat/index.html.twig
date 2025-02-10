@@ -11,16 +11,59 @@
         </script>
     {% else %}
         <!-- Include the forum grid -->
-        {{ include('student/chat/forum/_grid.html.twig', {
-            forums: forums,
-            categories: categories
-        }) }}
+        <div class="h-screen flex flex-col">
+            {{ include('student/chat/forum/_grid.html.twig', {
+                forums: forums,
+                categories: categories
+            }) }}
+        </div>
     {% endif %}
 {% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
+    <!-- Add Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #00a884;
+            --primary-foreground: #ffffff;
+            --secondary: #f0f2f5;
+            --secondary-foreground: #111b21;
+            --muted: #667781;
+            --muted-foreground: #8696a0;
+            --background: #ffffff;
+            --foreground: #111b21;
+            --border: #e9edef;
+            --radius: 0.5rem;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+        }
+
+        .bg-primary {
+            background-color: var(--primary) !important;
+        }
+
+        .text-primary {
+            color: var(--primary) !important;
+        }
+
+        .bg-secondary {
+            background-color: var(--secondary) !important;
+        }
+
+        .text-muted {
+            color: var(--muted) !important;
+        }
+
+        .border-color {
+            border-color: var(--border) !important;
+        }
+
         /* Additional styles for the chat interface */
         .page-content {
             background-color: var(--bs-light);

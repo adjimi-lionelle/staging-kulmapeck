@@ -1,93 +1,71 @@
 <!-- Forum Grid START -->
-<div class="forum-grid">
-    <!-- Search and filter bar -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="search-bar flex-grow-1 me-3">
-            <div class="input-group">
-                <span class="input-group-text bg-light border-0">
-                    <i class="fas fa-search"></i>
-                </span>
-                <input type="text" class="form-control border-0 bg-light" id="forumSearch" 
-                       placeholder="{% trans %}SEARCH_FORUMS_KEY{% endtrans %}">
+<div class="flex h-screen bg-white">
+    <!-- Left Sidebar -->
+    <div class="w-[400px] border-r flex flex-col">
+        <!-- Search Bar -->
+        <div class="p-4 border-b">
+            <div class="relative">
+                <i class="fas fa-search absolute left-3 top-2.5 h-4 w-4 text-gray-500"></i>
+                <input type="text" 
+                       id="forumSearch" 
+                       placeholder="{% trans %}SEARCH_FORUMS_KEY{% endtrans %}" 
+                       class="w-full pl-9 pr-4 py-2 rounded-lg bg-gray-100">
             </div>
         </div>
-        <div class="filter-buttons d-flex gap-2">
-            <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown">
-                    <i class="fas fa-filter me-2"></i>{% trans %}FILTER_KEY{% endtrans %}
+
+        <!-- Forum Tabs -->
+        <div class="px-4 pt-4 border-b">
+            <div class="flex space-x-1 mb-4">
+                <button class="flex-1 px-3 py-2 text-sm font-medium rounded-lg bg-primary text-white" data-tab="all">
+                    {% trans %}ALL_KEY{% endtrans %}
                 </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" data-filter="all">{% trans %}ALL_KEY{% endtrans %}</a></li>
-                    <li><a class="dropdown-item" href="#" data-filter="active">{% trans %}ACTIVE_KEY{% endtrans %}</a></li>
-                    <li><a class="dropdown-item" href="#" data-filter="unread">{% trans %}UNREAD_KEY{% endtrans %}</a></li>
-                </ul>
-            </div>
-            <div class="dropdown">
-                <button class="btn btn-light dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
-                    <i class="fas fa-sort me-2"></i>{% trans %}SORT_KEY{% endtrans %}
+                <button class="flex-1 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg" data-tab="active">
+                    {% trans %}ACTIVE_KEY{% endtrans %}
                 </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" data-sort="recent">{% trans %}MOST_RECENT_KEY{% endtrans %}</a></li>
-                    <li><a class="dropdown-item" href="#" data-sort="active">{% trans %}MOST_ACTIVE_KEY{% endtrans %}</a></li>
-                </ul>
+                <button class="flex-1 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg" data-tab="unread">
+                    {% trans %}UNREAD_KEY{% endtrans %}
+                </button>
             </div>
+        </div>
+
+        <!-- Forums List -->
+        <div class="flex-1 overflow-y-auto" id="forumsGrid">
+            {% for forum in forums %}
+                <div class="flex items-center gap-3 p-4 hover:bg-gray-100 cursor-pointer forum-card" data-forum-id="{{ forum.id }}">
+                    <div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white">
+                        <span class="text-lg font-semibold">{{ forum.subject|slice(0, 1)|upper }}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-start">
+                            <p class="font-medium truncate">{{ forum.subject }}</p>
+                            <span class="text-xs text-gray-500">{{ forum.lastActivity|ago }}</span>
+                        </div>
+                        <p class="text-sm text-gray-500 truncate">
+                            {{ forum.teacherName }} • {{ forum.onlineCount }} {% trans %}ONLINE_KEY{% endtrans %}
+                        </p>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     </div>
 
-    <!-- Forums grid -->
-    <div class="row g-4" id="forumsGrid">
-        {% for forum in forums %}
-            <div class="col-md-6 col-lg-4 forum-card" 
-                 data-forum-id="{{ forum.id }}"
-                 data-subject="{{ forum.subject|lower }}"
-                 data-activity="{{ forum.lastActivity|date('U') }}">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="card-title mb-0">{{ forum.subject }}</h5>
-                            {% if forum.unreadCount > 0 %}
-                                <span class="badge bg-danger rounded-pill">{{ forum.unreadCount }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="teacher-info d-flex align-items-center mb-3">
-                            <div class="avatar avatar-xs me-2">
-                                <img src="{{ forum.teacherAvatar }}" class="avatar-img rounded-circle" alt="">
-                                <span class="position-absolute bottom-0 end-0 small">
-                                    <span class="badge bg-success rounded-circle" data-bs-toggle="tooltip" 
-                                          title="{% trans %}TEACHER_ONLINE_KEY{% endtrans %}">
-                                        <span class="visually-hidden">{% trans %}ONLINE_KEY{% endtrans %}</span>
-                                    </span>
-                                </span>
-                            </div>
-                            <div class="small">{{ forum.teacherName }}</div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center small text-muted">
-                            <div>
-                                <i class="fas fa-users me-1"></i>
-                                <span>{{ forum.onlineCount }} {% trans %}ONLINE_KEY{% endtrans %}</span>
-                            </div>
-                            <div>
-                                <i class="far fa-clock me-1"></i>
-                                <span>{{ forum.lastActivity|ago }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
+    <!-- Main Chat Area -->
+    <div class="flex-1 flex flex-col" id="chatContainer" style="display: none;">
+        {{ include('student/chat/forum/_chat.html.twig', {
+            forum: null,
+            messages: [],
+            onlineTeachers: [],
+            onlineStudents: []
+        }) }}
     </div>
 </div>
 
-<!-- Chat Interface -->
-{{ include('student/chat/forum/_chat.html.twig', {
-    forum: null,
-    messages: [],
-    onlineTeachers: [],
-    onlineStudents: []
-}) }}
-
 <!-- Add necessary styles -->
 <style>
+.forum-card.active {
+    background-color: #f0f2f5;
+}
+
 .forum-card .card {
     transition: transform 0.2s;
     cursor: pointer;
@@ -121,8 +99,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const forumsGrid = document.getElementById('forumsGrid');
-    const chatInterface = document.getElementById('chatInterface');
-    const backToForums = document.getElementById('backToForums');
+    const chatContainer = document.getElementById('chatContainer');
     const forumSearch = document.getElementById('forumSearch');
     let currentForumId = null;
     let websocket = null;
@@ -157,15 +134,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Hide grid, show chat
         document.querySelector('.forum-grid').style.display = 'none';
-        chatInterface.style.display = 'block';
+        chatContainer.style.display = 'block';
 
         // Load forum messages
         loadForumMessages(forumId);
     });
 
     // Back button handler
-    backToForums.addEventListener('click', function() {
-        chatInterface.style.display = 'none';
+    document.querySelector('.back-to-forums').addEventListener('click', function() {
+        chatContainer.style.display = 'none';
         document.querySelector('.forum-grid').style.display = 'block';
         currentForumId = null;
     });
@@ -174,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
     forumSearch.addEventListener('input', function(e) {
         const searchTerm = e.target.value.toLowerCase();
         document.querySelectorAll('.forum-card').forEach(card => {
-            const subject = card.dataset.subject;
+            const subject = card.querySelector('p.font-medium').textContent.toLowerCase();
             card.style.display = subject.includes(searchTerm) ? '' : 'none';
         });
     });

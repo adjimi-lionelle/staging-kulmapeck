@@ -3,74 +3,67 @@
     <div class="row g-0">
         <!-- Main chat area -->
         <div class="col-lg-9 chat-main border-end">
-            <!-- Chat header -->
-            <div class="chat-header border-bottom p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <button class="btn btn-light btn-sm me-2 d-lg-none" id="toggleUserList">
-                            <i class="fas fa-users"></i>
-                        </button>
+            <!-- Chat Header -->
+            <div class="flex items-center justify-between p-4 border-b">
+                <div class="flex items-center gap-3">
+                    <button class="back-to-forums text-gray-500 hover:text-gray-700" id="backToForums">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
                         {% if forum %}
-                        <div class="d-flex align-items-center">
-                            <div class="avatar avatar-sm me-2">
-                                <img src="{{ forum.teacherAvatar }}" class="avatar-img rounded-circle" alt="">
-                                <span class="position-absolute bottom-0 end-0 small">
-                                    <span class="badge bg-success rounded-circle">
-                                        <span class="visually-hidden">{% trans %}ONLINE_KEY{% endtrans %}</span>
-                                    </span>
-                                </span>
-                            </div>
-                            <div>
-                                <h6 class="mb-0">{{ forum.subject }}</h6>
-                                <small class="text-muted">{{ forum.teacherName }}</small>
-                            </div>
-                        </div>
+                            <span class="text-lg font-semibold">{{ forum.subject|slice(0, 1)|upper }}</span>
                         {% endif %}
                     </div>
                     <div>
-                        <button class="btn btn-light btn-sm" id="backToForums">
-                            <i class="fas fa-times"></i>
-                        </button>
+                        <h2 class="font-medium">{{ forum ? forum.subject : '' }}</h2>
+                        <p class="text-sm text-gray-500">{{ forum ? forum.onlineCount ~ ' ' ~ 'en ligne'|trans : '' }}</p>
                     </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 hover:bg-gray-100 rounded-full" id="emojiButton" data-bs-toggle="tooltip" title="{% trans %}ADD_EMOJI_KEY{% endtrans %}">
+                        <i class="fas fa-search text-gray-500"></i>
+                    </button>
+                    <button class="p-2 hover:bg-gray-100 rounded-full">
+                        <i class="fas fa-ellipsis-v text-gray-500"></i>
+                    </button>
                 </div>
             </div>
 
             <!-- Connection Status -->
-            <div class="connection-status alert alert-warning d-none" role="alert">
+            <div class="connection-status bg-yellow-100 text-yellow-800 px-4 py-2 text-sm d-none" role="alert">
                 {% trans %}Connecting to chat server...{% endtrans %}
             </div>
 
-            <!-- Messages container -->
-            <div class="chat-messages-container p-3" id="messagesContainer">
-                <div class="chat-messages">
+            <!-- Messages Area -->
+            <div class="flex-1 overflow-y-auto p-4 bg-gray-50" id="messagesContainer">
+                <div class="chat-messages space-y-4">
                     {{ include('student/chat/forum/_messages.html.twig', { 
                         messages: messages|default([]),
                         forum: forum
                     }) }}
                 </div>
                 <!-- Typing Indicator -->
-                <div class="typing-indicator text-muted small d-none mt-2">
+                <div class="typing-indicator text-gray-500 text-sm mt-2 d-none">
                     <i class="fas fa-keyboard me-1"></i>
                     <span>{% trans %}SOMEONE_IS_TYPING_KEY{% endtrans %}</span>
                 </div>
             </div>
 
-            <!-- Input area -->
-            <div class="chat-input border-top p-3">
-                <form id="messageForm" class="message-form">
-                    <div class="input-group">
-                        <button type="button" class="btn btn-light" id="emojiButton" data-bs-toggle="tooltip" title="{% trans %}ADD_EMOJI_KEY{% endtrans %}">
-                            <i class="far fa-smile"></i>
-                        </button>
-                        <textarea class="form-control" id="messageInput" rows="1" 
-                                placeholder="{% trans %}TYPE_YOUR_MESSAGE_KEY{% endtrans %}"
-                                maxlength="500"
-                                data-emojiable="true"></textarea>
-                        <div class="char-counter" id="charCounter">500</div>
-                        <button type="submit" class="btn btn-primary" id="sendButton">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
+            <!-- Message Input -->
+            <div class="p-4 border-t bg-white">
+                <form class="chat-input-form flex items-center gap-2" id="messageForm">
+                    <button type="button" class="p-2 hover:bg-gray-100 rounded-full" id="emojiButton" data-bs-toggle="tooltip" title="{% trans %}ADD_EMOJI_KEY{% endtrans %}">
+                        <i class="far fa-smile text-gray-500"></i>
+                    </button>
+                    <textarea class="flex-1 px-4 py-2 rounded-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50" 
+                              id="messageInput" rows="1" 
+                              placeholder="{% trans %}TYPE_YOUR_MESSAGE_KEY{% endtrans %}"
+                              maxlength="500"
+                              data-emojiable="true"></textarea>
+                    <div class="char-counter" id="charCounter">500</div>
+                    <button type="submit" class="p-2 hover:bg-gray-100 rounded-full" id="sendButton">
+                        <i class="fas fa-paper-plane text-primary"></i>
+                    </button>
                 </form>
             </div>
         </div>
@@ -205,5 +198,36 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    max-width: 75%;
+    margin-bottom: 1rem;
+}
+
+.message-bubble {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    position: relative;
+}
+
+.message-out .message-bubble {
+    background-color: #dcf8c6;
+}
+
+.message-in .message-bubble {
+    background-color: white;
+}
+
+.typing-indicator {
+    padding: 0.5rem;
+    border-radius: 1rem;
+    background-color: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 </style>
