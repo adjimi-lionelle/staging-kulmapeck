@@ -153,6 +153,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Contact::class)]
     private Collection $contacts;
 
+    #[ORM\OneToMany(mappedBy: 'sender', targetEntity: MessageChat::class, orphanRemoval: true)]
+    private Collection $messageChats;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: WebSocketConnection::class, orphanRemoval: true)]
+    private Collection $webSocketConnections;
+
     public function __construct()
     {
         $this->notifications = new ArrayCollection();
@@ -168,6 +174,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->isAdmin = false;
         $this->devices = new ArrayCollection();
         $this->contacts = new ArrayCollection();
+        $this->messageChats = new ArrayCollection();
+        $this->webSocketConnections = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -627,6 +635,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->getPersonne()->getNomComplet();
         // Or any other property that represents the user as a string
+    }
+
+    /**
+     * @return Collection<int, MessageChat>
+     */
+    public function getMessageChats(): Collection
+    {
+        return $this->messageChats;
+    }
+
+    public function addMessageChat(MessageChat $messageChat): static
+    {
+        if (!$this->messageChats->contains($messageChat)) {
+            $this->messageChats->add($messageChat);
+            $messageChat->setSender($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessageChat(MessageChat $messageChat): static
+    {
+        if ($this->messageChats->removeElement($messageChat)) {
+            // set the owning side to null (unless already changed)
+            if ($messageChat->getSender() === $this) {
+                $messageChat->setSender(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, WebSocketConnection>
+     */
+    public function getWebSocketConnections(): Collection
+    {
+        return $this->webSocketConnections;
+    }
+
+    public function addWebSocketConnection(WebSocketConnection $webSocketConnection): static
+    {
+        if (!$this->webSocketConnections->contains($webSocketConnection)) {
+            $this->webSocketConnections->add($webSocketConnection);
+            $webSocketConnection->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWebSocketConnection(WebSocketConnection $webSocketConnection): static
+    {
+        if ($this->webSocketConnections->removeElement($webSocketConnection)) {
+            // set the owning side to null (unless already changed)
+            if ($webSocketConnection->getUser() === $this) {
+                $webSocketConnection->setUser(null);
+            }
+        }
+
+        return $this;
     }
 
 }

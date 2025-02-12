@@ -82,6 +82,12 @@ class Categorie
     #[ORM\OneToMany(mappedBy: 'matiere', targetEntity: Evaluation::class, orphanRemoval: true)]
     private Collection $evaluations;
 
+    #[ORM\OneToMany(mappedBy: 'matiere', targetEntity: MatiereCycle::class, orphanRemoval: true)]
+    private Collection $matiereCycles;
+
+    #[ORM\OneToMany(mappedBy: 'matiere', targetEntity: GroupChat::class, orphanRemoval: true)]
+    private Collection $groupChats;
+
     public function __construct()
     {
         $this->cours = new ArrayCollection();
@@ -90,6 +96,8 @@ class Categorie
         $this->exams = new ArrayCollection();
         $this->isSubCategory = false;
         $this->evaluations = new ArrayCollection();
+        $this->matiereCycles = new ArrayCollection();
+        $this->groupChats = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -301,6 +309,66 @@ class Categorie
             // set the owning side to null (unless already changed)
             if ($evaluation->getMatiere() === $this) {
                 $evaluation->setMatiere(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MatiereCycle>
+     */
+    public function getMatiereCycles(): Collection
+    {
+        return $this->matiereCycles;
+    }
+
+    public function addMatiereCycle(MatiereCycle $matiereCycle): static
+    {
+        if (!$this->matiereCycles->contains($matiereCycle)) {
+            $this->matiereCycles->add($matiereCycle);
+            $matiereCycle->setMatiere($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMatiereCycle(MatiereCycle $matiereCycle): static
+    {
+        if ($this->matiereCycles->removeElement($matiereCycle)) {
+            // set the owning side to null (unless already changed)
+            if ($matiereCycle->getMatiere() === $this) {
+                $matiereCycle->setMatiere(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GroupChat>
+     */
+    public function getGroupChats(): Collection
+    {
+        return $this->groupChats;
+    }
+
+    public function addGroupChat(GroupChat $groupChat): static
+    {
+        if (!$this->groupChats->contains($groupChat)) {
+            $this->groupChats->add($groupChat);
+            $groupChat->setMatiere($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupChat(GroupChat $groupChat): static
+    {
+        if ($this->groupChats->removeElement($groupChat)) {
+            // set the owning side to null (unless already changed)
+            if ($groupChat->getMatiere() === $this) {
+                $groupChat->setMatiere(null);
             }
         }
 

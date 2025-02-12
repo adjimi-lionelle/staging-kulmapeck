@@ -1,0 +1,133 @@
+.chat-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center; /* Centrer le contenu */
+    padding: 0;
+    overflow: hidden;
+    background-color: #ede7dc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ajoute l'ombre autour */
+border-radius: 10px; /* Ajoute des bords arrondis pour un effet plus esthétique */
+}
+
+.chat-wrapper {
+    width: 1200px; /* Ajuste la largeur maximale du chat */
+    display: flex;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
+.chat-sidebar {
+    width: 30%; /* Ajuste la largeur de la barre latérale */
+    background: #f8f9fa;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.chat-sidebar-header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.search-bar {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.chat-group-list {
+    margin-top: 10px;
+}
+
+.chat-group {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border-bottom: 1px solid #ddd; 
+}
+
+.chat-group:hover, .chat-group.active {
+    background: #e9ecef;
+}
+
+.chat-group-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.chat-group-info h6 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.unread-badge {
+    background: red;
+    color: white;
+    padding: 3px 7px;
+    border-radius: 50%;
+    font-size: 12px;
+    margin-left: auto;
+}
+
+.chat-main {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.chat-main-header {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.welcome-message {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 18px;
+    color: #777;
+}
+
+.chat-input-area {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    background-color: #f8f9fa;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-right: 10px;
+}
+
+.chat-send {
+    width: 50px;
+    height: 40px;
+    border-radius: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+
+#chat-input-area.d-none {
+    display: none !important;
+}
+
+
