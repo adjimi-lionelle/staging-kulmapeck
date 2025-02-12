@@ -25,15 +25,21 @@ class ChatController extends AbstractController
     }  
 
 
-    #[IsGranted('ROLE_USER')]
+    
     #[Route('/chat', name: 'app_chat')]
+    #[IsGranted('ROLE_USER')]
     public function index(): Response
     {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
+        }
         return $this->render('front/chat/index.html.twig');
     }
 
 
-    #[Route('/chat1', name: 'app_chat')]
+    #[Route('/chat1', name: 'app_chat1')]
     public function chat(): Response
     {
         return $this->render('front/chat/chat.html.twig');
@@ -45,7 +51,6 @@ class ChatController extends AbstractController
      public function generateWebSocketToken(): JsonResponse
      {
         $user = $this->getUser();
-        echo $user->getId(); 
  
          if (!$user) {
              return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);

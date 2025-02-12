@@ -26,56 +26,6 @@ class ChatServer implements MessageComponentInterface
         $this->jwtSecret = $jwtSecret;
     }
 
-   /*public function onOpen(ConnectionInterface $conn)
-    {
-        $query = $conn->httpRequest->getUri()->getQuery();
-        parse_str($query, $queryParams);
-    
-        if (!isset($queryParams['token'])) {
-            echo "Aucun token fourni !\n";
-            $conn->close();
-            return;
-        }
-    
-        try {
-            $decoded = JWT::decode($queryParams['token'], new Key($this->jwtSecret, 'HS256'));
-            echo "Token décodé avec succès : " . print_r($decoded, true) . "\n";
-    
-            $user = $this->entityManager->getRepository(User::class)->find($decoded->user_id);
-            if (!$user) {
-                echo "Utilisateur introuvable !\n";
-                $conn->close();
-                return;
-            }
-    
-           // echo "Connexion WebSocket acceptée pour l'utilisateur : " . $user->getId() . "\n";
-            $groupChat = $this->entityManager->getRepository(GroupChat::class)->find($queryParams['group_id']);
-
-        if (!$user || !$groupChat) {
-            echo "Connexion WebSocket refusée : utilisateur ou groupe introuvable\n";
-            $conn->close();
-            return;
-        }
-
-        echo "Nouvelle connexion WebSocket : Utilisateur " . $user->getId() . " connecté au groupe " . $groupChat->getId() . "\n";
-
-        // Ajout de l'utilisateur et du groupe dans la liste des connexions actives
-        $this->clients->attach($conn, ['user' => $user, 'groupChat' => $groupChat]);
-
-        // Enregistrement en base de données
-        $wsConnection = new WebSocketConnection();
-        $wsConnection->setUser($user);
-        $wsConnection->setGroupChat($groupChat);
-        $wsConnection->setIsTyping(false);
-        $wsConnection->setLastActivity(new \DateTime());
-        $this->entityManager->persist($wsConnection);
-        $this->entityManager->flush();
-    
-        } catch (\Exception $e) {
-            echo "Erreur de décodage du token : " . $e->getMessage() . "\n";
-            $conn->close();
-        }
-    }*/
 
     public function onOpen(ConnectionInterface $conn)
 {
@@ -111,7 +61,7 @@ class ChatServer implements MessageComponentInterface
 
         echo "Nouvelle connexion WebSocket : Utilisateur " . $user->getId() . " connecté au groupe " . $groupChat->getId() . "\n";
 
-        // **✅ Récupérer l'historique des messages**
+        // **Récupérer l'historique des messages**
         $messages = $this->entityManager->getRepository(MessageChat::class)
             ->findBy(['groupChat' => $groupChat], ['createAt' => 'ASC']);
 
@@ -125,16 +75,16 @@ class ChatServer implements MessageComponentInterface
             ];
         }
 
-        // **✅ Envoyer l'historique des messages au nouvel utilisateur**
+        // **Envoyer l'historique des messages au nouvel utilisateur**
         $conn->send(json_encode([
             'type' => 'history',
             'messages' => $history
         ]));
 
-        // **✅ Attacher l'utilisateur et le groupe au WebSocket**
+        // **Attacher l'utilisateur et le groupe au WebSocket**
         $this->clients->attach($conn, ['user' => $user, 'groupChat' => $groupChat]);
 
-        // **✅ Enregistrement en base de données de la connexion**
+        // ** Enregistrement en base de données de la connexion**
         $wsConnection = new WebSocketConnection();
         $wsConnection->setUser($user);
         $wsConnection->setGroupChat($groupChat);
@@ -148,71 +98,6 @@ class ChatServer implements MessageComponentInterface
         $conn->close();
     }
 }
-
-    
-
-    /*public function onOpen(ConnectionInterface $conn)
-    {
-        $query = $conn->httpRequest->getUri()->getQuery();
-        parse_str($query, $queryParams);
-
-        if (!isset($queryParams['token'])) {
-            $conn->close();
-            return;
-        }
-
-        try {
-            $decoded = JWT::decode($queryParams['token'], $this->jwtSecret, ['HS256']);
-            $user = $this->entityManager->getRepository(User::class)->find($decoded->user_id);
-            $groupChat = $this->entityManager->getRepository(GroupChat::class)->find($queryParams['group_id']);
-
-            if (!$user || !$groupChat) {
-                $conn->close();
-                return;
-            }
-
-            $wsConnection = new WebSocketConnection();
-            $wsConnection->setUser($user);
-            $wsConnection->setGroupChat($groupChat);
-            $this->entityManager->persist($wsConnection);
-            $this->entityManager->flush();
-
-            $this->clients->attach($conn, ['user' => $user, 'groupChat' => $groupChat]);
-
-        } catch (\Exception $e) {
-            $conn->close();
-        }
-    }
-        
-    */
-
-    
-
-   /* public function onMessage(ConnectionInterface $from, $msg)
-    {
-        $data = json_decode($msg, true);
-        $groupChat = $this->entityManager->getRepository(GroupChat::class)->find($data['group_id']);
-
-        if (!$groupChat) {
-            return;
-        }
-
-        $message = new MessageChat();
-        $message->setSender($this->clients[$from]['user']);
-        $message->setGroupChat($groupChat);
-        $message->setContent($data['message']);
-        $this->entityManager->persist($message);
-        $this->entityManager->flush();
-
-        foreach ($this->clients as $client) {
-            if ($client !== $from && $this->clients[$client]['groupChat'] === $groupChat) {
-                $client->send(json_encode([
-                    'message' => $data['message'],
-                    'author' => $this->clients[$from]['user']->getEmail()
-                ]));
-            }
-        }
-    }*/
 
     public function onMessage(ConnectionInterface $from, $msg)
 {
@@ -244,12 +129,12 @@ class ChatServer implements MessageComponentInterface
 
         // Diffuser le message aux autres clients du même groupe
         foreach ($this->clients as $client) {
-            if ($client !== $from && $this->clients[$client]['groupChat'] === $groupChat) {
+            if ($this->clients[$client]['groupChat'] === $groupChat) {
                 $client->send(json_encode([
                     'message' => $data['message'],
                     'author' => $this->clients[$from]['user']->getEmail()
                 ]));
-            }
+            }    
         }
 
     } catch (\Exception $e) {
