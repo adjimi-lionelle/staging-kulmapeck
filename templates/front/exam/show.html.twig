@@ -52,7 +52,7 @@
                         </div>
                     </div>
                     <!-- Title and Info END -->
-                    
+
                     <!-- Video START -->
                     <div class="row mt-4">
                         <div class="col-xl-10 mx-auto">
@@ -61,40 +61,31 @@
                                 <!-- Card Image overlay -->
                                 <div class="bg-overlay bg-dark opacity-4"></div>
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
-                                    <div class="w-100 my-auto">
-                                        <div class="row justify-content-center">
-                                            <div id="exam-iframe-container" class="w-100"></div>
-                                            <script>
-                                                document.addEventListener('DOMContentLoaded', function() {
-                                                    var container = document.getElementById('exam-iframe-container');
-                                                    var iframe = document.createElement('iframe');
-                                                    iframe.height = "800px";
-                                                    iframe.frameBorder = "0";
-                                                    iframe.sandbox = "allow-same-origin allow-scripts allow-popups allow-forms";
-                                                    iframe.setAttribute("oncontextmenu", "return false;");
-                                                    var baseUrl = "{{ asset('uploads/media/exams/files/') }}";
-                                                    var filePath = "{{ data }}";
-                                                    iframe.src = baseUrl + filePath + "#toolbar=0";
-                                                    container.appendChild(iframe);
-                                                });
-                                            </script>
-                                        </div>
-                                    </div>
+                                     {% if data ends with '.pdf' %}
+            <!-- Afficher le PDF dans un iframe -->
+            <div class="card overflow-hidden h-700px rounded-3 text-center">
+                <iframe src="{{ path('app_front_exam_view', {'reference': exam.reference, 'type': display}) }}#toolbar=0&navpanes=0&scrollbar=0" 
+                        style="width: 100%; height: 800px; border: none;"
+                        sandbox="allow-same-origin allow-scripts"
+                        oncontextmenu="return false;">
+                </iframe>
+            </div>
+            {% endif %}
                                 </div>
                             </div>
                             <!-- Card item END -->
                         </div>
                     </div>
                     <!-- Video END -->
-                    
+
                 </div>
             </div> <!-- Row END -->
         </div>
     </section>
     <!-- Main Content END -->
-    
+
     {{ include('front/includes/_newsletterorange.html.twig') }}
-    
+
     {% if courses is defined and courses is not empty %}
         <!-- Related blog START -->
         <section class="pt-0">

@@ -32,10 +32,14 @@ class ChatMessage
     #[ORM\JoinColumn(nullable: false)]
     private ?Categorie $subject = null;
 
+    #[ORM\Column]
+    private bool $isRead = false;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->isFromAI = false;
+        $this->isRead = false;
     }
 
     public function getId(): ?int
@@ -96,6 +100,17 @@ class ChatMessage
     public function setSubject(?Categorie $subject): self
     {
         $this->subject = $subject;
+        return $this;
+    }
+
+    public function isRead(): bool
+    {
+        return $this->isRead;
+    }
+
+    public function setIsRead(bool $isRead): self
+    {
+        $this->isRead = $isRead;
         return $this;
     }
 }

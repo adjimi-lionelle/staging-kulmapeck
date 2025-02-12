@@ -465,4 +465,9 @@ class Eleve
 
         return $this;
     }
+
+    public function getSkillLevel(): ?SkillLevel
+    {
+        return $this->classe ? $this->classe->getSkillLevel() : null;
+    }
 }

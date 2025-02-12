@@ -4,13 +4,16 @@ namespace App\Controller\Student;
 
 use App\Entity\Categorie;
 use App\Entity\ChatMessage;
+use App\Entity\Classe;
 use App\Entity\Eleve;
+use App\Entity\SkillLevel;
 use App\Repository\CategorieRepository;
 use App\Repository\ChatMessageRepository;
 use App\Repository\ClasseRepository;
 use App\Repository\EleveRepository;
+use App\Repository\SkillLevelRepository;
 use App\Repository\SpecialiteRepository;
-use App\Service\AIService;
+use App\Service\MockChatDataProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,9 +33,10 @@ class ChatController extends AbstractController
         private ChatMessageRepository $chatMessageRepository,
         private CategorieRepository $categorieRepository,
         private ClasseRepository $classeRepository,
-        private SpecialiteRepository $specialiteRepository,
         private EleveRepository $eleveRepository,
-        private AIService $aiService
+        private SkillLevelRepository $skillLevelRepository,
+        private SpecialiteRepository $specialiteRepository,
+        private MockChatDataProvider $mockDataProvider
     ) {}
 
     #[Route('', name: 'app_student_chat')]
@@ -48,8 +52,8 @@ class ChatController extends AbstractController
             throw $this->createAccessDeniedException('Student account not found.');
         }
 
-        // Check if student has class and specialization set
-        if (!$student->getClasse() || !$student->getSpecialite()) {
+        // Check if student has class set
+        if (!$student->getClasse()) {
             return $this->render('student/chat/index.html.twig', [
                 'needsSetup' => true,
                 'classes' => $this->classeRepository->findAll(),
@@ -58,24 +62,23 @@ class ChatController extends AbstractController
             ]);
         }
 
-        // Get student's subjects based on class and specialization
-        $subjects = $this->categorieRepository->findByClasseAndSpecialite(
-            $student->getClasse(),
-            $student->getSpecialite()
-        );
+        // Get student's skill level from class
+        $skillLevel = $student->getClasse()->getSkillLevel();
 
-        // Add unread count for each subject
-        foreach ($subjects as $subject) {
-            $unreadCount = $this->chatMessageRepository->getUnreadCount($student, $subject);
-            $subject->unreadCount = $unreadCount;
+        if (!$skillLevel) {
+            return $this->render('student/chat/index.html.twig', [
+                'needsSetup' => true,
+                'classes' => $this->classeRepository->findAll(),
+                'specialites' => $this->specialiteRepository->findAll(),
+                'student' => $student,
+            ]);
         }
 
+        // Use mock data for testing the frontend
         return $this->render('student/chat/index.html.twig', [
             'needsSetup' => false,
-            'subjects' => $subjects,
-            'messages' => [],
-            'dailyCount' => $this->chatMessageRepository->getDailyMessageCount($student),
-            'maxMessages' => self::MAX_DAILY_MESSAGES,
+            'forums' => $this->mockDataProvider->getMockForums(),
+            'categories' => $this->mockDataProvider->getMockCategories(),
             'student' => $student,
         ]);
     }
@@ -97,11 +100,14 @@ class ChatController extends AbstractController
         $specialite = $this->specialiteRepository->find($data['specialite']);
 
         if (!$classe || !$specialite) {
-            return new JsonResponse(['success' => false], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['success' => false, 'message' => 'Invalid class or specialization'], Response::HTTP_BAD_REQUEST);
         }
 
         $student->setClasse($classe);
-        $student->setSpecialite($specialite);
+        $classe->setSpecialite($specialite);
+        
+        $this->entityManager->persist($student);
+        $this->entityManager->persist($classe);
         $this->entityManager->flush();
 
         return new JsonResponse(['success' => true]);
