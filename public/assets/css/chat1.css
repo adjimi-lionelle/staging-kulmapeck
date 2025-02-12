@@ -1,0 +1,44 @@
+.chat-container {
+    height: 85vh; /* Ajustez la hauteur pour qu'elle ne prenne pas tout l'écran */
+    display: flex;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ajoute l'ombre autour */
+    border-radius: 10px; /* Ajoute des bords arrondis pour un effet plus esthétique */
+    background: white; /* Assurez-vous que l'arrière-plan est blanc */
+    margin: 20px auto; /* Centre la boîte horizontalement */
+    max-width: 90%; /* Évite que la boîte prenne toute la largeur */
+    }
+    
+    .chat-sidebar {
+    background: #f8f9fa;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+    
+    height: 100%;
+    overflow-y: auto;
+    }
+    
+    .chat-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: rgb(236, 158, 138);
+    }
+    
+    .chat-main-header {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    }
+    
+    .chat-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    }
+    
+    .chat-input-area {
+    display: none; /* Caché par défaut */
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    }

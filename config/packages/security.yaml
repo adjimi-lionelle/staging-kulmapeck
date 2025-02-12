@@ -69,7 +69,7 @@ security:
         - { path: ^/course/, roles: IS_AUTHENTICATED_FULLY}
         - { path: ^/payment/, roles: IS_AUTHENTICATED_FULLY}
         - { path: ^/firebase/, roles: IS_AUTHENTICATED_FULLY}
-       # - { path: ^/api/chat, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/chat, roles: IS_AUTHENTICATED_FULLY }
         #- { path: ^/api/login_check, roles: PUBLIC_ACCESS }
         - { path: ^/websocket/token, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/chat/groupchat/init, roles: PUBLIC_ACCESS }

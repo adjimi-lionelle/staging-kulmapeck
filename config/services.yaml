@@ -54,8 +54,8 @@ services:
         tags:
             - { name: twig.extension }
 
-    # Custom Twig extensions
-    App\Twig\TimeExtension:
+     # Custom Twig extensions
+    App\TwigTimeExtension:
         tags: ['twig.extension']
 
     # Mock service for frontend testing

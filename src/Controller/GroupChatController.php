@@ -66,7 +66,7 @@ class GroupChatController extends AbstractController
                                 MessageChatRepository $messageChatRepository): JsonResponse
     {
         $user = $this->getUser();
-        echo $user->getId(); exit;
+        //echo $user->getId();
 
         if (!$user) {
             return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
