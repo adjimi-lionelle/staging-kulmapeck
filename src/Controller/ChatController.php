@@ -32,6 +32,13 @@ class ChatController extends AbstractController
         return $this->render('front/chat/index.html.twig');
     }
 
+
+    #[Route('/chat1', name: 'app_chat')]
+    public function chat(): Response
+    {
+        return $this->render('front/chat/chat.html.twig');
+    }
+
      /* Création d'un token temporaire */
      #[Route('/websocket/token', name: 'api_websocket_token', methods: ['GET'])]
      #[IsGranted('ROLE_USER')]
