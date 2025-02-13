@@ -52,7 +52,6 @@ CREATE_ACCOUNT_KEY: 'Créer un compte'
 ACCOUNT_CREATED_SUCCESS_KEY: 'Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.'
 LOGIN_CREDENTIALS_KEY: Entrez email, nom d'utilisateur ou numéro de téléphone
 PASSWORD_KEY: 'Mot de passe'
-LOGIN_KEY: 'Se connecter'
 WELCOME_LOGIN_KEY: Bienvenue dans notre communauté d'apprentissage
 WELCOME_LARGEST_COMMUNITY_KEY: Bienvenue dans notre plus grande communauté
 LOGIN_DESCRIPTION_KEY: Rejoignez notre communauté dynamique d'apprenants et profitez d'une expérience d'apprentissage enrichissante et personnalisée.
@@ -110,6 +109,9 @@ START_CHAT_KEY: 'Démarrer la discussion'
 BACK_TO_SUBJECTS_KEY: 'Retour aux matières'
 
 # Chat Interface
+CHAT_INTERFACE_KEY: 'Interface de chat'
+CHAT_WITH_TEACHER_KEY: 'Discuter avec l''enseignant'
+CHAT_WITH_STUDENT_KEY: 'Discuter avec l''étudiant'
 ADD_EMOJI_KEY: 'Ajouter un emoji'
 SOMEONE_IS_TYPING_KEY: 'Quelqu''un est en train d''écrire...'
 ONLINE_USERS_KEY: 'Utilisateurs en ligne'
@@ -118,36 +120,49 @@ STUDENTS_KEY: 'Étudiants'
 READ_KEY: 'Lu'
 SENT_KEY: 'Envoyé'
 
-# Authentication messages
+# Forum Grid
+FORUM_GRID_KEY: 'Grille du forum'
+FORUM_TOPIC_KEY: 'Sujet du forum'
+FORUM_POST_KEY: 'Message du forum'
+SEARCH_FORUMS_KEY: 'Rechercher dans les forums...'
+FILTER_KEY: 'Filtrer'
+SORT_KEY: 'Trier'
+MOST_RECENT_KEY: 'Plus récent'
+MOST_PARTICIPANTS_KEY: 'Plus de participants'
+ALPHABETICAL_KEY: 'Alphabétique'
+HIGH_ACTIVITY_KEY: 'Activité élevée'
+MEDIUM_ACTIVITY_KEY: 'Activité moyenne'
+LOW_ACTIVITY_KEY: 'Activité faible'
+ONLINE_KEY: 'en ligne'
+TEACHER_ONLINE_KEY: 'Enseignant en ligne'
+
+# Authentication
+AUTHENTICATION_KEY: 'Authentification'
+LOGIN_KEY: 'Connexion'
+REGISTER_KEY: 'Inscription'
 CREDENTIALS_REQUIRED_KEY: 'Veuillez fournir l''identifiant et le mot de passe'
 USER_NOT_FOUND_KEY: 'Utilisateur non trouvé'
 
-# Form placeholders
-INVITATION_CODE_PLACEHOLDER_KEY: 'Entrez le code d''invitation (facultatif)'
+# Form Elements
+FORM_PLACEHOLDER_KEY: 'Placeholder du formulaire'
+FORM_LABEL_KEY: 'Label du formulaire'
+FORM_VALIDATION_ERROR_KEY: 'Erreur de validation du formulaire'
+FORM_VALIDATION_SUCCESS_KEY: 'Validation du formulaire réussie'
+INVITATION_CODE_PLACEHOLDER_KEY: 'Entrez le code d''invitation (optionnel)'
 FULL_NAME_PLACEHOLDER_KEY: 'Entrez votre nom complet'
-USERNAME_PLACEHOLDER_KEY: '4-15 caractères, saisir sans espacer'
-PHONE_PLACEHOLDER_KEY: 'Saisir sans espacer'
+USERNAME_PLACEHOLDER_KEY: '4-15 caractères sans espace'
+PHONE_PLACEHOLDER_KEY: 'Pas d''espace autorisé'
 PASSWORD_PLACEHOLDER_KEY: 'Au moins 4 caractères'
-CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Doit etre identique au mot de passe'
+CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Doit être identique au mot de passe'
 
-# Validation messages
-PHONE_NO_SPACE_KEY: 'Le numéro de téléphone ne doit pas contenir d''espaces'
-PASSWORD_MISMATCH_KEY: 'Les mots de passe ne correspondent pas'
-
-# Form validation errors
-REQUIRED_FIELD_KEY: 'Ce champ est obligatoire'
-USERNAME_LENGTH_ERROR_KEY: 'Le nom d''utilisateur doit comporter au moins 4 caractères'
-INVALID_USERNAME_KEY: 'Le nom d''utilisateur ne peut contenir que des lettres, des chiffres et des tirets bas'
-INVALID_PHONE_KEY: 'Veuillez entrer un numéro de téléphone valide'
-USERNAME_EXISTS_KEY: 'Ce nom d''utilisateur est déjà pris'
-PHONE_EXISTS_KEY: 'Ce numéro de téléphone est déjà enregistré'
-TERMS_REQUIRED_KEY: 'Vous devez accepter les conditions d''utilisation'
-INVALID_INVITATION_CODE_KEY: 'Code d''invitation invalide'
-EMAIL_ALREADY_EXISTS_KEY: 'Cette adresse e-mail est déjà enregistrée'
-INVALID_EMAIL_FORMAT_KEY: 'Veuillez entrer une adresse e-mail valide'
-PASSWORD_TOO_SHORT_KEY: 'Le mot de passe doit comporter au moins 4 caractères'
-USERNAME_TOO_LONG_KEY: 'Le nom d''utilisateur ne doit pas dépasser 15 caractères'
-USERNAME_NO_SPACE_KEY: 'Le nom d''utilisateur ne doit contenir que des lettres, des chiffres et des tirets bas (saisir sans espacer)'
+# Password Strength
+PASSWORD_STRENGTH_INDICATOR_KEY: 'Indicateur de force du mot de passe'
+PASSWORD_STRENGTH_KEY: 'Force du mot de passe'
+VERY_WEAK_KEY: 'Très faible'
+WEAK_KEY: 'Faible'
+MEDIUM_KEY: 'Moyen'
+STRONG_KEY: 'Fort'
+VERY_STRONG_KEY: 'Très fort'
 
 # SEARCH AND FILTERS
 WHATDOYOUWATTOLEARN_KEY: Que voulez-vous apprendre?
@@ -328,16 +343,3 @@ MAINMESSAGEDESCRIPTION_KEY: Rejoignez notre communauté d'apprenants et d'éduca
 
 MOSTPOPULAR_KEY: Cours les plus populaires
 MOSTPOPULARDESCRIPTION_KEY: Choisissez parmi des centaines de cours proposés par des organisations spécialisées
-
-# Forum Grid
-SEARCH_FORUMS_KEY: 'Rechercher des forums...'
-FILTER_KEY: 'Filtrer'
-SORT_KEY: 'Trier'
-MOST_RECENT_KEY: 'Plus Récent'
-MOST_PARTICIPANTS_KEY: 'Plus de Participants'
-ALPHABETICAL_KEY: 'Alphabétique'
-HIGH_ACTIVITY_KEY: 'Activité Élevée'
-MEDIUM_ACTIVITY_KEY: 'Activité Moyenne'
-LOW_ACTIVITY_KEY: 'Activité Faible'
-ONLINE_KEY: 'en ligne'
-TEACHER_ONLINE_KEY: 'Professeur en ligne'

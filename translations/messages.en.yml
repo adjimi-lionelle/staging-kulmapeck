@@ -240,6 +240,9 @@ PREV_KEY: Prev
 MANY_ANSWERS_POSSIBLE_KEY: Many answers are possible for this question
 
 # Chat Interface
+CHAT_INTERFACE_KEY: 'Chat Interface'
+CHAT_WITH_TEACHER_KEY: 'Chat with teacher'
+CHAT_WITH_STUDENT_KEY: 'Chat with student'
 ADD_EMOJI_KEY: 'Add emoji'
 SOMEONE_IS_TYPING_KEY: 'Someone is typing...'
 ONLINE_USERS_KEY: 'Online Users'
@@ -249,6 +252,9 @@ READ_KEY: 'Read'
 SENT_KEY: 'Sent'
 
 # Forum Grid
+FORUM_GRID_KEY: 'Forum Grid'
+FORUM_TOPIC_KEY: 'Forum Topic'
+FORUM_POST_KEY: 'Forum Post'
 SEARCH_FORUMS_KEY: 'Search forums...'
 FILTER_KEY: 'Filter'
 SORT_KEY: 'Sort'
@@ -261,19 +267,24 @@ LOW_ACTIVITY_KEY: 'Low Activity'
 ONLINE_KEY: 'online'
 TEACHER_ONLINE_KEY: 'Teacher is online'
 
-# Authentication messages
+# Authentication
+AUTHENTICATION_KEY: 'Authentication'
+LOGIN_KEY: 'Login'
+REGISTER_KEY: 'Register'
 CREDENTIALS_REQUIRED_KEY: 'Please provide both identifier and password'
 USER_NOT_FOUND_KEY: 'User not found'
 
-# Form placeholders
+# Form Elements
+FORM_PLACEHOLDER_KEY: 'Form Placeholder'
+FORM_LABEL_KEY: 'Form Label'
+FORM_VALIDATION_ERROR_KEY: 'Form Validation Error'
+FORM_VALIDATION_SUCCESS_KEY: 'Form Validation Success'
 INVITATION_CODE_PLACEHOLDER_KEY: 'Enter invitation code (optional)'
 FULL_NAME_PLACEHOLDER_KEY: 'Enter your full name'
 USERNAME_PLACEHOLDER_KEY: '4-15 characters and no space'
 PHONE_PLACEHOLDER_KEY: 'No space allowed'
 PASSWORD_PLACEHOLDER_KEY: 'At least 4 characters'
 CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Must be identical to the password'
-
-# Form validation errors
 REQUIRED_FIELD_KEY: 'This field is required'
 USERNAME_LENGTH_ERROR_KEY: 'Username must be at least 4 characters long'
 INVALID_USERNAME_KEY: 'Username can only contain letters, numbers, and underscores'
@@ -290,7 +301,8 @@ USERNAME_NO_SPACE_KEY: 'Username must contain only letters, numbers, and undersc
 PHONE_NO_SPACE_KEY: 'Phone number must not contain spaces'
 PASSWORD_MISMATCH_KEY: 'Passwords do not match'
 
-# Password strength
+# Password Strength
+PASSWORD_STRENGTH_INDICATOR_KEY: 'Password Strength Indicator'
 PASSWORD_STRENGTH_KEY: 'Password Strength'
 VERY_WEAK_KEY: 'Very Weak'
 WEAK_KEY: 'Weak'
