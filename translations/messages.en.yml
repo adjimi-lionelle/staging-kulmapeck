@@ -309,3 +309,27 @@ WEAK_KEY: 'Weak'
 MEDIUM_KEY: 'Medium'
 STRONG_KEY: 'Strong'
 VERY_STRONG_KEY: 'Very Strong'
+
+# Chat translations
+chat:
+  title: Chat
+  groups: Groups
+  messages: Messages
+  input:
+    placeholder: Type your message...
+  status:
+    connecting: Connecting to chat server...
+    connected: Connected
+    disconnected: Disconnected
+  typing:
+    single: "%name% is typing..."
+    multiple: "Several people are typing..."
+  unread:
+    messages: "{count, plural, =0 {No new messages} one {1 new message} other {# new messages}}"
+  presence:
+    online: Online
+    offline: Offline
+  errors:
+    connection: Unable to connect to chat server
+    message: Failed to send message
+    group: Unable to load group

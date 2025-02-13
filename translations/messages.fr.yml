@@ -118,6 +118,30 @@ STUDENTS_KEY: 'Étudiants'
 READ_KEY: 'Lu'
 SENT_KEY: 'Envoyé'
 
+# Chat translations
+chat:
+  title: Chat
+  groups: Groupes
+  messages: Messages
+  input:
+    placeholder: Tapez votre message...
+  status:
+    connecting: Connexion au serveur de chat...
+    connected: Connecté
+    disconnected: Déconnecté
+  typing:
+    single: "%name% est en train d'écrire..."
+    multiple: "Plusieurs personnes écrivent..."
+  unread:
+    messages: "{count, plural, =0 {Aucun nouveau message} one {1 nouveau message} other {# nouveaux messages}}"
+  presence:
+    online: En ligne
+    offline: Hors ligne
+  errors:
+    connection: Impossible de se connecter au serveur de chat
+    message: Échec de l'envoi du message
+    group: Impossible de charger le groupe
+
 # Forum Grid
 FORUM_GRID_KEY: 'Grille du forum'
 FORUM_TOPIC_KEY: 'Sujet du forum'

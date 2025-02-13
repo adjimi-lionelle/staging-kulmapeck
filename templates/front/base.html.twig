@@ -230,7 +230,11 @@ gtag('config', 'G-7N7LGGGWT1');
 
 	</head>
 
-	<body class="">
+	<body 
+        data-user-id="{{ app.user ? app.user.id : '' }}"
+        data-auth-token="{{ app.user ? app.user.chatToken : '' }}"
+        data-chat-type="{{ app.request.attributes.get('_route') starts with 'student_' ? 'student' : 'general' }}"
+        class="">
 		{% block header %}
 			<!-- Header START -->
 			<header class="navbar-light navbar-sticky header-static">
@@ -650,7 +654,7 @@ gtag('config', 'G-7N7LGGGWT1');
 							<div
 								class="d-lg-flex justify-content-between align-items-center py-3 text-center text-md-left">
 								<!-- copyright text -->
-								<div class="text-primary-hover">{{ siteSettings.siteCopyrights|default('Copyrights ©2023 Sensei237. All rights reserved') }}</div>
+								<div class="text-primary-hover">{{ siteSettings.siteCopyrights|default('Copyrights 2023 Sensei237. All rights reserved') }}</div>
 								<!-- copyright links-->
 								<div class="justify-content-center mt-3 mt-lg-0">
 									<ul class="nav list-inline justify-content-center mb-0">
@@ -956,4 +960,14 @@ document.querySelectorAll('.like-forum-message').forEach(btn => {
 btn.addEventListener("click", likeForumMessage)
 })
 	</script>
-{% endblock %}{% endblock %}{% block script %}{% endblock %}<!-- Template Functions --><script src="{{ asset('assets/js/functions.js') }}"></script></body></html>
+{% endblock %}{% endblock %}{% block script %}{% endblock %}<!-- Template Functions --><script src="{{ asset('assets/js/functions.js') }}"></script>
+<script>
+    // Global translations for JavaScript
+    window.translations = {
+        'chat.typing.single': "{{ 'chat.typing.single'|trans }}",
+        'chat.typing.multiple': "{{ 'chat.typing.multiple'|trans }}",
+        'chat.errors.connection': "{{ 'chat.errors.connection'|trans }}",
+        'chat.errors.message': "{{ 'chat.errors.message'|trans }}",
+        'chat.errors.group': "{{ 'chat.errors.group'|trans }}"
+    };
+</script>

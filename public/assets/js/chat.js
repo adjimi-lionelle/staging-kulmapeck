@@ -1,149 +1,309 @@
 document.addEventListener("DOMContentLoaded", function () {
-    fetchMyGroups();
+    initializeChat();
 });
 
 let socket = null;
+let currentGroupId = null;
+let typingTimeout = null;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+const RECONNECT_DELAY = 3000;
 
-function fetchMyGroups() {
-    fetch('/api/chat/my-groups', {
+function initializeChat() {
+    fetchGroups();
+    setupEventListeners();
+}
+
+function fetchGroups() {
+    const endpoint = document.body.dataset.chatType === 'student' ? '/student/chat/groups' : '/chat/groups';
+    
+    fetch(endpoint, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: 'include' // Assure que les cookies de session sont envoyés
+        credentials: 'include'
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error("Erreur HTTP " + response.status);
+            throw new Error("HTTP error " + response.status);
         }
         return response.json();
     })
     .then(data => {
         if (data.error) {
-            console.error("Erreur : " + data.error);
+            console.error("Error: " + data.error);
             return;
         }
 
-        let groupList = document.getElementById("group-list");
-
-        data.forEach(group => {
-            let groupElement = document.createElement("div");
-            groupElement.classList.add("chat-group");
-            groupElement.dataset.groupId = group.id;
-            groupElement.innerHTML = `
-                <div class="chat-group-info">
-                    <h6>${group.name}</h6>
-                    <!-- span class="unread-badge" id="unread-${group.id}">0</span -->
-                </div>
-            `;
-            groupElement.addEventListener("click", () => selectGroup(group.id));
-            groupList.appendChild(groupElement);
-        });
+        updateGroupList(data.groups);
     })
-    .catch(error => console.error("Erreur lors du chargement des groupes :", error));
+    .catch(error => {
+        console.error("Error loading groups:", error);
+        showError('chat.errors.group');
+    });
 }
 
-//  Fonction pour se connecter à un groupe via WebSocket
+function updateGroupList(groups) {
+    const groupList = document.getElementById("group-list");
+    groupList.innerHTML = '';
+
+    groups.forEach(group => {
+        const groupElement = createGroupElement(group);
+        groupList.appendChild(groupElement);
+    });
+}
+
+function createGroupElement(group) {
+    const element = document.createElement("div");
+    element.classList.add("chat-group");
+    element.dataset.groupId = group.id;
+
+    const lastMessage = group.lastMessage ? 
+        `<small class="text-muted">${group.lastMessage.sender}: ${group.lastMessage.content}</small>` : '';
+    
+    const unreadBadge = group.unreadCount > 0 ? 
+        `<span class="badge bg-primary">${group.unreadCount}</span>` : '';
+
+    element.innerHTML = `
+        <div class="chat-group-info">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">${group.name}</h6>
+                ${unreadBadge}
+            </div>
+            <div class="chat-group-meta">
+                <small class="text-muted">${group.subject} - Cycle ${group.cycle}</small>
+                ${lastMessage}
+            </div>
+        </div>
+    `;
+
+    element.addEventListener("click", () => selectGroup(group.id));
+    return element;
+}
+
 function selectGroup(groupId) {
-    console.log("Groupe sélectionné :", groupId);
-
-    let selectedGroup = document.querySelector(`[data-group-id="${groupId}"] h6`).textContent;
-    let chatTitle = document.getElementById("chat-title");
-    chatTitle.textContent = selectedGroup;
-    chatTitle.setAttribute("data-group-id", groupId);
-
-    let chatInputArea = document.getElementById("chat-input-area");
-    chatInputArea.classList.remove("d-none");
-
-    document.getElementById("chat-message").removeAttribute("disabled");
-    document.getElementById("send-message").removeAttribute("disabled");
-
-    let chatMessages = document.querySelector(".chat-messages");
-    chatMessages.innerHTML = "<p>Chargement des messages...</p>";
-
+    if (currentGroupId === groupId) return;
+    
+    // Disconnect from current group if any
     if (socket) {
         socket.close();
     }
 
-    fetch("/websocket/token")
-        .then(response => response.json())
-        .then(data => {
-            if (!data.token) {
-                console.error("Impossible d'obtenir un token WebSocket.");
-                return;
-            }
+    currentGroupId = groupId;
+    document.querySelector('.chat-messages').innerHTML = '';
+    document.querySelector('.chat-title').textContent = 
+        document.querySelector(`[data-group-id="${groupId}"] h6`).textContent;
 
-            socket = new WebSocket(`ws://127.0.0.1:9000?token=${data.token}&group_id=${groupId}`);
+    // Show chat interface
+    document.querySelector('.groups-container').classList.add('d-none');
+    document.querySelector('.chat-container').classList.remove('d-none');
 
-            socket.onopen = function () {
-                console.log("Connexion WebSocket établie pour le groupe", groupId);
-            };
-
-            socket.onmessage = function (event) {
-                let data = JSON.parse(event.data);
-
-                if (data.type === "history") {
-                    chatMessages.innerHTML = "";
-                    data.messages.forEach(msg => {
-                        displayMessage(msg.author, msg.content, msg.createdAt);
-                    });
-                }
-
-                if (data.message) {
-                    displayMessage(data.author, data.message, new Date().toLocaleTimeString());
-                }
-            };
-
-            socket.onerror = function (error) {
-                console.error("Erreur WebSocket :", error);
-            };
-
-            socket.onclose = function () {
-                console.log("Connexion WebSocket fermée.");
-            };
-        })
-        .catch(error => console.error("Erreur lors de la récupération du token WebSocket :", error));
+    // Connect to new group
+    connectWebSocket(groupId);
+    loadMessages(groupId);
 }
 
-function displayMessage(author, content, createdAt) {
-    let chatMessages = document.querySelector(".chat-messages");
+function connectWebSocket(groupId) {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/chat/${groupId}?token=${getAuthToken()}`;
+    
+    socket = new WebSocket(wsUrl);
+    
+    socket.onopen = handleSocketOpen;
+    socket.onmessage = handleSocketMessage;
+    socket.onclose = handleSocketClose;
+    socket.onerror = handleSocketError;
+}
 
-    let messageElement = document.createElement("div");
-    messageElement.classList.add("message-item");
+function handleSocketOpen() {
+    console.log('Connected to chat server');
+    document.querySelector('.connection-status').classList.add('d-none');
+    reconnectAttempts = 0;
+}
 
+function handleSocketMessage(event) {
+    const data = JSON.parse(event.data);
+    
+    switch(data.type) {
+        case 'message':
+            displayMessage(data.message);
+            break;
+        case 'typing':
+            updateTypingStatus(data);
+            break;
+        case 'presence':
+            updatePresence(data);
+            break;
+    }
+}
+
+function handleSocketClose() {
+    console.log('Disconnected from chat server');
+    document.querySelector('.connection-status').classList.remove('d-none');
+    
+    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        reconnectAttempts++;
+        setTimeout(() => connectWebSocket(currentGroupId), RECONNECT_DELAY);
+    }
+}
+
+function handleSocketError(error) {
+    console.error('WebSocket error:', error);
+    showError('chat.errors.connection');
+}
+
+function loadMessages(groupId) {
+    const endpoint = document.body.dataset.chatType === 'student' ? 
+        `/student/chat/messages/${groupId}` : `/chat/messages/${groupId}`;
+
+    fetch(endpoint, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        const messagesContainer = document.querySelector('.chat-messages');
+        messagesContainer.innerHTML = '';
+        data.messages.forEach(message => displayMessage(message));
+        scrollToBottom();
+    })
+    .catch(error => {
+        console.error('Error loading messages:', error);
+        showError('chat.errors.message');
+    });
+}
+
+function displayMessage(message) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', message.sender.id === getCurrentUserId() ? 'message-out' : 'message-in');
+    
     messageElement.innerHTML = `
-        <div class="message-header">
-            <strong>${author}</strong> <span class="message-time">${createdAt}</span>
+        <div class="message-wrapper">
+            ${message.sender.id !== getCurrentUserId() ? `
+                <div class="message-avatar">
+                    <div class="avatar avatar-xs">
+                        <img src="/assets/images/default-avatar.png" class="avatar-img rounded-circle" alt="${message.sender.name}">
+                    </div>
+                </div>
+            ` : ''}
+            <div class="message-content">
+                ${message.sender.id !== getCurrentUserId() ? `
+                    <h6 class="mb-1 small">${message.sender.name}</h6>
+                ` : ''}
+                <div class="message-bubble p-3 ${message.sender.id === getCurrentUserId() ? 'bg-primary text-white' : 'bg-light'} rounded-3">
+                    ${message.content}
+                </div>
+                <div class="message-meta mt-1">
+                    <small class="text-muted">
+                        ${formatDate(message.createdAt)}
+                        ${message.sender.id === getCurrentUserId() ? `
+                            <i class="fas fa-${message.isRead ? 'check-double text-primary' : 'check'} ms-1"></i>
+                        ` : ''}
+                    </small>
+                </div>
+            </div>
         </div>
-        <div class="message-content">${content}</div>
     `;
 
-    chatMessages.appendChild(messageElement);
-    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
+    document.querySelector('.chat-messages').appendChild(messageElement);
+    scrollToBottom();
 }
 
-document.getElementById("send-message").addEventListener("click", function () {
-    let messageInput = document.getElementById("chat-message");
-    let messageText = messageInput.value.trim();
+function sendMessage(event) {
+    event.preventDefault();
+    
+    const input = document.querySelector('.chat-input');
+    const message = input.value.trim();
+    
+    if (!message || !socket || socket.readyState !== WebSocket.OPEN) return;
+    
+    socket.send(JSON.stringify({
+        type: 'message',
+        content: message,
+        groupId: currentGroupId
+    }));
+    
+    input.value = '';
+}
 
-    if (messageText === "") return;
-
-    let groupId = document.getElementById("chat-title").getAttribute("data-group-id");
-
-    let messageData = {
-        group_id: parseInt(groupId), // Assure que c'est bien un nombre
-        message: messageText
-    };
-
-    console.log("Envoi du message WebSocket :", messageData);
-
-    if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify(messageData));
-        displayMessage("Moi", messageText, new Date().toLocaleTimeString());
-        messageInput.value = ""; // Efface le champ après envoi
+function updateTypingStatus(data) {
+    const typingIndicator = document.querySelector('.typing-indicator');
+    
+    if (data.typing) {
+        typingIndicator.textContent = data.users.length > 1 ? 
+            translate('chat.typing.multiple') : 
+            translate('chat.typing.single', { name: data.users[0] });
+        typingIndicator.classList.remove('d-none');
     } else {
-        console.error("Connexion WebSocket non établie !");
+        typingIndicator.classList.add('d-none');
     }
-     
-});
+}
 
+function updatePresence(data) {
+    // Update online users count and list
+    const onlineCount = document.querySelector('.online-count');
+    if (onlineCount) {
+        onlineCount.textContent = data.onlineCount;
+    }
+}
+
+function setupEventListeners() {
+    // Message form submission
+    document.querySelector('.chat-input-form').addEventListener('submit', sendMessage);
+    
+    // Back button
+    document.getElementById('backToGroups').addEventListener('click', () => {
+        document.querySelector('.groups-container').classList.remove('d-none');
+        document.querySelector('.chat-container').classList.add('d-none');
+        if (socket) {
+            socket.close();
+        }
+        currentGroupId = null;
+    });
+    
+    // Typing indicator
+    const input = document.querySelector('.chat-input');
+    input.addEventListener('input', () => {
+        if (!socket || socket.readyState !== WebSocket.OPEN) return;
+        
+        clearTimeout(typingTimeout);
+        socket.send(JSON.stringify({ type: 'typing', typing: true }));
+        
+        typingTimeout = setTimeout(() => {
+            socket.send(JSON.stringify({ type: 'typing', typing: false }));
+        }, 1000);
+    });
+}
+
+// Utility functions
+function scrollToBottom() {
+    const container = document.querySelector('.chat-messages-container');
+    container.scrollTop = container.scrollHeight;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+}
+
+function showError(key) {
+    // Implement error display using your UI framework
+    console.error(translate(key));
+}
+
+function translate(key, params = {}) {
+    // Implement translation using your translation system
+    return key; // Temporary return the key itself
+}
+
+function getCurrentUserId() {
+    return document.body.dataset.userId;
+}
+
+function getAuthToken() {
+    return document.body.dataset.authToken;
+}
