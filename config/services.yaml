@@ -62,6 +62,10 @@ services:
         arguments:
             $jwtSecret: '%jwt_secret%'
 
+    App\Controller\ChatController:
+        arguments:
+            $jwtSecret: '%jwt_secret%'
+
     # Mock service for frontend testing
     App\Service\MockChatDataProvider:
         autowire: true
