@@ -1,0 +1,1041 @@
+<?php //resource_metadata_collection_7d0bbaddc8ef222e5fd16e3ebcc25cb2
+
+return [PHP_INT_MAX, static function () { return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
+    $o = [
+        clone (($p = &\Symfony\Component\VarExporter\Internal\Registry::$prototypes)['ApiPlatform\\Metadata\\ApiResource'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\ApiResource')),
+        clone ($p['ApiPlatform\\Metadata\\Operations'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\Operations')),
+        clone ($p['ApiPlatform\\Metadata\\Get'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\Get')),
+        clone ($p['ApiPlatform\\Metadata\\Link'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\Link')),
+        clone ($p['ApiPlatform\\Metadata\\GetCollection'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\GetCollection')),
+        clone $p['ApiPlatform\\Metadata\\GetCollection'],
+        clone $p['ApiPlatform\\Metadata\\Link'],
+        clone ($p['ApiPlatform\\Metadata\\Post'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\Metadata\\Post')),
+        clone $p['ApiPlatform\\Metadata\\Link'],
+        clone ($p['ApiPlatform\\OpenApi\\Model\\Operation'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\OpenApi\\Model\\Operation')),
+        clone ($p['ApiPlatform\\OpenApi\\Model\\RequestBody'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ApiPlatform\\OpenApi\\Model\\RequestBody')),
+        clone ($p['ArrayObject'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('ArrayObject')),
+        clone $p['ApiPlatform\\Metadata\\Post'],
+        clone $p['ApiPlatform\\Metadata\\Link'],
+        clone $p['ApiPlatform\\Metadata\\Link'],
+    ],
+    null,
+    [
+        'ApiPlatform\\Metadata\\ApiResource' => [
+            'operations' => [
+                $o[1],
+            ],
+            'uriTemplate' => [
+                null,
+            ],
+            'shortName' => [
+                'Payment',
+            ],
+            'description' => [
+                null,
+            ],
+            'types' => [
+                null,
+            ],
+            'formats' => [
+                null,
+            ],
+            'inputFormats' => [
+                null,
+            ],
+            'outputFormats' => [
+                null,
+            ],
+            'uriVariables' => [
+                [
+                    'id' => $o[14],
+                ],
+            ],
+            'routePrefix' => [
+                null,
+            ],
+            'defaults' => [
+                null,
+            ],
+            'requirements' => [
+                null,
+            ],
+            'options' => [
+                null,
+            ],
+            'stateless' => [
+                null,
+            ],
+            'sunset' => [
+                null,
+            ],
+            'acceptPatch' => [
+                null,
+            ],
+            'status' => [
+                null,
+            ],
+            'host' => [
+                null,
+            ],
+            'schemes' => [
+                null,
+            ],
+            'condition' => [
+                null,
+            ],
+            'controller' => [
+                null,
+            ],
+            'class' => [
+                'App\\Entity\\Payment',
+            ],
+            'urlGenerationStrategy' => [
+                null,
+            ],
+            'deprecationReason' => [
+                null,
+            ],
+            'cacheHeaders' => [
+                null,
+            ],
+            'normalizationContext' => [
+                [
+                    'groups' => [
+                        'read:payment:collection',
+                    ],
+                ],
+            ],
+            'denormalizationContext' => [
+                null,
+            ],
+            'collectDenormalizationErrors' => [
+                null,
+            ],
+            'hydraContext' => [
+                null,
+            ],
+            'openapiContext' => [
+                null,
+            ],
+            'openapi' => [
+                null,
+            ],
+            'validationContext' => [
+                null,
+            ],
+            'filters' => [
+                null,
+            ],
+            'elasticsearch' => [
+                null,
+            ],
+            'order' => [
+                null,
+            ],
+            'fetchPartial' => [
+                null,
+            ],
+            'forceEager' => [
+                null,
+            ],
+            'paginationClientEnabled' => [
+                null,
+            ],
+            'paginationClientItemsPerPage' => [
+                null,
+            ],
+            'paginationClientPartial' => [
+                null,
+            ],
+            'paginationViaCursor' => [
+                null,
+            ],
+            'paginationEnabled' => [
+                null,
+            ],
+            'paginationFetchJoinCollection' => [
+                null,
+            ],
+            'paginationUseOutputWalkers' => [
+                null,
+            ],
+            'paginationItemsPerPage' => [
+                null,
+            ],
+            'paginationMaximumItemsPerPage' => [
+                null,
+            ],
+            'paginationPartial' => [
+                null,
+            ],
+            'paginationType' => [
+                null,
+            ],
+            'security' => [
+                null,
+            ],
+            'securityMessage' => [
+                null,
+            ],
+            'securityPostDenormalize' => [
+                null,
+            ],
+            'securityPostDenormalizeMessage' => [
+                null,
+            ],
+            'securityPostValidation' => [
+                null,
+            ],
+            'securityPostValidationMessage' => [
+                null,
+            ],
+            'compositeIdentifier' => [
+                null,
+            ],
+            'exceptionToStatus' => [
+                null,
+            ],
+            'queryParameterValidationEnabled' => [
+                null,
+            ],
+            'graphQlOperations' => [
+                [],
+            ],
+            'stateOptions' => [
+                null,
+            ],
+            'extraProperties' => [
+                [],
+            ],
+        ],
+        'ApiPlatform\\Metadata\\Operations' => [
+            'operations' => [
+                1 => [
+                    [
+                        '_api_/payments/{id}{._format}_get',
+                        $o[2],
+                    ],
+                    [
+                        '_api_/payments{._format}_get_collection',
+                        $o[4],
+                    ],
+                    [
+                        '_api_/student/{id}/payments_get_collection',
+                        $o[5],
+                    ],
+                    [
+                        '_api_/abonnement/{id}/subscribe_post',
+                        $o[7],
+                    ],
+                    [
+                        '_api_/cours/{id}/paied_post',
+                        $o[12],
+                    ],
+                ],
+            ],
+        ],
+        'ApiPlatform\\Metadata\\Operation' => [
+            'shortName' => [
+                2 => 'Payment',
+                4 => 'Payment',
+                'Payment',
+                7 => 'Payment',
+                12 => 'Payment',
+            ],
+            'class' => [
+                2 => 'App\\Entity\\Payment',
+                4 => 'App\\Entity\\Payment',
+                'App\\Entity\\Payment',
+                7 => 'App\\Entity\\Payment',
+                12 => 'App\\Entity\\Payment',
+            ],
+            'paginationEnabled' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'paginationType' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'paginationItemsPerPage' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'paginationMaximumItemsPerPage' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'paginationPartial' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'paginationClientEnabled' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'paginationClientItemsPerPage' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'paginationClientPartial' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'paginationFetchJoinCollection' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'paginationUseOutputWalkers' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'order' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'description' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'normalizationContext' => [
+                2 => [
+                    'groups' => [
+                        'read:payment:collection',
+                    ],
+                ],
+                4 => [
+                    'groups' => [
+                        'read:payment:collection',
+                    ],
+                ],
+                [
+                    'groups' => [
+                        'read:payment:collection',
+                    ],
+                ],
+                7 => [
+                    'groups' => [
+                        'read:payment:collection',
+                    ],
+                ],
+                12 => [
+                    'groups' => [
+                        'read:payment:collection',
+                    ],
+                ],
+            ],
+            'denormalizationContext' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'collectDenormalizationErrors' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'security' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'securityMessage' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'securityPostDenormalize' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'securityPostDenormalizeMessage' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'securityPostValidation' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'securityPostValidationMessage' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'deprecationReason' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'filters' => [
+                2 => [],
+                4 => [],
+                [],
+                7 => [],
+                12 => [],
+            ],
+            'validationContext' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'elasticsearch' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'urlGenerationStrategy' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'read' => [
+                2 => null,
+                4 => null,
+                false,
+                7 => false,
+                12 => false,
+            ],
+            'deserialize' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'validate' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'write' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => false,
+                12 => false,
+            ],
+            'serialize' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'fetchPartial' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'forceEager' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'priority' => [
+                2 => 0,
+                4 => 1,
+                2,
+                7 => 3,
+                12 => 4,
+            ],
+            'name' => [
+                2 => '_api_/payments/{id}{._format}_get',
+                4 => '_api_/payments{._format}_get_collection',
+                '_api_/student/{id}/payments_get_collection',
+                7 => '_api_/abonnement/{id}/subscribe_post',
+                12 => '_api_/cours/{id}/paied_post',
+            ],
+            'provider' => [
+                2 => 'ApiPlatform\\Doctrine\\Orm\\State\\ItemProvider',
+                4 => 'ApiPlatform\\Doctrine\\Orm\\State\\CollectionProvider',
+                'ApiPlatform\\Doctrine\\Orm\\State\\CollectionProvider',
+                7 => 'ApiPlatform\\Doctrine\\Orm\\State\\ItemProvider',
+                12 => 'ApiPlatform\\Doctrine\\Orm\\State\\ItemProvider',
+            ],
+            'processor' => [
+                2 => 'api_platform.doctrine.orm.state.persist_processor',
+                4 => 'api_platform.doctrine.orm.state.persist_processor',
+                'api_platform.doctrine.orm.state.persist_processor',
+                7 => 'api_platform.doctrine.orm.state.persist_processor',
+                12 => 'api_platform.doctrine.orm.state.persist_processor',
+            ],
+            'stateOptions' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'extraProperties' => [
+                2 => [],
+                4 => [],
+                [
+                    'user_defined_uri_template' => true,
+                ],
+                7 => [
+                    'user_defined_uri_template' => true,
+                ],
+                12 => [
+                    'user_defined_uri_template' => true,
+                ],
+            ],
+        ],
+        'ApiPlatform\\Metadata\\HttpOperation' => [
+            'paginationViaCursor' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'method' => [
+                2 => 'GET',
+                4 => 'GET',
+                'GET',
+                7 => 'POST',
+                12 => 'POST',
+            ],
+            'uriTemplate' => [
+                2 => '/payments/{id}{._format}',
+                4 => '/payments{._format}',
+                '/student/{id}/payments',
+                7 => '/abonnement/{id}/subscribe',
+                12 => '/cours/{id}/paied',
+            ],
+            'types' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'inputFormats' => [
+                2 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                4 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                7 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                12 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+            ],
+            'outputFormats' => [
+                2 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                4 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                7 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+                12 => [
+                    'jsonld' => [
+                        'application/ld+json',
+                    ],
+                    'json' => [
+                        'application/json',
+                    ],
+                    'multipart' => [
+                        'multipart/form-data',
+                    ],
+                    'html' => [
+                        'text/html',
+                    ],
+                ],
+            ],
+            'uriVariables' => [
+                2 => [
+                    'id' => $o[3],
+                ],
+                5 => [
+                    'id' => $o[6],
+                ],
+                7 => [
+                    'id' => $o[8],
+                ],
+                12 => [
+                    'id' => $o[13],
+                ],
+            ],
+            'routePrefix' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'routeName' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'defaults' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'requirements' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'options' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'stateless' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'sunset' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'acceptPatch' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'host' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'schemes' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'condition' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'controller' => [
+                2 => null,
+                4 => null,
+                'App\\Controller\\Api\\Controller\\Payment\\StudentPaymentController',
+                7 => 'App\\Controller\\Api\\Controller\\Payment\\PayerAbonnementController',
+                12 => 'App\\Controller\\Api\\Controller\\Payment\\PayerCoursController',
+            ],
+            'cacheHeaders' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'hydraContext' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'openapiContext' => [
+                2 => [
+                    'security' => [
+                        [
+                            'bearerAuth' => [],
+                        ],
+                    ],
+                ],
+                4 => null,
+                [
+                    'security' => [
+                        [
+                            'bearerAuth' => [],
+                        ],
+                    ],
+                ],
+                7 => null,
+                12 => [
+                    'security' => [
+                        [
+                            'bearerAuth' => [],
+                        ],
+                    ],
+                    'description' => 'Cette route permet à un élève de payer un cours. Ici ID = id du cours. Dans le corps de la requête HTTP, il faut envoyé la propriété payment_method contenant la methode de paiement',
+                ],
+            ],
+            'openapi' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => $o[9],
+                12 => null,
+            ],
+            'exceptionToStatus' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+            'queryParameterValidationEnabled' => [
+                2 => null,
+                4 => null,
+                null,
+                7 => null,
+                12 => null,
+            ],
+        ],
+        'ApiPlatform\\Metadata\\Link' => [
+            'parameterName' => [
+                3 => 'id',
+                6 => 'id',
+                8 => 'id',
+                13 => 'id',
+                'id',
+            ],
+            'fromProperty' => [
+                3 => null,
+                6 => null,
+                8 => null,
+                13 => null,
+                null,
+            ],
+            'toProperty' => [
+                3 => null,
+                6 => null,
+                8 => null,
+                13 => null,
+                null,
+            ],
+            'fromClass' => [
+                3 => 'App\\Entity\\Payment',
+                6 => 'App\\Entity\\Payment',
+                8 => 'App\\Entity\\Payment',
+                13 => 'App\\Entity\\Payment',
+                'App\\Entity\\Payment',
+            ],
+            'toClass' => [
+                3 => null,
+                6 => null,
+                8 => null,
+                13 => null,
+                null,
+            ],
+            'identifiers' => [
+                3 => [
+                    'id',
+                ],
+                6 => [
+                    'id',
+                ],
+                8 => [
+                    'id',
+                ],
+                13 => [
+                    'id',
+                ],
+                [
+                    'id',
+                ],
+            ],
+            'compositeIdentifier' => [
+                3 => null,
+                6 => null,
+                8 => null,
+                13 => null,
+                null,
+            ],
+            'expandedValue' => [
+                3 => null,
+                6 => null,
+                8 => null,
+                13 => null,
+                null,
+            ],
+        ],
+        'ApiPlatform\\Metadata\\GetCollection' => [
+            'itemUriTemplate' => [
+                4 => null,
+                null,
+            ],
+        ],
+        'ApiPlatform\\Metadata\\Post' => [
+            'itemUriTemplate' => [
+                7 => null,
+                12 => null,
+            ],
+        ],
+        'ApiPlatform\\OpenApi\\Model\\Operation' => [
+            'operationId' => [
+                9 => null,
+            ],
+            'tags' => [
+                9 => null,
+            ],
+            'responses' => [
+                9 => null,
+            ],
+            'summary' => [
+                9 => 'Cette route permet à un élève de payer un abonnement. Ici ID = id de l\'abonnement. Dans le corps de la requête HTTP, il faut envoyé la propriété payment_method contenant la methode de paiement et initiate_payment qui est juste un booleen',
+            ],
+            'description' => [
+                9 => 'Cette route permet à un élève de payer un abonnement. Ici ID = id de l\'abonnement. Dans le corps de la requête HTTP, il faut envoyé la propriété payment_method contenant la methode de paiement et initiate_payment qui est juste un booleen',
+            ],
+            'externalDocs' => [
+                9 => null,
+            ],
+            'parameters' => [
+                9 => null,
+            ],
+            'requestBody' => [
+                9 => $o[10],
+            ],
+            'callbacks' => [
+                9 => null,
+            ],
+            'deprecated' => [
+                9 => null,
+            ],
+            'security' => [
+                9 => [
+                    [
+                        'bearerAuth' => [],
+                    ],
+                ],
+            ],
+            'servers' => [
+                9 => null,
+            ],
+        ],
+        'ApiPlatform\\OpenApi\\Model\\RequestBody' => [
+            'description' => [
+                10 => '',
+            ],
+            'content' => [
+                10 => $o[11],
+            ],
+            'required' => [
+                10 => false,
+            ],
+        ],
+    ],
+    [
+        $o[0],
+    ],
+    [
+        -11 => [
+            0,
+            [
+                'application/json' => [
+                    'schema' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'payment_method' => [
+                                'type' => 'string',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [],
+            null,
+        ],
+    ]
+); }];

@@ -1,0 +1,3 @@
+<?php //App%255CController%255CApi%255CController%255CFaq%255CFaqCourseController
+
+return [PHP_INT_MAX, []];

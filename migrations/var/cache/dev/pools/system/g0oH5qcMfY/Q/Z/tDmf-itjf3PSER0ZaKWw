@@ -1,0 +1,3 @@
+<?php //App%255CEntity%255CPayment%2523isIsExpired
+
+return [PHP_INT_MAX, []];
