@@ -28,7 +28,7 @@ class GroupChat
     #[ORM\OneToMany(mappedBy: 'groupChat', targetEntity: MessageChat::class, orphanRemoval: true)]
     private Collection $messageChats;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'g0_create_at')]
     private ?\DateTimeImmutable $createAt = null;
 
     #[ORM\OneToMany(mappedBy: 'groupChat', targetEntity: WebSocketConnection::class, orphanRemoval: true)]

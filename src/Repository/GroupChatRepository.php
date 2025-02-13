@@ -40,7 +40,7 @@ class GroupChatRepository extends ServiceEntityRepository
             ->andWhere('g.cycle = :cycle')
             ->setParameter('subjects', [$classe->getSpecialite()->getName()])
             ->setParameter('cycle', $cycle)
-            ->orderBy('g.createAt', 'DESC');
+            ->orderBy('g.g0_create_at', 'DESC');
 
         return $qb->getQuery()->getResult();
     }
