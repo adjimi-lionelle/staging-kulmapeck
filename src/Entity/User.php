@@ -159,7 +159,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: WebSocketConnection::class, orphanRemoval: true)]
     private Collection $webSocketConnections;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(name: 't0_chat_token', length: 255, nullable: true)]
     private ?string $chatToken = null;
 
     public function __construct()
