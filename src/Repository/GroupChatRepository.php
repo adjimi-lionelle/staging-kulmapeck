@@ -28,15 +28,18 @@ class GroupChatRepository extends ServiceEntityRepository
     public function findByStudent(Eleve $student): array
     {
         $classe = $student->getClasse();
-        if (!$classe) {
+        if (!$classe || !$classe->getSkillLevel()) {
             return [];
         }
+
+        $skillLevel = $classe->getSkillLevel();
+        $cycle = (int) filter_var($skillLevel->getName(), FILTER_SANITIZE_NUMBER_INT);
 
         $qb = $this->createQueryBuilder('g')
             ->where('g.matiere IN (:subjects)')
             ->andWhere('g.cycle = :cycle')
             ->setParameter('subjects', [$classe->getSpecialite()->getName()])
-            ->setParameter('cycle', $classe->getCycle())
+            ->setParameter('cycle', $cycle)
             ->orderBy('g.createAt', 'DESC');
 
         return $qb->getQuery()->getResult();
