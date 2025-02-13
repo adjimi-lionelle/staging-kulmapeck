@@ -153,14 +153,6 @@ PHONE_PLACEHOLDER_KEY: 'Pas d''espace autorisé'
 PASSWORD_PLACEHOLDER_KEY: 'Au moins 4 caractères'
 CONFIRM_PASSWORD_PLACEHOLDER_KEY: 'Doit être identique au mot de passe'
 
-# Password Strength
-PASSWORD_STRENGTH_INDICATOR_KEY: 'Indicateur de force du mot de passe'
-PASSWORD_STRENGTH_KEY: 'Force du mot de passe'
-VERY_WEAK_KEY: 'Très faible'
-WEAK_KEY: 'Faible'
-MEDIUM_KEY: 'Moyen'
-STRONG_KEY: 'Fort'
-VERY_STRONG_KEY: 'Très fort'
 
 # SEARCH AND FILTERS
 WHATDOYOUWATTOLEARN_KEY: Que voulez-vous apprendre?
