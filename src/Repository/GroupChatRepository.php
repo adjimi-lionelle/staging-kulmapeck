@@ -35,7 +35,7 @@ class GroupChatRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('g')
             ->where('g.matiere IN (:subjects)')
             ->andWhere('g.cycle = :cycle')
-            ->setParameter('subjects', $classe->getSpecialite()->getCategories())
+            ->setParameter('subjects', [$classe->getSpecialite()->getName()])
             ->setParameter('cycle', $classe->getCycle())
             ->orderBy('g.createAt', 'DESC');
 
