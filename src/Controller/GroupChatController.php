@@ -210,10 +210,10 @@ class GroupChatController extends AbstractController
     public function index(): Response
     {
         $user = $this->getUser();
-        /** @var Eleve|null $student */
-        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        /** @var Eleve|null $eleve */
+        $eleve = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
         
-        if (!$student) {
+        if (!$eleve) {
             throw $this->createAccessDeniedException('Student account not found.');
         }
 
@@ -222,17 +222,17 @@ class GroupChatController extends AbstractController
         $specialites = $this->specialiteRepository->findAll();
 
         // Get student's groups if they have a class
-        $groups = $student->getClasse() ? $this->groupChatRepository->findByStudent($student) : [];
+        $groups = $eleve->getClasse() ? $this->groupChatRepository->findByStudent($eleve) : [];
 
         return $this->render('front/chat/index.html.twig', [
-            'student' => $student,
+            'eleve' => $eleve,
             'classes' => $classes,
             'specialites' => $specialites,
             'groups' => $groups
         ]);
     }
 
-    #[Route('/api/setup', name: 'app_student_chat_setup_new', methods: ['POST'])]
+    #[Route('/api/setup', name: 'app_eleve_chat_setup_new', methods: ['POST'])]
     #[IsGranted('ROLE_STUDENT')]
     public function setup(Request $request): JsonResponse
     {
