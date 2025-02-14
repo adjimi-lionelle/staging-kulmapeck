@@ -230,6 +230,7 @@ class GroupChatController extends AbstractController
             $groups = $this->groupChatRepository->findByStudent($eleve);
         }
 
+        // Pass needsSetup flag to template
         return $this->render('front/chat/index.html.twig', [
             'eleve' => $eleve,
             'classes' => $classes,
