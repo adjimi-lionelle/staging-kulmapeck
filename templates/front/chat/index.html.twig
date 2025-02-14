@@ -3,7 +3,7 @@
 {% block title %} - Chat{% endblock %}
 
 {% block mainContent %}
-    {% if needsSetup %}
+    {% if needsSetup is defined and needsSetup %}
         {% include 'front/chat/_setup_modal.html.twig' with {
             'classes': classes,
             'specialites': specialites,
