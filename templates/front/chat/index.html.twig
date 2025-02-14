@@ -3,11 +3,11 @@
 {% block title %} - Chat{% endblock %}
 
 {% block mainContent %}
-    {% if not app.user.eleve.classe %}
+    {% if eleve is defined and not eleve.classe %}
         {% include 'front/chat/_setup_modal.html.twig' with {
             'classes': classes,
             'specialites': specialites,
-            'eleve': app.user.eleve
+            'eleve': eleve
         } %}
         <div class="chat-wrapper">
             <div class="container-fluid chat-container">

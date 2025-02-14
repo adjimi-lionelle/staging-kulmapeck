@@ -209,8 +209,8 @@ class GroupChatController extends AbstractController
     #[IsGranted('ROLE_STUDENT')]
     public function index(): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
-        /** @var Eleve|null $eleve */
         $eleve = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
         
         if (!$eleve) {
@@ -224,12 +224,7 @@ class GroupChatController extends AbstractController
         // Get student's groups if they have a class
         $groups = $eleve->getClasse() ? $this->groupChatRepository->findByStudent($eleve) : [];
 
-        return $this->render('front/chat/index.html.twig', [
-            'eleve' => $eleve,
-            'classes' => $classes,
-            'specialites' => $specialites,
-            'groups' => $groups
-        ]);
+        return $this->render('front/chat/index.html.twig', compact('eleve', 'classes', 'specialites', 'groups'));
     }
 
     #[Route('/api/setup', name: 'app_eleve_chat_setup_new', methods: ['POST'])]
