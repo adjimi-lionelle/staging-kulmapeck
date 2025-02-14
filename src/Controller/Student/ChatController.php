@@ -32,30 +32,8 @@ class ChatController extends AbstractController
     #[Route('', name: 'app_student_chat')]
     public function index(): Response
     {
-        $user = $this->getUser();
-        /** @var Eleve|null $student */
-        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
-        
-        if (!$student) {
-            throw $this->createAccessDeniedException('Student account not found.');
-        }
-
-        // Check if student has class set
-        if (!$student->getClasse()) {
-            return $this->render('front/chat/index.html.twig', [
-                'needsSetup' => true,
-                'student' => $student,
-            ]);
-        }
-
-        // Get student's groups
-        $groups = $this->groupChatRepository->findByStudent($student);
-
-        return $this->render('front/chat/index.html.twig', [
-            'needsSetup' => false,
-            'groups' => $groups,
-            'student' => $student,
-        ]);
+        // Redirect to the new chat interface
+        return $this->redirectToRoute('app_chat');
     }
 
     #[Route('/groups', name: 'app_student_chat_groups', methods: ['GET'])]

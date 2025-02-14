@@ -26,7 +26,7 @@ use App\Entity\GroupChat;
 use App\Entity\MessageChat;
 use DateTime;
 
-#[Route('/api/chat')]
+#[Route('/chat')]
 class GroupChatController extends AbstractController
 {
     private EntityManagerInterface $entityManager;
@@ -52,7 +52,7 @@ class GroupChatController extends AbstractController
     
      
 
-    #[Route('/groupchat/init', name: 'api_groupchat_init', methods: ['POST'])]
+    #[Route('/groupchat/init', name: 'groupchat_init', methods: ['POST'])]
     public function initGroupChats(GroupChatGenerator $groupChatGenerator): JsonResponse
     {
         $groupChatGenerator->generateGroupChats();
@@ -69,7 +69,7 @@ class GroupChatController extends AbstractController
      * cette fonction pour envoyer le nombbre de message non lu pr un user connecté dans chacun de ses groupe 
      * exempele groupe 1 nombre de message non lu groupe 2 nombre de message non lu groupe 3 nombre de message non lu
      */
-    #[Route('/my-groups', name: 'api_chat_my_groups', methods: ['GET'])]
+    #[Route('/my-groups', name: 'chat_my_groups', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function getMyGroups(GroupChatRepository $groupChatRepository,
                                 PersonneRepository $personneRepository,
@@ -132,7 +132,7 @@ class GroupChatController extends AbstractController
     /**
      *  Envoyer un message dans un groupe
      */
-    #[Route('/send', name: 'api_chat_send', methods: ['POST'])]
+    #[Route('/send', name: 'chat_send', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function sendMessage(Request $request, GroupChatRepository $groupChatRepository, PersonneRepository $personneRepository): JsonResponse
     {
@@ -176,7 +176,7 @@ class GroupChatController extends AbstractController
     /**
      * Récupérer les messages d'un groupe spécifique
      */
-    #[Route('/messages/{group_id}', name: 'api_chat_messages', methods: ['GET'])]
+    #[Route('/messages/{group_id}', name: 'chat_messages', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function getGroupMessages(int $group_id, MessageChatRepository $messageChatRepository, PersonneRepository $personneRepository): JsonResponse
     {
@@ -244,7 +244,7 @@ class GroupChatController extends AbstractController
         ]);
     }
 
-    #[Route('/setup', name: 'app_student_chat_setup', methods: ['POST'])]
+    #[Route('/api/setup', name: 'app_student_chat_setup_new', methods: ['POST'])]
     #[IsGranted('ROLE_STUDENT')]
     public function setup(Request $request): JsonResponse
     {
