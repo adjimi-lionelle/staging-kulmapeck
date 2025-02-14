@@ -12,7 +12,7 @@
                         <label for="classe" class="form-label">{% trans %}SELECT_YOUR_CLASS_KEY{% endtrans %}</label>
                         <select class="form-select" id="classe" name="classe" required>
                             <option value="">{% trans %}CHOOSE_CLASS_KEY{% endtrans %}</option>
-                            {% for class in classes %}
+                            {% for class in allClasses %}
                                 <option value="{{ class.id }}">{{ class.name }}</option>
                             {% endfor %}
                         </select>
@@ -23,7 +23,7 @@
                         <label for="specialite" class="form-label">{% trans %}SELECT_YOUR_SPECIALIZATION_KEY{% endtrans %}</label>
                         <select class="form-select" id="specialite" name="specialite" required>
                             <option value="">{% trans %}CHOOSE_SPECIALIZATION_KEY{% endtrans %}</option>
-                            {% for specialite in specialites %}
+                            {% for specialite in allSpecialites %}
                                 <option value="{{ specialite.id }}">{{ specialite.name }}</option>
                             {% endfor %}
                         </select>

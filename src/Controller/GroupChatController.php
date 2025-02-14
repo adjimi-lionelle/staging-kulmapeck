@@ -20,6 +20,8 @@ use App\Repository\GroupChatRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\MessageChatRepository;   
 use App\Repository\EleveRepository;
+use App\Repository\ClasseRepository;
+use App\Repository\SpecialiteRepository;
 use App\Entity\GroupChat;
 use App\Entity\MessageChat;
 use DateTime;
@@ -31,15 +33,19 @@ class GroupChatController extends AbstractController
     private string $jwtSecret;
     private JWTTokenManagerInterface $jwtManager;
     private EleveRepository $eleveRepository;
+    private ClasseRepository $classeRepository;
+    private SpecialiteRepository $specialiteRepository;
 
 
 
-    public function __construct(EntityManagerInterface $entityManager, string $jwtSecret, JWTTokenManagerInterface $jwtManager, EleveRepository $eleveRepository)
+    public function __construct(EntityManagerInterface $entityManager, string $jwtSecret, JWTTokenManagerInterface $jwtManager, EleveRepository $eleveRepository, ClasseRepository $classeRepository, SpecialiteRepository $specialiteRepository)
     {
         $this->entityManager = $entityManager;
         $this->jwtSecret = $jwtSecret;
         $this->jwtManager = $jwtManager;
         $this->eleveRepository = $eleveRepository;
+        $this->classeRepository = $classeRepository;
+        $this->specialiteRepository = $specialiteRepository;
     }
     
      
@@ -195,6 +201,34 @@ class GroupChatController extends AbstractController
         ], $messages);
 
         return $this->json($data);
+    }
+
+    #[Route('', name: 'app_chat')]
+    #[IsGranted('ROLE_STUDENT')]
+    public function index(ClasseRepository $classeRepository, SpecialiteRepository $specialiteRepository): Response
+    {
+        $user = $this->getUser();
+        /** @var Eleve|null $student */
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        
+        if (!$student) {
+            throw $this->createAccessDeniedException('Student account not found.');
+        }
+
+        // Check if student has class set
+        if (!$student->getClasse()) {
+            return $this->render('front/chat/index.html.twig', [
+                'needsSetup' => true,
+                'student' => $student,
+                'allClasses' => $classeRepository->findAll(),
+                'allSpecialites' => $specialiteRepository->findAll(),
+            ]);
+        }
+
+        return $this->render('front/chat/index.html.twig', [
+            'needsSetup' => false,
+            'student' => $student,
+        ]);
     }
 
     #[Route('/setup', name: 'app_student_chat_setup', methods: ['POST'])]
