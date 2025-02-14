@@ -217,30 +217,18 @@ class GroupChatController extends AbstractController
             throw $this->createAccessDeniedException('Student account not found.');
         }
 
-        // Check if student has class set
-        if (!$student->getClasse()) {
-            // Get all classes and specializations
-            $classes = $this->classeRepository->findAll();
-            $specialites = $this->specialiteRepository->findAll();
-
-            return $this->render('front/chat/index.html.twig', [
-                'needsSetup' => true,
-                'student' => $student,
-                'classes' => $classes,
-                'specialites' => $specialites,
-                'groups' => [] // Empty array since student has no class yet
-            ]);
-        }
+        // Get all classes and specializations
+        $classes = $this->classeRepository->findAll();
+        $specialites = $this->specialiteRepository->findAll();
 
         // Get student's groups if they have a class
-        $groups = $this->groupChatRepository->findByStudent($student);
+        $groups = $student->getClasse() ? $this->groupChatRepository->findByStudent($student) : [];
 
         return $this->render('front/chat/index.html.twig', [
-            'needsSetup' => false,
             'student' => $student,
-            'groups' => $groups,
-            'classes' => [], // Not needed when student has a class
-            'specialites' => [] // Not needed when student has a class
+            'classes' => $classes,
+            'specialites' => $specialites,
+            'groups' => $groups
         ]);
     }
 

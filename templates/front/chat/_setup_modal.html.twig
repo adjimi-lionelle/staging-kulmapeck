@@ -48,14 +48,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    {% if needsSetup %}
-    // Show modal automatically when page loads
+    // Show modal automatically since this template is only included when setup is needed
     const setupModal = new bootstrap.Modal(document.getElementById('setupModal'), {
         backdrop: 'static',
         keyboard: false
     });
     setupModal.show();
-    {% endif %}
 
     const form = document.getElementById('setupForm');
     

@@ -3,7 +3,7 @@
 {% block title %} - Chat{% endblock %}
 
 {% block mainContent %}
-    {% if needsSetup %}
+    {% if not student.classe %}
         {% include 'front/chat/_setup_modal.html.twig' with {
             'classes': classes,
             'specialites': specialites,
