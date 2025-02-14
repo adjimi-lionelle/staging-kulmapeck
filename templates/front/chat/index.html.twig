@@ -14,58 +14,70 @@
             'specialites': specialites,
             'eleve': eleve
         } %}
-        <div class="chat-wrapper">
-            <div class="container-fluid chat-container">
-                <div class="text-center mt-5">
-                    <h3>{% trans %}WELCOME_TO_CHAT_KEY{% endtrans %}</h3>
-                    <p>{% trans %}PLEASE_SETUP_PROFILE_KEY{% endtrans %}</p>
+        <section class="pt-0">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="text-center mt-5">
+                            <h3>{% trans %}WELCOME_TO_CHAT_KEY{% endtrans %}</h3>
+                            <p>{% trans %}PLEASE_SETUP_PROFILE_KEY{% endtrans %}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
     {% else %}
-        <div class="chat-wrapper">
-            <div class="chat-container">
-                <!-- Groups column -->
-                <div class="chat-sidebar">
-                    <div class="chat-sidebar-header">
-                        <h5>{% trans %}DISCUSSIONS_KEY{% endtrans %}</h5>
-                        <input type="text" class="search-bar" placeholder="{% trans %}SEARCH_KEY{% endtrans %}">
-                    </div>
-                    <div id="group-list" class="chat-group-list">
-                        {% if groups is not defined or groups is empty %}
-                            <div class="text-center mt-3 text-muted">
-                                <p>{% trans %}NO_GROUPS_YET_KEY{% endtrans %}</p>
-                            </div>
-                        {% else %}
-                            {% for group in groups %}
-                                <div class="chat-group" data-group-id="{{ group.id }}">
-                                    <div class="group-info">
-                                        <h6>{{ group.name }}</h6>
-                                        <p>{{ group.matiere.nom }}</p>
+        <section class="pt-0">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="chat-wrapper">
+                            <div class="chat-container">
+                                <!-- Groups column -->
+                                <div class="chat-sidebar">
+                                    <div class="chat-sidebar-header">
+                                        <h5>{% trans %}DISCUSSIONS_KEY{% endtrans %}</h5>
+                                        <input type="text" class="search-bar" placeholder="{% trans %}SEARCH_KEY{% endtrans %}">
+                                    </div>
+                                    <div id="group-list" class="chat-group-list">
+                                        {% if groups is not defined or groups is empty %}
+                                            <div class="text-center mt-3 text-muted">
+                                                <p>{% trans %}NO_GROUPS_YET_KEY{% endtrans %}</p>
+                                            </div>
+                                        {% else %}
+                                            {% for group in groups %}
+                                                <div class="chat-group" data-group-id="{{ group.id }}">
+                                                    <div class="group-info">
+                                                        <h6>{{ group.name }}</h6>
+                                                        <p>{{ group.matiere.nom }}</p>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
                                     </div>
                                 </div>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
 
-                <!-- Main chat column -->
-                <div class="chat-main">
-                    <div class="chat-main-header">
-                        <h5 class="chat-title" id="chat-title">{% trans %}SELECT_GROUP_TO_CHAT_KEY{% endtrans %}</h5>
-                    </div>
-                    <div class="chat-messages" id="chat-messages">
-                        <p class="welcome-message">{% trans %}WELCOME_MESSAGE_KEY{% endtrans %}</p>
-                    </div>
-                    <div id="chat-input-area" class="chat-input-area d-none">
-                        <input type="text" id="chat-message" class="chat-input" placeholder="{% trans %}WRITE_MESSAGE_KEY{% endtrans %}" disabled>
-                        <button id="send-message" class="chat-send" disabled>
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
+                                <!-- Main chat column -->
+                                <div class="chat-main">
+                                    <div class="chat-main-header">
+                                        <h5 class="chat-title" id="chat-title">{% trans %}SELECT_GROUP_TO_CHAT_KEY{% endtrans %}</h5>
+                                    </div>
+                                    <div class="chat-messages" id="chat-messages">
+                                        <p class="welcome-message">{% trans %}WELCOME_MESSAGE_KEY{% endtrans %}</p>
+                                    </div>
+                                    <div id="chat-input-area" class="chat-input-area d-none">
+                                        <input type="text" id="chat-message" class="chat-input" placeholder="{% trans %}WRITE_MESSAGE_KEY{% endtrans %}" disabled>
+                                        <button id="send-message" class="chat-send" disabled>
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     {% endif %}
 {% endblock %}
 
