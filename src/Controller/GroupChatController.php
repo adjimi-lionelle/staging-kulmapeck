@@ -205,7 +205,7 @@ class GroupChatController extends AbstractController
 
     #[Route('', name: 'app_chat')]
     #[IsGranted('ROLE_STUDENT')]
-    public function index(ClasseRepository $classeRepository, SpecialiteRepository $specialiteRepository): Response
+    public function index(): Response
     {
         $user = $this->getUser();
         /** @var Eleve|null $student */
@@ -217,11 +217,14 @@ class GroupChatController extends AbstractController
 
         // Check if student has class set
         if (!$student->getClasse()) {
+            $classes = $this->classeRepository->findAll();
+            $specialites = $this->specialiteRepository->findAll();
+
             return $this->render('front/chat/index.html.twig', [
                 'needsSetup' => true,
                 'student' => $student,
-                'classes' => $classeRepository->findAll(),
-                'specialites' => $specialiteRepository->findAll(),
+                'classes' => $classes,
+                'specialites' => $specialites,
             ]);
         }
 
