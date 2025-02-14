@@ -217,14 +217,26 @@ class GroupChatController extends AbstractController
             throw $this->createAccessDeniedException('Student account not found.');
         }
 
-        // Get all classes and specializations
+        // Get all classes and specializations for the setup modal
         $classes = $this->classeRepository->findAll();
         $specialites = $this->specialiteRepository->findAll();
 
-        // Get student's groups if they have a class
-        $groups = $eleve->getClasse() ? $this->groupChatRepository->findByStudent($eleve) : [];
+        // Check if student needs setup (no class or specialization set)
+        $needsSetup = !$eleve->getClasse() || !$eleve->getSpecialite();
 
-        return $this->render('front/chat/index.html.twig', compact('eleve', 'classes', 'specialites', 'groups'));
+        // Only get groups if student is fully set up
+        $groups = [];
+        if (!$needsSetup) {
+            $groups = $this->groupChatRepository->findByStudent($eleve);
+        }
+
+        return $this->render('front/chat/index.html.twig', [
+            'eleve' => $eleve,
+            'classes' => $classes,
+            'specialites' => $specialites,
+            'groups' => $groups,
+            'needsSetup' => $needsSetup
+        ]);
     }
 
     #[Route('/api/setup', name: 'app_eleve_chat_setup_new', methods: ['POST'])]
@@ -235,7 +247,7 @@ class GroupChatController extends AbstractController
             $data = json_decode($request->getContent(), true);
             
             if (!isset($data['classe']) || !isset($data['specialite'])) {
-                throw new \InvalidArgumentException('Missing required fields');
+                throw new \InvalidArgumentException('Both class and specialization are required');
             }
 
             /** @var User $user */
@@ -246,8 +258,13 @@ class GroupChatController extends AbstractController
                 throw new \RuntimeException('Student not found');
             }
 
-            $classe = $this->entityManager->getReference('App\Entity\Classe', $data['classe']);
-            $specialite = $this->entityManager->getReference('App\Entity\Specialite', $data['specialite']);
+            // Get the actual entities instead of just references
+            $classe = $this->classeRepository->find($data['classe']);
+            $specialite = $this->specialiteRepository->find($data['specialite']);
+
+            if (!$classe || !$specialite) {
+                throw new \InvalidArgumentException('Invalid class or specialization selected');
+            }
 
             $eleve->setClasse($classe);
             $eleve->setSpecialite($specialite);
@@ -256,7 +273,11 @@ class GroupChatController extends AbstractController
 
             return new JsonResponse(['success' => true]);
         } catch (\Exception $e) {
-            return new JsonResponse(['success' => false, 'error' => $e->getMessage()], 400);
+            return new JsonResponse([
+                'success' => false, 
+                'error' => $e->getMessage(),
+                'message' => 'Please ensure both class and specialization are selected'
+            ], 400);
         }
     }
 }

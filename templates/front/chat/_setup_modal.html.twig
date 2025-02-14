@@ -6,6 +6,11 @@
                 <h5 class="modal-title" id="setupModalLabel">{% trans %}SETUP_YOUR_PROFILE_KEY{% endtrans %}</h5>
             </div>
             <div class="modal-body">
+                <div id="setup-error" class="alert alert-danger d-none">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="error-message"></span>
+                </div>
+                
                 <form id="setupForm">
                     <!-- Class/Skill Level selection -->
                     <div class="mb-3">
@@ -16,6 +21,9 @@
                                 <option value="{{ classe.id }}">{{ classe.nom }}</option>
                             {% endfor %}
                         </select>
+                        <div class="invalid-feedback">
+                            {% trans %}CLASS_REQUIRED_KEY{% endtrans %}
+                        </div>
                     </div>
 
                     <!-- Specialization selection -->
@@ -27,6 +35,9 @@
                                 <option value="{{ specialite.id }}">{{ specialite.nom }}</option>
                             {% endfor %}
                         </select>
+                        <div class="invalid-feedback">
+                            {% trans %}SPECIALIZATION_REQUIRED_KEY{% endtrans %}
+                        </div>
                     </div>
 
                     <div class="alert alert-info">
@@ -56,17 +67,51 @@ document.addEventListener('DOMContentLoaded', function() {
     setupModal.show();
 
     const form = document.getElementById('setupForm');
+    const errorDiv = document.getElementById('setup-error');
+    const errorMessage = document.getElementById('error-message');
+    
+    // Reset form validation on input change
+    form.querySelectorAll('select').forEach(select => {
+        select.addEventListener('change', function() {
+            this.classList.remove('is-invalid');
+            errorDiv.classList.add('d-none');
+        });
+    });
     
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const classe = document.getElementById('classe').value;
-        const specialite = document.getElementById('specialite').value;
+        const classe = document.getElementById('classe');
+        const specialite = document.getElementById('specialite');
+        let hasError = false;
 
-        if (!classe || !specialite) {
-            alert("{% trans %}PLEASE_FILL_ALL_FIELDS_KEY{% endtrans %}");
+        // Reset previous validation state
+        errorDiv.classList.add('d-none');
+        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+        // Validate class
+        if (!classe.value) {
+            classe.classList.add('is-invalid');
+            hasError = true;
+        }
+
+        // Validate specialization
+        if (!specialite.value) {
+            specialite.classList.add('is-invalid');
+            hasError = true;
+        }
+
+        if (hasError) {
+            errorMessage.textContent = "{% trans %}PLEASE_FILL_ALL_FIELDS_KEY{% endtrans %}";
+            errorDiv.classList.remove('d-none');
             return;
         }
+
+        // Disable form while submitting
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>{% trans %}SAVING_KEY{% endtrans %}';
 
         fetch('{{ path('app_eleve_chat_setup_new') }}', {
             method: 'POST',
@@ -75,8 +120,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-CSRF-Token': '{{ csrf_token('setup_token') }}'
             },
             body: JSON.stringify({
-                classe: classe,
-                specialite: specialite
+                classe: classe.value,
+                specialite: specialite.value
             })
         })
         .then(response => response.json())
@@ -84,12 +129,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 window.location.reload();
             } else {
-                alert("{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}");
+                errorMessage.textContent = data.message || "{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}";
+                errorDiv.classList.remove('d-none');
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert("{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}");
+            errorMessage.textContent = "{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}";
+            errorDiv.classList.remove('d-none');
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonText;
         });
     });
 });</script>

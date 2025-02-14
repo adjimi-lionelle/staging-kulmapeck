@@ -3,7 +3,7 @@
 {% block title %} - Chat{% endblock %}
 
 {% block mainContent %}
-    {% if eleve is defined and not eleve.classe %}
+    {% if needsSetup %}
         {% include 'front/chat/_setup_modal.html.twig' with {
             'classes': classes,
             'specialites': specialites,
@@ -27,9 +27,9 @@
                         <input type="text" class="form-control search-bar" placeholder="{% trans %}SEARCH_KEY{% endtrans %}">
                     </div>
                     <div id="group-list" class="chat-group-list">
-                        {% if groups is defined and groups is empty %}
+                        {% if groups is empty %}
                             <p class="text-center mt-3">{% trans %}NO_GROUPS_YET_KEY{% endtrans %}</p>
-                        {% elseif groups is defined %}
+                        {% else %}
                             {% for group in groups %}
                                 <div class="chat-group" data-group-id="{{ group.id }}">
                                     <div class="group-info">
