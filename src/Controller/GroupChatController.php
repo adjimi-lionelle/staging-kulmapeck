@@ -25,6 +25,7 @@ use App\Repository\SpecialiteRepository;
 use App\Entity\GroupChat;
 use App\Entity\MessageChat;
 use App\Entity\Eleve;
+use App\Entity\User;
 use DateTime;
 
 #[Route('/chat')]

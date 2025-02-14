@@ -72,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRF-Token': '{{ csrf_token('setup_token') }}'
             },
             body: JSON.stringify({
                 classe: classe,
