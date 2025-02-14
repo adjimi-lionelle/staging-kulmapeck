@@ -1,161 +1,215 @@
-/* Centrer la boîte de chat et empêcher qu'elle touche le header et footer */
+/* Modern Chat UI Styles */
 .chat-wrapper {
     display: flex;
-    justify-content: center; /* Centrer horizontalement */
-    align-items: center; /* Centrer verticalement */
-    min-height: calc(100vh - 120px); /* Hauteur de l'écran - hauteur estimée du header et footer */
-    margin-top: 20px;
-    margin-bottom: 20px;
-    background-color: rgba(8, 8, 80, 0.932);
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+    background-color: #f0f2f5;
+    padding: 16px;
 }
 
-/* Container global du chat */
 .chat-container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1400px;
     display: flex;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: calc(100vh - 112px);
     overflow: hidden;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Ajustement de la hauteur du chat pour ne pas toucher le header/footer */
-.chat-main,
+/* Sidebar Styles */
 .chat-sidebar {
-    height: calc(100vh - 160px); /* Ajuste la hauteur pour éviter l’écrasement */
-}
-
-/* Barre latérale */
-.chat-sidebar {
-    width: 30%;
-    background: #ffffff;
-    padding: 10px;
-    border-right: 1px solid #ddd;
-    overflow-y: auto;
+    width: 350px;
+    background: #fff;
+    border-right: 1px solid #e9edef;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 160px); /* Ajuste pour ne pas toucher le header/footer */
 }
 
-/* En-tête de la barre latérale */
 .chat-sidebar-header {
-    padding-bottom: 10px;
-    border-bottom: 2px solid #ddd;
+    padding: 16px;
+    background: #f0f2f5;
+    border-bottom: 1px solid #e9edef;
 }
 
 .chat-sidebar-header h5 {
-    font-weight: bold;
-    font-size: 18px;
+    color: #111b21;
+    font-size: 16px;
     margin: 0;
-    padding-bottom: 5px;
+    font-weight: 600;
 }
 
-/* Barre de recherche */
 .search-bar {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    border: none;
+    background: #f0f2f5;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #111b21;
 }
 
-/* Liste des groupes */
+.search-bar:focus {
+    outline: none;
+    background: #e9edef;
+}
+
+/* Group List Styles */
 .chat-group-list {
-    margin-top: 10px;
+    flex: 1;
+    overflow-y: auto;
 }
 
-/* Style des groupes avec ligne de séparation */
 .chat-group {
+    padding: 12px 16px;
     display: flex;
     align-items: center;
-    padding: 12px 10px;
+    border-bottom: 1px solid #e9edef;
     cursor: pointer;
-    transition: background 0.3s;
-    border-bottom: 1px solid #ddd; /* Ligne de séparation */
+    transition: background-color 0.2s;
 }
 
 .chat-group:hover {
-    background: #f1f1f1;
+    background-color: #f0f2f5;
 }
 
-/* Style du nom du groupe */
-.chat-group-name {
-    flex-grow: 1;
-    font-size: 16px;
-    font-weight: bold;
-    color: #333;
+.chat-group.active {
+    background-color: #f0f2f5;
 }
 
-/* Icône ou statut */
-.chat-group-extra {
-    font-size: 12px;
-    color: #777;
+.group-info {
+    flex: 1;
+    min-width: 0;
 }
 
-/* Dernier message en petit */
-.chat-group-info p {
+.group-info h6 {
     margin: 0;
-    font-size: 12px;
-    color: #666;
+    font-size: 16px;
+    font-weight: 500;
+    color: #111b21;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+.group-info p {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #667781;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-/* Conteneur principal des messages */
+/* Main Chat Area Styles */
 .chat-main {
-    width: 70%;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    background: lightgray;
+    background: #efeae2;
+    position: relative;
 }
 
-/* Messages */
-.chat-messages {
-    flex: 1;
-    padding: 10px;
-    overflow-y: auto;
-}
-
-/* Barre d'entrée de texte */
-.chat-input-area {
+.chat-main-header {
+    padding: 16px;
+    background: #f0f2f5;
+    border-bottom: 1px solid #e9edef;
     display: flex;
     align-items: center;
-    padding: 10px;
-    border-top: 1px solid #ddd;
-    background-color: #f8f9fa;
 }
 
-/* Masquer la saisie de message par défaut */
-#chat-input-area.d-none {
-    display: none !important;
+.chat-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #111b21;
 }
 
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAA1SURBVDhPY/j//z8DLtzQ0PAfnzwxGKsgKRirICkYqyApGKsgKRirICkYqyApGKsgKXjgDGQAAD3wE0H/dplKAAAAAElFTkSuQmCC");
+}
+
+.welcome-message {
+    text-align: center;
+    color: #8696a0;
+    margin-top: 40px;
+    font-size: 14px;
+}
+
+.chat-input-area {
+    padding: 12px;
+    background: #f0f2f5;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 9px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 15px;
+    color: #111b21;
+}
+
+.chat-input:focus {
+    outline: none;
+}
+
+.chat-send {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    background: #00a884;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.chat-send:hover {
+    background: #008f72;
+}
+
+.chat-send:disabled {
+    background: #8696a0;
+    cursor: not-allowed;
+}
+
+/* Message Styles */
 .message-item {
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 5px;
-    background: #f8f9fa;
-    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    max-width: 65%;
+    margin-bottom: 12px;
+    align-self: flex-start;
 }
 
-.message-header {
-    font-size: 12px;
-    color: #666;
-    margin-bottom: 5px;
-}
-
-.message-time {
-    float: right;
-    font-size: 11px;
-    color: #aaa;
+.message-item.outgoing {
+    align-self: flex-end;
 }
 
 .message-content {
-    background: white;
-    padding: 8px;
-    border-radius: 5px;
-    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    position: relative;
 }
 
+.message-item.outgoing .message-content {
+    background: #d9fdd3;
+}
+
+.message-time {
+    font-size: 11px;
+    color: #667781;
+    margin-top: 4px;
+    align-self: flex-end;
+}
