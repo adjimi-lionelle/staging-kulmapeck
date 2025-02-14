@@ -1,0 +1,293 @@
+<!-- Forum Grid START -->
+<div class="forum-grid">
+    <!-- Search and filter bar -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="search-bar flex-grow-1 me-3">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-0">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control border-0 bg-light" id="forumSearch" 
+                       placeholder="{% trans %}SEARCH_FORUMS_KEY{% endtrans %}">
+            </div>
+        </div>
+        <div class="filter-buttons d-flex gap-2">
+            <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown">
+                    <i class="fas fa-filter me-2"></i>{% trans %}FILTER_KEY{% endtrans %}
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" data-filter="all">{% trans %}ALL_KEY{% endtrans %}</a></li>
+                    <li><a class="dropdown-item" href="#" data-filter="active">{% trans %}ACTIVE_KEY{% endtrans %}</a></li>
+                    <li><a class="dropdown-item" href="#" data-filter="unread">{% trans %}UNREAD_KEY{% endtrans %}</a></li>
+                </ul>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown">
+                    <i class="fas fa-sort me-2"></i>{% trans %}SORT_KEY{% endtrans %}
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" data-sort="recent">{% trans %}MOST_RECENT_KEY{% endtrans %}</a></li>
+                    <li><a class="dropdown-item" href="#" data-sort="active">{% trans %}MOST_ACTIVE_KEY{% endtrans %}</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forums grid -->
+    <div class="row g-4" id="forumsGrid">
+        {% for forum in forums %}
+            <div class="col-md-6 col-lg-4 forum-card" 
+                 data-forum-id="{{ forum.id }}"
+                 data-subject="{{ forum.subject|lower }}"
+                 data-activity="{{ forum.lastActivity|date('U') }}">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">{{ forum.subject }}</h5>
+                            {% if forum.unreadCount > 0 %}
+                                <span class="badge bg-danger rounded-pill">{{ forum.unreadCount }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="teacher-info d-flex align-items-center mb-3">
+                            <div class="avatar avatar-xs me-2">
+                                <img src="{{ forum.teacherAvatar }}" class="avatar-img rounded-circle" alt="">
+                                <span class="position-absolute bottom-0 end-0 small">
+                                    <span class="badge bg-success rounded-circle" data-bs-toggle="tooltip" 
+                                          title="{% trans %}TEACHER_ONLINE_KEY{% endtrans %}">
+                                        <span class="visually-hidden">{% trans %}ONLINE_KEY{% endtrans %}</span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="small">{{ forum.teacherName }}</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center small text-muted">
+                            <div>
+                                <i class="fas fa-users me-1"></i>
+                                <span>{{ forum.onlineCount }} {% trans %}ONLINE_KEY{% endtrans %}</span>
+                            </div>
+                            <div>
+                                <i class="far fa-clock me-1"></i>
+                                <span>{{ forum.lastActivity|ago }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Chat Interface -->
+{{ include('student/chat/forum/_chat.html.twig', {
+    forum: null,
+    messages: [],
+    onlineTeachers: [],
+    onlineStudents: []
+}) }}
+
+<!-- Add necessary styles -->
+<style>
+.forum-card .card {
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.forum-card .card:hover {
+    transform: translateY(-5px);
+}
+
+.search-bar .form-control:focus {
+    box-shadow: none;
+}
+
+.avatar {
+    position: relative;
+}
+
+.avatar-xs {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+</style>
+
+<!-- Add forum selection handling -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forumsGrid = document.getElementById('forumsGrid');
+    const chatInterface = document.getElementById('chatInterface');
+    const backToForums = document.getElementById('backToForums');
+    const forumSearch = document.getElementById('forumSearch');
+    let currentForumId = null;
+    let websocket = null;
+
+    // Initialize chat for a forum
+    function initializeForumChat(forumId) {
+        currentForumId = forumId;
+        
+        // Disconnect existing WebSocket if any
+        if (websocket) {
+            websocket.disconnect();
+        }
+
+        // Create new WebSocket connection
+        websocket = new ForumWebSocket(forumId);
+
+        // Listen for WebSocket events
+        document.addEventListener(`forum:message`, handleWebSocketMessage);
+        document.addEventListener(`forum:typing`, handleTypingStatus);
+        document.addEventListener(`forum:presence`, handlePresenceUpdate);
+        document.addEventListener(`forum:connected`, handleWebSocketConnected);
+        document.addEventListener(`forum:disconnected`, handleWebSocketDisconnected);
+    }
+
+    // Forum card click handler
+    forumsGrid.addEventListener('click', function(e) {
+        const forumCard = e.target.closest('.forum-card');
+        if (!forumCard) return;
+
+        const forumId = forumCard.dataset.forumId;
+        initializeForumChat(forumId);
+
+        // Hide grid, show chat
+        document.querySelector('.forum-grid').style.display = 'none';
+        chatInterface.style.display = 'block';
+
+        // Load forum messages
+        loadForumMessages(forumId);
+    });
+
+    // Back button handler
+    backToForums.addEventListener('click', function() {
+        chatInterface.style.display = 'none';
+        document.querySelector('.forum-grid').style.display = 'block';
+        currentForumId = null;
+    });
+
+    // Search functionality
+    forumSearch.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.forum-card').forEach(card => {
+            const subject = card.dataset.subject;
+            card.style.display = subject.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // Load forum messages
+    function loadForumMessages(forumId) {
+        fetch(`{{ path('app_student_chat_messages', {'subject': '__ID__'}) }}`.replace('__ID__', forumId))
+            .then(response => response.json())
+            .then(data => {
+                // Update chat interface with forum data
+                document.querySelector('.chat-messages').innerHTML = '';
+                if (data.messages) {
+                    data.messages.forEach(message => {
+                        const messageHtml = createMessageElement(message);
+                        document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+                    });
+                }
+                // Update online users
+                updateOnlineUsers(data.onlineTeachers, data.onlineStudents);
+                // Scroll to bottom
+                const messagesContainer = document.querySelector('.chat-messages-container');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            });
+    }
+
+    // WebSocket event handlers
+    function handleWebSocketMessage(event) {
+        const { message } = event.detail;
+        if (message && event.detail.forumId === currentForumId) {
+            const messageHtml = createMessageElement(message);
+            document.querySelector('.chat-messages').insertAdjacentHTML('beforeend', messageHtml);
+            scrollToBottom();
+        }
+    }
+
+    function handleTypingStatus(event) {
+        const { userId, isTyping } = event.detail;
+        const typingIndicator = document.querySelector('.typing-indicator');
+        
+        if (event.detail.forumId === currentForumId) {
+            if (isTyping) {
+                typingIndicator.textContent = 'Someone is typing...';
+                typingIndicator.classList.remove('d-none');
+            } else {
+                typingIndicator.classList.add('d-none');
+            }
+        }
+    }
+
+    function handlePresenceUpdate(event) {
+        const { onlineTeachers, onlineStudents } = event.detail;
+        if (event.detail.forumId === currentForumId) {
+            updateOnlineUsers(onlineTeachers, onlineStudents);
+        }
+    }
+
+    function handleWebSocketConnected(event) {
+        if (event.detail.forumId === currentForumId) {
+            console.log('Connected to chat server');
+            document.querySelector('.connection-status').classList.add('d-none');
+        }
+    }
+
+    function handleWebSocketDisconnected(event) {
+        if (event.detail.forumId === currentForumId) {
+            console.log('Disconnected from chat server');
+            document.querySelector('.connection-status').classList.remove('d-none');
+        }
+    }
+
+    // Update message sending to use WebSocket
+    document.querySelector('.chat-input-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const input = this.querySelector('input[type="text"]');
+        const message = input.value.trim();
+        
+        if (message && websocket) {
+            const success = websocket.sendMessage(message);
+            if (success) {
+                input.value = '';
+            }
+        }
+    });
+
+    // Add typing indicator
+    let typingTimeout;
+    document.querySelector('.chat-input').addEventListener('input', function() {
+        if (websocket) {
+            clearTimeout(typingTimeout);
+            websocket.sendTypingStatus(true);
+            
+            typingTimeout = setTimeout(() => {
+                websocket.sendTypingStatus(false);
+            }, 1000);
+        }
+    });
+
+    // Cleanup function
+    function cleanup() {
+        if (websocket) {
+            websocket.disconnect();
+        }
+        document.removeEventListener(`forum:message`, handleWebSocketMessage);
+        document.removeEventListener(`forum:typing`, handleTypingStatus);
+        document.removeEventListener(`forum:presence`, handlePresenceUpdate);
+        document.removeEventListener(`forum:connected`, handleWebSocketConnected);
+        document.removeEventListener(`forum:disconnected`, handleWebSocketDisconnected);
+    }
+
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>

@@ -1,0 +1,107 @@
+<div class="card h-100 forum-card" data-forum-id="{{ forum.id }}">
+    <!-- Card body -->
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <!-- Subject info -->
+            <div class="d-flex align-items-center">
+                <div class="subject-icon me-2">
+                    <i class="fas {{ forum.icon|default('fa-book') }} fa-2x text-primary"></i>
+                </div>
+                <div>
+                    <h5 class="card-title mb-0">
+                        <a href="#" class="stretched-link text-decoration-none">{{ forum.subject }}</a>
+                    </h5>
+                    <small class="text-muted">{{ forum.teacherName }}</small>
+                </div>
+            </div>
+            
+            <!-- Unread badge -->
+            {% if forum.unreadCount > 0 %}
+                <span class="badge bg-danger rounded-pill">{{ forum.unreadCount }}</span>
+            {% endif %}
+        </div>
+
+        <!-- Teacher info -->
+        <div class="d-flex align-items-center mb-3">
+            <div class="avatar avatar-xs me-2 position-relative">
+                <img src="{{ forum.teacherAvatar }}" class="avatar-img rounded-circle" alt="{{ forum.teacherName }}">
+                {% if forum.isTeacherOnline %}
+                    <span class="position-absolute bottom-0 end-0 small">
+                        <span class="badge bg-success rounded-circle" data-bs-toggle="tooltip" title="{% trans %}TEACHER_ONLINE_KEY{% endtrans %}">
+                            <span class="visually-hidden">{% trans %}ONLINE_KEY{% endtrans %}</span>
+                        </span>
+                    </span>
+                {% endif %}
+            </div>
+            <div class="small">
+                <div class="fw-bold">{{ forum.teacherName }}</div>
+                <div class="text-muted">{{ forum.teacherStatus }}</div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="small text-muted">
+                <i class="fas fa-users me-1"></i>
+                {{ forum.onlineCount }} {% trans %}ONLINE_KEY{% endtrans %}
+            </div>
+            <div class="small text-muted">
+                <i class="fas fa-clock me-1"></i>
+                {{ forum.lastActivity|ago }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Card overlay for hover effect -->
+    <div class="card-overlay">
+        <button class="btn btn-primary start-chat">
+            <i class="fas fa-comments me-2"></i>{% trans %}START_CHAT_KEY{% endtrans %}
+        </button>
+    </div>
+</div>
+
+<!-- Add necessary styles -->
+<style>
+.forum-card {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.forum-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.forum-card:hover .card-overlay {
+    opacity: 1;
+}
+
+.avatar {
+    position: relative;
+}
+
+.avatar-xs {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+</style>

@@ -1,0 +1,53 @@
+{% extends "student/base.html.twig" %}
+
+{% block pageContent %}
+    {% if needsSetup %}
+        {{ include('student/chat/_setup_modal.html.twig') }}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const setupModal = new bootstrap.Modal(document.getElementById('setupModal'));
+                setupModal.show();
+            });
+        </script>
+    {% else %}
+        <!-- Include the forum grid -->
+        {{ include('student/chat/forum/_grid.html.twig', {
+            forums: forums,
+            categories: categories
+        }) }}
+    {% endif %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Additional styles for the chat interface */
+        .page-content {
+            background-color: var(--bs-light);
+            min-height: calc(100vh - 70px); /* Adjust based on your header height */
+            padding: 1.5rem;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/chat/websocket.js') }}"></script>
+    <script>
+        // Initialize WebSocket configuration
+        window.WS_CONFIG = {
+            reconnectAttempts: 5,
+            reconnectDelay: 3000,
+            messageQueueSize: 100
+        };
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+{% endblock %}

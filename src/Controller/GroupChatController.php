@@ -30,14 +30,16 @@ class GroupChatController extends AbstractController
     private EntityManagerInterface $entityManager;
     private string $jwtSecret;
     private JWTTokenManagerInterface $jwtManager;
+    private EleveRepository $eleveRepository;
 
 
 
-    public function __construct(EntityManagerInterface $entityManager, string $jwtSecret, JWTTokenManagerInterface $jwtManager)
+    public function __construct(EntityManagerInterface $entityManager, string $jwtSecret, JWTTokenManagerInterface $jwtManager, EleveRepository $eleveRepository)
     {
         $this->entityManager = $entityManager;
         $this->jwtSecret = $jwtSecret;
         $this->jwtManager = $jwtManager;
+        $this->eleveRepository = $eleveRepository;
     }
     
      
@@ -134,6 +136,7 @@ class GroupChatController extends AbstractController
             return new JsonResponse(['error' => 'Aucune entité Personne trouvée pour cet utilisateur'], 403);
         }
 
+        $eleve = $personne->getUtilisateur()->getEleve();
         if (!$eleve || !$eleve->isIsPremium()) {
             return new JsonResponse(['error' => 'Accès refusé : vous devez être premium pour accéder au chat'], 403);
         }
@@ -194,5 +197,36 @@ class GroupChatController extends AbstractController
         return $this->json($data);
     }
 
+    #[Route('/setup', name: 'app_student_chat_setup', methods: ['POST'])]
+    #[IsGranted('ROLE_STUDENT')]
+    public function setup(Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+            
+            if (!isset($data['classe']) || !isset($data['specialite'])) {
+                throw new \InvalidArgumentException('Missing required fields');
+            }
 
+            /** @var User $user */
+            $user = $this->getUser();
+            $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+            
+            if (!$student) {
+                throw new \RuntimeException('Student not found');
+            }
+
+            $classe = $this->entityManager->getReference('App\Entity\Classe', $data['classe']);
+            $specialite = $this->entityManager->getReference('App\Entity\Specialite', $data['specialite']);
+
+            $student->setClasse($classe);
+            $student->setSpecialite($specialite);
+
+            $this->entityManager->flush();
+
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['success' => false, 'error' => $e->getMessage()], 400);
+        }
+    }
 }

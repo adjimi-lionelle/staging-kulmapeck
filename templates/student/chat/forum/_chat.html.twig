@@ -1,0 +1,209 @@
+<!-- Chat Interface START -->
+<div class="chat-interface" id="chatInterface" style="display: none;">
+    <div class="row g-0">
+        <!-- Main chat area -->
+        <div class="col-lg-9 chat-main border-end">
+            <!-- Chat header -->
+            <div class="chat-header border-bottom p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-light btn-sm me-2 d-lg-none" id="toggleUserList">
+                            <i class="fas fa-users"></i>
+                        </button>
+                        {% if forum %}
+                        <div class="d-flex align-items-center">
+                            <div class="avatar avatar-sm me-2">
+                                <img src="{{ forum.teacherAvatar }}" class="avatar-img rounded-circle" alt="">
+                                <span class="position-absolute bottom-0 end-0 small">
+                                    <span class="badge bg-success rounded-circle">
+                                        <span class="visually-hidden">{% trans %}ONLINE_KEY{% endtrans %}</span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">{{ forum.subject }}</h6>
+                                <small class="text-muted">{{ forum.teacherName }}</small>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <button class="btn btn-light btn-sm" id="backToForums">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connection Status -->
+            <div class="connection-status alert alert-warning d-none" role="alert">
+                {% trans %}Connecting to chat server...{% endtrans %}
+            </div>
+
+            <!-- Messages container -->
+            <div class="chat-messages-container p-3" id="messagesContainer">
+                <div class="chat-messages">
+                    {{ include('student/chat/forum/_messages.html.twig', { 
+                        messages: messages|default([]),
+                        forum: forum
+                    }) }}
+                </div>
+                <!-- Typing Indicator -->
+                <div class="typing-indicator text-muted small d-none mt-2">
+                    <i class="fas fa-keyboard me-1"></i>
+                    <span>{% trans %}SOMEONE_IS_TYPING_KEY{% endtrans %}</span>
+                </div>
+            </div>
+
+            <!-- Input area -->
+            <div class="chat-input border-top p-3">
+                <form id="messageForm" class="message-form">
+                    <div class="input-group">
+                        <button type="button" class="btn btn-light" id="emojiButton" data-bs-toggle="tooltip" title="{% trans %}ADD_EMOJI_KEY{% endtrans %}">
+                            <i class="far fa-smile"></i>
+                        </button>
+                        <textarea class="form-control" id="messageInput" rows="1" 
+                                placeholder="{% trans %}TYPE_YOUR_MESSAGE_KEY{% endtrans %}"
+                                maxlength="500"
+                                data-emojiable="true"></textarea>
+                        <div class="char-counter" id="charCounter">500</div>
+                        <button type="submit" class="btn btn-primary" id="sendButton">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- User list panel -->
+        <div class="col-lg-3 chat-users border-start" id="userListPanel">
+            <div class="p-3 border-bottom">
+                <h6 class="mb-0">{% trans %}ONLINE_USERS_KEY{% endtrans %}</h6>
+            </div>
+            <div class="p-3">
+                <!-- Teachers section -->
+                <div class="mb-4">
+                    <h6 class="text-muted small mb-2">{% trans %}TEACHERS_KEY{% endtrans %}</h6>
+                    <div class="online-teachers">
+                        {% for teacher in onlineTeachers|default([]) %}
+                            <div class="user-item d-flex align-items-center mb-3">
+                                <div class="avatar avatar-xs me-2">
+                                    <img src="{{ teacher.avatar }}" class="avatar-img rounded-circle" alt="">
+                                    <span class="position-absolute bottom-0 end-0 small">
+                                        <span class="badge bg-success rounded-circle">
+                                            <span class="visually-hidden">{% trans %}ONLINE_KEY{% endtrans %}</span>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="small">
+                                    <div class="fw-bold">{{ teacher.name }}</div>
+                                    <div class="text-muted">{{ teacher.status }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Students section -->
+                <div>
+                    <h6 class="text-muted small mb-2">{% trans %}STUDENTS_KEY{% endtrans %}</h6>
+                    <div class="online-students">
+                        {% for student in onlineStudents|default([]) %}
+                            <div class="user-item d-flex align-items-center mb-3">
+                                <div class="avatar avatar-xs me-2">
+                                    <img src="{{ student.avatar }}" class="avatar-img rounded-circle" alt="">
+                                    <span class="position-absolute bottom-0 end-0 small">
+                                        <span class="badge bg-success rounded-circle">
+                                            <span class="visually-hidden">{% trans %}ONLINE_KEY{% endtrans %}</span>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="small">
+                                    <div class="fw-bold">{{ student.name }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add necessary styles -->
+<style>
+.chat-interface {
+    background: var(--bs-light);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    height: calc(100vh - 150px);
+}
+
+.chat-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat-messages-container {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.chat-input {
+    background: #fff;
+}
+
+.message-form {
+    position: relative;
+}
+
+.char-counter {
+    position: absolute;
+    right: 50px;
+    bottom: 8px;
+    font-size: 12px;
+    color: var(--bs-gray-500);
+}
+
+.typing-indicator {
+    height: 20px;
+}
+
+@media (max-width: 991.98px) {
+    .chat-users {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 280px;
+        height: 100vh;
+        background: #fff;
+        z-index: 1050;
+        transition: right 0.3s ease;
+    }
+
+    .chat-users.show {
+        right: 0;
+    }
+}
+
+.avatar {
+    position: relative;
+}
+
+.avatar-xs {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.avatar-sm {
+    width: 2rem;
+    height: 2rem;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+</style>

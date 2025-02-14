@@ -3,8 +3,19 @@
 {% block title %} - Chat{% endblock %}
 
 {% block mainContent %}
-    <div class="chat-wrapper">
-        <div class="container-fluid chat-container">
+    {% if not student.classe %}
+        {{ include('front/chat/_setup_modal.html.twig') }}
+        <div class="chat-wrapper">
+            <div class="container-fluid chat-container">
+                <div class="text-center mt-5">
+                    <h3>{% trans %}WELCOME_TO_CHAT_KEY{% endtrans %}</h3>
+                    <p>{% trans %}PLEASE_SETUP_PROFILE_KEY{% endtrans %}</p>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="chat-wrapper">
+            <div class="container-fluid chat-container">
                 <!-- Colonne des groupes -->
                 <div class="col-md-4 chat-sidebar">
                     <div class="chat-sidebar-header">
@@ -29,10 +40,9 @@
                         </button>
                     </div>
                 </div>
-          
+            </div>
         </div>
-    </div>
-
+    {% endif %}
     {% block stylesheet %}
         {{ parent() }}
         <link rel="stylesheet" href="{{ asset('assets/css/chat.css') }}">
