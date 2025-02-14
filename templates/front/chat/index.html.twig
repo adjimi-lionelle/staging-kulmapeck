@@ -27,7 +27,7 @@
                         <input type="text" class="form-control search-bar" placeholder="{% trans %}SEARCH_KEY{% endtrans %}">
                     </div>
                     <div id="group-list" class="chat-group-list">
-                        {% if groups is empty %}
+                        {% if groups is not defined or groups is empty %}
                             <p class="text-center mt-3">{% trans %}NO_GROUPS_YET_KEY{% endtrans %}</p>
                         {% else %}
                             {% for group in groups %}
