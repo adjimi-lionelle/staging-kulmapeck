@@ -35,10 +35,11 @@ class GroupChatController extends AbstractController
     private EleveRepository $eleveRepository;
     private ClasseRepository $classeRepository;
     private SpecialiteRepository $specialiteRepository;
+    private GroupChatRepository $groupChatRepository;
 
 
 
-    public function __construct(EntityManagerInterface $entityManager, string $jwtSecret, JWTTokenManagerInterface $jwtManager, EleveRepository $eleveRepository, ClasseRepository $classeRepository, SpecialiteRepository $specialiteRepository)
+    public function __construct(EntityManagerInterface $entityManager, string $jwtSecret, JWTTokenManagerInterface $jwtManager, EleveRepository $eleveRepository, ClasseRepository $classeRepository, SpecialiteRepository $specialiteRepository, GroupChatRepository $groupChatRepository)
     {
         $this->entityManager = $entityManager;
         $this->jwtSecret = $jwtSecret;
@@ -46,6 +47,7 @@ class GroupChatController extends AbstractController
         $this->eleveRepository = $eleveRepository;
         $this->classeRepository = $classeRepository;
         $this->specialiteRepository = $specialiteRepository;
+        $this->groupChatRepository = $groupChatRepository;
     }
     
      
@@ -217,6 +219,7 @@ class GroupChatController extends AbstractController
 
         // Check if student has class set
         if (!$student->getClasse()) {
+            // Get all classes and specializations
             $classes = $this->classeRepository->findAll();
             $specialites = $this->specialiteRepository->findAll();
 
@@ -225,12 +228,19 @@ class GroupChatController extends AbstractController
                 'student' => $student,
                 'classes' => $classes,
                 'specialites' => $specialites,
+                'groups' => [] // Empty array since student has no class yet
             ]);
         }
+
+        // Get student's groups if they have a class
+        $groups = $this->groupChatRepository->findByStudent($student);
 
         return $this->render('front/chat/index.html.twig', [
             'needsSetup' => false,
             'student' => $student,
+            'groups' => $groups,
+            'classes' => [], // Not needed when student has a class
+            'specialites' => [] // Not needed when student has a class
         ]);
     }
 
