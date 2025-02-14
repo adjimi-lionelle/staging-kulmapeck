@@ -220,8 +220,8 @@ class GroupChatController extends AbstractController
             return $this->render('front/chat/index.html.twig', [
                 'needsSetup' => true,
                 'student' => $student,
-                'allClasses' => $classeRepository->findAll(),
-                'allSpecialites' => $specialiteRepository->findAll(),
+                'classes' => $classeRepository->findAll(),
+                'specialites' => $specialiteRepository->findAll(),
             ]);
         }
 
