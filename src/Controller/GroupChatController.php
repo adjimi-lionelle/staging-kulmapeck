@@ -24,6 +24,7 @@ use App\Repository\ClasseRepository;
 use App\Repository\SpecialiteRepository;
 use App\Entity\GroupChat;
 use App\Entity\MessageChat;
+use App\Entity\Eleve;
 use DateTime;
 
 #[Route('/chat')]
@@ -36,8 +37,6 @@ class GroupChatController extends AbstractController
     private ClasseRepository $classeRepository;
     private SpecialiteRepository $specialiteRepository;
     private GroupChatRepository $groupChatRepository;
-
-
 
     public function __construct(EntityManagerInterface $entityManager, string $jwtSecret, JWTTokenManagerInterface $jwtManager, EleveRepository $eleveRepository, ClasseRepository $classeRepository, SpecialiteRepository $specialiteRepository, GroupChatRepository $groupChatRepository)
     {
@@ -245,17 +244,17 @@ class GroupChatController extends AbstractController
 
             /** @var User $user */
             $user = $this->getUser();
-            $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+            $eleve = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
             
-            if (!$student) {
+            if (!$eleve) {
                 throw new \RuntimeException('Student not found');
             }
 
             $classe = $this->entityManager->getReference('App\Entity\Classe', $data['classe']);
             $specialite = $this->entityManager->getReference('App\Entity\Specialite', $data['specialite']);
 
-            $student->setClasse($classe);
-            $student->setSpecialite($specialite);
+            $eleve->setClasse($classe);
+            $eleve->setSpecialite($specialite);
 
             $this->entityManager->flush();
 
