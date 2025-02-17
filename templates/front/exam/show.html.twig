@@ -64,13 +64,8 @@
                                      {% if data ends with '.pdf' %}
             <!-- Afficher le PDF dans un iframe -->
             <div class="card overflow-hidden h-700px rounded-3 text-center">
-                <iframe src="{{ path('app_front_exam_view', {'reference': exam.reference, 'type': display}) }}#toolbar=0&navpanes=0&scrollbar=0" 
-                        style="width: 100%; height: 800px; border: none;"
-                        sandbox="allow-same-origin allow-scripts"
-                        oncontextmenu="return false;">
-                </iframe>
+               
             </div>
-            {% endif %}
                                 </div>
                             </div>
                             <!-- Card item END -->

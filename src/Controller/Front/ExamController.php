@@ -69,53 +69,21 @@ class ExamController extends AbstractController
         ]);
     }
     
-    #[Route('/exam/{reference}/view/{type}', name: 'app_front_exam_view')]
-    public function viewExam(Request $request, Exam $exam, string $type, PersonneRepository $personneRepository): Response
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-        $personne = $personneRepository->findOneBy(['utilisateur' => $this->getUser()]);
-        if (!$personne) {
-            throw $this->createAccessDeniedException();
-        }
-
-        $eleve = $personne->getUtilisateur()->getEleve();
-        if ($eleve && !$eleve->isIsPremium()) {
-            throw $this->createAccessDeniedException("Vous devez être premium!");
-        }
-
-        $file = $type === 'correction' ? $exam->getCorrection() : $exam->getSujet();
-        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/media/exams/files/' . $file;
-
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/pdf');
-        $response->headers->set('Content-Disposition', 'inline; filename="' . $file . '"');
-        $response->headers->set('Content-Security-Policy', "default-src 'self'; object-src 'none'");
-        $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-        $response->headers->set('Pragma', 'no-cache');
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-        
-        $response->setContent(file_get_contents($filePath));
-        
-        return $response;
-    }
-    
     #[Route('/exam/file/{filename}', name: 'app_exam_file')]
-    public function servePdfFile(string $filename): Response
-    {
-        $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
+public function servePdfFile(string $filename): Response
+{
+    $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
 
-        if (!file_exists($filePath)) {
-            throw $this->createNotFoundException("Fichier introuvable.");
-        }
-
-        return new Response(file_get_contents($filePath), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline', // Empêche le téléchargement en forçant l'affichage
-            'X-Content-Type-Options' => 'nosniff',
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma' => 'no-cache',
-        ]);
+    if (!file_exists($filePath)) {
+        throw $this->createNotFoundException("Fichier introuvable.");
     }
+
+    return new Response(file_get_contents($filePath), 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline', // Empêche le téléchargement en forçant l'affichage
+        'X-Content-Type-Options' => 'nosniff',
+        'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma' => 'no-cache',
+    ]);
+}
 }
