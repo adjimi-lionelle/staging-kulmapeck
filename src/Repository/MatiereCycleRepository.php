@@ -54,14 +54,15 @@ class MatiereCycleRepository extends ServiceEntityRepository
             ->select('m')
             ->distinct();
 
-        // if ($classe) {
-        //     $qb->andWhere('m.cycle = :cycle')
-        //        ->setParameter('cycle', $classe->getCycle());
-        // }
+        if ($classe) {
+            $qb->andWhere('m.cycle = :cycle')
+               ->setParameter('cycle', $classe->getCycle());
+        }
 
         if ($specialite) {
-            $qb->andWhere('m.specialite = :specialite')
-               ->setParameter('specialite', $specialite);
+            $qb->leftJoin('m.specialites', 's')
+               ->andWhere('s.id = :specialite_id OR m.specialites IS EMPTY')
+               ->setParameter('specialite_id', $specialite->getId());
         }
 
         return $qb->getQuery()->getResult();
