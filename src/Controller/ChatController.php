@@ -2,42 +2,94 @@
 
 namespace App\Controller;
 
+use App\Entity\Categorie;
+use App\Entity\GroupChat;
+use App\Entity\MessageChat;
+use App\Entity\User;
+use App\Entity\Eleve;
+use App\Entity\MatiereCycle;
+use App\Entity\Specialite;
+use App\Repository\GroupChatRepository;
+use App\Repository\MessageChatRepository;
+use App\Repository\EleveRepository;
+use App\Repository\MatiereCycleRepository;
+use App\Repository\ClasseRepository;
+use App\Repository\SpecialiteRepository;
+use App\Repository\PersonneRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Security\Core\Security;
 
 class ChatController extends AbstractController
 {
-
     private string $jwtSecret;
-    private JWTTokenManagerInterface $jwtManager;
 
-
-
-    public function __construct(string $jwtSecret)
-    {
-        
+    public function __construct(
+        string $jwtSecret,
+        private EntityManagerInterface $entityManager,
+        private MessageChatRepository $messageChatRepository,
+        private GroupChatRepository $groupChatRepository,
+        private EleveRepository $eleveRepository,
+        private MatiereCycleRepository $matiereCycleRepository,
+        private ClasseRepository $classeRepository,
+        private SpecialiteRepository $specialiteRepository,
+        private PersonneRepository $personneRepository
+    ) {
         $this->jwtSecret = $jwtSecret;
-    }  
+    }
 
-
-    
     #[Route('/chat', name: 'app_chat')]
     #[IsGranted('ROLE_USER')]
     public function index(): Response
     {
         $user = $this->getUser();
-
         if (!$user) {
-            return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
+            return $this->redirectToRoute('app_login');
         }
+
+        // For students, check premium status and setup
+        if ($this->isGranted('ROLE_STUDENT')) {
+            $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+            if (!$student) {
+                throw $this->createAccessDeniedException('Student account not found.');
+            }
+
+            // Check premium status
+            if (!$student->isIsPremium()) {
+                $this->addFlash('warning', 'You need a premium account to access chat features.');
+                return $this->redirectToRoute('app_premium_plans');
+            }
+
+            // Get all classes and specializations for setup if needed
+            $classes = $this->classeRepository->findAll();
+            $specialites = $this->specialiteRepository->findAll();
+
+            // Check if student needs setup
+            $needsSetup = !$student->getClasse() || !$student->getSpecialite();
+            
+            // Only get groups if student is fully set up
+            $groups = [];
+            if (!$needsSetup) {
+                $groups = $this->groupChatRepository->findByStudent($student);
+            }
+
+            return $this->render('front/chat/index.html.twig', [
+                'student' => $student,
+                'classes' => $classes,
+                'specialites' => $specialites,
+                'groups' => $groups,
+                'needsSetup' => $needsSetup
+            ]);
+        }
+
+        // For non-students, show appropriate interface
         return $this->render('front/chat/index.html.twig');
     }
-
 
     /**
      * Entry point for AI Teacher Chats
@@ -52,6 +104,12 @@ class ChatController extends AbstractController
         
         if (!$student) {
             throw $this->createAccessDeniedException('Student account not found.');
+        }
+
+        // Check premium status
+        if (!$student->isIsPremium()) {
+            $this->addFlash('warning', 'You need a premium account to access AI teacher chats.');
+            return $this->redirectToRoute('app_premium_plans');
         }
 
         // Get available subjects
@@ -122,6 +180,81 @@ class ChatController extends AbstractController
             'student_token' => $token,
             'websocket_url' => $this->getParameter('websocket_url')
         ]);
+    }
+
+    #[Route('/chat/setup', name: 'app_chat_setup', methods: ['POST'])]
+    #[IsGranted('ROLE_STUDENT')]
+    public function setup(Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+            
+            if (!isset($data['classe']) || !isset($data['specialite'])) {
+                throw new \InvalidArgumentException('Both class and specialization are required');
+            }
+
+            /** @var User $user */
+            $user = $this->getUser();
+            $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+            
+            if (!$student) {
+                throw new \RuntimeException('Student not found');
+            }
+
+            $classe = $this->classeRepository->find($data['classe']);
+            $specialite = $this->specialiteRepository->find($data['specialite']);
+
+            if (!$classe || !$specialite) {
+                throw new \InvalidArgumentException('Invalid class or specialization selected');
+            }
+
+            $student->setClasse($classe);
+            $student->setSpecialite($specialite);
+
+            $this->entityManager->flush();
+
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false, 
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    #[Route('/chat/send', name: 'app_chat_send', methods: ['POST'])]
+    #[IsGranted('ROLE_STUDENT')]
+    public function sendMessage(Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        
+        if (!$student || !$student->isIsPremium()) {
+            return new JsonResponse(['error' => 'Premium account required'], 403);
+        }
+       
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['group_id']) || !isset($data['content'])) {
+            return new JsonResponse(['error' => 'Incomplete data'], 400);
+        }
+
+        $groupChat = $this->groupChatRepository->find($data['group_id']);
+        if (!$groupChat) {
+            return new JsonResponse(['error' => 'Group not found'], 404);
+        }
+
+        $message = new MessageChat();
+        $message->setContent($data['content']);
+        $message->setSender($user);
+        $message->setGroupChat($groupChat);
+        $message->setIsRead(false);
+        $message->setIsFromAI(false);
+
+        $this->entityManager->persist($message);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['success' => true]);
     }
 
     #[Route('/chat/groups', name: 'app_chat_groups', methods: ['GET'])]
