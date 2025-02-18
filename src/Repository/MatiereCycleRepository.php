@@ -55,8 +55,10 @@ class MatiereCycleRepository extends ServiceEntityRepository
             ->join('m.matiere', 'c') // Join with Categorie
             ->distinct();
 
-        // For now, just get all subjects without specialite filtering
-        // We'll need to update the data model to properly link categories with specialites
+        if ($classe) {
+            $qb->andWhere('m.cycle = :skill_level')
+               ->setParameter('skill_level', $classe->getSkillLevel()->getId());
+        }
 
         return $qb->getQuery()->getResult();
     }
