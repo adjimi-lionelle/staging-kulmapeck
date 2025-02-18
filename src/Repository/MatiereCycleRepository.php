@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\MatiereCycle;
 use App\Entity\Classe;
-use App\Entity\Specialite;
+use App\Entity\SkillLevel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -23,46 +23,19 @@ class MatiereCycleRepository extends ServiceEntityRepository
         parent::__construct($registry, MatiereCycle::class);
     }
 
-//    /**
-//     * @return MatiereCycle[] Returns an array of MatiereCycle objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('m.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?MatiereCycle
-//    {
-//        return $this->createQueryBuilder('m')
-//            ->andWhere('m.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
-
-    public function findAvailableSubjects(?Classe $classe, ?Specialite $specialite): array
+    public function findAvailableSubjects(?Classe $classe, ?SkillLevel $skillLevel): array
     {
         $qb = $this->createQueryBuilder('m')
-            ->select('m')
-            ->distinct();
+            ->orderBy('m.id', 'ASC');
 
         if ($classe) {
-            $qb->andWhere('m.cycle = :cycle')
-               ->setParameter('cycle', $classe->getCycle());
+            $qb->andWhere('m.classe = :classe')
+               ->setParameter('classe', $classe);
         }
 
-        if ($specialite) {
-            $qb->leftJoin('m.specialites', 's')
-               ->andWhere('s.id = :specialite_id OR m.specialites IS EMPTY')
-               ->setParameter('specialite_id', $specialite->getId());
+        if ($skillLevel) {
+            $qb->andWhere('m.skillLevel = :skillLevel')
+               ->setParameter('skillLevel', $skillLevel);
         }
 
         return $qb->getQuery()->getResult();
