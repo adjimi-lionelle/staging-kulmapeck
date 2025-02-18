@@ -11,8 +11,8 @@ controllers:
 # Chat routes
 chat:
     path: /chat
-    controller: App\Controller\GroupChatController::index
+    controller: App\Controller\ChatController::index
 
-group_chat:
-    path: /group/chat
-    controller: App\Controller\GroupChatController::index
+chat_teachers:
+    path: /chat/teachers
+    controller: App\Controller\ChatController::teacherChat
