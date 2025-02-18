@@ -30,7 +30,7 @@ class ChatController extends AbstractController
     private string $jwtSecret;
 
     public function __construct(
-        string $jwtSecret,
+        string $jwtSecretKey,
         private EntityManagerInterface $entityManager,
         private MessageChatRepository $messageChatRepository,
         private SubjectChatRepository $subjectChatRepository,
@@ -40,7 +40,7 @@ class ChatController extends AbstractController
         private SpecialiteRepository $specialiteRepository,
         private PersonneRepository $personneRepository
     ) {
-        $this->jwtSecret = $jwtSecret;
+        $this->jwtSecret = $jwtSecretKey;
     }
 
     #[Route('/chat', name: 'app_chat')]

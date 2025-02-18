@@ -65,4 +65,4 @@ services:
     # Controllers with JWT Secret
     App\Controller\ChatController:
         arguments:
-            $jwtSecret: "%jwt_secret%"
+            $jwtSecretKey: "%jwt_secret%"

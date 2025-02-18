@@ -19,8 +19,8 @@ class WebSocketConnection
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'webSocketConnections')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?GroupChat $groupChat = null;
+    #[ORM\JoinColumn(nullable: true)]
+    private ?SubjectChat $subjectChat = null;
 
     #[ORM\Column]
     private ?bool $isTyping = false;
@@ -51,15 +51,14 @@ class WebSocketConnection
         return $this;
     }
 
-    public function getGroupChat(): ?GroupChat
+    public function getSubjectChat(): ?SubjectChat
     {
-        return $this->groupChat;
+        return $this->subjectChat;
     }
 
-    public function setGroupChat(?GroupChat $groupChat): static
+    public function setSubjectChat(?SubjectChat $subjectChat): static
     {
-        $this->groupChat = $groupChat;
-
+        $this->subjectChat = $subjectChat;
         return $this;
     }
 

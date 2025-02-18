@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\MessageChat;
-use App\Entity\GroupChat;
+use App\Entity\SubjectChat;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -24,27 +24,27 @@ class MessageChatRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find messages for a specific group
+     * Find messages for a specific chat
      */
-    public function findByGroup(GroupChat $group, int $limit = 50): array
+    public function findByChat(SubjectChat $chat, int $limit = 50): array
     {
         return $this->createQueryBuilder('m')
-            ->where('m.groupChat = :group')
-            ->setParameter('group', $group)
-            ->orderBy('m.createAt', 'ASC')
+            ->where('m.subjectChat = :chat')
+            ->setParameter('chat', $chat)
+            ->orderBy('m.createAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * Find the last message in a group
+     * Find the last message in a chat
      */
-    public function findLastMessageByGroup(GroupChat $group): ?MessageChat
+    public function findLastMessageByChat(SubjectChat $chat): ?MessageChat
     {
         return $this->createQueryBuilder('m')
-            ->where('m.groupChat = :group')
-            ->setParameter('group', $group)
+            ->where('m.subjectChat = :chat')
+            ->setParameter('chat', $chat)
             ->orderBy('m.createAt', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
@@ -52,15 +52,15 @@ class MessageChatRepository extends ServiceEntityRepository
     }
 
     /**
-     * Count unread messages in a group
+     * Count unread messages in a chat
      */
-    public function countUnreadByGroup(GroupChat $group): int
+    public function countUnreadByChat(SubjectChat $chat): int
     {
-        return $this->createQueryBuilder('m')
+        return (int) $this->createQueryBuilder('m')
             ->select('COUNT(m.id)')
-            ->where('m.groupChat = :group')
+            ->where('m.subjectChat = :chat')
             ->andWhere('m.isRead = :isRead')
-            ->setParameter('group', $group)
+            ->setParameter('chat', $chat)
             ->setParameter('isRead', false)
             ->getQuery()
             ->getSingleScalarResult();
@@ -69,44 +69,44 @@ class MessageChatRepository extends ServiceEntityRepository
     /**
      * Find messages after a specific message ID
      */
-    public function findMessagesAfter(GroupChat $group, int $lastMessageId): array
+    public function findMessagesAfter(SubjectChat $chat, int $lastMessageId): array
     {
         return $this->createQueryBuilder('m')
-            ->where('m.groupChat = :group')
-            ->andWhere('m.id > :lastMessageId')
-            ->setParameter('group', $group)
-            ->setParameter('lastMessageId', $lastMessageId)
+            ->where('m.subjectChat = :chat')
+            ->andWhere('m.id > :lastId')
+            ->setParameter('chat', $chat)
+            ->setParameter('lastId', $lastMessageId)
             ->orderBy('m.createAt', 'ASC')
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * Mark all messages as read for a user in a group
+     * Mark all messages in a chat as read for a user
      */
-    public function markAllAsRead(GroupChat $group, User $user): void
+    public function markAllAsRead(SubjectChat $chat, User $user): void
     {
         $this->createQueryBuilder('m')
             ->update()
             ->set('m.isRead', ':isRead')
-            ->where('m.groupChat = :group')
+            ->where('m.subjectChat = :chat')
             ->andWhere('m.sender != :user')
             ->setParameter('isRead', true)
-            ->setParameter('group', $group)
+            ->setParameter('chat', $chat)
             ->setParameter('user', $user)
             ->getQuery()
             ->execute();
     }
 
     /**
-     * Find messages for a specific subject chat
+     * Find messages for a subject chat
      */
-    public function findSubjectChatMessages(GroupChat $subject, int $limit = 50): array
+    public function findSubjectChatMessages(SubjectChat $chat, int $limit = 50): array
     {
         return $this->createQueryBuilder('m')
-            ->where('m.groupChat = :subject')
-            ->setParameter('subject', $subject)
-            ->orderBy('m.createAt', 'DESC')  // Most recent messages first
+            ->where('m.subjectChat = :chat')
+            ->setParameter('chat', $chat)
+            ->orderBy('m.createAt', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
