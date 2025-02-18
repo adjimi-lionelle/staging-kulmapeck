@@ -52,19 +52,11 @@ class MatiereCycleRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('m')
             ->select('m')
+            ->join('m.matiere', 'c') // Join with Categorie
             ->distinct();
 
-        if ($classe) {
-            // Temporarily commenting out cycle check
-            // $qb->andWhere('m.cycle = :cycle')
-            //    ->setParameter('cycle', $classe->getCycle());
-        }
-
-        if ($specialite) {
-            $qb->leftJoin('m.specialites', 's')
-                ->andWhere('s.id = :specialite_id OR m.specialites IS EMPTY')
-                ->setParameter('specialite_id', $specialite->getId());
-        }
+        // For now, just get all subjects without specialite filtering
+        // We'll need to update the data model to properly link categories with specialites
 
         return $qb->getQuery()->getResult();
     }
