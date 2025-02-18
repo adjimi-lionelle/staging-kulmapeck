@@ -7,11 +7,11 @@ use App\Entity\GroupChat;
 use App\Entity\MessageChat;
 use App\Entity\User;
 use App\Entity\Eleve;
-use App\Entity\Matiere;
+use App\Entity\MatiereCycle;
 use App\Repository\GroupChatRepository;
 use App\Repository\MessageChatRepository;
 use App\Repository\EleveRepository;
-use App\Repository\MatiereRepository;
+use App\Repository\MatiereCycleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,7 +30,7 @@ class ChatController extends AbstractController
         private MessageChatRepository $messageChatRepository,
         private GroupChatRepository $groupChatRepository,
         private EleveRepository $eleveRepository,
-        private MatiereRepository $matiereRepository
+        private MatiereCycleRepository $matiereCycleRepository
     ) {}
 
     #[Route('', name: 'app_student_chat')]
@@ -58,7 +58,7 @@ class ChatController extends AbstractController
                 return [
                     'id' => $group->getId(),
                     'name' => $group->getName(),
-                    'subject' => $group->getMatiere()->getNom(),
+                    'subject' => $group->getMatiereCycle()->getNom(),
                     'cycle' => $group->getCycle(),
                     'lastMessage' => $this->getLastMessage($group),
                     'unreadCount' => $this->getUnreadCount($group)
@@ -106,7 +106,7 @@ class ChatController extends AbstractController
     }
 
     #[Route('/subject/{id}', name: 'app_student_subject_chat')]
-    public function subjectChat(Matiere $subject): Response
+    public function subjectChat(MatiereCycle $subject): Response
     {
         $user = $this->getUser();
         /** @var Eleve|null $student */
@@ -117,7 +117,7 @@ class ChatController extends AbstractController
         }
 
         // Get all subjects available to the student based on their class and specialization
-        $availableSubjects = $this->matiereRepository->findAvailableSubjects(
+        $availableSubjects = $this->matiereCycleRepository->findAvailableSubjects(
             $student->getClasse(),
             $student->getSpecialisation()
         );
