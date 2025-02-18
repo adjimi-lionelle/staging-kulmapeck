@@ -9,7 +9,7 @@ use App\Entity\User;
 use App\Entity\Eleve;
 use App\Entity\MatiereCycle;
 use App\Entity\Specialite;
-use App\Repository\GroupChatRepository;
+use App\Repository\TeacherChatRepository;
 use App\Repository\MessageChatRepository;
 use App\Repository\EleveRepository;
 use App\Repository\MatiereCycleRepository;
@@ -33,7 +33,7 @@ class ChatController extends AbstractController
         string $jwtSecret,
         private EntityManagerInterface $entityManager,
         private MessageChatRepository $messageChatRepository,
-        private GroupChatRepository $groupChatRepository,
+        private TeacherChatRepository $teacherChatRepository,
         private EleveRepository $eleveRepository,
         private MatiereCycleRepository $matiereCycleRepository,
         private ClasseRepository $classeRepository,
@@ -72,17 +72,17 @@ class ChatController extends AbstractController
             // Check if student needs setup
             $needsSetup = !$student->getClasse() || !$student->getSpecialite();
             
-            // Only get groups if student is fully set up
-            $groups = [];
+            // Only get active teacher chats if student is fully set up
+            $chats = [];
             if (!$needsSetup) {
-                $groups = $this->groupChatRepository->findByStudent($student);
+                $chats = $this->teacherChatRepository->findStudentActiveChats($student);
             }
 
             return $this->render('front/chat/index.html.twig', [
                 'student' => $student,
                 'classes' => $classes,
                 'specialites' => $specialites,
-                'groups' => $groups,
+                'chats' => $chats,
                 'needsSetup' => $needsSetup
             ]);
         }
@@ -157,7 +157,7 @@ class ChatController extends AbstractController
         }
 
         // Get or create subject chat group
-        $groupChat = $this->groupChatRepository->findOrCreateSubjectChat($student, $subject);
+        $groupChat = $this->teacherChatRepository->findOrCreateSubjectChat($student, $subject);
 
         // Get chat history
         $messages = $this->messageChatRepository->findSubjectChatMessages($groupChat);
@@ -299,7 +299,7 @@ class ChatController extends AbstractController
             return new JsonResponse(['error' => 'Incomplete data'], 400);
         }
 
-        $groupChat = $this->groupChatRepository->find($data['group_id']);
+        $groupChat = $this->teacherChatRepository->find($data['group_id']);
         if (!$groupChat) {
             return new JsonResponse(['error' => 'Group not found'], 404);
         }
@@ -329,10 +329,10 @@ class ChatController extends AbstractController
             throw $this->createAccessDeniedException('Student account not found.');
         }
 
-        $groups = $this->groupChatRepository->findByStudent($student);
+        $groups = $this->teacherChatRepository->findByStudent($student);
         
         return new JsonResponse([
-            'groups' => array_map(function(GroupChat $group) {
+            'groups' => array_map(function($group) {
                 return [
                     'id' => $group->getId(),
                     'name' => $group->getName(),
@@ -347,7 +347,7 @@ class ChatController extends AbstractController
 
     #[Route('/chat/messages/{group}', name: 'app_chat_messages', methods: ['GET'])]
     #[IsGranted('ROLE_STUDENT')]
-    public function getMessages(GroupChat $group): JsonResponse
+    public function getMessages($group): JsonResponse
     {
         $user = $this->getUser();
         /** @var Eleve|null $student */
@@ -404,7 +404,7 @@ class ChatController extends AbstractController
         return new JsonResponse(['token' => $token]);
     }
 
-    private function getLastMessage(GroupChat $group): ?array
+    private function getLastMessage($group): ?array
     {
         $message = $this->messageChatRepository->findLastMessageByGroup($group);
         if (!$message) {
@@ -418,7 +418,7 @@ class ChatController extends AbstractController
         ];
     }
 
-    private function getUnreadCount(GroupChat $group): int
+    private function getUnreadCount($group): int
     {
         return $this->messageChatRepository->countUnreadByGroup($group);
     }
