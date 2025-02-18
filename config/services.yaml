@@ -57,17 +57,13 @@ services:
     App\Twig\TwigTimeExtension:
         tags: ['twig.extension']
 
-    # Mock service for frontend testing
-    App\Service\MockChatDataProvider:
-        autowire: true
-
     # WebSocket Server Command
     App\Command\WebSocketServerCommand:
         arguments:
             $jwtSecret: "%jwt_secret%"
 
     # Controllers with JWT Secret
-    App\Controller\GroupChatController:
+    App\Controller\ChatController:
         arguments:
             $jwtSecret: "%jwt_secret%"
 
