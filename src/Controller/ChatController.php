@@ -115,7 +115,7 @@ class ChatController extends AbstractController
         // Get available subjects
         $availableSubjects = $this->matiereCycleRepository->findAvailableSubjects(
             $student->getClasse(),
-            $student->getSkillLevel()
+            $student->getSpecialite()
         );
 
         // If no subjects available, show appropriate message
@@ -148,7 +148,7 @@ class ChatController extends AbstractController
         // Get all subjects available to the student
         $availableSubjects = $this->matiereCycleRepository->findAvailableSubjects(
             $student->getClasse(),
-            $student->getSkillLevel()
+            $student->getSpecialite()
         );
 
         // Verify student has access to this subject
