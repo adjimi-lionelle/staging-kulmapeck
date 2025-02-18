@@ -121,7 +121,7 @@ class ChatController extends AbstractController
         // If no subjects available, show appropriate message
         if (empty($availableSubjects)) {
             $this->addFlash('warning', 'No subjects are currently available for your class level.');
-            return $this->redirectToRoute('app_dashboard');
+            return $this->redirectToRoute('app_student_home');
         }
 
         // Redirect to the first available subject
