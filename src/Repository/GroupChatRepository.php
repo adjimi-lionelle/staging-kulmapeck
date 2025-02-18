@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\GroupChat;
 use App\Entity\Eleve;
+use App\Entity\MatiereCycle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -66,6 +67,36 @@ class GroupChatRepository extends ServiceEntityRepository
             ->setParameter('cycle', $cycle)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Find or create a subject-specific chat group for a student
+     */
+    public function findOrCreateSubjectChat(Eleve $student, MatiereCycle $subject): GroupChat
+    {
+        // Try to find existing chat
+        $groupChat = $this->createQueryBuilder('g')
+            ->where('g.student = :student')
+            ->andWhere('g.subject = :subject')
+            ->setParameter('student', $student)
+            ->setParameter('subject', $subject)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$groupChat) {
+            // Create new chat group
+            $groupChat = new GroupChat();
+            $groupChat->setStudent($student);
+            $groupChat->setSubject($subject);
+            $groupChat->setName($subject->getMatiere()->getName() . ' Chat');
+            $groupChat->setType('subject');
+            $groupChat->setCreatedAt(new \DateTime());
+
+            $this->getEntityManager()->persist($groupChat);
+            $this->getEntityManager()->flush();
+        }
+
+        return $groupChat;
     }
 
 //    /**

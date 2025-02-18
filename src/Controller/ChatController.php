@@ -156,30 +156,90 @@ class ChatController extends AbstractController
             throw $this->createAccessDeniedException('You do not have access to this subject.');
         }
 
+        // Get or create subject chat group
+        $groupChat = $this->groupChatRepository->findOrCreateSubjectChat($student, $subject);
+
         // Get chat history
-        $messages = $this->messageChatRepository->findSubjectChatMessages(
-            $student,
-            $subject,
-            50 // Limit to last 50 messages
-        );
+        $messages = $this->messageChatRepository->findSubjectChatMessages($groupChat);
 
         // Generate JWT token for WebSocket authentication
         $payload = [
             'user_id' => $user->getId(),
             'student_id' => $student->getId(),
             'subject_id' => $subject->getId(),
+            'group_id' => $groupChat->getId(),
             'exp' => time() + 3600 // 1 hour expiration
         ];
         
         $token = JWT::encode($payload, $this->jwtSecret, 'HS256');
 
+        // Get teacher persona for this subject
+        $teacherPersona = [
+            'name' => $this->getTeacherName($subject->getMatiere()),
+            'avatar' => $this->getTeacherAvatar($subject->getMatiere())
+        ];
+
         return $this->render('front/chat/subject_chat.html.twig', [
-            'current_subject' => $subject,
-            'available_subjects' => $availableSubjects,
+            'current_subject' => [
+                'id' => $subject->getId(),
+                'name' => $subject->getMatiere()->getName(),
+                'teacherPersona' => $teacherPersona
+            ],
+            'available_subjects' => array_map(function($s) {
+                return [
+                    'id' => $s->getId(),
+                    'name' => $s->getMatiere()->getName(),
+                    'icon' => $this->getSubjectIcon($s->getMatiere()),
+                    'teacherPersona' => [
+                        'name' => $this->getTeacherName($s->getMatiere()),
+                        'avatar' => $this->getTeacherAvatar($s->getMatiere())
+                    ]
+                ];
+            }, $availableSubjects),
             'messages' => $messages,
             'student_token' => $token,
             'websocket_url' => $this->getParameter('websocket_url')
         ]);
+    }
+
+    private function getTeacherName(Categorie $subject): string
+    {
+        $teacherNames = [
+            'MATHEMATIQUES' => 'Sophie Laurent',
+            'SCIENCE DE LA VIE ET DE LA TERRE (SVT)' => 'Marc Dubois',
+            'PHYSIQUES' => 'Claire Martin',
+            'FRANCAIS' => 'Pierre Dupont',
+            'ANGLAIS' => 'John Smith'
+        ];
+
+        return $teacherNames[$subject->getName()] ?? 'Prof. ' . $subject->getName();
+    }
+
+    private function getTeacherAvatar(Categorie $subject): string
+    {
+        // Default avatars based on subject
+        $avatars = [
+            'MATHEMATIQUES' => 'math-teacher.png',
+            'SCIENCE DE LA VIE ET DE LA TERRE (SVT)' => 'biology-teacher.png',
+            'PHYSIQUES' => 'physics-teacher.png',
+            'FRANCAIS' => 'french-teacher.png',
+            'ANGLAIS' => 'english-teacher.png'
+        ];
+
+        return $avatars[$subject->getName()] ?? 'default-teacher.png';
+    }
+
+    private function getSubjectIcon(Categorie $subject): string
+    {
+        $icons = [
+            'MATHEMATIQUES' => 'calculator',
+            'SCIENCE DE LA VIE ET DE LA TERRE (SVT)' => 'leaf',
+            'PHYSIQUES' => 'atom',
+            'FRANCAIS' => 'book',
+            'ANGLAIS' => 'globe'
+        ];
+
+        return $icons[$subject->getName()] ?? 'book';
     }
 
     #[Route('/chat/setup', name: 'app_chat_setup', methods: ['POST'])]
