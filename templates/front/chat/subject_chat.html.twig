@@ -1,0 +1,75 @@
+{% extends "front/base.html.twig" %}
+
+{% block title %} - {{ subject.name }} Chat{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/subject_chat.css') }}">
+{% endblock %}
+
+{% block mainContent %}
+<div class="chat-container">
+    <div class="sidebar">
+        <div class="search-bar">
+            <input type="text" placeholder="Rechercher une matière...">
+        </div>
+        <div class="subjects">
+            {% for subject in available_subjects %}
+                <div class="subject {% if subject.id == current_subject.id %}active{% endif %}" 
+                     data-subject-id="{{ subject.id }}">
+                    <div class="subject-icon">
+                        <i class="fas fa-{{ subject.icon|default('book') }}"></i>
+                    </div>
+                    <div class="subject-info">
+                        <h4>{{ subject.name }}</h4>
+                        <p class="teacher-name">Prof. {{ subject.teacherPersona.name }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="chat-window">
+        <div class="chat-header">
+            <div class="teacher-info">
+                <img src="{{ asset('images/teacher-avatars/' ~ current_subject.teacherPersona.avatar) }}" 
+                     alt="{{ current_subject.teacherPersona.name }}">
+                <div>
+                    <h3>Prof. {{ current_subject.teacherPersona.name }}</h3>
+                    <p class="subject-name">{{ current_subject.name }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            {% for message in messages %}
+                <div class="message {% if message.isFromAI %}received{% else %}sent{% endif %}">
+                    <div class="message-content">
+                        <p>{{ message.content }}</p>
+                        <span class="time">{{ message.createdAt|date('H:i') }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="chat-input">
+            <textarea id="message-input" 
+                     placeholder="Posez votre question..."
+                     rows="1"></textarea>
+            <button id="send-button" class="send-btn">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        const WEBSOCKET_URL = "{{ websocket_url }}";
+        const SUBJECT_ID = "{{ current_subject.id }}";
+        const STUDENT_TOKEN = "{{ student_token }}";
+    </script>
+    <script src="{{ asset('js/subject_chat.js') }}"></script>
+{% endblock %}

@@ -7,9 +7,11 @@ use App\Entity\GroupChat;
 use App\Entity\MessageChat;
 use App\Entity\User;
 use App\Entity\Eleve;
+use App\Entity\Matiere;
 use App\Repository\GroupChatRepository;
 use App\Repository\MessageChatRepository;
 use App\Repository\EleveRepository;
+use App\Repository\MatiereRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Firebase\JWT\JWT;
 
 #[Route('/student/chat')]
 #[IsGranted('ROLE_STUDENT')]
@@ -26,7 +29,8 @@ class ChatController extends AbstractController
         private EntityManagerInterface $entityManager,
         private MessageChatRepository $messageChatRepository,
         private GroupChatRepository $groupChatRepository,
-        private EleveRepository $eleveRepository
+        private EleveRepository $eleveRepository,
+        private MatiereRepository $matiereRepository
     ) {}
 
     #[Route('', name: 'app_student_chat')]
@@ -98,6 +102,54 @@ class ChatController extends AbstractController
                     'createdAt' => $message->getCreateAt()->format('c')
                 ];
             }, $messages)
+        ]);
+    }
+
+    #[Route('/subject/{id}', name: 'app_student_subject_chat')]
+    public function subjectChat(Matiere $subject): Response
+    {
+        $user = $this->getUser();
+        /** @var Eleve|null $student */
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        
+        if (!$student) {
+            throw $this->createAccessDeniedException('Student account not found.');
+        }
+
+        // Get all subjects available to the student based on their class and specialization
+        $availableSubjects = $this->matiereRepository->findAvailableSubjects(
+            $student->getClasse(),
+            $student->getSpecialisation()
+        );
+
+        // Verify student has access to this subject
+        if (!in_array($subject, $availableSubjects)) {
+            throw $this->createAccessDeniedException('You do not have access to this subject.');
+        }
+
+        // Get chat history
+        $messages = $this->messageChatRepository->findSubjectChatMessages(
+            $student,
+            $subject,
+            50 // Limit to last 50 messages
+        );
+
+        // Generate JWT token for WebSocket authentication
+        $payload = [
+            'user_id' => $user->getId(),
+            'student_id' => $student->getId(),
+            'subject_id' => $subject->getId(),
+            'exp' => time() + 3600 // 1 hour expiration
+        ];
+        
+        $token = JWT::encode($payload, $this->getParameter('jwt_secret'), 'HS256');
+
+        return $this->render('front/chat/subject_chat.html.twig', [
+            'current_subject' => $subject,
+            'available_subjects' => $availableSubjects,
+            'messages' => $messages,
+            'student_token' => $token,
+            'websocket_url' => $this->getParameter('websocket_url')
         ]);
     }
 
