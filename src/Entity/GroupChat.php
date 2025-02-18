@@ -2,20 +2,21 @@
 
 namespace App\Entity;
 
-use App\Repository\TeacherChatRepository;
+use App\Repository\SubjectChatRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: TeacherChatRepository::class)]
-class GroupChat
+#[ORM\Entity(repositoryClass: SubjectChatRepository::class)]
+#[ORM\Table(name: 'group_chat')] // Keep the table name for DB compatibility
+class SubjectChat
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'groupChats')]
+    #[ORM\ManyToOne(inversedBy: 'subjectChats')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Categorie $matiere = null;
 
@@ -28,13 +29,13 @@ class GroupChat
     #[ORM\Column(length: 20)]
     private ?string $type = 'teacher';
 
-    #[ORM\OneToMany(mappedBy: 'groupChat', targetEntity: MessageChat::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'subjectChat', targetEntity: MessageChat::class, orphanRemoval: true)]
     private Collection $messageChats;
 
     #[ORM\Column(name: 'g0_create_at')]
     private ?\DateTimeImmutable $createAt = null;
 
-    #[ORM\OneToMany(mappedBy: 'groupChat', targetEntity: WebSocketConnection::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'subjectChat', targetEntity: WebSocketConnection::class, orphanRemoval: true)]
     private Collection $webSocketConnections;
 
     public function __construct()
@@ -106,7 +107,7 @@ class GroupChat
     {
         if (!$this->messageChats->contains($messageChat)) {
             $this->messageChats->add($messageChat);
-            $messageChat->setGroupChat($this);
+            $messageChat->setSubjectChat($this);
         }
         return $this;
     }
@@ -114,8 +115,8 @@ class GroupChat
     public function removeMessageChat(MessageChat $messageChat): static
     {
         if ($this->messageChats->removeElement($messageChat)) {
-            if ($messageChat->getGroupChat() === $this) {
-                $messageChat->setGroupChat(null);
+            if ($messageChat->getSubjectChat() === $this) {
+                $messageChat->setSubjectChat(null);
             }
         }
         return $this;
@@ -144,7 +145,7 @@ class GroupChat
     {
         if (!$this->webSocketConnections->contains($webSocketConnection)) {
             $this->webSocketConnections->add($webSocketConnection);
-            $webSocketConnection->setGroupChat($this);
+            $webSocketConnection->setSubjectChat($this);
         }
         return $this;
     }
@@ -152,8 +153,8 @@ class GroupChat
     public function removeWebSocketConnection(WebSocketConnection $webSocketConnection): static
     {
         if ($this->webSocketConnections->removeElement($webSocketConnection)) {
-            if ($webSocketConnection->getGroupChat() === $this) {
-                $webSocketConnection->setGroupChat(null);
+            if ($webSocketConnection->getSubjectChat() === $this) {
+                $webSocketConnection->setSubjectChat(null);
             }
         }
         return $this;

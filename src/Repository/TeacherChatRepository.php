@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\GroupChat;
+use App\Entity\SubjectChat;
 use App\Entity\Eleve;
 use App\Entity\MatiereCycle;
 use App\Entity\User;
@@ -10,24 +10,24 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<GroupChat>
+ * @extends ServiceEntityRepository<SubjectChat>
  *
- * @method GroupChat|null find($id, $lockMode = null, $lockVersion = null)
- * @method GroupChat|null findOneBy(array $criteria, array $orderBy = null)
- * @method GroupChat[]    findAll()
- * @method GroupChat[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method SubjectChat|null find($id, $lockMode = null, $lockVersion = null)
+ * @method SubjectChat|null findOneBy(array $criteria, array $orderBy = null)
+ * @method SubjectChat[]    findAll()
+ * @method SubjectChat[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class TeacherChatRepository extends ServiceEntityRepository
+class SubjectChatRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, GroupChat::class);
+        parent::__construct($registry, SubjectChat::class);
     }
 
     /**
      * Find student's chat with AI teacher for a specific subject
      */
-    public function findStudentTeacherChat(Eleve $student, MatiereCycle $subject): ?GroupChat
+    public function findOneByStudentAndSubject(Eleve $student, MatiereCycle $subject): ?SubjectChat
     {
         return $this->createQueryBuilder('c')
             ->where('c.matiere = :subject')
@@ -43,9 +43,9 @@ class TeacherChatRepository extends ServiceEntityRepository
     /**
      * Create a new chat between student and AI teacher
      */
-    public function createTeacherChat(Eleve $student, MatiereCycle $subject): GroupChat
+    private function createSubjectChat(Eleve $student, MatiereCycle $subject): SubjectChat
     {
-        $chat = new GroupChat();
+        $chat = new SubjectChat();
         $chat->setMatiere($subject->getMatiere());
         $chat->setCycle($subject->getCycle());
         $chat->setName($this->getTeacherPersonaName($subject->getMatiere()->getName()));
@@ -60,12 +60,12 @@ class TeacherChatRepository extends ServiceEntityRepository
     /**
      * Find or create a chat between student and AI teacher for a subject
      */
-    public function findOrCreateTeacherChat(Eleve $student, MatiereCycle $subject): GroupChat
+    public function findOrCreateByStudentAndSubject(Eleve $student, MatiereCycle $subject): SubjectChat
     {
-        $chat = $this->findStudentTeacherChat($student, $subject);
+        $chat = $this->findOneByStudentAndSubject($student, $subject);
         
         if (!$chat) {
-            $chat = $this->createTeacherChat($student, $subject);
+            $chat = $this->createSubjectChat($student, $subject);
         }
         
         return $chat;
@@ -87,16 +87,15 @@ class TeacherChatRepository extends ServiceEntityRepository
             'Geography' => 'Prof. Paul Vidal',
             'Philosophy' => 'Prof. Jean-Paul Sartre',
             'Economics' => 'Prof. Thomas Piketty',
-            // Add more subjects and personas as needed
         ];
 
         return $personas[$subject] ?? "Prof. " . ucfirst($subject);
     }
 
     /**
-     * Get all active teacher chats for a student
+     * Get all active subject chats for a student
      */
-    public function findStudentActiveChats(Eleve $student): array
+    public function findByStudent(Eleve $student): array
     {
         $classe = $student->getClasse();
         if (!$classe || !$classe->getSkillLevel()) {

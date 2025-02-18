@@ -3,13 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Categorie;
-use App\Entity\GroupChat;
+use App\Entity\SubjectChat;
 use App\Entity\MessageChat;
 use App\Entity\User;
 use App\Entity\Eleve;
 use App\Entity\MatiereCycle;
 use App\Entity\Specialite;
-use App\Repository\TeacherChatRepository;
+use App\Repository\SubjectChatRepository;
 use App\Repository\MessageChatRepository;
 use App\Repository\EleveRepository;
 use App\Repository\MatiereCycleRepository;
@@ -33,7 +33,7 @@ class ChatController extends AbstractController
         string $jwtSecret,
         private EntityManagerInterface $entityManager,
         private MessageChatRepository $messageChatRepository,
-        private TeacherChatRepository $teacherChatRepository,
+        private SubjectChatRepository $subjectChatRepository,
         private EleveRepository $eleveRepository,
         private MatiereCycleRepository $matiereCycleRepository,
         private ClasseRepository $classeRepository,
@@ -72,10 +72,10 @@ class ChatController extends AbstractController
             // Check if student needs setup
             $needsSetup = !$student->getClasse() || !$student->getSpecialite();
             
-            // Only get active teacher chats if student is fully set up
+            // Only get active subject chats if student is fully set up
             $chats = [];
             if (!$needsSetup) {
-                $chats = $this->teacherChatRepository->findStudentActiveChats($student);
+                $chats = $this->subjectChatRepository->findByStudent($student);
             }
 
             return $this->render('front/chat/index.html.twig', [
@@ -92,41 +92,38 @@ class ChatController extends AbstractController
     }
 
     /**
-     * Entry point for AI Teacher Chats
+     * Entry point for Subject Teacher Chats
      */
-    #[Route('/chat/teachers', name: 'app_teacher_chat')]
+    #[Route('/chat/subject/{subject}', name: 'app_subject_chat')]
     #[IsGranted('ROLE_STUDENT')]
-    public function teacherChat(): Response
+    public function subjectChat(MatiereCycle $subject): Response
     {
         $user = $this->getUser();
         /** @var Eleve|null $student */
         $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
-        
         if (!$student) {
             throw $this->createAccessDeniedException('Student account not found.');
         }
 
-        // Check premium status
-        if (!$student->isIsPremium()) {
-            $this->addFlash('warning', 'You need a premium account to access AI teacher chats.');
-            return $this->redirectToRoute('app_premium_plans');
+        // Check if student has access to this subject
+        $availableSubjects = $this->matiereCycleRepository->findAvailableSubjects($student);
+        if (!in_array($subject, $availableSubjects)) {
+            throw $this->createAccessDeniedException('You do not have access to this subject.');
         }
 
-        // Get available subjects
-        $availableSubjects = $this->matiereCycleRepository->findAvailableSubjects(
-            $student->getClasse(),
-            $student->getClasse()?->getSpecialite()
-        );
+        // Get or create subject chat
+        $chat = $this->subjectChatRepository->findOrCreateByStudentAndSubject($student, $subject);
 
-        // If no subjects available, show appropriate message
-        if (empty($availableSubjects)) {
-            $this->addFlash('warning', 'No subjects are currently available for your class level.');
-            return $this->redirectToRoute('app_student_home');
-        }
+        // Get chat history
+        $messages = $this->messageChatRepository->findSubjectChatMessages($chat);
 
-        // Redirect to the first available subject
-        return $this->redirectToRoute('app_subject_chat', [
-            'id' => $availableSubjects[0]->getId()
+        // Generate JWT token for WebSocket authentication
+        $token = $this->generateWebSocketToken($student, $chat);
+
+        return $this->render('front/chat/subject_chat.html.twig', [
+            'chat' => $chat,
+            'messages' => $messages,
+            'token' => $token
         ]);
     }
 
@@ -135,7 +132,7 @@ class ChatController extends AbstractController
      */
     #[Route('/chat/subject/{id}', name: 'app_subject_chat')]
     #[IsGranted('ROLE_STUDENT')]
-    public function subjectChat(MatiereCycle $subject): Response
+    public function subjectChatInterface(MatiereCycle $subject): Response
     {
         $user = $this->getUser();
         /** @var Eleve|null $student */
@@ -157,17 +154,17 @@ class ChatController extends AbstractController
         }
 
         // Get or create subject chat group
-        $groupChat = $this->teacherChatRepository->findOrCreateSubjectChat($student, $subject);
+        $chat = $this->subjectChatRepository->findOrCreateByStudentAndSubject($student, $subject);
 
         // Get chat history
-        $messages = $this->messageChatRepository->findSubjectChatMessages($groupChat);
+        $messages = $this->messageChatRepository->findSubjectChatMessages($chat);
 
         // Generate JWT token for WebSocket authentication
         $payload = [
             'user_id' => $user->getId(),
             'student_id' => $student->getId(),
             'subject_id' => $subject->getId(),
-            'group_id' => $groupChat->getId(),
+            'chat_id' => $chat->getId(),
             'exp' => time() + 3600 // 1 hour expiration
         ];
         
@@ -295,19 +292,19 @@ class ChatController extends AbstractController
        
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['group_id']) || !isset($data['content'])) {
+        if (!isset($data['chat_id']) || !isset($data['content'])) {
             return new JsonResponse(['error' => 'Incomplete data'], 400);
         }
 
-        $groupChat = $this->teacherChatRepository->find($data['group_id']);
-        if (!$groupChat) {
-            return new JsonResponse(['error' => 'Group not found'], 404);
+        $chat = $this->subjectChatRepository->find($data['chat_id']);
+        if (!$chat) {
+            return new JsonResponse(['error' => 'Chat not found'], 404);
         }
 
         $message = new MessageChat();
         $message->setContent($data['content']);
         $message->setSender($user);
-        $message->setGroupChat($groupChat);
+        $message->setChat($chat);
         $message->setIsRead(false);
         $message->setIsFromAI(false);
 
@@ -317,9 +314,9 @@ class ChatController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    #[Route('/chat/groups', name: 'app_chat_groups', methods: ['GET'])]
+    #[Route('/chat/chats', name: 'app_chat_chats', methods: ['GET'])]
     #[IsGranted('ROLE_STUDENT')]
-    public function getGroups(): JsonResponse
+    public function getChats(): JsonResponse
     {
         $user = $this->getUser();
         /** @var Eleve|null $student */
@@ -329,25 +326,25 @@ class ChatController extends AbstractController
             throw $this->createAccessDeniedException('Student account not found.');
         }
 
-        $groups = $this->teacherChatRepository->findByStudent($student);
+        $chats = $this->subjectChatRepository->findByStudent($student);
         
         return new JsonResponse([
-            'groups' => array_map(function($group) {
+            'chats' => array_map(function($chat) {
                 return [
-                    'id' => $group->getId(),
-                    'name' => $group->getName(),
-                    'subject' => $group->getMatiereCycle()->getNom(),
-                    'cycle' => $group->getCycle(),
-                    'lastMessage' => $this->getLastMessage($group),
-                    'unreadCount' => $this->getUnreadCount($group)
+                    'id' => $chat->getId(),
+                    'name' => $chat->getName(),
+                    'subject' => $chat->getMatiereCycle()->getNom(),
+                    'cycle' => $chat->getCycle(),
+                    'lastMessage' => $this->getLastMessage($chat),
+                    'unreadCount' => $this->getUnreadCount($chat)
                 ];
-            }, $groups)
+            }, $chats)
         ]);
     }
 
-    #[Route('/chat/messages/{group}', name: 'app_chat_messages', methods: ['GET'])]
+    #[Route('/chat/messages/{chat}', name: 'app_chat_messages', methods: ['GET'])]
     #[IsGranted('ROLE_STUDENT')]
-    public function getMessages($group): JsonResponse
+    public function getMessages($chat): JsonResponse
     {
         $user = $this->getUser();
         /** @var Eleve|null $student */
@@ -357,7 +354,7 @@ class ChatController extends AbstractController
             throw $this->createAccessDeniedException('Student account not found.');
         }
         
-        $messages = $this->messageChatRepository->findByGroup($group);
+        $messages = $this->messageChatRepository->findByChat($chat);
         
         // Mark messages as read
         foreach ($messages as $message) {
@@ -404,9 +401,9 @@ class ChatController extends AbstractController
         return new JsonResponse(['token' => $token]);
     }
 
-    private function getLastMessage($group): ?array
+    private function getLastMessage($chat): ?array
     {
-        $message = $this->messageChatRepository->findLastMessageByGroup($group);
+        $message = $this->messageChatRepository->findLastMessageByChat($chat);
         if (!$message) {
             return null;
         }
@@ -418,8 +415,8 @@ class ChatController extends AbstractController
         ];
     }
 
-    private function getUnreadCount($group): int
+    private function getUnreadCount($chat): int
     {
-        return $this->messageChatRepository->countUnreadByGroup($group);
+        return $this->messageChatRepository->countUnreadByChat($chat);
     }
 }
