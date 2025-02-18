@@ -97,4 +97,18 @@ class MessageChatRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * Find messages for a specific subject chat
+     */
+    public function findSubjectChatMessages(GroupChat $subject, int $limit = 50): array
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.groupChat = :subject')
+            ->setParameter('subject', $subject)
+            ->orderBy('m.createAt', 'DESC')  // Most recent messages first
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }
