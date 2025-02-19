@@ -73,7 +73,24 @@ final class Version20250219SchemaUpdate extends AbstractMigration
             DEALLOCATE PREPARE stmt;
         ');
         
-        $this->addSql('DROP INDEX IF EXISTS IDX_CC0869739C9A2529 ON message_chat');
+        // Check and drop index if exists
+        $this->addSql('
+            SET @index_exists = (
+                SELECT COUNT(*)
+                FROM information_schema.STATISTICS 
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = "message_chat"
+                AND INDEX_NAME = "IDX_CC0869739C9A2529"
+            );
+            SET @drop_idx = IF(@index_exists > 0,
+                "DROP INDEX IDX_CC0869739C9A2529 ON message_chat",
+                "SELECT 1"
+            );
+            PREPARE stmt FROM @drop_idx;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+        ');
+        
         $this->addSql('ALTER TABLE message_chat CHANGE group_chat_id subject_chat_id INT NOT NULL');
         $this->addSql('ALTER TABLE message_chat ADD CONSTRAINT FK_CC086973BF18DD87 FOREIGN KEY (subject_chat_id) REFERENCES group_chat (id)');
         $this->addSql('CREATE INDEX IDX_CC086973BF18DD87 ON message_chat (subject_chat_id)');
@@ -97,7 +114,23 @@ final class Version20250219SchemaUpdate extends AbstractMigration
             DEALLOCATE PREPARE stmt;
         ');
         
-        $this->addSql('DROP INDEX IF EXISTS IDX_7C4108E99C9A2529 ON web_socket_connection');
+        // Check and drop index if exists
+        $this->addSql('
+            SET @index_exists = (
+                SELECT COUNT(*)
+                FROM information_schema.STATISTICS 
+                WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME = "web_socket_connection"
+                AND INDEX_NAME = "IDX_7C4108E99C9A2529"
+            );
+            SET @drop_idx = IF(@index_exists > 0,
+                "DROP INDEX IDX_7C4108E99C9A2529 ON web_socket_connection",
+                "SELECT 1"
+            );
+            PREPARE stmt FROM @drop_idx;
+            EXECUTE stmt;
+            DEALLOCATE PREPARE stmt;
+        ');
         
         // Check if subject_chat_id exists before adding
         $this->addSql('
