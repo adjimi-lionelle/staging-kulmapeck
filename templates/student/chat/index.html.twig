@@ -1,4 +1,4 @@
-{% extends "front/base.html.twig" %}
+{% extends "student/base.html.twig" %}
 
 {% block title %} - Chat{% endblock %}
 
@@ -9,7 +9,7 @@
 
 {% block mainContent %}
     {% if needsSetup is defined and needsSetup %}
-        {% include 'front/chat/_setup_modal.html.twig' with {
+        {% include 'student/chat/_setup_modal.html.twig' with {
             'classes': classes,
             'specialites': specialites
         } %}

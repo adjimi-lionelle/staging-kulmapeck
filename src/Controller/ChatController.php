@@ -87,7 +87,7 @@ class ChatController extends AbstractController
                 }, $this->subjectChatRepository->findByStudent($student));
             }
 
-            return $this->render('front/chat/index.html.twig', [
+            return $this->render('student/chat/index.html.twig', [
                 'student' => $student,
                 'classes' => $classes,
                 'specialites' => $specialites,
@@ -97,7 +97,7 @@ class ChatController extends AbstractController
         }
 
         // For non-students, show appropriate interface
-        return $this->render('front/chat/index.html.twig');
+        return $this->render('front/chat/non_student_index.html.twig');
     }
 
     /**
@@ -129,7 +129,7 @@ class ChatController extends AbstractController
         // Generate JWT token for WebSocket authentication
         $token = $this->generateWebSocketToken($student, $chat);
 
-        return $this->render('front/chat/subject_chat.html.twig', [
+        return $this->render('student/chat/subject_chat.html.twig', [
             'chat' => $chat,
             'messages' => $messages,
             'token' => $token
@@ -185,7 +185,7 @@ class ChatController extends AbstractController
             'avatar' => $this->getTeacherAvatar($subject->getMatiere())
         ];
 
-        return $this->render('front/chat/subject_chat.html.twig', [
+        return $this->render('student/chat/subject_chat.html.twig', [
             'current_subject' => [
                 'id' => $subject->getId(),
                 'name' => $subject->getMatiere()->getName(),

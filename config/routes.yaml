@@ -9,10 +9,10 @@ controllers:
     type: attribute
 
 # Chat routes
-chat:
+app_chat:
     path: /chat
     controller: App\Controller\ChatController::index
 
-chat_teachers:
-    path: /chat/teachers
-    controller: App\Controller\ChatController::teacherChat
+app_subject_chat:
+    path: /chat/subject/{subject}
+    controller: App\Controller\ChatController::subjectChat
