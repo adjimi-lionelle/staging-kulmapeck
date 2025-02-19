@@ -75,7 +75,16 @@ class ChatController extends AbstractController
             // Only get active subject chats if student is fully set up
             $chats = [];
             if (!$needsSetup) {
-                $chats = $this->subjectChatRepository->findByStudent($student);
+                $chats = array_map(function($chat) {
+                    return [
+                        'id' => $chat->getId(),
+                        'matiere' => [
+                            'name' => $chat->getMatiere()->getName(),
+                            'icon' => $this->getSubjectIcon($chat->getMatiere())
+                        ],
+                        'teacherName' => $this->getTeacherName($chat->getMatiere())
+                    ];
+                }, $this->subjectChatRepository->findByStudent($student));
             }
 
             return $this->render('front/chat/index.html.twig', [
