@@ -111,6 +111,10 @@ function displayMessage(author, content, createdAt) {
     let messageElement = document.createElement("div");
     messageElement.classList.add("message-item");
 
+   /* let currentUser = getCurrentUserIdentifier(); // Fonction qui retourne l'identifiant (email ou pseudo)
+
+    let isCurrentUser = (author === currentUser);*/
+
     messageElement.innerHTML = `
         <div class="message-header">
             <strong>${author}</strong> <span class="message-time">${createdAt}</span>

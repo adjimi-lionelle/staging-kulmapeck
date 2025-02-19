@@ -55,7 +55,7 @@ services:
             - { name: twig.extension }      
 
      # Custom Twig extensions
-    App\TwigTimeExtension:
+    App\Twig\TimeExtension:
         tags: ['twig.extension']
 
     # Mock service for frontend testing
@@ -73,4 +73,5 @@ services:
             $jwtSecret: "%jwt_secret%"
 
     App\Controller\ChatController:
-        arguments:          
+        arguments:   
+            $jwtSecret: "%jwt_secret%"       

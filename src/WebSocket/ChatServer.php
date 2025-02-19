@@ -70,7 +70,7 @@ class ChatServer implements MessageComponentInterface
             $history[] = [
                 'id' => $msg->getId(),
                 'content' => $msg->getContent(),
-                'author' => $msg->getSender()->getemail(),
+                'author' => $msg->getSender()->getPersonne()->getPseudo(),
                 'createdAt' => $msg->getCreateAt()->format('Y-m-d H:i:s')
             ];
         }
@@ -132,7 +132,7 @@ class ChatServer implements MessageComponentInterface
             if ($this->clients[$client]['groupChat'] === $groupChat) {
                 $client->send(json_encode([
                     'message' => $data['message'],
-                    'author' => $this->clients[$from]['user']->getEmail()
+                    'author' => $this->clients[$from]['user']->getPersonne()->getPseudo(),
                 ]));
             }    
         }

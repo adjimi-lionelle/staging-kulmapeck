@@ -5,31 +5,31 @@
 {% block mainContent %}
     <div class="chat-wrapper">
         <div class="container-fluid chat-container">
-                <!-- Colonne des groupes -->
-                <div class="col-md-4 chat-sidebar">
-                    <div class="chat-sidebar-header">
-                        <h5>Discussions</h5>
-                        <input type="text" class="form-control search-bar" placeholder="Rechercher...">
-                    </div>
-                    <div id="group-list" class="chat-group-list"></div>
+            <!-- Colonne des groupes -->
+            <div class="col-md-4 chat-sidebar">
+                <div class="chat-sidebar-header">
+                    <h5>Discussions</h5>
+                    <input type="text" class="form-control search-bar" placeholder="Rechercher...">
                 </div>
+                <div id="group-list" class="chat-group-list"></div>
+            </div>
 
-                <!-- Colonne du chat principal -->
-                <div class="col-md-8 chat-main">
-                    <div class="chat-main-header">
-                        <h5 class="chat-title" id="chat-title" data-group-id="">Sélectionnez un groupe pour discuter</h5>
-                    </div>
-                    <div class="chat-messages">
-                        <p class="welcome-message">Bienvenue dans le chat Kulmapeck ! Sélectionnez un groupe à gauche pour commencer la discussion.</p>
-                    </div>
-                    <div id="chat-input-area" class="chat-input-area d-none">
-                        <input type="text" id="chat-message" class="form-control chat-input" placeholder="Écrivez un message..." disabled>
-                        <button id="send-message" class="btn btn-primary chat-send" disabled>
-                            <i class="fa fa-paper-plane"></i>
-                        </button>
-                    </div>
+            <!-- Colonne du chat principal -->
+            <div class="col-md-8 chat-main">
+                <div class="chat-main-header">
+                    <button class="btn btn-light d-md-none" id="back-button">← Retour</button>
+                    <h5 class="chat-title" id="chat-title" data-group-id="">Sélectionnez un groupe</h5>
                 </div>
-          
+                <div class="chat-messages">
+                    <p class="welcome-message">Bienvenue dans le chat ! Sélectionnez un groupe.</p>
+                </div>
+                <div id="chat-input-area" class="chat-input-area d-none">
+                    <input type="text" id="chat-message" class="form-control chat-input" placeholder="Écrivez un message..." disabled>
+                    <button id="send-message" class="btn btn-primary chat-send" disabled>
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

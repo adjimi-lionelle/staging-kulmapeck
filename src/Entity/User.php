@@ -66,7 +66,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['read:course:collection', 'read:forum:item', 'read:forum:messsage:collection', 'read:sujet:item', 'read:sujet:collection', 'read:exam:collection', 'read:user:item', 'read:payment:collection', 'read:review:collection'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180, unique: true, nullable: true)]
+    #[ORM\Column(length: 180, nullable: true)]
     #[Assert\Email(message: "L'email {{ value }} n'est pas une adresse e-mail valide !")]
     #[Groups(['read:course:collection', 'read:sujet:collection', 'post:user:item', 'post:user:item', 'read:payment:collection', 'read:review:collection'])]
     private ?string $email = null;
