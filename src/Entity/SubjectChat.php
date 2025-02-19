@@ -26,13 +26,13 @@ class SubjectChat
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(name: 'type', length: 20)]
     private ?string $type = 'teacher';
 
     #[ORM\OneToMany(mappedBy: 'subjectChat', targetEntity: MessageChat::class, orphanRemoval: true)]
     private Collection $messageChats;
 
-    #[ORM\Column(name: 'g0_create_at')]
+    #[ORM\Column(name: 'g0_create_at', type: 'datetime_immutable')]
     private ?\DateTimeImmutable $createAt = null;
 
     #[ORM\OneToMany(mappedBy: 'subjectChat', targetEntity: WebSocketConnection::class, orphanRemoval: true)]

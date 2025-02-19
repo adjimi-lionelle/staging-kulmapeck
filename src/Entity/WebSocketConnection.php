@@ -19,7 +19,7 @@ class WebSocketConnection
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'webSocketConnections')]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(name: 'subject_chat_id', nullable: true)]
     private ?SubjectChat $subjectChat = null;
 
     #[ORM\Column]
