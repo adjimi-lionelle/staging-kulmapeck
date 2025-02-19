@@ -1,249 +1,237 @@
-{% extends 'student/base.html.twig' %}
-
-{% block title %} - {% trans %}CHAT_TITLE_KEY{% endtrans %}{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans %}CHAT_TITLE_KEY{% endtrans %}</title>
+    
+    {# Bootstrap CSS #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    {# Custom CSS #}
     <link rel="stylesheet" href="{{ asset('css/subject_chat.css') }}">
     <style>
-        .page-content {
+        body {
             background-color: var(--bs-light);
-            min-height: calc(100vh - 70px);
-            padding: 1.5rem;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
         }
     </style>
-{% endblock %}
-
-{% block pageContent %}
+</head>
+<body>
     {% if needsSetup %}
         {{ include('student/chat/_setup_modal.html.twig') }}
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const setupModal = new bootstrap.Modal(document.getElementById('setupModal'));
-                setupModal.show();
-            });
-        </script>
-    {% else %}
-        <div class="chat-container">
-            <div id="error-container" class="alert alert-danger d-none m-3">
-                <i class="bi bi-exclamation-circle me-2"></i>
-                <span id="error-message"></span>
-            </div>
-            
-            <div class="chat-wrapper">
-                <div class="sidebar">
-                    <div class="search-box">
-                        <div class="input-group">
-                            <span class="input-group-text border-0 bg-light">
-                                <i class="bi bi-search"></i>
-                            </span>
-                            <input type="text" class="form-control border-0 bg-light" 
-                                   placeholder="{% trans %}SEARCH_SUBJECTS_KEY{% endtrans %}" 
-                                   id="subject-search">
-                        </div>
-                    </div>
-                    <div class="subject-list">
-                        {% for subject in available_subjects %}
-                            <div class="subject-item d-flex align-items-center p-3 {% if subject.id == current_subject.id %}active{% endif %}" 
-                                 data-subject-id="{{ subject.id }}">
-                                <div class="avatar avatar-md">
-                                    <img src="{{ asset(subject.icon) }}" alt="{{ subject.name }}" class="avatar-img rounded-circle">
-                                </div>
-                                <div class="ms-3">
-                                    <h6 class="mb-1">{{ subject.name }}</h6>
-                                    <p class="small text-secondary mb-0">{{ subject.teacherPersona.name }}</p>
-                                </div>
-                            </div>
-                        {% endfor %}
+    {% endif %}
+
+    <div class="chat-container">
+        <div class="chat-wrapper">
+            {# Sidebar #}
+            <div class="sidebar">
+                <div class="search-box">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="subject-search" placeholder="{% trans %}SEARCH_SUBJECTS{% endtrans %}">
                     </div>
                 </div>
-                
-                <div class="chat-window">
-                    <div class="chat-header">
-                        <div class="current-subject d-flex align-items-center justify-content-between p-3">
-                            <div class="d-flex align-items-center">
-                                <div class="avatar avatar-lg me-2">
-                                    <img src="{{ current_subject.teacherPersona.avatar }}" class="avatar-img rounded-circle" alt="{{ current_subject.teacherPersona.name }}">
-                                </div>
-                                <div>
-                                    <h5 class="mb-0">{{ current_subject.name }}</h5>
-                                    <p class="small text-secondary mb-0">{{ current_subject.teacherPersona.name }}</p>
-                                </div>
+                <div class="subject-list" id="subject-list">
+                    {% for subject in available_subjects %}
+                        <div class="subject-item d-flex align-items-center" data-subject-id="{{ subject.id }}">
+                            <div class="avatar-md me-3">
+                                <img src="{{ asset(subject.icon) }}" alt="{{ subject.name }}" class="avatar-img">
                             </div>
-                            <div class="connection-status text-success d-none">
-                                <i class="bi bi-circle-fill"></i> {% trans %}CONNECTED_KEY{% endtrans %}
+                            <div>
+                                <h6 class="mb-1">{{ subject.name }}</h6>
+                                <small class="text-muted">{{ subject.teacherPersona.name }}</small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Chat Window #}
+            <div class="chat-window">
+                <div class="chat-header px-4 py-3">
+                    <div class="d-flex align-items-center">
+                        <div id="current-subject-info">
+                            <h5 class="mb-1">{% trans %}SELECT_SUBJECT{% endtrans %}</h5>
+                            <div class="connection-status">
+                                <i class="bi bi-circle-fill text-success"></i>
+                                <span>{% trans %}CONNECTED{% endtrans %}</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="chat-messages" id="chat-messages">
-                        {% for message in messages %}
-                            <div class="message {% if message.fromStudent %}outgoing{% else %}incoming{% endif %}">
-                                <div class="message-content">{{ message.content }}</div>
-                                <div class="message-time">{{ message.createdAt|date('H:i') }}</div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="chat-input">
-                        <div class="input-group">
-                            <textarea id="message-input" class="form-control" 
-                                      placeholder="{% trans %}TYPE_MESSAGE_KEY{% endtrans %}" 
-                                      rows="1"></textarea>
-                            <button id="send-button" class="btn btn-primary">
-                                <i class="bi bi-send-fill"></i>
-                            </button>
-                        </div>
+                </div>
+
+                <div class="chat-messages" id="chat-messages"></div>
+
+                <div class="chat-input">
+                    <div class="input-group">
+                        <textarea class="form-control" id="message-input" rows="1" placeholder="{% trans %}TYPE_MESSAGE{% endtrans %}"></textarea>
+                        <button class="btn btn-primary" id="send-button" type="button">
+                            <i class="bi bi-send"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    {% endif %}
-{% endblock %}
+    </div>
 
-{% block javascripts %}
-    {{ parent() }}
+    {# Error Container #}
+    <div id="error-container" class="toast-container">
+        <div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="error-message"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    {# Bootstrap JS Bundle #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {# WebSocket JS #}
     <script src="{{ asset('assets/js/chat/websocket.js') }}"></script>
     <script>
         // Initialize WebSocket configuration
         window.WS_CONFIG = {
             reconnectAttempts: 5,
             reconnectDelay: 3000,
-            messageQueueSize: 100
+            debug: {{ app.debug ? 'true' : 'false' }}
         };
-        
+
         document.addEventListener('DOMContentLoaded', function() {
             const chatSocket = new WebSocket('{{ websocket_url }}');
             const studentToken = '{{ student_token }}';
             const errorContainer = document.getElementById('error-container');
             const errorMessage = document.getElementById('error-message');
-            const connectionStatus = document.querySelector('.connection-status');
-            let reconnectAttempt = 0;
-            let messageQueue = [];
-            
+            const toast = new bootstrap.Toast(errorContainer.querySelector('.toast'));
+            let currentSubjectId = null;
+
             function showError(message) {
                 errorMessage.textContent = message;
-                errorContainer.classList.remove('d-none');
-                setTimeout(() => {
-                    errorContainer.classList.add('d-none');
-                }, 5000);
+                toast.show();
             }
-            
-            function connect() {
-                chatSocket.onopen = () => {
-                    console.log('Connected to chat server');
-                    connectionStatus.classList.remove('d-none');
-                    reconnectAttempt = 0;
+
+            function appendMessage(message) {
+                const messagesContainer = document.getElementById('chat-messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.isOutgoing ? 'outgoing' : 'incoming'}`;
+                
+                const content = document.createElement('div');
+                content.className = 'message-content';
+                content.textContent = message.content;
+                
+                const time = document.createElement('div');
+                time.className = 'message-time';
+                time.textContent = message.time;
+                
+                messageDiv.appendChild(content);
+                messageDiv.appendChild(time);
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            // WebSocket event handlers
+            chatSocket.addEventListener('open', () => {
+                chatSocket.send(JSON.stringify({
+                    type: 'auth',
+                    token: studentToken
+                }));
+            });
+
+            chatSocket.addEventListener('message', (event) => {
+                const data = JSON.parse(event.data);
+                
+                switch(data.type) {
+                    case 'message':
+                        appendMessage({
+                            content: data.content,
+                            time: new Date().toLocaleTimeString(),
+                            isOutgoing: false
+                        });
+                        break;
+                    case 'error':
+                        showError(data.message);
+                        break;
+                }
+            });
+
+            chatSocket.addEventListener('close', () => {
+                showError('{% trans %}CONNECTION_LOST{% endtrans %}');
+            });
+
+            chatSocket.addEventListener('error', () => {
+                showError('{% trans %}CONNECTION_ERROR{% endtrans %}');
+            });
+
+            // Subject selection
+            document.querySelectorAll('.subject-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.subject-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    currentSubjectId = item.dataset.subjectId;
+                    
+                    const subjectName = item.querySelector('h6').textContent;
+                    document.querySelector('#current-subject-info h5').textContent = subjectName;
                     
                     chatSocket.send(JSON.stringify({
-                        type: 'auth',
-                        token: studentToken
+                        type: 'join',
+                        subjectId: currentSubjectId
                     }));
-                    
-                    // Send any queued messages
-                    while (messageQueue.length > 0) {
-                        const message = messageQueue.shift();
-                        chatSocket.send(JSON.stringify(message));
-                    }
-                };
-                
-                chatSocket.onclose = () => {
-                    console.log('Disconnected from chat server');
-                    connectionStatus.classList.add('d-none');
-                    
-                    if (reconnectAttempt < window.WS_CONFIG.reconnectAttempts) {
-                        reconnectAttempt++;
-                        setTimeout(connect, window.WS_CONFIG.reconnectDelay);
-                    } else {
-                        showError("{% trans %}CONNECTION_LOST_KEY{% endtrans %}");
-                    }
-                };
-                
-                chatSocket.onerror = (error) => {
-                    console.error('WebSocket error:', error);
-                    showError("{% trans %}CONNECTION_ERROR_KEY{% endtrans %}");
-                };
-                
-                chatSocket.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    if (data.type === 'message') {
-                        appendMessage(data.message);
-                    } else if (data.type === 'error') {
-                        showError(data.message);
-                    }
-                };
-            }
-            
-            function appendMessage(message) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${message.fromStudent ? 'outgoing' : 'incoming'}`;
-                messageDiv.innerHTML = `
-                    <div class="message-content">${message.content}</div>
-                    <div class="message-time">${new Date(message.createdAt).toLocaleTimeString()}</div>
-                `;
-                const messagesDiv = document.getElementById('chat-messages');
-                messagesDiv.appendChild(messageDiv);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            }
-            
-            function sendMessage(content) {
-                const message = {
-                    type: 'message',
-                    content: content
-                };
-                
-                if (chatSocket.readyState === WebSocket.OPEN) {
-                    chatSocket.send(JSON.stringify(message));
-                } else {
-                    if (messageQueue.length < window.WS_CONFIG.messageQueueSize) {
-                        messageQueue.push(message);
-                        showError("{% trans %}MESSAGE_QUEUED_KEY{% endtrans %}");
-                    } else {
-                        showError("{% trans %}MESSAGE_QUEUE_FULL_KEY{% endtrans %}");
-                    }
-                }
-            }
-            
-            // Auto-resize textarea
+                });
+            });
+
+            // Message sending
             const messageInput = document.getElementById('message-input');
-            messageInput.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = (this.scrollHeight) + 'px';
-            });
-            
-            document.getElementById('send-button').addEventListener('click', () => {
-                const message = messageInput.value.trim();
-                if (message) {
-                    sendMessage(message);
-                    messageInput.value = '';
-                    messageInput.style.height = 'auto';
-                }
-            });
-            
+            const sendButton = document.getElementById('send-button');
+
+            function sendMessage() {
+                const content = messageInput.value.trim();
+                if (!content || !currentSubjectId) return;
+
+                chatSocket.send(JSON.stringify({
+                    type: 'message',
+                    content: content,
+                    subjectId: currentSubjectId
+                }));
+
+                appendMessage({
+                    content: content,
+                    time: new Date().toLocaleTimeString(),
+                    isOutgoing: true
+                });
+
+                messageInput.value = '';
+            }
+
+            sendButton.addEventListener('click', sendMessage);
             messageInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    document.getElementById('send-button').click();
+                    sendMessage();
                 }
             });
-            
-            document.getElementById('subject-search').addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase();
+
+            // Subject search
+            const searchInput = document.getElementById('subject-search');
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.toLowerCase();
                 document.querySelectorAll('.subject-item').forEach(item => {
-                    const subjectName = item.querySelector('h6').textContent.toLowerCase();
-                    item.style.display = subjectName.includes(searchTerm) ? 'flex' : 'none';
+                    const name = item.querySelector('h6').textContent.toLowerCase();
+                    const teacher = item.querySelector('small').textContent.toLowerCase();
+                    item.style.display = name.includes(query) || teacher.includes(query) ? '' : 'none';
                 });
             });
-            
-            document.querySelectorAll('.subject-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const subjectId = item.dataset.subjectId;
-                    window.location.href = `{{ path('app_subject_chat', {'subject': 'SUBJECT_ID'}) }}`.replace('SUBJECT_ID', subjectId);
-                });
-            });
-            
-            // Start connection
-            connect();
+
+            {% if needsSetup %}
+            const setupModal = new bootstrap.Modal(document.getElementById('setup-modal'));
+            setupModal.show();
+            {% endif %}
         });
     </script>
-{% endblock %}
+</body>
+</html>
