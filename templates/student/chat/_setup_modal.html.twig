@@ -1,55 +1,35 @@
 <!-- Setup Modal -->
-<div class="modal fade" id="setupModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setupModalLabel" aria-hidden="true">
+<div class="modal fade" id="setup-modal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title" id="setupModalLabel">{% trans %}SETUP_YOUR_PROFILE_KEY{% endtrans %}</h5>
+            <div class="modal-header">
+                <h5 class="modal-title">{% trans %}SETUP_PROFILE{% endtrans %}</h5>
             </div>
             <div class="modal-body">
-                <div id="setup-error" class="alert alert-danger d-none">
-                    <i class="fas fa-exclamation-circle me-2"></i>
-                    <span id="error-message"></span>
-                </div>
-                
-                <form id="setupForm">
-                    <!-- Class/Skill Level selection -->
+                <form id="setup-form" method="POST" action="{{ path('app_student_setup') }}">
                     <div class="mb-3">
-                        <label for="classe" class="form-label">{% trans %}SELECT_YOUR_CLASS_KEY{% endtrans %}</label>
+                        <label for="classe" class="form-label">{% trans %}SELECT_CLASS{% endtrans %}</label>
                         <select class="form-select" id="classe" name="classe" required>
-                            <option value="">{% trans %}CHOOSE_CLASS_KEY{% endtrans %}</option>
-                            {% for classe in classes %}
-                                <option value="{{ classe.id }}">{{ classe.nom }}</option>
+                            <option value="">{% trans %}CHOOSE_CLASS{% endtrans %}</option>
+                            {% for class in classes %}
+                                <option value="{{ class.id }}" data-cycle="{{ class.cycle }}">{{ class.name }}</option>
                             {% endfor %}
                         </select>
-                        <div class="invalid-feedback">
-                            {% trans %}CLASS_REQUIRED_KEY{% endtrans %}
-                        </div>
                     </div>
 
-                    <!-- Specialization selection -->
-                    <div class="mb-3">
-                        <label for="specialite" class="form-label">{% trans %}SELECT_YOUR_SPECIALIZATION_KEY{% endtrans %}</label>
-                        <select class="form-select" id="specialite" name="specialite" required>
-                            <option value="">{% trans %}CHOOSE_SPECIALIZATION_KEY{% endtrans %}</option>
-                            {% for specialite in specialites %}
-                                <option value="{{ specialite.id }}">{{ specialite.nom }}</option>
+                    <div class="mb-3" id="specialization-group" style="display: none;">
+                        <label for="specialization" class="form-label">{% trans %}SELECT_SPECIALIZATION{% endtrans %}</label>
+                        <select class="form-select" id="specialization" name="specialization">
+                            <option value="">{% trans %}CHOOSE_SPECIALIZATION{% endtrans %}</option>
+                            {% for spec in specializations %}
+                                <option value="{{ spec.id }}">{{ spec.name }}</option>
                             {% endfor %}
                         </select>
-                        <div class="invalid-feedback">
-                            {% trans %}SPECIALIZATION_REQUIRED_KEY{% endtrans %}
-                        </div>
+                        <div class="form-text text-muted">{% trans %}SPECIALIZATION_REQUIRED_SECOND_CYCLE{% endtrans %}</div>
                     </div>
 
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        {% trans %}SETUP_INFO_MESSAGE_KEY{% endtrans %}
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-check me-2"></i>
-                            {% trans %}SAVE_SETUP_KEY{% endtrans %}
-                        </button>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">{% trans %}SAVE{% endtrans %}</button>
                     </div>
                 </form>
             </div>
@@ -59,88 +39,44 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Show modal automatically since this template is only included when setup is needed
-    const setupModal = new bootstrap.Modal(document.getElementById('setupModal'), {
-        backdrop: 'static',
-        keyboard: false
-    });
-    setupModal.show();
+    const classeSelect = document.getElementById('classe');
+    const specializationGroup = document.getElementById('specialization-group');
+    const specializationSelect = document.getElementById('specialization');
+    const setupForm = document.getElementById('setup-form');
 
-    const form = document.getElementById('setupForm');
-    const errorDiv = document.getElementById('setup-error');
-    const errorMessage = document.getElementById('error-message');
-    
-    // Reset form validation on input change
-    form.querySelectorAll('select').forEach(select => {
-        select.addEventListener('change', function() {
-            this.classList.remove('is-invalid');
-            errorDiv.classList.add('d-none');
-        });
+    // Handle class selection change
+    classeSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const cycle = selectedOption.dataset.cycle;
+        
+        // Show specialization only for second cycle (2nde to Terminal)
+        if (cycle === 'second') {
+            specializationGroup.style.display = 'block';
+            specializationSelect.required = true;
+        } else {
+            specializationGroup.style.display = 'none';
+            specializationSelect.required = false;
+            specializationSelect.value = ''; // Reset selection
+        }
     });
-    
-    form.addEventListener('submit', function(e) {
+
+    // Form validation
+    setupForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const classe = document.getElementById('classe');
-        const specialite = document.getElementById('specialite');
-        let hasError = false;
-
-        // Reset previous validation state
-        errorDiv.classList.add('d-none');
-        form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-
-        // Validate class
-        if (!classe.value) {
-            classe.classList.add('is-invalid');
-            hasError = true;
-        }
-
-        // Validate specialization
-        if (!specialite.value) {
-            specialite.classList.add('is-invalid');
-            hasError = true;
-        }
-
-        if (hasError) {
-            errorMessage.textContent = "{% trans %}PLEASE_FILL_ALL_FIELDS_KEY{% endtrans %}";
-            errorDiv.classList.remove('d-none');
+        if (!classeSelect.value) {
+            alert('{% trans %}PLEASE_SELECT_CLASS{% endtrans %}');
             return;
         }
 
-        // Disable form while submitting
-        const submitButton = form.querySelector('button[type="submit"]');
-        const originalButtonText = submitButton.innerHTML;
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>{% trans %}SAVING_KEY{% endtrans %}';
+        const cycle = classeSelect.options[classeSelect.selectedIndex].dataset.cycle;
+        if (cycle === 'second' && !specializationSelect.value) {
+            alert('{% trans %}PLEASE_SELECT_SPECIALIZATION{% endtrans %}');
+            return;
+        }
 
-        fetch('{{ path('app_eleve_chat_setup_new') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': '{{ csrf_token('setup_token') }}'
-            },
-            body: JSON.stringify({
-                classe: classe.value,
-                specialite: specialite.value
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            } else {
-                errorMessage.textContent = data.message || "{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}";
-                errorDiv.classList.remove('d-none');
-                submitButton.disabled = false;
-                submitButton.innerHTML = originalButtonText;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            errorMessage.textContent = "{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}";
-            errorDiv.classList.remove('d-none');
-            submitButton.disabled = false;
-            submitButton.innerHTML = originalButtonText;
-        });
+        // If validation passes, submit the form
+        this.submit();
     });
-});</script>
+});
+</script>
