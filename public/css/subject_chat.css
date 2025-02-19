@@ -1,21 +1,23 @@
 /* Chat Container Layout */
-.chat-card {
-    height: calc(100vh - 250px);
-    margin: 20px;
-    border: none;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-}
-
 .chat-container {
     display: flex;
-    height: 100%;
+    height: calc(100vh - 140px);
     background: #fff;
+    margin: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+}
+
+.chat-wrapper {
+    display: flex;
+    width: 100%;
+    height: 100%;
 }
 
 /* Sidebar Styles */
 .sidebar {
-    width: 320px;
+    width: 300px;
     background: #f8f9fa;
     border-right: 1px solid #e9ecef;
     display: flex;
@@ -28,11 +30,19 @@
 }
 
 .search-box .input-group-text {
+    background: transparent;
+    border: none;
     color: #6c757d;
 }
 
-.search-box .form-control:focus {
+.search-box input {
+    border: none;
+    background: transparent;
+}
+
+.search-box input:focus {
     box-shadow: none;
+    background: transparent;
 }
 
 .subject-list {
@@ -41,6 +51,7 @@
 }
 
 .subject-item {
+    padding: 15px;
     border-bottom: 1px solid #e9ecef;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -55,9 +66,16 @@
     border-left: 4px solid #0d6efd;
 }
 
-.subject-item .avatar-md {
+.avatar-md {
     width: 48px;
     height: 48px;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 /* Chat Window Styles */
@@ -69,13 +87,9 @@
 }
 
 .chat-header {
+    padding: 15px;
     background: #fff;
     border-bottom: 1px solid #e9ecef;
-}
-
-.chat-header .avatar-lg {
-    width: 56px;
-    height: 56px;
 }
 
 .chat-messages {
@@ -107,7 +121,6 @@
     border-radius: 15px;
     font-size: 14px;
     line-height: 1.4;
-    position: relative;
 }
 
 .message.incoming .message-content {
@@ -169,6 +182,25 @@
     font-size: 18px;
 }
 
+/* Error Container */
+#error-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 350px;
+}
+
+/* Connection Status */
+.connection-status {
+    font-size: 12px;
+}
+
+.connection-status i {
+    font-size: 8px;
+    margin-right: 4px;
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
     width: 6px;
@@ -189,6 +221,11 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .chat-container {
+        margin: 10px;
+        height: calc(100vh - 120px);
+    }
+    
     .sidebar {
         width: 280px;
     }
@@ -196,17 +233,12 @@
     .message {
         max-width: 85%;
     }
-    
-    .chat-card {
-        margin: 10px;
-        height: calc(100vh - 220px);
-    }
 }
 
 @media (max-width: 576px) {
-    .chat-card {
+    .chat-container {
         margin: 0;
-        height: calc(100vh - 200px);
+        height: calc(100vh - 100px);
     }
     
     .sidebar {
