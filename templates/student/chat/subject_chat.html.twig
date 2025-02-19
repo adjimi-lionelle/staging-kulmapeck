@@ -1,6 +1,6 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %} - Chat{% endblock %}
+{% block title %} - {% trans %}CHAT_TITLE_KEY{% endtrans %}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -8,95 +8,124 @@
 {% endblock %}
 
 {% block mainContent %}
-    <main>
-        <section class="pt-0">
-            <div class="container-fluid px-0">
-                <div class="bg-blue h-100px h-md-200px rounded-0" style="background: url({{ asset('assets/images/pattern/04.png') }}) no-repeat center center; background-size: cover;">
-                </div>
-                <div class="container mt-n4">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card bg-transparent card-body p-0">
-                                <div class="row d-flex justify-content-between">
-                                    <div class="col-auto mt-4 mt-md-0">
-                                        <div class="avatar avatar-xxl mt-n3">
-                                            <img class="avatar-img rounded-circle border border-white border-3 shadow" src="{{ asset('uploads/images/eleves/' ~ app.user.personne.avatar) }}" alt="">
+    {% if needsSetup %}
+        {{ include('student/chat/_setup_modal.html.twig') }}
+    {% else %}
+        <main>
+            <section class="pt-0">
+                <div class="container-fluid px-0">
+                    <div class="bg-blue h-100px h-md-200px rounded-0" style="background: url({{ asset('assets/images/pattern/04.png') }}) no-repeat center center; background-size: cover;">
+                    </div>
+                    <div class="container mt-n4">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card bg-transparent card-body p-0">
+                                    <div class="row d-flex justify-content-between">
+                                        <div class="col-auto mt-4 mt-md-0">
+                                            <div class="avatar avatar-xxl mt-n3">
+                                                <img class="avatar-img rounded-circle border border-white border-3 shadow" src="{{ asset('uploads/images/eleves/' ~ app.user.personne.avatar) }}" alt="">
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col d-md-flex justify-content-between align-items-center mt-4">
-                                        <div>
-                                            <h1 class="my-1 fs-4">{{ app.user.personne.nomComplet }} <i class="bi bi-patch-check-fill text-info small"></i></h1>
+                                        <div class="col d-md-flex justify-content-between align-items-center mt-4">
+                                            <div>
+                                                <h1 class="my-1 fs-4">{{ app.user.personne.nomComplet }} <i class="bi bi-patch-check-fill text-info small"></i></h1>
+                                                <p class="small text-secondary mb-0">{{ app.user.personne.classe.nom }} - {{ app.user.personne.specialite.nom }}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <section class="pt-0">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card chat-card border-0">
-                                <div class="card-body p-0">
-                                    <div class="chat-container">
-                                        <div class="sidebar">
-                                            <div class="search-box">
-                                                <div class="input-group">
-                                                    <span class="input-group-text border-0 bg-light">
-                                                        <i class="bi bi-search"></i>
-                                                    </span>
-                                                    <input type="text" class="form-control border-0 bg-light" placeholder="Search subjects..." id="subject-search">
-                                                </div>
-                                            </div>
-                                            <div class="subject-list">
-                                                {% for subject in available_subjects %}
-                                                    <div class="subject-item d-flex align-items-center p-3 {% if subject.id == current_subject.id %}active{% endif %}" 
-                                                         data-subject-id="{{ subject.id }}">
-                                                        <div class="avatar avatar-md">
-                                                            <img src="{{ asset(subject.icon) }}" alt="{{ subject.name }}" class="avatar-img rounded-circle">
-                                                        </div>
-                                                        <div class="ms-3">
-                                                            <h6 class="mb-1">{{ subject.name }}</h6>
-                                                            <p class="small text-secondary mb-0">{{ subject.teacherPersona.name }}</p>
-                                                        </div>
-                                                    </div>
-                                                {% endfor %}
-                                            </div>
+                <section class="pt-0">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card chat-card border-0">
+                                    <div class="card-body p-0">
+                                        <div id="error-container" class="alert alert-danger d-none m-3">
+                                            <i class="bi bi-exclamation-circle me-2"></i>
+                                            <span id="error-message"></span>
                                         </div>
                                         
-                                        <div class="chat-window">
-                                            <div class="chat-header">
-                                                <div class="current-subject d-flex align-items-center justify-content-between p-3">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="avatar avatar-lg me-2">
-                                                            <img src="{{ current_subject.teacherPersona.avatar }}" class="avatar-img rounded-circle" alt="{{ current_subject.teacherPersona.name }}">
-                                                        </div>
-                                                        <div>
-                                                            <h5 class="mb-0">{{ current_subject.name }}</h5>
-                                                            <p class="small text-secondary mb-0">{{ current_subject.teacherPersona.name }}</p>
-                                                        </div>
+                                        <div class="chat-container">
+                                            <div class="sidebar">
+                                                <div class="search-box">
+                                                    <div class="input-group">
+                                                        <span class="input-group-text border-0 bg-light">
+                                                            <i class="bi bi-search"></i>
+                                                        </span>
+                                                        <input type="text" class="form-control border-0 bg-light" 
+                                                               placeholder="{% trans %}SEARCH_SUBJECTS_KEY{% endtrans %}" 
+                                                               id="subject-search"
+                                                               data-bs-toggle="tooltip"
+                                                               data-bs-placement="bottom"
+                                                               title="{% trans %}SEARCH_TOOLTIP_KEY{% endtrans %}">
                                                     </div>
+                                                </div>
+                                                <div class="subject-list">
+                                                    {% for subject in available_subjects %}
+                                                        <div class="subject-item d-flex align-items-center p-3 {% if subject.id == current_subject.id %}active{% endif %}" 
+                                                             data-subject-id="{{ subject.id }}"
+                                                             data-bs-toggle="tooltip"
+                                                             data-bs-placement="right"
+                                                             title="{% trans %}CLICK_TO_CHAT_KEY{% endtrans %}">
+                                                            <div class="avatar avatar-md">
+                                                                <img src="{{ asset(subject.icon) }}" alt="{{ subject.name }}" class="avatar-img rounded-circle">
+                                                            </div>
+                                                            <div class="ms-3">
+                                                                <h6 class="mb-1">{{ subject.name }}</h6>
+                                                                <p class="small text-secondary mb-0">{{ subject.teacherPersona.name }}</p>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
                                                 </div>
                                             </div>
                                             
-                                            <div class="chat-messages" id="chat-messages">
-                                                {% for message in messages %}
-                                                    <div class="message {% if message.fromStudent %}outgoing{% else %}incoming{% endif %}">
-                                                        <div class="message-content">{{ message.content }}</div>
-                                                        <div class="message-time">{{ message.createdAt|date('H:i') }}</div>
+                                            <div class="chat-window">
+                                                <div class="chat-header">
+                                                    <div class="current-subject d-flex align-items-center justify-content-between p-3">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="avatar avatar-lg me-2">
+                                                                <img src="{{ current_subject.teacherPersona.avatar }}" class="avatar-img rounded-circle" alt="{{ current_subject.teacherPersona.name }}">
+                                                            </div>
+                                                            <div>
+                                                                <h5 class="mb-0">{{ current_subject.name }}</h5>
+                                                                <p class="small text-secondary mb-0">{{ current_subject.teacherPersona.name }}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="connection-status text-success d-none">
+                                                            <i class="bi bi-circle-fill"></i> {% trans %}CONNECTED_KEY{% endtrans %}
+                                                        </div>
                                                     </div>
-                                                {% endfor %}
-                                            </div>
-                                            
-                                            <div class="chat-input">
-                                                <div class="input-group">
-                                                    <textarea id="message-input" class="form-control" placeholder="Type your message..." rows="1"></textarea>
-                                                    <button id="send-button" class="btn btn-primary">
-                                                        <i class="bi bi-send-fill"></i>
-                                                    </button>
+                                                </div>
+                                                
+                                                <div class="chat-messages" id="chat-messages">
+                                                    {% for message in messages %}
+                                                        <div class="message {% if message.fromStudent %}outgoing{% else %}incoming{% endif %}">
+                                                            <div class="message-content">{{ message.content }}</div>
+                                                            <div class="message-time">{{ message.createdAt|date('H:i') }}</div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                                
+                                                <div class="chat-input">
+                                                    <div class="input-group">
+                                                        <textarea id="message-input" class="form-control" 
+                                                                  placeholder="{% trans %}TYPE_MESSAGE_KEY{% endtrans %}" 
+                                                                  rows="1"
+                                                                  data-bs-toggle="tooltip"
+                                                                  data-bs-placement="top"
+                                                                  title="{% trans %}PRESS_ENTER_TO_SEND_KEY{% endtrans %}"></textarea>
+                                                        <button id="send-button" class="btn btn-primary"
+                                                                data-bs-toggle="tooltip"
+                                                                data-bs-placement="top"
+                                                                title="{% trans %}SEND_MESSAGE_KEY{% endtrans %}">
+                                                            <i class="bi bi-send-fill"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -105,83 +134,160 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-        </main>
+                </section>
+            </main>
+    {% endif %}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
+    <script src="{{ asset('assets/js/chat/websocket.js') }}"></script>
     <script>
-        const chatSocket = new WebSocket('{{ websocket_url }}');
-        const studentToken = '{{ student_token }}';
-        
-        chatSocket.onopen = () => {
-            console.log('Connected to chat server');
-            chatSocket.send(JSON.stringify({
-                type: 'auth',
-                token: studentToken
-            }));
+        // WebSocket configuration
+        window.WS_CONFIG = {
+            reconnectAttempts: 5,
+            reconnectDelay: 3000,
+            messageQueueSize: 100
         };
         
-        chatSocket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.type === 'message') {
-                appendMessage(data.message);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            const chatSocket = new WebSocket('{{ websocket_url }}');
+            const studentToken = '{{ student_token }}';
+            const errorContainer = document.getElementById('error-container');
+            const errorMessage = document.getElementById('error-message');
+            const connectionStatus = document.querySelector('.connection-status');
+            let reconnectAttempt = 0;
+            let messageQueue = [];
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorContainer.classList.remove('d-none');
+                setTimeout(() => {
+                    errorContainer.classList.add('d-none');
+                }, 5000);
             }
-        };
-        
-        function appendMessage(message) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${message.fromStudent ? 'outgoing' : 'incoming'}`;
-            messageDiv.innerHTML = `
-                <div class="message-content">${message.content}</div>
-                <div class="message-time">${new Date(message.createdAt).toLocaleTimeString()}</div>
-            `;
-            const messagesDiv = document.getElementById('chat-messages');
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-        
-        // Auto-resize textarea
-        const messageInput = document.getElementById('message-input');
-        messageInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        });
-        
-        document.getElementById('send-button').addEventListener('click', () => {
-            const message = messageInput.value.trim();
-            if (message) {
-                chatSocket.send(JSON.stringify({
+            
+            function connect() {
+                chatSocket.onopen = () => {
+                    console.log('Connected to chat server');
+                    connectionStatus.classList.remove('d-none');
+                    reconnectAttempt = 0;
+                    
+                    chatSocket.send(JSON.stringify({
+                        type: 'auth',
+                        token: studentToken
+                    }));
+                    
+                    // Send any queued messages
+                    while (messageQueue.length > 0) {
+                        const message = messageQueue.shift();
+                        chatSocket.send(JSON.stringify(message));
+                    }
+                };
+                
+                chatSocket.onclose = () => {
+                    console.log('Disconnected from chat server');
+                    connectionStatus.classList.add('d-none');
+                    
+                    if (reconnectAttempt < window.WS_CONFIG.reconnectAttempts) {
+                        reconnectAttempt++;
+                        setTimeout(connect, window.WS_CONFIG.reconnectDelay);
+                    } else {
+                        showError("{% trans %}CONNECTION_LOST_KEY{% endtrans %}");
+                    }
+                };
+                
+                chatSocket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    showError("{% trans %}CONNECTION_ERROR_KEY{% endtrans %}");
+                };
+                
+                chatSocket.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'message') {
+                        appendMessage(data.message);
+                    } else if (data.type === 'error') {
+                        showError(data.message);
+                    }
+                };
+            }
+            
+            function appendMessage(message) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${message.fromStudent ? 'outgoing' : 'incoming'}`;
+                messageDiv.innerHTML = `
+                    <div class="message-content">${message.content}</div>
+                    <div class="message-time">${new Date(message.createdAt).toLocaleTimeString()}</div>
+                `;
+                const messagesDiv = document.getElementById('chat-messages');
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+            
+            function sendMessage(content) {
+                const message = {
                     type: 'message',
-                    content: message
-                }));
-                messageInput.value = '';
-                messageInput.style.height = 'auto';
+                    content: content
+                };
+                
+                if (chatSocket.readyState === WebSocket.OPEN) {
+                    chatSocket.send(JSON.stringify(message));
+                } else {
+                    if (messageQueue.length < window.WS_CONFIG.messageQueueSize) {
+                        messageQueue.push(message);
+                        showError("{% trans %}MESSAGE_QUEUED_KEY{% endtrans %}");
+                    } else {
+                        showError("{% trans %}MESSAGE_QUEUE_FULL_KEY{% endtrans %}");
+                    }
+                }
             }
-        });
-        
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                document.getElementById('send-button').click();
-            }
-        });
-        
-        document.getElementById('subject-search').addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
+            
+            // Auto-resize textarea
+            const messageInput = document.getElementById('message-input');
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            document.getElementById('send-button').addEventListener('click', () => {
+                const message = messageInput.value.trim();
+                if (message) {
+                    sendMessage(message);
+                    messageInput.value = '';
+                    messageInput.style.height = 'auto';
+                }
+            });
+            
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('send-button').click();
+                }
+            });
+            
+            document.getElementById('subject-search').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                document.querySelectorAll('.subject-item').forEach(item => {
+                    const subjectName = item.querySelector('h6').textContent.toLowerCase();
+                    item.style.display = subjectName.includes(searchTerm) ? 'flex' : 'none';
+                });
+            });
+            
             document.querySelectorAll('.subject-item').forEach(item => {
-                const subjectName = item.querySelector('h6').textContent.toLowerCase();
-                item.style.display = subjectName.includes(searchTerm) ? 'flex' : 'none';
+                item.addEventListener('click', () => {
+                    const subjectId = item.dataset.subjectId;
+                    window.location.href = `{{ path('app_subject_chat', {'subject': 'SUBJECT_ID'}) }}`.replace('SUBJECT_ID', subjectId);
+                });
             });
-        });
-        
-        document.querySelectorAll('.subject-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const subjectId = item.dataset.subjectId;
-                window.location.href = `{{ path('app_subject_chat', {'subject': 'SUBJECT_ID'}) }}`.replace('SUBJECT_ID', subjectId);
-            });
+            
+            // Start connection
+            connect();
         });
     </script>
 {% endblock %}
