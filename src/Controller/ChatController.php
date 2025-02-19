@@ -202,9 +202,15 @@ class ChatController extends AbstractController
                     ]
                 ];
             }, $availableSubjects),
-            'messages' => $messages,
-            'student_token' => $token,
-            'websocket_url' => $this->getParameter('websocket_url')
+            'messages' => array_map(function($m) {
+                return [
+                    'content' => $m->getContent(),
+                    'fromStudent' => $m->isFromStudent(),
+                    'createdAt' => $m->getCreatedAt()
+                ];
+            }, $messages),
+            'websocket_url' => $this->getParameter('websocket_url'),
+            'student_token' => $token
         ]);
     }
 

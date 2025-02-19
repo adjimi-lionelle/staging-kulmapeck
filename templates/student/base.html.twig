@@ -2,8 +2,206 @@
 
 {% block title %} - Student {% block subTitle %}{% endblock %} {% endblock %}
 
+{% block mainContent %}
+    {% block studentContent %}
+        {% block instructorBanner %}
+            <!-- =======================
+            Page Banner START -->
+            <section class="pt-0">
+                <!-- Main banner background image -->
+                
+               <div class="container-fluid px-0">
+                    <div class="bg-blue h-100px h-md-200px rounded-0 d-flex justify-content-center align-items-center" 
+                        style="background: url({{ asset('assets/images/pattern/04.png') }}) no-repeat center center; background-size: cover;">
+                        <div class="text-center w-100">
+                            {% if tempsRestant() > 0 %}
+                                <h3 class="text-white">
+                                    La période d'accès gratuit prend fin dans : <br>
+                                    <span id="countdown" class="text-warning"></span>
+                                </h3>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+
+                {% block profileBlock %}
+                    <div class="container mt-n4">
+                        <div class="row">
+                            <!-- Profile banner START -->
+                            <div class="col-12">
+                                <div class="card bg-transparent card-body p-0">
+                                    <div class="row d-flex justify-content-between">
+                                        <!-- Avatar -->
+                                        <div class="col-auto mt-4 mt-md-0">
+                                            <div class="avatar avatar-xxl mt-n3">
+                                                <img class="avatar-img rounded-circle border border-white border-3 shadow" src="{{ asset('uploads/images/eleves/' ~ app.user.personne.avatar) }}" alt="">
+                                            </div>
+                                        </div>
+                                        <!-- Profile info -->
+                                        <div class="col d-md-flex justify-content-between align-items-center mt-4">
+                                            <div>
+                                                <h1 class="my-1 fs-4">{{ app.user.personne.nomComplet }} <i class="bi bi-patch-check-fill text-info small"></i></h1>
+                                                 <ul class="list-inline mb-0">
+                                                    <li class="list-inline-item me-3 mb-1 mb-sm-0">
+                                                        <span class="h6">00</span>
+                                                        <span class="text-body fw-light">points</span>
+                                                    </li>
+                                                    <li class="list-inline-item me-3 mb-1 mb-sm-0">
+                                                        <span class="h6">00</span>
+                                                        <span class="text-body fw-light">Completed courses</span>
+                                                    </li>
+                                                    <!-- li class="list-inline-item me-3 mb-1 mb-sm-0">
+                                                        <span class="h6">{{ student.lectures|length < 10 ?'0' ~ student.lectures|length : student.lectures|length }}</span>
+                                                        <span class="text-body fw-light">Completed lessons</span>
+                                                    </li -->
+                                                </ul>
+                                                    
+                                            </div>
+                                        </div>
+                                        <div class="col-3 justify-content-between align-items-center mt-5">
+                                           <button class="btn btn-primary d-xl-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+                                                <i class="fas fa-sliders-h"></i>
+                                            </button>
+                                         </div>
+                                    </div>
+                                </div>
+                                <!-- Profile banner END -->
+
+                                <!-- Advanced filter responsive toggler START -->
+                                <!-- Divider -->
+                                <hr class="d-xl-none">
+                                <div class="col-12 col-xl-3 d-flex justify-content-between align-items-center">
+                                    <a class="h6 mb-0 fw-bold d-xl-none btn btn-primary hide-btn" href="{{ path('app_front_courses_category') }}">Voir tous nos cours</a>
+                                     
+                                     {% if not app.user or (app.user.eleve and not app.user.eleve.isPremium) %}
+                                        <a class="h6 mb-0 fw-bold d-xl-none btn btn-primary hide-btn" href="{{ path('app_plan') }}">S'abonner</a>
+                                     {% endif %}
+                                </div>
+                                <!-- Advanced filter responsive toggler END -->
+                            </div>
+                        </div>
+                    </div>
+                {% endblock %}
+            </section>
+            <!-- =======================
+            Page Banner END -->
+        {% endblock %}
+        <!-- =======================
+        Page content START -->
+        <section class="pt-0">
+            <div class="container">
+                <div class="row">
+                    {% block instructorSidebar %}
+                        <!-- Left sidebar START -->
+                        <div class="col-xl-3">
+                            <!-- Responsive offcanvas body START -->
+                            <div class="offcanvas-xl offcanvas-end" tabindex="-1" id="offcanvasSidebar">
+                                <!-- Offcanvas header -->
+                                <div class="offcanvas-header bg-light">
+                                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel">My profile</h5>
+                                    <button  type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasSidebar" aria-label="Close"></button>
+                                </div>
+                                <!-- Offcanvas body -->
+                                <div class="offcanvas-body p-3 p-xl-0">
+                                    <div class="bg-dark border rounded-3 pb-0 p-3 w-100">
+                                        <!-- Dashboard menu -->
+                                        <div class="list-group list-group-dark list-group-borderless">
+                                            {% if not app.user or (app.user.eleve and not app.user.eleve.isPremium) %}
+                                                <a class="list-group-item bg-success" href="{{ path('app_plan') }}"><i class="fas fa-id-card me-2"></i>S'ABONNER</a>
+                                            {% endif %}
+                                            <a class="list-group-item {{ studentHome is defined ? 'active' : '' }}" href="{{ path('app_student_home') }}"><i class="bi bi-ui-checks-grid fa-fw me-2"></i>Dashboard</a>
+                                            <a class="list-group-item {{ isSubscriptions is defined ? 'active' : '' }}" href="{{ path('app_front_courses_category') }}"><i class="bi bi-basket fa-fw me-2"></i>Voir tous nos cours</a>
+                                            <a class="list-group-item {{ isSubscriptions is defined ? 'active' : '' }}" href="{{ path('app_student_subscriptions') }}"><i class="bi bi-basket fa-fw me-2"></i>Mes subscriptions</a>
+                                            <a class="list-group-item {{ studentCourses is defined ? 'active' : '' }}" href="{{ path('app_student_courses') }}"><i class="bi bi-basket fa-fw me-2"></i>Mes cours</a>
+                                            <!-- a class="list-group-item {{ isEvaluations is defined ? 'active' : '' }}" href="{{ path('app_student_evaluation') }}"><i class="bi bi-file fa-fw me-2"></i>Mes tests</a -->
+                                            <a class="list-group-item {{ isPayments is defined ? 'active' : '' }}" href="{{ url("app_student_payments") }}"><i class="bi bi-credit-card-2-front fa-fw me-2"></i>Mes paiements</a>
+                                            <a class="list-group-item {{ isNetWork is defined ? 'active' : '' }}" href="{{ url("app_student_network") }}"><i class="bi bi-people fa-fw me-2"></i>Mon réseau</a>
+                                            <a class="list-group-item {{ isProfile is defined ? 'active' : '' }}" href="{{ url("app_student_profile") }}"><i class="bi bi-pencil-square fa-fw me-2"></i>Mon Profile</a>
+                                            <a class="list-group-item {{ chatActive is defined ? 'active' : '' }}" href="{{ path('app_chat') }}"><i class="bi bi-chat-dots fa-fw me-2"></i>Chat with our teachers</a>
+                                            <a class="list-group-item text-danger bg-danger-soft-hover" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt fa-fw me-2"></i>Se déconnecter</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Responsive offcanvas body END -->
+                        </div>
+                        <!-- Left sidebar END -->
+                    {% endblock %}
+                    <!-- Main content START -->
+                    <div class="{{ mainContentClass|default('col-xl-9') }}">
+
+                        {% for message in app.flashes('errors') %}
+                            <div class="alert alert-danger alert-dismissible">
+                                <p>{{ message }}</p>
+                            </div>
+                        {% endfor %}
+                        {% for message in app.flashes('danger') %}
+                            <div class="alert alert-danger alert-dismissible">
+                                <p>{{ message }}</p>
+                            </div>
+                        {% endfor %}
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success alert-dismissible">
+                                <p>{{ message }}</p>
+                            </div>
+                        {% endfor %}
+                        {% for message in app.flashes('warning') %}
+                            <div class="alert alert-warning alert-dismissible">
+                                <p>{{ message }}</p>
+                            </div>
+                        {% endfor %}
+                        {% for message in app.flashes('infos') %}
+                            <div class="alert alert-info alert-dismissible">
+                                <p>{{ message }}</p>
+                            </div>
+                        {% endfor %}
+
+                        {% block pageContent %}{% endblock %}
+                        
+                    </div>
+                    <!-- Main content END -->
+                </div><!-- Row END -->
+            </div>
+        </section>
+        <!-- =======================
+        Page content END -->
+
+        <script>
+        // Exemple : Temps restant envoyé par le backend en secondes
+        const tempsRestant = {{ tempsRestant()|default(0) }};
+
+        if (tempsRestant > 0) {
+            // Fonction pour formater le temps restant
+            function formatTime(seconds) {
+                const days = Math.floor(seconds / (3600 * 24));
+                const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+
+                return `${days}J : ${hours}H : ${minutes}M : ${secs}S`;
+            }
+
+            // Initialisation du compte à rebours
+            const countdownElement = document.getElementById('countdown');
+            let remainingTime = tempsRestant;
+
+            // Mise à jour du compte à rebours chaque seconde
+            const interval = setInterval(() => {
+                if (remainingTime <= 0) {
+                    clearInterval(interval);
+                    countdownElement.textContent = "Période expirée.";
+                } else {
+                    countdownElement.textContent = formatTime(remainingTime);
+                    remainingTime--;
+                }
+            }, 1000);
+        } 
+    </script>
+    {% endblock %}
+{% endblock %}
+
 {% block footer %}
-    
     <footer class="bg-dark p-3">
         <div class="container">
             <div class="row align-items-center">
@@ -16,7 +214,7 @@
                 <!-- Widget -->
                 <div class="col-md-4 mb-3 mb-md-0">
                     <div class="text-center text-white">
-                        Copyrights 2025 kulmapeck</a>. All rights reserved.
+                        Copyrights 2025 kulmapeck. All rights reserved.
                     </div>
                 </div>
                 <!-- Widget -->
@@ -32,238 +230,4 @@
             </div>
         </div>
     </footer>
-
-{% endblock %}
-
-{% block script %}
-<style>
-        .bg-blue {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background-size: cover;
-            background-position: center;
-            height: auto;
-        }
-
-        @media (max-width: 576px) {
-            .bg-blue h3 {
-                font-size: 8px;
-                padding: 10px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .bg-blue h3 {
-                font-size: 1.2rem; /* Taille réduite pour les écrans moyens */
-        }
-}
-
-        @media (max-width: 1024px) { /* Cible les appareils avec une largeur maximale de 1024px (tablette et mobile) */
-			.counter-box {
-				display: none;
-			}
-		}
-    </style>
-    
-{% endblock %}
-
-{% block mainContent %}
-
-    {% block instructorBanner %}
-        <!-- =======================
-        Page Banner START -->
-        <section class="pt-0">
-            <!-- Main banner background image -->
-            
-           <div class="container-fluid px-0">
-                <div class="bg-blue h-100px h-md-200px rounded-0 d-flex justify-content-center align-items-center" 
-                    style="background: url({{ asset('assets/images/pattern/04.png') }}) no-repeat center center; background-size: cover;">
-                    <div class="text-center w-100">
-                        {% if tempsRestant() > 0 %}
-                            <h3 class="text-white">
-                                La période d'accès gratuit prend fin dans : <br>
-                                <span id="countdown" class="text-warning"></span>
-                            </h3>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-
-            {% block profileBlock %}
-                <div class="container mt-n4">
-                    <div class="row">
-                        <!-- Profile banner START -->
-                        <div class="col-12">
-                            <div class="card bg-transparent card-body p-0">
-                                <div class="row d-flex justify-content-between">
-                                    <!-- Avatar -->
-                                    <div class="col-auto mt-4 mt-md-0">
-                                        <div class="avatar avatar-xxl mt-n3">
-                                            <img class="avatar-img rounded-circle border border-white border-3 shadow" src="{{ asset('uploads/images/eleves/' ~ app.user.personne.avatar) }}" alt="">
-                                        </div>
-                                    </div>
-                                    <!-- Profile info -->
-                                    <div class="col d-md-flex justify-content-between align-items-center mt-4">
-                                        <div>
-                                            <h1 class="my-1 fs-4">{{ app.user.personne.nomComplet }} <i class="bi bi-patch-check-fill text-info small"></i></h1>
-                                             <ul class="list-inline mb-0">
-                                                <li class="list-inline-item me-3 mb-1 mb-sm-0">
-                                                    <span class="h6">00</span>
-                                                    <span class="text-body fw-light">points</span>
-                                                </li>
-                                                <li class="list-inline-item me-3 mb-1 mb-sm-0">
-                                                    <span class="h6">00</span>
-                                                    <span class="text-body fw-light">Completed courses</span>
-                                                </li>
-                                                <!-- li class="list-inline-item me-3 mb-1 mb-sm-0">
-                                                    <span class="h6">{{ student.lectures|length < 10 ?'0' ~ student.lectures|length : student.lectures|length }}</span>
-                                                    <span class="text-body fw-light">Completed lessons</span>
-                                                </li -->
-                                            </ul>
-                                                        
-                                        </div>
-                                    </div>
-                                    <div class="col-3 justify-content-between align-items-center mt-5">
-                                       <button class="btn btn-primary d-xl-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
-                                            <i class="fas fa-sliders-h"></i>
-                                        </button>
-                                     </div>
-                                </div>
-                            </div>
-                            <!-- Profile banner END -->
-
-                            <!-- Advanced filter responsive toggler START -->
-                            <!-- Divider -->
-                            <hr class="d-xl-none">
-                            <div class="col-12 col-xl-3 d-flex justify-content-between align-items-center">
-                                <a class="h6 mb-0 fw-bold d-xl-none btn btn-primary hide-btn" href="{{ path('app_front_courses_category') }}">Voir tous nos cours</a>
-                                 
-                                 {% if not app.user or (app.user.eleve and not app.user.eleve.isPremium) %}
-                                    <a class="h6 mb-0 fw-bold d-xl-none btn btn-primary hide-btn" href="{{ path('app_plan') }}">S'abonner</a>
-                                 {% endif %}
-                            </div>
-                            <!-- Advanced filter responsive toggler END -->
-                        </div>
-                    </div>
-                </div>
-            {% endblock %}
-        </section>
-        <!-- =======================
-        Page Banner END -->
-    {% endblock %}
-    <!-- =======================
-    Page content START -->
-    <section class="pt-0">
-        <div class="container">
-            <div class="row">
-                {% block instructorSidebar %}
-                    <!-- Left sidebar START -->
-                    <div class="col-xl-3">
-                        <!-- Responsive offcanvas body START -->
-                        <div class="offcanvas-xl offcanvas-end" tabindex="-1" id="offcanvasSidebar">
-                            <!-- Offcanvas header -->
-                            <div class="offcanvas-header bg-light">
-                                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">My profile</h5>
-                                <button  type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasSidebar" aria-label="Close"></button>
-                            </div>
-                            <!-- Offcanvas body -->
-                            <div class="offcanvas-body p-3 p-xl-0">
-                                <div class="bg-dark border rounded-3 pb-0 p-3 w-100">
-                                    <!-- Dashboard menu -->
-                                    <div class="list-group list-group-dark list-group-borderless">
-                                        {% if not app.user or (app.user.eleve and not app.user.eleve.isPremium) %}
-                                            <a class="list-group-item bg-success" href="{{ path('app_plan') }}"><i class="fas fa-id-card me-2"></i>S'ABONNER</a>
-                                        {% endif %}
-                                        <a class="list-group-item {{ studentHome is defined ? 'active' : '' }}" href="{{ path('app_student_home') }}"><i class="bi bi-ui-checks-grid fa-fw me-2"></i>Dashboard</a>
-                                        <a class="list-group-item {{ isSubscriptions is defined ? 'active' : '' }}" href="{{ path('app_front_courses_category') }}"><i class="bi bi-basket fa-fw me-2"></i>Voir tous nos cours</a>
-                                        <a class="list-group-item {{ isSubscriptions is defined ? 'active' : '' }}" href="{{ path('app_student_subscriptions') }}"><i class="bi bi-basket fa-fw me-2"></i>Mes subscriptions</a>
-                                        <a class="list-group-item {{ studentCourses is defined ? 'active' : '' }}" href="{{ path('app_student_courses') }}"><i class="bi bi-basket fa-fw me-2"></i>Mes cours</a>
-                                        <!-- a class="list-group-item {{ isEvaluations is defined ? 'active' : '' }}" href="{{ path('app_student_evaluation') }}"><i class="bi bi-file fa-fw me-2"></i>Mes tests</a -->
-                                        <a class="list-group-item {{ isPayments is defined ? 'active' : '' }}" href="{{ url("app_student_payments") }}"><i class="bi bi-credit-card-2-front fa-fw me-2"></i>Mes paiements</a>
-                                        <a class="list-group-item {{ isNetWork is defined ? 'active' : '' }}" href="{{ url("app_student_network") }}"><i class="bi bi-people fa-fw me-2"></i>Mon réseau</a>
-                                        <a class="list-group-item {{ isProfile is defined ? 'active' : '' }}" href="{{ url("app_student_profile") }}"><i class="bi bi-pencil-square fa-fw me-2"></i>Mon Profile</a>
-                                        <a class="list-group-item {{ chatActive is defined ? 'active' : '' }}" href="{{ path('app_chat') }}"><i class="bi bi-chat-dots fa-fw me-2"></i>Chat with our teachers</a>
-                                        <a class="list-group-item text-danger bg-danger-soft-hover" href="{{ path('app_logout') }}"><i class="fas fa-sign-out-alt fa-fw me-2"></i>Se déconnecter</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Responsive offcanvas body END -->
-                    </div>
-                    <!-- Left sidebar END -->
-                {% endblock %}
-                <!-- Main content START -->
-                <div class="{{ mainContentClass|default('col-xl-9') }}">
-
-                    {% for message in app.flashes('errors') %}
-                        <div class="alert alert-danger alert-dismissible">
-                            <p>{{ message }}</p>
-                        </div>
-                    {% endfor %}
-                    {% for message in app.flashes('danger') %}
-                        <div class="alert alert-danger alert-dismissible">
-                            <p>{{ message }}</p>
-                        </div>
-                    {% endfor %}
-                    {% for message in app.flashes('success') %}
-                        <div class="alert alert-success alert-dismissible">
-                            <p>{{ message }}</p>
-                        </div>
-                    {% endfor %}
-                    {% for message in app.flashes('warning') %}
-                        <div class="alert alert-warning alert-dismissible">
-                            <p>{{ message }}</p>
-                        </div>
-                    {% endfor %}
-                    {% for message in app.flashes('infos') %}
-                        <div class="alert alert-info alert-dismissible">
-                            <p>{{ message }}</p>
-                        </div>
-                    {% endfor %}
-
-                    {% block pageContent %}{% endblock %}
-                    
-                </div>
-                <!-- Main content END -->
-            </div><!-- Row END -->
-        </div>
-    </section>
-    <!-- =======================
-    Page content END -->
-
-    <script>
-    // Exemple : Temps restant envoyé par le backend en secondes
-    const tempsRestant = {{ tempsRestant()|default(0) }};
-
-    if (tempsRestant > 0) {
-        // Fonction pour formater le temps restant
-        function formatTime(seconds) {
-            const days = Math.floor(seconds / (3600 * 24));
-            const hours = Math.floor((seconds % (3600 * 24)) / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            const secs = seconds % 60;
-
-            return `${days}J : ${hours}H : ${minutes}M : ${secs}S`;
-        }
-
-        // Initialisation du compte à rebours
-        const countdownElement = document.getElementById('countdown');
-        let remainingTime = tempsRestant;
-
-        // Mise à jour du compte à rebours chaque seconde
-        const interval = setInterval(() => {
-            if (remainingTime <= 0) {
-                clearInterval(interval);
-                countdownElement.textContent = "Période expirée.";
-            } else {
-                countdownElement.textContent = formatTime(remainingTime);
-                remainingTime--;
-            }
-        }, 1000);
-    } 
-</script>
-
 {% endblock %}

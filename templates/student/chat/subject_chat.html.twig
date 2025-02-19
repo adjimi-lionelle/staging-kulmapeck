@@ -1,75 +1,124 @@
-{% extends "student/base.html.twig" %}
+{% extends 'student/base.html.twig' %}
 
-{% block title %} - {{ subject.name }} Chat{% endblock %}
+{% block title %}Chat{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/subject_chat.css') }}">
 {% endblock %}
 
-{% block mainContent %}
-<div class="chat-container">
-    <div class="sidebar">
-        <div class="search-bar">
-            <input type="text" placeholder="Rechercher une matière...">
-        </div>
-        <div class="subjects">
-            {% for subject in available_subjects %}
-                <div class="subject {% if subject.id == current_subject.id %}active{% endif %}" 
-                     data-subject-id="{{ subject.id }}">
-                    <div class="subject-icon">
-                        <i class="fas fa-{{ subject.icon|default('book') }}"></i>
+{% block studentContent %}
+    <div class="chat-container">
+        <div class="sidebar">
+            <div class="search-box">
+                <input type="text" placeholder="Search subjects..." id="subject-search">
+            </div>
+            <div class="subject-list">
+                {% for subject in available_subjects %}
+                    <div class="subject-item {% if subject.id == current_subject.id %}active{% endif %}" 
+                         data-subject-id="{{ subject.id }}">
+                        <img src="{{ asset(subject.icon) }}" alt="{{ subject.name }}" class="subject-icon">
+                        <div class="subject-info">
+                            <div class="subject-name">{{ subject.name }}</div>
+                            <div class="teacher-name">{{ subject.teacherPersona.name }}</div>
+                        </div>
                     </div>
-                    <div class="subject-info">
-                        <h4>{{ subject.name }}</h4>
-                        <p class="teacher-name">Prof. {{ subject.teacherPersona.name }}</p>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <div class="chat-window">
-        <div class="chat-header">
-            <div class="teacher-info">
-                <img src="{{ asset('images/teacher-avatars/' ~ current_subject.teacherPersona.avatar) }}" 
-                     alt="{{ current_subject.teacherPersona.name }}">
-                <div>
-                    <h3>Prof. {{ current_subject.teacherPersona.name }}</h3>
-                    <p class="subject-name">{{ current_subject.name }}</p>
-                </div>
+                {% endfor %}
             </div>
         </div>
-
-        <div class="chat-messages" id="chat-messages">
-            {% for message in messages %}
-                <div class="message {% if message.isFromAI %}received{% else %}sent{% endif %}">
-                    <div class="message-content">
-                        <p>{{ message.content }}</p>
-                        <span class="time">{{ message.createdAt|date('H:i') }}</span>
+        
+        <div class="chat-window">
+            <div class="chat-header">
+                <div class="current-subject">
+                    <h3>{{ current_subject.name }}</h3>
+                    <div class="teacher-info">
+                        <img src="{{ current_subject.teacherPersona.avatar }}" alt="{{ current_subject.teacherPersona.name }}" class="teacher-avatar">
+                        <span class="teacher-name">{{ current_subject.teacherPersona.name }}</span>
                     </div>
                 </div>
-            {% endfor %}
-        </div>
-
-        <div class="chat-input">
-            <textarea id="message-input" 
-                     placeholder="Posez votre question..."
-                     rows="1"></textarea>
-            <button id="send-button" class="send-btn">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                {% for message in messages %}
+                    <div class="message {% if message.fromStudent %}outgoing{% else %}incoming{% endif %}">
+                        <div class="message-content">{{ message.content }}</div>
+                        <div class="message-time">{{ message.createdAt|date('H:i') }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <div class="chat-input">
+                <textarea id="message-input" placeholder="Type your message..."></textarea>
+                <button id="send-button">Send</button>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script>
-        const WEBSOCKET_URL = "{{ websocket_url }}";
-        const SUBJECT_ID = "{{ current_subject.id }}";
-        const STUDENT_TOKEN = "{{ student_token }}";
+        const chatSocket = new WebSocket('{{ websocket_url }}');
+        const studentToken = '{{ student_token }}';
+        
+        chatSocket.onopen = () => {
+            console.log('Connected to chat server');
+            chatSocket.send(JSON.stringify({
+                type: 'auth',
+                token: studentToken
+            }));
+        };
+        
+        chatSocket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'message') {
+                appendMessage(data.message);
+            }
+        };
+        
+        function appendMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${message.fromStudent ? 'outgoing' : 'incoming'}`;
+            messageDiv.innerHTML = `
+                <div class="message-content">${message.content}</div>
+                <div class="message-time">${new Date(message.createdAt).toLocaleTimeString()}</div>
+            `;
+            document.getElementById('chat-messages').appendChild(messageDiv);
+            messageDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        document.getElementById('send-button').addEventListener('click', () => {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            if (message) {
+                chatSocket.send(JSON.stringify({
+                    type: 'message',
+                    content: message
+                }));
+                input.value = '';
+            }
+        });
+        
+        document.getElementById('message-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('send-button').click();
+            }
+        });
+        
+        document.getElementById('subject-search').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            document.querySelectorAll('.subject-item').forEach(item => {
+                const subjectName = item.querySelector('.subject-name').textContent.toLowerCase();
+                item.style.display = subjectName.includes(searchTerm) ? 'flex' : 'none';
+            });
+        });
+        
+        document.querySelectorAll('.subject-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const subjectId = item.dataset.subjectId;
+                window.location.href = `{{ path('app_subject_chat', {'subject': 'SUBJECT_ID'}) }}`.replace('SUBJECT_ID', subjectId);
+            });
+        });
     </script>
-    <script src="{{ asset('js/subject_chat.js') }}"></script>
 {% endblock %}
