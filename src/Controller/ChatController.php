@@ -70,7 +70,7 @@ class ChatController extends AbstractController
             $specialites = $this->specialiteRepository->findAll();
 
             // Check if student needs setup
-            $needsSetup = !$student->getClasse() || !$student->getSpecialite();
+            $needsSetup = !$student->getClasse() || !$student->getClasse()?->getSpecialite();
             
             // Only get active subject chats if student is fully set up
             $chats = [];
