@@ -1,79 +1,113 @@
-{% extends 'student/base.html.twig' %}
+{% extends 'front/base.html.twig' %}
 
-{% block title %}Chat{% endblock %}
+{% block title %} - Chat{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/subject_chat.css') }}">
 {% endblock %}
 
-{% block pageContent %}
-    <div class="container-fluid p-0">
-        <div class="card chat-card">
-            <div class="card-body p-0">
-                <div class="chat-container">
-                    <div class="sidebar">
-                        <div class="search-box">
-                            <div class="input-group">
-                                <span class="input-group-text border-0 bg-light">
-                                    <i class="bi bi-search"></i>
-                                </span>
-                                <input type="text" class="form-control border-0 bg-light" placeholder="Search subjects..." id="subject-search">
-                            </div>
-                        </div>
-                        <div class="subject-list">
-                            {% for subject in available_subjects %}
-                                <div class="subject-item d-flex align-items-center p-3 {% if subject.id == current_subject.id %}active{% endif %}" 
-                                     data-subject-id="{{ subject.id }}">
-                                    <div class="avatar avatar-md">
-                                        <img src="{{ asset(subject.icon) }}" alt="{{ subject.name }}" class="avatar-img rounded-circle">
+{% block mainContent %}
+    <main>
+        <section class="pt-0">
+            <div class="container-fluid px-0">
+                <div class="bg-blue h-100px h-md-200px rounded-0" style="background: url({{ asset('assets/images/pattern/04.png') }}) no-repeat center center; background-size: cover;">
+                </div>
+                <div class="container mt-n4">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card bg-transparent card-body p-0">
+                                <div class="row d-flex justify-content-between">
+                                    <div class="col-auto mt-4 mt-md-0">
+                                        <div class="avatar avatar-xxl mt-n3">
+                                            <img class="avatar-img rounded-circle border border-white border-3 shadow" src="{{ asset('uploads/images/eleves/' ~ app.user.personne.avatar) }}" alt="">
+                                        </div>
                                     </div>
-                                    <div class="ms-3">
-                                        <h6 class="mb-1">{{ subject.name }}</h6>
-                                        <p class="small text-secondary mb-0">{{ subject.teacherPersona.name }}</p>
+                                    <div class="col d-md-flex justify-content-between align-items-center mt-4">
+                                        <div>
+                                            <h1 class="my-1 fs-4">{{ app.user.personne.nomComplet }} <i class="bi bi-patch-check-fill text-info small"></i></h1>
+                                        </div>
                                     </div>
                                 </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <div class="chat-window">
-                        <div class="chat-header">
-                            <div class="current-subject d-flex align-items-center justify-content-between p-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar avatar-lg me-2">
-                                        <img src="{{ current_subject.teacherPersona.avatar }}" class="avatar-img rounded-circle" alt="{{ current_subject.teacherPersona.name }}">
-                                    </div>
-                                    <div>
-                                        <h5 class="mb-0">{{ current_subject.name }}</h5>
-                                        <p class="small text-secondary mb-0">{{ current_subject.teacherPersona.name }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="chat-messages" id="chat-messages">
-                            {% for message in messages %}
-                                <div class="message {% if message.fromStudent %}outgoing{% else %}incoming{% endif %}">
-                                    <div class="message-content">{{ message.content }}</div>
-                                    <div class="message-time">{{ message.createdAt|date('H:i') }}</div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                        
-                        <div class="chat-input">
-                            <div class="input-group">
-                                <textarea id="message-input" class="form-control" placeholder="Type your message..." rows="1"></textarea>
-                                <button id="send-button" class="btn btn-primary">
-                                    <i class="bi bi-send-fill"></i>
-                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
+            </section>
+
+            <section class="pt-0">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card chat-card border-0">
+                                <div class="card-body p-0">
+                                    <div class="chat-container">
+                                        <div class="sidebar">
+                                            <div class="search-box">
+                                                <div class="input-group">
+                                                    <span class="input-group-text border-0 bg-light">
+                                                        <i class="bi bi-search"></i>
+                                                    </span>
+                                                    <input type="text" class="form-control border-0 bg-light" placeholder="Search subjects..." id="subject-search">
+                                                </div>
+                                            </div>
+                                            <div class="subject-list">
+                                                {% for subject in available_subjects %}
+                                                    <div class="subject-item d-flex align-items-center p-3 {% if subject.id == current_subject.id %}active{% endif %}" 
+                                                         data-subject-id="{{ subject.id }}">
+                                                        <div class="avatar avatar-md">
+                                                            <img src="{{ asset(subject.icon) }}" alt="{{ subject.name }}" class="avatar-img rounded-circle">
+                                                        </div>
+                                                        <div class="ms-3">
+                                                            <h6 class="mb-1">{{ subject.name }}</h6>
+                                                            <p class="small text-secondary mb-0">{{ subject.teacherPersona.name }}</p>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="chat-window">
+                                            <div class="chat-header">
+                                                <div class="current-subject d-flex align-items-center justify-content-between p-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar avatar-lg me-2">
+                                                            <img src="{{ current_subject.teacherPersona.avatar }}" class="avatar-img rounded-circle" alt="{{ current_subject.teacherPersona.name }}">
+                                                        </div>
+                                                        <div>
+                                                            <h5 class="mb-0">{{ current_subject.name }}</h5>
+                                                            <p class="small text-secondary mb-0">{{ current_subject.teacherPersona.name }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="chat-messages" id="chat-messages">
+                                                {% for message in messages %}
+                                                    <div class="message {% if message.fromStudent %}outgoing{% else %}incoming{% endif %}">
+                                                        <div class="message-content">{{ message.content }}</div>
+                                                        <div class="message-time">{{ message.createdAt|date('H:i') }}</div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                            
+                                            <div class="chat-input">
+                                                <div class="input-group">
+                                                    <textarea id="message-input" class="form-control" placeholder="Type your message..." rows="1"></textarea>
+                                                    <button id="send-button" class="btn btn-primary">
+                                                        <i class="bi bi-send-fill"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
 {% endblock %}
 
 {% block javascripts %}
