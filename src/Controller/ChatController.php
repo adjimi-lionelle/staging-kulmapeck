@@ -16,6 +16,7 @@ use App\Repository\MatiereCycleRepository;
 use App\Repository\ClasseRepository;
 use App\Repository\SpecialiteRepository;
 use App\Repository\PersonneRepository;
+use App\Repository\PaymentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,7 +39,8 @@ class ChatController extends AbstractController
         private MatiereCycleRepository $matiereCycleRepository,
         private ClasseRepository $classeRepository,
         private SpecialiteRepository $specialiteRepository,
-        private PersonneRepository $personneRepository
+        private PersonneRepository $personneRepository,
+        private PaymentRepository $paymentRepository
     ) {
         $this->jwtSecret = $jwtSecretKey;
     }
@@ -60,7 +62,22 @@ class ChatController extends AbstractController
             }
 
             // Check premium status
-            if (!$student->isIsPremium()) {
+            $payments = $this->paymentRepository->findBy([
+                'eleve' => $student,
+                'status' => 'SUCCESS',
+                'isExpired' => false
+            ]);
+
+            $hasPremiumAccess = false;
+            $today = new \DateTimeImmutable();
+            foreach ($payments as $payment) {
+                if ($payment->getExpiredAt() > $today) {
+                    $hasPremiumAccess = true;
+                    break;
+                }
+            }
+
+            if (!$hasPremiumAccess) {
                 $this->addFlash('warning', 'You need a premium account to access chat features.');
                 return $this->redirectToRoute('app_premium_plans');
             }
@@ -214,6 +231,42 @@ class ChatController extends AbstractController
         ]);
     }
 
+    #[Route('/chat/setup', name: 'app_chat_setup', methods: ['POST'])]
+    public function setup(Request $request): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        if (!$student) {
+            throw $this->createNotFoundException('Student not found');
+        }
+
+        $classe = $this->classeRepository->find($request->request->get('classe'));
+        if (!$classe) {
+            throw $this->createNotFoundException('Class not found');
+        }
+
+        $student->setClasse($classe);
+
+        // Only set specialization for second cycle students
+        $specializationId = $request->request->get('specialization');
+        if ($classe->getCycle() === 'second' && $specializationId) {
+            $specialization = $this->specialiteRepository->find($specializationId);
+            if ($specialization) {
+                $student->setSpecialite($specialization);
+            }
+        } else {
+            $student->setSpecialite(null);
+        }
+
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_chat');
+    }
+
     private function getTeacherName(Categorie $subject): string
     {
         $teacherNames = [
@@ -252,46 +305,6 @@ class ChatController extends AbstractController
         ];
 
         return $icons[$subject->getName()] ?? 'book';
-    }
-
-    #[Route('/chat/setup', name: 'app_chat_setup', methods: ['POST'])]
-    #[IsGranted('ROLE_STUDENT')]
-    public function setup(Request $request): JsonResponse
-    {
-        try {
-            $data = json_decode($request->getContent(), true);
-            
-            if (!isset($data['classe']) || !isset($data['specialite'])) {
-                throw new \InvalidArgumentException('Both class and specialization are required');
-            }
-
-            /** @var User $user */
-            $user = $this->getUser();
-            $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
-            
-            if (!$student) {
-                throw new \RuntimeException('Student not found');
-            }
-
-            $classe = $this->classeRepository->find($data['classe']);
-            $specialite = $this->specialiteRepository->find($data['specialite']);
-
-            if (!$classe || !$specialite) {
-                throw new \InvalidArgumentException('Invalid class or specialization selected');
-            }
-
-            $student->setClasse($classe);
-            $student->setSpecialite($specialite);
-
-            $this->entityManager->flush();
-
-            return new JsonResponse(['success' => true]);
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'success' => false, 
-                'error' => $e->getMessage()
-            ], 400);
-        }
     }
 
     #[Route('/chat/send', name: 'app_chat_send', methods: ['POST'])]
