@@ -86,21 +86,33 @@ class ChatController extends AbstractController
             $specialites = $this->specialiteRepository->findAll();
 
             // Check if student needs setup
-            $needsSetup = !$student->getClasse() || !$student->getClasse()?->getSpecialite();
-            
-            // Only get active subject chats if student is fully set up
+            $needsSetup = true; // Default to true
             $chats = [];
-            if (!$needsSetup) {
-                $chats = array_map(function($chat) {
-                    return [
-                        'id' => $chat->getId(),
-                        'matiere' => [
-                            'name' => $chat->getMatiere()->getName(),
-                            'icon' => $this->getSubjectIcon($chat->getMatiere())
-                        ],
-                        'teacherName' => $this->getTeacherName($chat->getMatiere())
-                    ];
-                }, $this->subjectChatRepository->findByStudent($student));
+            
+            if ($student->getClasse()) {
+                $classe = $student->getClasse();
+                $secondCycleSkillLevels = [5, 6, 7]; // Adjust these IDs based on your database
+                
+                // Only require specialization for second cycle classes
+                if (in_array($classe->getSkillLevel()->getId(), $secondCycleSkillLevels)) {
+                    $needsSetup = !$student->getSpecialite();
+                } else {
+                    $needsSetup = false;
+                }
+                
+                // Load chats if setup is complete
+                if (!$needsSetup) {
+                    $chats = array_map(function($chat) {
+                        return [
+                            'id' => $chat->getId(),
+                            'matiere' => [
+                                'name' => $chat->getMatiere()->getName(),
+                                'icon' => $this->getSubjectIcon($chat->getMatiere())
+                            ],
+                            'teacherName' => $this->getTeacherName($chat->getMatiere())
+                        ];
+                    }, $this->subjectChatRepository->findByStudent($student));
+                }
             }
 
             return $this->render('student/chat/index.html.twig', [
