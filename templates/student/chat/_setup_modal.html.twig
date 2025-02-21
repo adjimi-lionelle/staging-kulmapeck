@@ -21,7 +21,7 @@
                         <label for="specialization" class="form-label">{% trans %}SELECT_SPECIALIZATION{% endtrans %}</label>
                         <select class="form-select" id="specialization" name="specialization" required>
                             <option value="">{% trans %}CHOOSE_SPECIALIZATION{% endtrans %}</option>
-                            {% for spec in specializations %}
+                            {% for spec in specialites %}
                                 <option value="{{ spec.id }}">{{ spec.name }}</option>
                             {% endfor %}
                         </select>
