@@ -61,7 +61,7 @@ class ChatController extends AbstractController
                 throw $this->createAccessDeniedException('Student account not found.');
             }
 
-            // Check premium status
+            // Check premium status first
             $payments = $this->paymentRepository->findBy([
                 'eleve' => $student,
                 'status' => 'SUCCESS',
@@ -85,17 +85,19 @@ class ChatController extends AbstractController
             $classes = $this->classeRepository->findAll();
             $specialites = $this->specialiteRepository->findAll();
 
-            // Check if student needs setup
+            // Check if student needs setup - either no class or missing required specialization
             $needsSetup = !$student->getClasse();
-            
-            // Only get active subject chats if student is fully set up
             $chats = [];
+
             if (!$needsSetup) {
-                // For second cycle students, also check specialization
+                // For second cycle students, check specialization requirement
                 $secondCycleSkillLevels = [5, 6, 7]; // Adjust these IDs based on your database
-                if (in_array($student->getClasse()->getSkillLevel()->getId(), $secondCycleSkillLevels) && !$student->getSpecialite()) {
+                $currentSkillLevel = $student->getClasse()->getSkillLevel()->getId();
+                
+                if (in_array($currentSkillLevel, $secondCycleSkillLevels) && !$student->getSpecialite()) {
                     $needsSetup = true;
                 } else {
+                    // Only load chats if all setup requirements are met
                     $chats = array_map(function($chat) {
                         return [
                             'id' => $chat->getId(),
@@ -109,6 +111,7 @@ class ChatController extends AbstractController
                 }
             }
 
+            // Always render the template - the setup modal will show automatically if needed
             return $this->render('student/chat/index.html.twig', [
                 'needsSetup' => $needsSetup,
                 'classes' => $classes,
@@ -117,8 +120,10 @@ class ChatController extends AbstractController
             ]);
         }
 
-        // For non-students, show appropriate interface
-        return $this->render('front/chat/non_student_index.html.twig');
+        // For non-student users (e.g., teachers)
+        return $this->render('student/chat/index.html.twig', [
+            'chats' => []
+        ]);
     }
 
     /**
