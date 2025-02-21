@@ -6,7 +6,7 @@
                 <h5 class="modal-title" id="setupModalLabel">{% trans %}SETUP_YOUR_PROFILE_KEY{% endtrans %}</h5>
             </div>
             <div class="modal-body">
-                <form id="setupForm">
+                <form id="setupForm" method="POST" action="{{ path('app_chat_setup') }}">
                     <!-- Class/Skill Level selection -->
                     <div class="mb-3">
                         <label for="classe" class="form-label">{% trans %}SELECT_YOUR_CLASS_KEY{% endtrans %}</label>

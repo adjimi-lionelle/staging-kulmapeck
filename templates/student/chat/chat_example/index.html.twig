@@ -2,7 +2,10 @@
 
 {% block pageContent %}
     {% if needsSetup %}
-        {{ include('student/chat/_setup_modal.html.twig') }}
+        {% include 'student/chat/_setup_modal.html.twig' with {
+            'classes': classes,
+            'specialites': specialites
+         } %}
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const setupModal = new bootstrap.Modal(document.getElementById('setupModal'));
