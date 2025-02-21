@@ -250,9 +250,11 @@ class ChatController extends AbstractController
 
         $student->setClasse($classe);
 
-        // Only set specialization for second cycle students
+        // Only set specialization for second cycle students (2nde to Terminal)
+        $secondCycleSkillLevels = [5, 6, 7]; // Adjust these IDs based on your database
         $specializationId = $request->request->get('specialization');
-        if ($classe->getCycle() === 'second' && $specializationId) {
+        
+        if (in_array($classe->getSkillLevel()->getId(), $secondCycleSkillLevels) && $specializationId) {
             $specialization = $this->specialiteRepository->find($specializationId);
             if ($specialization) {
                 $student->setSpecialite($specialization);
