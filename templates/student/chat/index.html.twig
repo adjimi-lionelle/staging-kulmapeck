@@ -62,6 +62,11 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            {% if needsSetup %}
+                // Show setup modal automatically
+                const setupModal = new bootstrap.Modal(document.getElementById('setup-modal'));
+                setupModal.show();
+            {% endif %}
             const subjects = document.querySelectorAll('.subject');
             subjects.forEach(subject => {
                 subject.addEventListener('click', function() {

@@ -86,22 +86,16 @@ class ChatController extends AbstractController
             $specialites = $this->specialiteRepository->findAll();
 
             // Check if student needs setup
-            $needsSetup = true; // Default to true
-            $chats = [];
+            $needsSetup = !$student->getClasse();
             
-            if ($student->getClasse()) {
-                $classe = $student->getClasse();
+            // Only get active subject chats if student is fully set up
+            $chats = [];
+            if (!$needsSetup) {
+                // For second cycle students, also check specialization
                 $secondCycleSkillLevels = [5, 6, 7]; // Adjust these IDs based on your database
-                
-                // Only require specialization for second cycle classes
-                if (in_array($classe->getSkillLevel()->getId(), $secondCycleSkillLevels)) {
-                    $needsSetup = !$student->getSpecialite();
+                if (in_array($student->getClasse()->getSkillLevel()->getId(), $secondCycleSkillLevels) && !$student->getSpecialite()) {
+                    $needsSetup = true;
                 } else {
-                    $needsSetup = false;
-                }
-                
-                // Load chats if setup is complete
-                if (!$needsSetup) {
                     $chats = array_map(function($chat) {
                         return [
                             'id' => $chat->getId(),
@@ -116,11 +110,10 @@ class ChatController extends AbstractController
             }
 
             return $this->render('student/chat/index.html.twig', [
-                'student' => $student,
+                'needsSetup' => $needsSetup,
                 'classes' => $classes,
                 'specialites' => $specialites,
-                'chats' => $chats,
-                'needsSetup' => $needsSetup
+                'chats' => $chats
             ]);
         }
 
