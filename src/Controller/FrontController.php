@@ -106,8 +106,11 @@ class FrontController extends AbstractController
     }
 
     #[Route('/subscriptions-plans', name: 'app_plan')]
-    public function plan(Request $request, AbonnementItemRepository $abonnementItemRepository
-    , EleveRepository $eleveRepository, AbonnementRepository $abonnementRepository) {
+    public function plan(Request $request, AbonnementItemRepository $abonnementItemRepository, EleveRepository $eleveRepository, AbonnementRepository $abonnementRepository): Response
+    {
+        if ($request->query->get('message') === 'chat') {
+            $this->addFlash('warning', 'You need a premium account to access chat features.');
+        }
 
         $eleve = $eleveRepository->findOneBy(['utilisateur' => $this->getUser()]);
 

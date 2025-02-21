@@ -78,8 +78,7 @@ class ChatController extends AbstractController
             }
 
             if (!$hasPremiumAccess) {
-                $this->addFlash('warning', 'You need a premium account to access chat features.');
-                return $this->redirectToRoute('app_plan');
+                return $this->redirectToRoute('app_plan', ['message' => 'chat']);
             }
 
             // Get all classes and specializations for setup if needed
