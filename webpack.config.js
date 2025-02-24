@@ -8,6 +8,7 @@ Encore
     .setOutputPath('public/build/')
     .setPublicPath('/build')
     .addEntry('chat', './assets/react/chat/index.tsx')
+    .addStyleEntry('chat_styles', './assets/react/chat/styles/chat.css')
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
