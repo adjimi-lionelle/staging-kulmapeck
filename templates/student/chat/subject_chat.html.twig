@@ -16,9 +16,9 @@
     <div class="row">
         <div class="col-12">
             <div id="react-chat"
-                 data-websocket-url="{{ websocket_url }}"
-                 data-token="{{ student_token }}"
-                 data-subjects="{{ available_subjects|json_encode|e('html_attr') }}"
+                 data-websocket-url="{{ app.request.schemeAndHttpHost|replace({'http': 'ws', 'https': 'wss'}) }}/ws"
+                 data-token="{{ token }}"
+                 data-subjects="{{ [chat]|json_encode|e('html_attr') }}"
                  data-messages="{{ messages|json_encode|e('html_attr') }}">
             </div>
         </div>

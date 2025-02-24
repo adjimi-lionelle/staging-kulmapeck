@@ -116,7 +116,8 @@ class ChatController extends AbstractController
                 'needsSetup' => $needsSetup,
                 'classes' => $classes,
                 'specialites' => $specialites,
-                'chats' => $chats
+                'chats' => $chats,
+                'token' => $this->generateWebSocketToken($student)
             ]);
         }
 
@@ -195,15 +196,7 @@ class ChatController extends AbstractController
         $messages = $this->messageChatRepository->findSubjectChatMessages($chat);
 
         // Generate JWT token for WebSocket authentication
-        $payload = [
-            'user_id' => $user->getId(),
-            'student_id' => $student->getId(),
-            'subject_id' => $subject->getId(),
-            'chat_id' => $chat->getId(),
-            'exp' => time() + 3600 // 1 hour expiration
-        ];
-        
-        $token = JWT::encode($payload, $this->jwtSecret, 'HS256');
+        $token = $this->generateWebSocketToken($student, $chat);
 
         // Get teacher persona for this subject
         $teacherPersona = [
@@ -467,6 +460,22 @@ class ChatController extends AbstractController
         $token = JWT::encode($payload, $this->jwtSecret, 'HS256');
 
         return new JsonResponse(['token' => $token]);
+    }
+
+    private function generateWebSocketToken(Eleve $student, ?SubjectChat $chat = null): string
+    {
+        $payload = [
+            'sub' => $student->getId(),
+            'iat' => time(),
+            'exp' => time() + 3600, // Token expires in 1 hour
+            'role' => 'student'
+        ];
+
+        if ($chat) {
+            $payload['chat'] = $chat->getId();
+        }
+
+        return JWT::encode($payload, $this->jwtSecret, 'HS256');
     }
 
     private function getLastMessage($chat): ?array

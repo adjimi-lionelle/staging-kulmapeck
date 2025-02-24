@@ -34,8 +34,8 @@
         <div class="row">
             <div class="col-12">
                 <div id="react-chat"
-                     data-websocket-url="{{ websocket_url }}"
-                     data-token="{{ student_token }}"
+                     data-websocket-url="{{ app.request.schemeAndHttpHost|replace({'http': 'ws', 'https': 'wss'}) }}/ws"
+                     data-token="{{ token|default('') }}"
                      data-subjects="{{ chats|json_encode|e('html_attr') }}"
                      data-messages="[]">
                 </div>
