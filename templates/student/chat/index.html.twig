@@ -1,4 +1,4 @@
-{% extends "student/base.html.twig" %}
+{% extends 'student/chat/base_chat.html.twig' %}
 
 {% block title %} - Chat{% endblock %}
 
@@ -31,18 +31,23 @@
                         <input type="text" placeholder="{% trans %}SEARCH_SUBJECT_KEY{% endtrans %}">
                     </div>
                 </div>
-                <div class="chat-list">
+                {% block chat_list %}
                     {% if chats is empty %}
-                        <div class="chat-item">
+                        <div class="chat-item empty-state">
                             <div class="chat-item-info">
                                 <div class="chat-item-name">{% trans %}NO_SUBJECTS_YET_KEY{% endtrans %}</div>
+                                <div class="chat-item-preview text-muted">{% trans %}ENROLL_IN_SUBJECTS_KEY{% endtrans %}</div>
                             </div>
                         </div>
                     {% else %}
                         {% for chat in chats %}
                             <div class="chat-item" data-subject-id="{{ chat.id }}">
                                 <div class="chat-item-avatar">
-                                    <i class="bi bi-{{ chat.matiere.icon|default('book') }}"></i>
+                                    {% if chat.matiere.imageFile %}
+                                        <img src="{{ asset(chat.matiere.imageFile) }}" alt="{{ chat.matiere.name }}">
+                                    {% else %}
+                                        <i class="bi bi-{{ chat.matiere.icon|default('book') }}"></i>
+                                    {% endif %}
                                 </div>
                                 <div class="chat-item-info">
                                     <div class="chat-item-name">{{ chat.matiere.name }}</div>
@@ -51,27 +56,50 @@
                             </div>
                         {% endfor %}
                     {% endif %}
-                </div>
+                {% endblock %}
             </div>
 
             {# Welcome Screen #}
             <div class="chat-content">
-                <div class="chat-header">
-                    <div class="chat-header-info">
-                        <div class="chat-header-name">{% trans %}WELCOME_TO_SUBJECT_CHAT_KEY{% endtrans %}</div>
-                        <div class="chat-header-status">
-                            <i class="bi bi-circle-fill"></i>
-                            <span>{% trans %}SELECT_SUBJECT_TO_START_KEY{% endtrans %}</span>
+                {% block chat_content %}
+                    <div class="chat-header">
+                        <div class="chat-header-info">
+                            <div class="chat-header-name">{% trans %}WELCOME_TO_SUBJECT_CHAT_KEY{% endtrans %}</div>
+                            <div class="chat-header-status">
+                                <i class="bi bi-circle-fill text-success"></i>
+                                <span>{% trans %}ONLINE_KEY{% endtrans %}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="chat-messages">
-                    <div class="text-center mt-5">
-                        <i class="bi bi-chat-dots" style="font-size: 48px; color: #6c757d;"></i>
-                        <h4 class="mt-3">{% trans %}SELECT_SUBJECT_TO_START_KEY{% endtrans %}</h4>
-                        <p class="text-muted">{% trans %}CLICK_SUBJECT_TO_START_KEY{% endtrans %}</p>
+                    
+                    <div class="chat-messages welcome-screen">
+                        <div class="welcome-content">
+                            <div class="welcome-icon">
+                                <i class="bi bi-chat-dots"></i>
+                            </div>
+                            <h2>{% trans %}SELECT_SUBJECT_TO_START_KEY{% endtrans %}</h2>
+                            <p class="text-muted">{% trans %}CLICK_SUBJECT_TO_START_CHAT_KEY{% endtrans %}</p>
+                            
+                            <div class="features-grid">
+                                <div class="feature-item">
+                                    <i class="bi bi-person-video3"></i>
+                                    <h4>{% trans %}CHAT_WITH_TEACHERS_KEY{% endtrans %}</h4>
+                                    <p>{% trans %}CHAT_WITH_TEACHERS_DESC_KEY{% endtrans %}</p>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                    <h4>{% trans %}SHARE_DOCUMENTS_KEY{% endtrans %}</h4>
+                                    <p>{% trans %}SHARE_DOCUMENTS_DESC_KEY{% endtrans %}</p>
+                                </div>
+                                <div class="feature-item">
+                                    <i class="bi bi-people"></i>
+                                    <h4>{% trans %}GROUP_DISCUSSIONS_KEY{% endtrans %}</h4>
+                                    <p>{% trans %}GROUP_DISCUSSIONS_DESC_KEY{% endtrans %}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                {% endblock %}
             </div>
         </div>
     {% endif %}
@@ -79,35 +107,59 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            {% if needsSetup %}
-                const setupModal = new bootstrap.Modal(document.getElementById('setup-modal'));
-                setupModal.show();
-            {% endif %}
+    {% block chat_scripts %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                {% if needsSetup %}
+                    const setupModal = new bootstrap.Modal(document.getElementById('setup-modal'));
+                    setupModal.show();
+                {% endif %}
 
-            // Handle subject selection
-            const subjects = document.querySelectorAll('.chat-item');
-            subjects.forEach(subject => {
-                subject.addEventListener('click', function() {
-                    document.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                    const subjectId = this.dataset.subjectId;
-                    window.location.href = '{{ path("app_subject_chat", {"subject": "__ID__"}) }}'.replace('__ID__', subjectId);
+                // Handle subject selection with animation
+                const subjects = document.querySelectorAll('.chat-item');
+                subjects.forEach(subject => {
+                    subject.addEventListener('click', function() {
+                        document.querySelectorAll('.chat-item').forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Add transition effect
+                        const welcomeScreen = document.querySelector('.welcome-screen');
+                        welcomeScreen.style.opacity = '0';
+                        
+                        setTimeout(() => {
+                            const subjectId = this.dataset.subjectId;
+                            window.location.href = '{{ path("app_subject_chat", {"subject": "__ID__"}) }}'.replace('__ID__', subjectId);
+                        }, 300);
+                    });
                 });
-            });
 
-            // Handle search
-            const searchInput = document.querySelector('.search-box input');
-            searchInput.addEventListener('input', function() {
-                const query = this.value.toLowerCase();
-                subjects.forEach(item => {
-                    const name = item.querySelector('.chat-item-name').textContent.toLowerCase();
-                    const teacher = item.querySelector('.chat-item-preview')?.textContent.toLowerCase() || '';
-                    const visible = name.includes(query) || teacher.includes(query);
-                    item.style.display = visible ? '' : 'none';
+                // Enhanced search with highlighting
+                const searchInput = document.querySelector('.search-box input');
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase();
+                    subjects.forEach(item => {
+                        const name = item.querySelector('.chat-item-name').textContent.toLowerCase();
+                        const teacher = item.querySelector('.chat-item-preview')?.textContent.toLowerCase() || '';
+                        const visible = name.includes(query) || teacher.includes(query);
+                        
+                        // Highlight matching text
+                        if (visible && query) {
+                            const nameEl = item.querySelector('.chat-item-name');
+                            const teacherEl = item.querySelector('.chat-item-preview');
+                            
+                            nameEl.innerHTML = highlightText(nameEl.textContent, query);
+                            teacherEl.innerHTML = highlightText(teacherEl.textContent, query);
+                        }
+                        
+                        item.style.display = visible ? '' : 'none';
+                    });
                 });
+
+                function highlightText(text, query) {
+                    const regex = new RegExp(`(${query})`, 'gi');
+                    return text.replace(regex, '<mark>$1</mark>');
+                }
             });
-        });
-    </script>
+        </script>
+    {% endblock %}
 {% endblock %}
