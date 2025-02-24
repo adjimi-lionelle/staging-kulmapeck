@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ChatSidebar } from './components/ChatSidebar';
 import { ChatHeader } from './components/ChatHeader';
 import { ChatMessages } from './components/ChatMessages';
@@ -29,15 +29,17 @@ export const Chat: React.FC<ChatProps> = ({
         setError
     } = useChatStore();
 
+    const wsRef = useRef<ChatWebSocket | null>(null);
+
     useEffect(() => {
         setSubjects(initialSubjects);
         setMessages(initialMessages);
     }, []);
 
     useEffect(() => {
-        const ws = new ChatWebSocket(websocketUrl, token);
+        wsRef.current = new ChatWebSocket(websocketUrl, token);
 
-        ws.addMessageHandler((message) => {
+        wsRef.current.addMessageHandler((message) => {
             switch (message.type) {
                 case 'message':
                     addMessage(message.payload);
@@ -48,7 +50,11 @@ export const Chat: React.FC<ChatProps> = ({
             }
         });
 
-        return () => ws.close();
+        return () => {
+            if (wsRef.current) {
+                wsRef.current.close();
+            }
+        };
     }, [websocketUrl, token]);
 
     const handleSubjectSelect = (subject: Subject) => {
@@ -56,7 +62,7 @@ export const Chat: React.FC<ChatProps> = ({
     };
 
     const handleSendMessage = (content: string) => {
-        if (!currentSubject) return;
+        if (!currentSubject || !wsRef.current) return;
 
         // Optimistic update
         const tempMessage: Message = {
@@ -69,7 +75,7 @@ export const Chat: React.FC<ChatProps> = ({
         addMessage(tempMessage);
 
         // Send via WebSocket
-        ws.sendMessage('message', {
+        wsRef.current.sendMessage('message', {
             content,
             subjectId: currentSubject.id
         });
