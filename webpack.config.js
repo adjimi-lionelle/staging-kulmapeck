@@ -14,9 +14,6 @@ Encore
     .enableBuildNotifications()
     .enableSourceMaps(!Encore.isProduction())
     .enableVersioning(Encore.isProduction())
-    .configureBabel((config) => {
-        config.plugins.push('@babel/plugin-transform-runtime');
-    })
     .enableReactPreset()
     .enableTypeScriptLoader()
     .enableForkedTypeScriptTypesChecking()
