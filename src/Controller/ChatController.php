@@ -280,21 +280,43 @@ class ChatController extends AbstractController
 
     private function getTeacherName(Categorie $subject): string
     {
-        $teacherNames = [
-            'MATHEMATIQUES' => 'Sophie Laurent',
-            'SCIENCE DE LA VIE ET DE LA TERRE (SVT)' => 'Marc Dubois',
-            'PHYSIQUES' => 'Claire Martin',
-            'FRANCAIS' => 'Pierre Dupont',
-            'ANGLAIS' => 'John Smith'
+        // Try to get the assigned teacher for this subject
+        $assignedTeachers = $subject->getEnseignants();
+        
+        if (!$assignedTeachers->isEmpty()) {
+            // Get the first assigned teacher
+            $teacher = $assignedTeachers->first();
+            return $teacher->getUtilisateur()->getPersonne()->getNomComplet();
+        }
+
+        // If no real teacher is assigned, use AI teacher persona
+        $teacherPersonas = [
+            'MATHEMATIQUES' => 'Prof. Sophie Laurent',
+            'SCIENCE DE LA VIE ET DE LA TERRE (SVT)' => 'Prof. Marc Dubois',
+            'PHYSIQUES' => 'Prof. Claire Martin',
+            'FRANCAIS' => 'Prof. Pierre Dupont',
+            'ANGLAIS' => 'Prof. John Smith'
         ];
 
-        return $teacherNames[$subject->getName()] ?? 'Prof. ' . $subject->getName();
+        return $teacherPersonas[$subject->getName()] ?? 'Prof. ' . $subject->getName();
     }
 
     private function getTeacherAvatar(Categorie $subject): string
     {
-        // Default avatars based on subject
-        $avatars = [
+        // Try to get the assigned teacher's avatar
+        $assignedTeachers = $subject->getEnseignants();
+        
+        if (!$assignedTeachers->isEmpty()) {
+            // Get the first assigned teacher's avatar
+            $teacher = $assignedTeachers->first();
+            $avatar = $teacher->getUtilisateur()->getPersonne()->getAvatarPath();
+            if ($avatar) {
+                return $avatar;
+            }
+        }
+
+        // If no real teacher or no avatar, use default subject-based avatar
+        $defaultAvatars = [
             'MATHEMATIQUES' => 'math-teacher.png',
             'SCIENCE DE LA VIE ET DE LA TERRE (SVT)' => 'biology-teacher.png',
             'PHYSIQUES' => 'physics-teacher.png',
@@ -302,12 +324,19 @@ class ChatController extends AbstractController
             'ANGLAIS' => 'english-teacher.png'
         ];
 
-        return $avatars[$subject->getName()] ?? 'default-teacher.png';
+        return $defaultAvatars[$subject->getName()] ?? 'default-teacher.png';
     }
 
     private function getSubjectIcon(Categorie $subject): string
     {
-        $icons = [
+        // Try to get icon from the subject's metadata first
+        $icon = $subject->getImageFile();
+        if ($icon) {
+            return $icon;
+        }
+
+        // If no icon in database, use default mapping
+        $defaultIcons = [
             'MATHEMATIQUES' => 'calculator',
             'SCIENCE DE LA VIE ET DE LA TERRE (SVT)' => 'leaf',
             'PHYSIQUES' => 'atom',
@@ -315,7 +344,7 @@ class ChatController extends AbstractController
             'ANGLAIS' => 'globe'
         ];
 
-        return $icons[$subject->getName()] ?? 'book';
+        return $defaultIcons[$subject->getName()] ?? 'book';
     }
 
     #[Route('/chat/send', name: 'app_chat_send', methods: ['POST'])]
