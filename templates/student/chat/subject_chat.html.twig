@@ -13,74 +13,80 @@
         {{ include('student/chat/_setup_modal.html.twig') }}
     {% endif %}
 
-    <div class="chat-container">
-        {# Sidebar #}
-        <div class="chat-sidebar">
-            <div class="search-container">
-                <div class="search-box">
-                    <i class="bi bi-search"></i>
-                    <input type="text" id="subject-search" placeholder="{% trans %}SEARCH_SUBJECTS{% endtrans %}">
-                </div>
-            </div>
-            <div class="chat-list" id="subject-list">
-                {% for subject in available_subjects %}
-                    <div class="chat-item" data-subject-id="{{ subject.id }}">
-                        <div class="chat-item-avatar">
-                            {% if subject.icon %}
-                                <img src="{{ asset(subject.icon) }}" alt="{{ subject.name }}">
-                            {% else %}
-                                <i class="bi bi-book-fill"></i>
-                            {% endif %}
+    <div class="container py-4">
+        <div class="card shadow">
+            <div class="card-body p-0">
+                <div class="chat-container">
+                    {# Sidebar #}
+                    <div class="chat-sidebar border-end">
+                        <div class="search-container border-bottom p-3">
+                            <div class="search-box">
+                                <i class="bi bi-search"></i>
+                                <input type="text" id="subject-search" placeholder="{% trans %}SEARCH_SUBJECTS{% endtrans %}">
+                            </div>
                         </div>
-                        <div class="chat-item-info">
-                            <div class="chat-item-name">{{ subject.name }}</div>
-                            <div class="chat-item-preview">{{ subject.teacherPersona.name }}</div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        {# Chat Content #}
-        <div class="chat-content">
-            <div class="chat-header">
-                <div class="chat-header-info">
-                    <img src="" alt="" class="chat-header-avatar" id="current-subject-icon">
-                    <div>
-                        <div class="chat-header-name" id="current-subject-name">{% trans %}SELECT_SUBJECT{% endtrans %}</div>
-                        <div class="chat-header-status">
-                            <i class="bi bi-circle-fill text-success"></i>
-                            <span>{% trans %}CONNECTED{% endtrans %}</span>
+                        <div class="chat-list" id="subject-list">
+                            {% for subject in available_subjects %}
+                                <div class="chat-item" data-subject-id="{{ subject.id }}">
+                                    <div class="chat-item-avatar">
+                                        {% if subject.icon %}
+                                            <img src="{{ asset(subject.icon) }}" alt="{{ subject.name }}">
+                                        {% else %}
+                                            <i class="bi bi-book-fill"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="chat-item-info">
+                                        <div class="chat-item-name">{{ subject.name }}</div>
+                                        <div class="chat-item-preview">{{ subject.teacherPersona.name }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
-                </div>
-                <div class="chat-header-actions">
-                    <button type="button" class="btn btn-light rounded-circle"><i class="bi bi-telephone"></i></button>
-                    <button type="button" class="btn btn-light rounded-circle"><i class="bi bi-camera-video"></i></button>
-                    <button type="button" class="btn btn-light rounded-circle"><i class="bi bi-three-dots-vertical"></i></button>
-                </div>
-            </div>
 
-            <div class="chat-messages" id="chat-messages">
-                {% for message in messages %}
-                    <div class="message {% if message.fromStudent %}outgoing{% else %}incoming{% endif %}">
-                        <div class="message-content">
-                            {{ message.content }}
-                            <div class="message-time">{{ message.createdAt|date('H:i') }}</div>
+                    {# Chat Content #}
+                    <div class="chat-content">
+                        <div class="chat-header border-bottom">
+                            <div class="chat-header-info">
+                                <img src="" alt="" class="chat-header-avatar" id="current-subject-icon">
+                                <div>
+                                    <div class="chat-header-name" id="current-subject-name">{% trans %}SELECT_SUBJECT{% endtrans %}</div>
+                                    <div class="chat-header-status">
+                                        <i class="bi bi-circle-fill text-success"></i>
+                                        <span>{% trans %}CONNECTED{% endtrans %}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-header-actions">
+                                <button type="button" class="btn btn-light rounded-circle"><i class="bi bi-telephone"></i></button>
+                                <button type="button" class="btn btn-light rounded-circle"><i class="bi bi-camera-video"></i></button>
+                                <button type="button" class="btn btn-light rounded-circle"><i class="bi bi-three-dots-vertical"></i></button>
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
 
-            <div class="chat-input">
-                <div class="chat-input-container">
-                    <button type="button" class="btn btn-light rounded-circle"><i class="bi bi-paperclip"></i></button>
-                    <textarea id="message-input" placeholder="{% trans %}TYPE_MESSAGE{% endtrans %}" rows="1"></textarea>
-                    <div class="chat-input-actions">
-                        <button type="button" class="btn btn-light rounded-circle"><i class="bi bi-emoji-smile"></i></button>
-                        <button type="button" class="btn btn-primary rounded-circle" id="send-button">
-                            <i class="bi bi-send-fill"></i>
-                        </button>
+                        <div class="chat-messages" id="chat-messages">
+                            {% for message in messages %}
+                                <div class="message {% if message.fromStudent %}outgoing{% else %}incoming{% endif %}">
+                                    <div class="message-content">
+                                        {{ message.content }}
+                                        <div class="message-time">{{ message.createdAt|date('H:i') }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="chat-input border-top">
+                            <div class="chat-input-container">
+                                <button type="button" class="btn btn-light rounded-circle"><i class="bi bi-paperclip"></i></button>
+                                <textarea id="message-input" placeholder="{% trans %}TYPE_MESSAGE{% endtrans %}" rows="1"></textarea>
+                                <div class="chat-input-actions">
+                                    <button type="button" class="btn btn-light rounded-circle"><i class="bi bi-emoji-smile"></i></button>
+                                    <button type="button" class="btn btn-primary rounded-circle" id="send-button">
+                                        <i class="bi bi-send-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
