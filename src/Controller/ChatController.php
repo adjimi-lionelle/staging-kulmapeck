@@ -94,7 +94,7 @@ class ChatController extends AbstractController
                 $secondCycleSkillLevels = [5, 6, 7]; // Adjust these IDs based on your database
                 $currentSkillLevel = $student->getClasse()->getSkillLevel()->getId();
                 
-                if (in_array($currentSkillLevel, $secondCycleSkillLevels) && !$student->getSpecialite()) {
+                if (in_array($currentSkillLevel, $secondCycleSkillLevels) && !$student->getSpecialisation()) {
                     $needsSetup = true;
                 } else {
                     // Only load chats if all setup requirements are met
