@@ -442,26 +442,6 @@ class ChatController extends AbstractController
         ]);
     }
 
-    #[Route('/chat/websocket/token', name: 'api_websocket_token', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
-    public function generateWebSocketToken(): JsonResponse
-    {
-        $user = $this->getUser();
-
-        if (!$user) {
-            return new JsonResponse(['error' => 'User not authenticated'], 401);
-        }
-
-        $payload = [
-            'user_id' => $user->getId(),
-            'exp' => time() + 3600 // 1 hour expiration
-        ];
-
-        $token = JWT::encode($payload, $this->jwtSecret, 'HS256');
-
-        return new JsonResponse(['token' => $token]);
-    }
-
     private function generateWebSocketToken(Eleve $student, ?SubjectChat $chat = null): string
     {
         $payload = [
