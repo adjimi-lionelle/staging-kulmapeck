@@ -67,7 +67,7 @@ class ChatController extends AbstractController
         }
 
         // Generate WebSocket token
-        $token = $this->generateToken($student);
+        $token = $this->generateWebSocketToken($student->getUtilisateur());
         
         // Get WebSocket URL from environment
         $websocketHost = $_ENV['WEBSOCKET_HOST'] ?? $_SERVER['HTTP_HOST'];
@@ -139,7 +139,7 @@ class ChatController extends AbstractController
         $messages = $this->messageChatRepository->findSubjectChatMessages($chat);
 
         // Generate JWT token for WebSocket authentication
-        $token = $this->generateToken($student);
+        $token = $this->generateWebSocketToken($student->getUtilisateur());
 
         return $this->render('student/chat/subject_chat.html.twig', [
             'chat' => $chat,
@@ -181,7 +181,7 @@ class ChatController extends AbstractController
         $messages = $this->messageChatRepository->findSubjectChatMessages($chat);
 
         // Generate JWT token for WebSocket authentication
-        $token = $this->generateToken($student);
+        $token = $this->generateWebSocketToken($student->getUtilisateur());
 
         // Get teacher persona for this subject
         $teacherPersona = [
