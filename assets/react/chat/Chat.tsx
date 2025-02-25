@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Subject, Message } from './types';
 
 interface ChatProps {
@@ -14,6 +14,9 @@ export const Chat: React.FC<ChatProps> = ({
     initialSubjects,
     initialMessages
 }) => {
+    const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+    const wsRef = useRef<WebSocket | null>(null);
+
     useEffect(() => {
         console.log('Chat component mounted with props:', {
             websocketUrl,
@@ -21,7 +24,64 @@ export const Chat: React.FC<ChatProps> = ({
             subjectsCount: initialSubjects.length,
             messagesCount: initialMessages.length
         });
-    }, []);
+
+        // Initialize WebSocket connection
+        const connectWebSocket = () => {
+            if (wsRef.current?.readyState === WebSocket.OPEN) {
+                console.log('WebSocket already connected');
+                return;
+            }
+
+            console.log('Connecting to WebSocket:', websocketUrl);
+            const ws = new WebSocket(websocketUrl);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                // Send authentication token
+                ws.send(JSON.stringify({ type: 'auth', token }));
+            };
+
+            ws.onmessage = (event) => {
+                console.log('WebSocket message received:', event.data);
+                try {
+                    const data = JSON.parse(event.data);
+                    // Handle incoming messages
+                } catch (error) {
+                    console.error('Error parsing WebSocket message:', error);
+                }
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                // Attempt to reconnect after a delay
+                setTimeout(connectWebSocket, 3000);
+            };
+
+            wsRef.current = ws;
+        };
+
+        connectWebSocket();
+
+        return () => {
+            if (wsRef.current) {
+                wsRef.current.close();
+            }
+        };
+    }, [websocketUrl, token]);
+
+    const handleSubjectSelect = (subject: Subject) => {
+        setSelectedSubject(subject);
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify({
+                type: 'join',
+                chat_id: subject.id
+            }));
+        }
+    };
 
     return (
         <div className="chat-container">
@@ -34,9 +94,25 @@ export const Chat: React.FC<ChatProps> = ({
                             {initialSubjects.map(subject => (
                                 <button 
                                     key={subject.id}
-                                    className="list-group-item list-group-item-action"
+                                    className={`list-group-item list-group-item-action ${selectedSubject?.id === subject.id ? 'active' : ''}`}
+                                    onClick={() => handleSubjectSelect(subject)}
                                 >
-                                    {subject.name}
+                                    <div className="d-flex align-items-center">
+                                        {subject.icon && (
+                                            <img 
+                                                src={subject.icon} 
+                                                alt={subject.name} 
+                                                className="subject-icon me-2"
+                                                style={{ width: '24px', height: '24px' }}
+                                            />
+                                        )}
+                                        <div>
+                                            <div className="fw-bold">{subject.name}</div>
+                                            {subject.teacherName && (
+                                                <small className="text-muted">{subject.teacherName}</small>
+                                            )}
+                                        </div>
+                                    </div>
                                 </button>
                             ))}
                         </div>
@@ -46,26 +122,13 @@ export const Chat: React.FC<ChatProps> = ({
                 {/* Main Chat Area */}
                 <div className="col-md-8 col-lg-9 chat-main">
                     <div className="chat-header">
-                        <h4>Welcome to Chat</h4>
+                        <h4>{selectedSubject ? selectedSubject.name : 'Select a subject to start chatting'}</h4>
                     </div>
                     <div className="chat-messages">
-                        {initialMessages.map((msg, index) => (
-                            <div key={index} className="message">
-                                {msg.content}
-                            </div>
-                        ))}
+                        {/* Messages will be displayed here */}
                     </div>
                     <div className="chat-input">
-                        <div className="input-group">
-                            <input 
-                                type="text" 
-                                className="form-control" 
-                                placeholder="Type a message..."
-                            />
-                            <button className="btn btn-primary">
-                                Send
-                            </button>
-                        </div>
+                        {/* Chat input will be here */}
                     </div>
                 </div>
             </div>
