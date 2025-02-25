@@ -33,6 +33,13 @@
 
 		<!-- Template Stylesheet -->
 		<link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+		
+		<!-- Webpack Encore -->
+        {% block encore_stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+
+        {% block stylesheets %}{% endblock %}
 
 		<style>
 
@@ -323,7 +330,15 @@
 		<script src="{{ asset('assets/lib/easing/easing.min.js') }}"></script>
 		<script src="{{ asset('assets/lib/waypoints/waypoints.min.js') }}"></script>
 		<script src="{{ asset('assets/lib/owlcarousel/owl.carousel.min.js') }}"></script>
-		<script src="{{ asset('assets/js/main.js') }}"></script>
+		<!-- Template Javascript -->
+            <script src="{{ asset('assets/js/main.js') }}"></script>
+            
+            <!-- Webpack Encore -->
+            {% block encore_javascripts %}
+                {{ encore_entry_script_tags('app') }}
+            {% endblock %}
+
+            {% block javascripts %}{% endblock %}
 
 		<script>
 			$(document).ready(function () {

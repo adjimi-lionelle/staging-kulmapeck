@@ -11,6 +11,7 @@
     width: 280px;
     border-right: 1px solid #e9ecef;
     background: #f8f9fa;
+    overflow-y: auto;
 }
 
 .chat-main {
@@ -41,6 +42,8 @@
 .message {
     margin-bottom: 1rem;
     max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 15px;
 }
 
 .message-sent {
@@ -48,14 +51,12 @@
     background: #0d6efd;
     color: white;
     border-radius: 15px 15px 0 15px;
-    padding: 0.75rem 1rem;
 }
 
 .message-received {
     margin-right: auto;
-    background: #e9ecef;
+    background: #f8f9fa;
     border-radius: 15px 15px 15px 0;
-    padding: 0.75rem 1rem;
 }
 
 .subject-list {
@@ -65,9 +66,12 @@
 }
 
 .subject-item {
-    padding: 0.75rem 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
     cursor: pointer;
     transition: background-color 0.2s;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
 }
 
 .subject-item:hover {
@@ -79,22 +83,19 @@
     color: white;
 }
 
-/* Loading and Error States */
-.loading-spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
+.subject-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.5rem;
 }
 
-.error-message {
-    color: #dc3545;
-    padding: 1rem;
-    text-align: center;
-    background: #f8d7da;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
-    margin: 1rem;
+.subject-name {
+    text-align: left;
+}
+
+.message-content {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .chat-content {
@@ -259,4 +260,21 @@
     justify-content: center;
     color: #6c757d;
     padding: 2rem;
+}
+
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.error-message {
+    color: #dc3545;
+    padding: 1rem;
+    text-align: center;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin: 1rem;
 }

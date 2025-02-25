@@ -50,21 +50,22 @@ class ChatController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function index(LoggerInterface $logger): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
 
-        $logger->info('User accessing chat', [
-            'user_id' => $user->getId(),
-            'username' => $user->getUsername()
-        ]);
-
-        // Get student
+        /** @var Eleve $student */
         $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
         if (!$student) {
             throw $this->createAccessDeniedException('Student account not found.');
         }
+
+        $logger->info('Student accessing chat', [
+            'student_id' => $student->getId(),
+            'class_id' => $student->getClasse()?->getId()
+        ]);
 
         // Generate WebSocket token
         $token = $this->generateWebSocketToken($student->getUtilisateur());
@@ -83,41 +84,31 @@ class ChatController extends AbstractController
             'url' => $websocketUrl
         ]);
 
-        // Get subjects for the user
+        // Get subjects for the student's class
         $subjects = [];
         if ($student->getClasse()) {
-            $subjects = $this->subjectChatRepository->findByClasse($student->getClasse());
+            $subjects = $this->entityManager
+                ->getRepository(SubjectChat::class)
+                ->findByClasse($student->getClasse());
+
+            $logger->info('Found subjects for class', [
+                'class_id' => $student->getClasse()->getId(),
+                'subject_count' => count($subjects)
+            ]);
         }
-        
-        $logger->info('Retrieved subjects for user', [
-            'count' => count($subjects),
-            'subjects' => array_map(fn($s) => $s->getId(), $subjects),
-            'student_id' => $student->getId(),
-            'class_id' => $student->getClasse() ? $student->getClasse()->getId() : null
-        ]);
-
-        // Format subjects for frontend
-        $formattedSubjects = array_map(function($subject) {
-            return [
-                'id' => $subject->getId(),
-                'name' => $subject->getMatiere()->getName(),
-                'icon' => $subject->getMatiere()->getIcon(),
-                'matiere' => [
-                    'name' => $subject->getMatiere()->getName(),
-                    'icon' => $subject->getMatiere()->getIcon()
-                ],
-                'teacherName' => $subject->getTeacher() ? $subject->getTeacher()->getFullName() : null
-            ];
-        }, $subjects);
-
-        // Get recent messages
-        $messages = [];  // You can implement this based on your needs
 
         return $this->render('student/chat/index.html.twig', [
             'websocket_url' => $websocketUrl,
             'token' => $token,
-            'subjects' => $formattedSubjects,
-            'messages' => $messages
+            'subjects' => array_map(function($subject) {
+                return [
+                    'id' => $subject->getId(),
+                    'name' => $subject->getMatiere()->getName(),
+                    'teacherName' => $subject->getName(),
+                    'icon' => $subject->getMatiere()->getIcon()
+                ];
+            }, $subjects),
+            'messages' => []
         ]);
     }
 
