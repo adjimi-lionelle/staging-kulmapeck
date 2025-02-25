@@ -32,13 +32,24 @@ export const Chat: React.FC<ChatProps> = ({
                 return;
             }
 
-            console.log('Connecting to WebSocket:', websocketUrl);
-            const ws = new WebSocket(websocketUrl);
+            // Add query parameters to WebSocket URL
+            const wsUrlWithParams = new URL(websocketUrl);
+            wsUrlWithParams.searchParams.append('token', token);
+            if (selectedSubject) {
+                wsUrlWithParams.searchParams.append('chat_id', selectedSubject.id.toString());
+            }
+
+            console.log('Connecting to WebSocket:', wsUrlWithParams.toString());
+            const ws = new WebSocket(wsUrlWithParams.toString());
 
             ws.onopen = () => {
-                console.log('WebSocket connected');
+                console.log('WebSocket connection established');
                 // Send authentication token
-                ws.send(JSON.stringify({ type: 'auth', token }));
+                ws.send(JSON.stringify({ 
+                    type: 'auth', 
+                    token,
+                    chat_id: selectedSubject?.id
+                }));
             };
 
             ws.onmessage = (event) => {
@@ -55,8 +66,12 @@ export const Chat: React.FC<ChatProps> = ({
                 console.error('WebSocket error:', error);
             };
 
-            ws.onclose = () => {
-                console.log('WebSocket disconnected');
+            ws.onclose = (event) => {
+                console.log('WebSocket disconnected:', {
+                    code: event.code,
+                    reason: event.reason,
+                    wasClean: event.wasClean
+                });
                 // Attempt to reconnect after a delay
                 setTimeout(connectWebSocket, 3000);
             };
@@ -64,14 +79,17 @@ export const Chat: React.FC<ChatProps> = ({
             wsRef.current = ws;
         };
 
-        connectWebSocket();
+        // Only connect if we have a selected subject
+        if (selectedSubject) {
+            connectWebSocket();
+        }
 
         return () => {
             if (wsRef.current) {
                 wsRef.current.close();
             }
         };
-    }, [websocketUrl, token]);
+    }, [websocketUrl, token, selectedSubject]);
 
     const handleSubjectSelect = (subject: Subject) => {
         setSelectedSubject(subject);

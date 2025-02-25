@@ -29,8 +29,15 @@ class ChatServer implements MessageComponentInterface
         $queryString = $conn->httpRequest->getUri()->getQuery();
         parse_str($queryString, $queryParams);
         
+        echo sprintf(
+            "New connection attempt! (ID: %s)\nQuery params: %s\n",
+            $conn->resourceId,
+            json_encode($queryParams)
+        );
+        
         // Validate required parameters
         if (!isset($queryParams['token']) || !isset($queryParams['chat_id'])) {
+            echo sprintf("Missing required parameters. Connection %s closed.\n", $conn->resourceId);
             $conn->close();
             return;
         }
@@ -39,22 +46,37 @@ class ChatServer implements MessageComponentInterface
         $chat = $this->entityManager->getRepository(SubjectChat::class)->find($queryParams['chat_id']);
         $user = $this->entityManager->getRepository(User::class)->find($queryParams['user_id']);
         
+        echo sprintf(
+            "Looking up entities:\nChat ID: %s (Found: %s)\nUser ID: %s (Found: %s)\n",
+            $queryParams['chat_id'],
+            $chat ? 'yes' : 'no',
+            $queryParams['user_id'],
+            $user ? 'yes' : 'no'
+        );
+        
         if (!$chat || !$user) {
+            echo sprintf("Chat or user not found. Connection %s closed.\n", $conn->resourceId);
             $conn->close();
             return;
         }
 
         // Create WebSocket connection record
-        $wsConnection = new WebSocketConnection();
-        $wsConnection->setConnectionId($conn->resourceId);
-        $wsConnection->setUser($user);
-        $wsConnection->setSubjectChat($chat);
-        $wsConnection->setIsTyping(false);
-        
-        $this->entityManager->persist($wsConnection);
-        $this->entityManager->flush();
-        
-        echo "New connection! ({$conn->resourceId})\n";
+        try {
+            $wsConnection = new WebSocketConnection();
+            $wsConnection->setConnectionId($conn->resourceId);
+            $wsConnection->setUser($user);
+            $wsConnection->setSubjectChat($chat);
+            $wsConnection->setIsTyping(false);
+            
+            $this->entityManager->persist($wsConnection);
+            $this->entityManager->flush();
+            
+            echo sprintf("WebSocket connection %s successfully established and recorded.\n", $conn->resourceId);
+        } catch (\Exception $e) {
+            echo sprintf("Error creating connection record: %s\n", $e->getMessage());
+            $conn->close();
+            return;
+        }
     }
 
     public function onMessage(ConnectionInterface $from, $msg)
