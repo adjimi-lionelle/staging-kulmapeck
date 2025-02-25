@@ -85,8 +85,8 @@ class Categorie
     #[ORM\OneToMany(mappedBy: 'matiere', targetEntity: MatiereCycle::class, orphanRemoval: true)]
     private Collection $matiereCycles;
 
-    #[ORM\OneToMany(mappedBy: 'matiere', targetEntity: GroupChat::class, orphanRemoval: true)]
-    private Collection $groupChats;
+    #[ORM\OneToMany(mappedBy: 'matiere', targetEntity: SubjectChat::class, orphanRemoval: true)]
+    private Collection $subjectChats;
 
     public function __construct()
     {
@@ -97,7 +97,7 @@ class Categorie
         $this->isSubCategory = false;
         $this->evaluations = new ArrayCollection();
         $this->matiereCycles = new ArrayCollection();
-        $this->groupChats = new ArrayCollection();
+        $this->subjectChats = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -346,32 +346,29 @@ class Categorie
     }
 
     /**
-     * @return Collection<int, GroupChat>
+     * @return Collection<int, SubjectChat>
      */
-    public function getGroupChats(): Collection
+    public function getSubjectChats(): Collection
     {
-        return $this->groupChats;
+        return $this->subjectChats;
     }
 
-    public function addGroupChat(GroupChat $groupChat): static
+    public function addSubjectChat(SubjectChat $chat): static
     {
-        if (!$this->groupChats->contains($groupChat)) {
-            $this->groupChats->add($groupChat);
-            $groupChat->setMatiere($this);
+        if (!$this->subjectChats->contains($chat)) {
+            $this->subjectChats->add($chat);
+            $chat->setMatiere($this);
         }
-
         return $this;
     }
 
-    public function removeGroupChat(GroupChat $groupChat): static
+    public function removeSubjectChat(SubjectChat $chat): static
     {
-        if ($this->groupChats->removeElement($groupChat)) {
-            // set the owning side to null (unless already changed)
-            if ($groupChat->getMatiere() === $this) {
-                $groupChat->setMatiere(null);
+        if ($this->subjectChats->removeElement($chat)) {
+            if ($chat->getMatiere() === $this) {
+                $chat->setMatiere(null);
             }
         }
-
         return $this;
     }
 }

@@ -1,0 +1,22 @@
+{% extends "front/base.html.twig" %}
+
+{% block title %} - Chat{% endblock %}
+
+{% block mainContent %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="alert alert-info">
+                <h4 class="alert-heading">{% trans %}STUDENT_ONLY_FEATURE_KEY{% endtrans %}</h4>
+                <p>{% trans %}CHAT_STUDENT_ONLY_MESSAGE_KEY{% endtrans %}</p>
+                <hr>
+                <p class="mb-0">
+                    {% if not app.user %}
+                        <a href="{{ path('app_login') }}" class="btn btn-primary">{% trans %}LOGIN_AS_STUDENT_KEY{% endtrans %}</a>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

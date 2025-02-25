@@ -14,8 +14,8 @@ class MessageChat
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'messageChats')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?GroupChat $groupChat = null;
+    #[ORM\JoinColumn(name: 'subject_chat_id', nullable: false)]
+    private ?SubjectChat $subjectChat = null;
 
     #[ORM\Column(length: 255)]
     private ?string $content = null;
@@ -33,29 +33,24 @@ class MessageChat
     #[ORM\Column]
     private ?\DateTimeImmutable $createAt = null;
 
-
     public function __construct()
     {
-        //$this->isIsRead = false;
-        //$this->isIsFromAI = false;
         $this->createAt = new \DateTimeImmutable();
     }
- 
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getGroupChat(): ?GroupChat
+    public function getSubjectChat(): ?SubjectChat
     {
-        return $this->groupChat;
+        return $this->subjectChat;
     }
 
-    public function setGroupChat(?GroupChat $groupChat): static
+    public function setSubjectChat(?SubjectChat $subjectChat): static
     {
-        $this->groupChat = $groupChat;
-
+        $this->subjectChat = $subjectChat;
         return $this;
     }
 
@@ -67,7 +62,6 @@ class MessageChat
     public function setContent(string $content): static
     {
         $this->content = $content;
-
         return $this;
     }
 
@@ -79,7 +73,6 @@ class MessageChat
     public function setSender(?User $sender): static
     {
         $this->sender = $sender;
-
         return $this;
     }
 
@@ -91,7 +84,6 @@ class MessageChat
     public function setIsFromAI(bool $isFromAI): static
     {
         $this->isFromAI = $isFromAI;
-
         return $this;
     }
 
@@ -103,7 +95,6 @@ class MessageChat
     public function setIsRead(bool $isRead): static
     {
         $this->isRead = $isRead;
-
         return $this;
     }
 
@@ -115,7 +106,6 @@ class MessageChat
     public function setCreateAt(\DateTimeImmutable $createAt): static
     {
         $this->createAt = $createAt;
-
         return $this;
     }
 }

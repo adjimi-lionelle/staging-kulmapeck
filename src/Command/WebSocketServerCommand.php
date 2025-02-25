@@ -31,12 +31,16 @@ class WebSocketServerCommand extends Command
         $output->writeln("Démarrage du serveur WebSocket...");
 
         try {
+            $port = $_ENV['WEBSOCKET_PORT'] ?? 9000;
+            $host = $_ENV['WEBSOCKET_HOST'] ?? '0.0.0.0';
+
             $server = IoServer::factory(
                 new HttpServer(new WsServer(new ChatServer($this->entityManager, $this->jwtSecret))),
-                9000
+                $port,
+                $host
             );
 
-            $output->writeln("Serveur WebSocket prêt sur ws://127.0.0.1:9000");
+            $output->writeln("Serveur WebSocket prêt sur ws://{$host}:{$port}");
             $server->run();
         } catch (\Exception $e) {
             $output->writeln("Erreur WebSocket : " . $e->getMessage());

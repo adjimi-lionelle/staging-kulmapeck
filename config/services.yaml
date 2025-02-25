@@ -15,7 +15,6 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
-    #Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface: '@lexik_jwt_authentication.jwt_manager'    
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -55,12 +54,8 @@ services:
             - { name: twig.extension }      
 
      # Custom Twig extensions
-    App\Twig\TimeExtension:
+    App\Twig\TwigTimeExtension:
         tags: ['twig.extension']
-
-    # Mock service for frontend testing
-    App\Service\MockChatDataProvider:
-        autowire: true
 
     # WebSocket Server Command
     App\Command\WebSocketServerCommand:
@@ -68,10 +63,6 @@ services:
             $jwtSecret: "%jwt_secret%"
 
     # Controllers with JWT Secret
-    App\Controller\GroupChatController:
-        arguments:
-            $jwtSecret: "%jwt_secret%"
-
     App\Controller\ChatController:
         arguments:   
             $jwtSecret: "%jwt_secret%"       

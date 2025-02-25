@@ -1,44 +1,34 @@
 <!-- Setup Modal -->
-<div class="modal fade" id="setupModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="setupModalLabel" aria-hidden="true">
+<div class="modal fade" id="setup-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title" id="setupModalLabel">{% trans %}SETUP_YOUR_PROFILE_KEY{% endtrans %}</h5>
+            <div class="modal-header">
+                <h5 class="modal-title" id="setupModalLabel">{% trans %}SETUP_PROFILE{% endtrans %}</h5>
             </div>
             <div class="modal-body">
-                <form id="setupForm">
-                    <!-- Class/Skill Level selection -->
+                <form id="setup-form" method="POST" action="{{ path('app_chat_setup') }}">
                     <div class="mb-3">
-                        <label for="classe" class="form-label">{% trans %}SELECT_YOUR_CLASS_KEY{% endtrans %}</label>
+                        <label for="classe" class="form-label">{% trans %}SELECT_CLASS{% endtrans %}</label>
                         <select class="form-select" id="classe" name="classe" required>
-                            <option value="">{% trans %}CHOOSE_CLASS_KEY{% endtrans %}</option>
+                            <option value="">{% trans %}CHOOSE_CLASS{% endtrans %}</option>
                             {% for class in classes %}
-                                <option value="{{ class.id }}">{{ class.name }}</option>
+                                <option value="{{ class.id }}" data-skill-level="{{ class.skillLevel.id }}">{{ class.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
 
-                    <!-- Specialization selection -->
-                    <div class="mb-3">
-                        <label for="specialite" class="form-label">{% trans %}SELECT_YOUR_SPECIALIZATION_KEY{% endtrans %}</label>
-                        <select class="form-select" id="specialite" name="specialite" required>
-                            <option value="">{% trans %}CHOOSE_SPECIALIZATION_KEY{% endtrans %}</option>
-                            {% for specialite in specialites %}
-                                <option value="{{ specialite.id }}">{{ specialite.name }}</option>
+                    <div class="mb-3" id="specialization-group" style="display: none;">
+                        <label for="specialization" class="form-label">{% trans %}SELECT_SPECIALIZATION{% endtrans %}</label>
+                        <select class="form-select" id="specialization" name="specialization">
+                            <option value="">{% trans %}CHOOSE_SPECIALIZATION{% endtrans %}</option>
+                            {% for spec in specialites %}
+                                <option value="{{ spec.id }}">{{ spec.name }}</option>
                             {% endfor %}
                         </select>
                     </div>
 
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        {% trans %}SETUP_INFO_MESSAGE_KEY{% endtrans %}
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-check me-2"></i>
-                            {% trans %}SAVE_SETUP_KEY{% endtrans %}
-                        </button>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">{% trans %}SAVE{% endtrans %}</button>
                     </div>
                 </form>
             </div>
@@ -48,49 +38,47 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    {% if needsSetup %}
-    // Show modal automatically when page loads
-    const setupModal = new bootstrap.Modal(document.getElementById('setupModal'), {
-        backdrop: 'static',
-        keyboard: false
-    });
-    setupModal.show();
-    {% endif %}
+    const classeSelect = document.getElementById('classe');
+    const specializationGroup = document.getElementById('specialization-group');
+    const specializationSelect = document.getElementById('specialization');
+    const setupForm = document.getElementById('setup-form');
 
-    const form = document.getElementById('setupForm');
-    
-    form.addEventListener('submit', function(e) {
+    // Get the skill level IDs for classes that require specialization (2nde to Terminal)
+    const secondCycleSkillLevels = [5, 6, 7]; // Adjust these IDs based on your database
+
+    // Handle class selection change
+    classeSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const skillLevelId = parseInt(selectedOption.dataset.skillLevel);
+        
+        // Show specialization only for second cycle classes
+        if (secondCycleSkillLevels.includes(skillLevelId)) {
+            specializationGroup.style.display = 'block';
+            specializationSelect.required = true;
+        } else {
+            specializationGroup.style.display = 'none';
+            specializationSelect.required = false;
+            specializationSelect.value = ''; // Reset selection
+        }
+    });
+
+    // Form validation
+    setupForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const classe = document.getElementById('classe').value;
-        const specialite = document.getElementById('specialite').value;
-
-        if (!classe || !specialite) {
-            alert("{% trans %}PLEASE_FILL_ALL_FIELDS_KEY{% endtrans %}");
+        if (!classeSelect.value) {
+            alert('{% trans %}PLEASE_SELECT_CLASS{% endtrans %}');
             return;
         }
 
-        fetch('{{ path('app_student_chat_setup') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                classe: classe,
-                specialite: specialite
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.reload();
-            } else {
-                alert("{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}");
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("{% trans %}SETUP_ERROR_MESSAGE_KEY{% endtrans %}");
-        });
+        const skillLevelId = parseInt(classeSelect.options[classeSelect.selectedIndex].dataset.skillLevel);
+        if (secondCycleSkillLevels.includes(skillLevelId) && !specializationSelect.value) {
+            alert('{% trans %}PLEASE_SELECT_SPECIALIZATION{% endtrans %}');
+            return;
+        }
+
+        // If validation passes, submit the form
+        this.submit();
     });
-});</script>
+});
+</script>

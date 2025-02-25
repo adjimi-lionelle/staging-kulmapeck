@@ -7,4 +7,12 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
-    
+
+# Chat routes
+app_chat:
+    path: /chat
+    controller: App\Controller\ChatController::index
+
+app_subject_chat:
+    path: /chat/subject/{subject}
+    controller: App\Controller\ChatController::subjectChat

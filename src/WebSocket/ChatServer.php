@@ -9,7 +9,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use App\Entity\MessageChat;
 use App\Entity\User;
-use App\Entity\GroupChat;
+use App\Entity\SubjectChat;
 use App\Entity\WebSocketConnection;
 
 class ChatServer implements MessageComponentInterface
@@ -52,18 +52,18 @@ class ChatServer implements MessageComponentInterface
         }
 
         // Vérifier si le groupe existe
-        $groupChat = $this->entityManager->getRepository(GroupChat::class)->find($queryParams['group_id']);
-        if (!$groupChat) {
+        $SubjectChat = $this->entityManager->getRepository(SubjectChat::class)->find($queryParams['group_id']);
+        if (!$SubjectChat) {
             echo "Groupe introuvable !\n";
             $conn->close();
             return;
         }
 
-        echo "Nouvelle connexion WebSocket : Utilisateur " . $user->getId() . " connecté au groupe " . $groupChat->getId() . "\n";
+        echo "Nouvelle connexion WebSocket : Utilisateur " . $user->getId() . " connecté au groupe " . $SubjectChat->getId() . "\n";
 
         // **Récupérer l'historique des messages**
         $messages = $this->entityManager->getRepository(MessageChat::class)
-            ->findBy(['groupChat' => $groupChat], ['createAt' => 'ASC']);
+            ->findBy(['SubjectChat' => $SubjectChat], ['createAt' => 'ASC']);
 
         $history = [];
         foreach ($messages as $msg) {
@@ -82,12 +82,12 @@ class ChatServer implements MessageComponentInterface
         ]));
 
         // **Attacher l'utilisateur et le groupe au WebSocket**
-        $this->clients->attach($conn, ['user' => $user, 'groupChat' => $groupChat]);
+        $this->clients->attach($conn, ['user' => $user, 'SubjectChat' => $SubjectChat]);
 
         // ** Enregistrement en base de données de la connexion**
         $wsConnection = new WebSocketConnection();
         $wsConnection->setUser($user);
-        $wsConnection->setGroupChat($groupChat);
+        $wsConnection->setSubjectChat($SubjectChat);
         $wsConnection->setIsTyping(false);
         $wsConnection->setLastActivity(new \DateTime());
         $this->entityManager->persist($wsConnection);
@@ -110,9 +110,9 @@ class ChatServer implements MessageComponentInterface
             throw new \Exception("Données de message invalides");
         }
 
-        $groupChat = $this->entityManager->getRepository(GroupChat::class)->find($data['group_id']);
+        $SubjectChat = $this->entityManager->getRepository(SubjectChat::class)->find($data['group_id']);
 
-        if (!$groupChat) {
+        if (!$SubjectChat) {
             throw new \Exception("Groupe introuvable");
         }
 
@@ -122,14 +122,14 @@ class ChatServer implements MessageComponentInterface
 
         $message = new MessageChat();
         $message->setSender($this->clients[$from]['user']);
-        $message->setGroupChat($groupChat);
+        $message->setSubjectChat($SubjectChat);
         $message->setContent($data['message']);
         $this->entityManager->persist($message);
         $this->entityManager->flush();
 
         // Diffuser le message aux autres clients du même groupe
         foreach ($this->clients as $client) {
-            if ($this->clients[$client]['groupChat'] === $groupChat) {
+            if ($this->clients[$client]['SubjectChat'] === $SubjectChat) {
                 $client->send(json_encode([
                     'message' => $data['message'],
                     'author' => $this->clients[$from]['user']->getPersonne()->getPseudo(),

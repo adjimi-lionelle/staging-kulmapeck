@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\MatiereCycle;
+use App\Entity\Classe;
+use App\Entity\Specialite;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -45,4 +47,19 @@ class MatiereCycleRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    public function findAvailableSubjects(?Classe $classe, ?Specialite $specialite): array
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->select('m')
+            ->join('m.matiere', 'c') // Join with Categorie
+            ->distinct();
+
+        if ($classe) {
+            $qb->andWhere('m.cycle = :skill_level')
+               ->setParameter('skill_level', $classe->getSkillLevel()->getId());
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }
