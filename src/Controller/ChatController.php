@@ -60,8 +60,14 @@ class ChatController extends AbstractController
             'username' => $user->getUsername()
         ]);
 
+        // Get student
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        if (!$student) {
+            throw $this->createAccessDeniedException('Student account not found.');
+        }
+
         // Generate WebSocket token
-        $token = $this->generateToken($user);
+        $token = $this->generateToken($student);
         
         // Get WebSocket URL from environment
         $websocketHost = $_ENV['WEBSOCKET_HOST'] ?? $_SERVER['HTTP_HOST'];
@@ -75,7 +81,7 @@ class ChatController extends AbstractController
         ]);
 
         // Get subjects for the user
-        $subjects = $this->getSubjectsForUser($user);
+        $subjects = $this->subjectChatRepository->findByStudent($student);
         $logger->info('Retrieved subjects for user', [
             'count' => count($subjects),
             'subjects' => array_map(fn($s) => $s->getId(), $subjects)
@@ -133,7 +139,7 @@ class ChatController extends AbstractController
         $messages = $this->messageChatRepository->findSubjectChatMessages($chat);
 
         // Generate JWT token for WebSocket authentication
-        $token = $this->generateWebSocketToken($student, $chat);
+        $token = $this->generateToken($student);
 
         return $this->render('student/chat/subject_chat.html.twig', [
             'chat' => $chat,
@@ -175,7 +181,7 @@ class ChatController extends AbstractController
         $messages = $this->messageChatRepository->findSubjectChatMessages($chat);
 
         // Generate JWT token for WebSocket authentication
-        $token = $this->generateWebSocketToken($student, $chat);
+        $token = $this->generateToken($student);
 
         // Get teacher persona for this subject
         $teacherPersona = [
@@ -421,20 +427,29 @@ class ChatController extends AbstractController
         ]);
     }
 
-    private function generateWebSocketToken(Eleve $student, ?SubjectChat $chat = null): string
+    private function generateToken(User $user): string
     {
         $payload = [
-            'sub' => $student->getId(),
+            'sub' => $user->getId(),
             'iat' => time(),
             'exp' => time() + 3600, // Token expires in 1 hour
             'role' => 'student'
         ];
 
-        if ($chat) {
-            $payload['chat'] = $chat->getId();
-        }
-
         return JWT::encode($payload, $this->jwtSecret, 'HS256');
+    }
+
+    private function generateWebSocketToken(User $user): string
+    {
+        $jwtSecret = $_ENV['JWT_SECRET'] ?? throw new \RuntimeException('JWT_SECRET not configured');
+        $payload = [
+            'sub' => $user->getId(),
+            'iat' => time(),
+            'exp' => time() + 3600, // Token expires in 1 hour
+            'role' => $user->getRoles()[0] ?? 'ROLE_USER'
+        ];
+
+        return JWT::encode($payload, $jwtSecret, 'HS256');
     }
 
     private function getLastMessage($chat): ?array
