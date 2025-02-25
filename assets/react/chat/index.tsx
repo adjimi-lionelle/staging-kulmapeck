@@ -2,6 +2,9 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Chat } from './Chat';
 import { Subject, Message } from './types';
+import './styles/chat.css';
+
+console.log('Chat script loaded');
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM Content Loaded');
@@ -17,14 +20,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get data from data attributes
     const websocketUrl = container.dataset.websocketUrl;
     const token = container.dataset.token;
-    const subjects = JSON.parse(container.dataset.subjects || '[]') as Subject[];
-    const messages = JSON.parse(container.dataset.messages || '[]') as Message[];
+    let subjects: Subject[] = [];
+    let messages: Message[] = [];
+
+    try {
+        subjects = JSON.parse(container.dataset.subjects || '[]');
+        messages = JSON.parse(container.dataset.messages || '[]');
+    } catch (error) {
+        console.error('Error parsing data attributes:', error);
+        console.log('Raw subjects:', container.dataset.subjects);
+        console.log('Raw messages:', container.dataset.messages);
+    }
 
     console.log('Chat initialization data:', {
         websocketUrl,
         token,
-        subjectsCount: subjects.length,
-        messagesCount: messages.length
+        subjects,
+        messages,
+        containerDataset: container.dataset
     });
 
     if (!websocketUrl || !token) {
