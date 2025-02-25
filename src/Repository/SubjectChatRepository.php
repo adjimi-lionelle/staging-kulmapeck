@@ -113,4 +113,25 @@ class SubjectChatRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Get all subject chats for a class
+     */
+    public function findByClasse($classe): array
+    {
+        if (!$classe || !$classe->getSkillLevel()) {
+            return [];
+        }
+
+        $cycle = (int) filter_var($classe->getSkillLevel()->getName(), FILTER_SANITIZE_NUMBER_INT);
+
+        return $this->createQueryBuilder('c')
+            ->where('c.cycle = :cycle')
+            ->andWhere('c.type = :type')
+            ->setParameter('cycle', $cycle)
+            ->setParameter('type', 'teacher')
+            ->orderBy('c.createAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

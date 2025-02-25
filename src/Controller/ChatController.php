@@ -71,6 +71,9 @@ class ChatController extends AbstractController
         
         // Get WebSocket URL from environment
         $websocketHost = $_ENV['WEBSOCKET_HOST'] ?? $_SERVER['HTTP_HOST'];
+        if ($websocketHost === '0.0.0.0') {
+            $websocketHost = $_SERVER['HTTP_HOST'];
+        }
         $websocketPort = $_ENV['WEBSOCKET_PORT'] ?? '9000';
         $websocketUrl = "ws://{$websocketHost}:{$websocketPort}";
 
@@ -81,10 +84,16 @@ class ChatController extends AbstractController
         ]);
 
         // Get subjects for the user
-        $subjects = $this->subjectChatRepository->findByStudent($student);
+        $subjects = [];
+        if ($student->getClasse()) {
+            $subjects = $this->subjectChatRepository->findByClasse($student->getClasse());
+        }
+        
         $logger->info('Retrieved subjects for user', [
             'count' => count($subjects),
-            'subjects' => array_map(fn($s) => $s->getId(), $subjects)
+            'subjects' => array_map(fn($s) => $s->getId(), $subjects),
+            'student_id' => $student->getId(),
+            'class_id' => $student->getClasse() ? $student->getClasse()->getId() : null
         ]);
 
         // Format subjects for frontend
