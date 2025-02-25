@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Firebase\JWT\JWT;
+use Psr\Log\LoggerInterface;
 
 class ChatController extends AbstractController
 {
@@ -47,84 +48,96 @@ class ChatController extends AbstractController
 
     #[Route('/chat', name: 'app_chat')]
     #[IsGranted('ROLE_USER')]
-    public function index(): Response
+    public function index(LoggerInterface $logger): Response
     {
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
+        $logger->info('Accessing chat index');
+        
+        try {
+            $user = $this->getUser();
+            $logger->info('Current user:', ['id' => $user?->getId()]);
 
-        // For students, check premium status and setup
-        if ($this->isGranted('ROLE_STUDENT')) {
-            $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
-            if (!$student) {
-                throw $this->createAccessDeniedException('Student account not found.');
+            if (!$user) {
+                return $this->redirectToRoute('app_login');
             }
 
-            // Check premium status first
-            $payments = $this->paymentRepository->findBy([
-                'eleve' => $student,
-                'status' => 'SUCCESS',
-                'isExpired' => false
-            ]);
-
-            $hasPremiumAccess = false;
-            $today = new \DateTimeImmutable();
-            foreach ($payments as $payment) {
-                if ($payment->getExpiredAt() > $today) {
-                    $hasPremiumAccess = true;
-                    break;
+            // For students, check premium status and setup
+            if ($this->isGranted('ROLE_STUDENT')) {
+                $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+                if (!$student) {
+                    throw $this->createAccessDeniedException('Student account not found.');
                 }
-            }
 
-            if (!$hasPremiumAccess) {
-                return $this->redirectToRoute('app_plan', ['message' => 'chat']);
-            }
+                // Check premium status first
+                $payments = $this->paymentRepository->findBy([
+                    'eleve' => $student,
+                    'status' => 'SUCCESS',
+                    'isExpired' => false
+                ]);
 
-            // Get all classes and specializations for setup if needed
-            $classes = $this->classeRepository->findAll();
-            $specialites = $this->specialiteRepository->findAll();
-
-            // Check if student needs setup - either no class or missing required specialization
-            $needsSetup = !$student->getClasse();
-            $chats = [];
-
-            if (!$needsSetup) {
-                // For second cycle students, check specialization requirement
-                $secondCycleSkillLevels = [5, 6, 7]; // Adjust these IDs based on your database
-                $currentSkillLevel = $student->getClasse()->getSkillLevel()->getId();
-                
-                if (in_array($currentSkillLevel, $secondCycleSkillLevels) && !$student->getClasse()->getSpecialite()) {
-                    $needsSetup = true;
-                } else {
-                    // Only load chats if all setup requirements are met
-                    $chats = array_map(function($chat) {
-                        return [
-                            'id' => $chat->getId(),
-                            'matiere' => [
-                                'name' => $chat->getMatiere()->getName(),
-                                'icon' => $this->getSubjectIcon($chat->getMatiere())
-                            ],
-                            'teacherName' => $this->getTeacherName($chat->getMatiere())
-                        ];
-                    }, $this->subjectChatRepository->findByStudent($student));
+                $hasPremiumAccess = false;
+                $today = new \DateTimeImmutable();
+                foreach ($payments as $payment) {
+                    if ($payment->getExpiredAt() > $today) {
+                        $hasPremiumAccess = true;
+                        break;
+                    }
                 }
+
+                if (!$hasPremiumAccess) {
+                    return $this->redirectToRoute('app_plan', ['message' => 'chat']);
+                }
+
+                // Get all classes and specializations for setup if needed
+                $classes = $this->classeRepository->findAll();
+                $specialites = $this->specialiteRepository->findAll();
+
+                // Check if student needs setup - either no class or missing required specialization
+                $needsSetup = !$student->getClasse();
+                $chats = [];
+
+                if (!$needsSetup) {
+                    // For second cycle students, check specialization requirement
+                    $secondCycleSkillLevels = [5, 6, 7]; // Adjust these IDs based on your database
+                    $currentSkillLevel = $student->getClasse()->getSkillLevel()->getId();
+                    
+                    if (in_array($currentSkillLevel, $secondCycleSkillLevels) && !$student->getClasse()->getSpecialite()) {
+                        $needsSetup = true;
+                    } else {
+                        // Only load chats if all setup requirements are met
+                        $chats = array_map(function($chat) {
+                            return [
+                                'id' => $chat->getId(),
+                                'matiere' => [
+                                    'name' => $chat->getMatiere()->getName(),
+                                    'icon' => $this->getSubjectIcon($chat->getMatiere())
+                                ],
+                                'teacherName' => $this->getTeacherName($chat->getMatiere())
+                            ];
+                        }, $this->subjectChatRepository->findByStudent($student));
+                    }
+                }
+
+                // Always render the template - the setup modal will show automatically if needed
+                return $this->render('student/chat/index.html.twig', [
+                    'needsSetup' => $needsSetup,
+                    'classes' => $classes,
+                    'specialites' => $specialites,
+                    'chats' => $chats,
+                    'token' => $this->generateWebSocketToken($student)
+                ]);
             }
 
-            // Always render the template - the setup modal will show automatically if needed
+            // For non-student users (e.g., teachers)
             return $this->render('student/chat/index.html.twig', [
-                'needsSetup' => $needsSetup,
-                'classes' => $classes,
-                'specialites' => $specialites,
-                'chats' => $chats,
-                'token' => $this->generateWebSocketToken($student)
+                'chats' => []
             ]);
+        } catch (\Exception $e) {
+            $logger->error('Error in chat index:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
         }
-
-        // For non-student users (e.g., teachers)
-        return $this->render('student/chat/index.html.twig', [
-            'chats' => []
-        ]);
     }
 
     /**

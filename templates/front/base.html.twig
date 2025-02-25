@@ -15,6 +15,10 @@
 		<meta
 		name="description" content="Kulmapeck - The Best E-learning platform">
 
+		<!-- Webpack Encore -->
+		{{ encore_entry_link_tags('app') }}
+		{% block stylesheets %}{% endblock %}
+
 		<!-- Dark mode -->
 		<script>
 			const storedTheme = localStorage.getItem('theme')
@@ -971,3 +975,7 @@ btn.addEventListener("click", likeForumMessage)
         'chat.errors.group': "{{ 'chat.errors.group'|trans }}"
     };
 </script>
+
+<!-- Webpack Encore -->
+{{ encore_entry_script_tags('app') }}
+{% block javascripts %}{% endblock %}
