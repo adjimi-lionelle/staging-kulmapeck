@@ -25,12 +25,13 @@
     {% else %}
         <div class="row">
             <div class="col-12">
-                <div id="react-chat"
-                     data-websocket-url="ws://{{ app.request.host }}:9000"
-                     data-token="{{ token|default('') }}"
-                     data-subjects="{{ chats|json_encode|e('html_attr') }}"
-                     data-messages="[]">
-                </div>
+                <div 
+                    id="react-chat"
+                    data-websocket-url="{{ websocket_url }}"
+                    data-token="{{ token }}"
+                    data-subjects="{{ subjects|json_encode|e('html_attr') }}"
+                    data-messages="{{ messages|json_encode|e('html_attr') }}"
+                ></div>
             </div>
         </div>
     {% endif %}

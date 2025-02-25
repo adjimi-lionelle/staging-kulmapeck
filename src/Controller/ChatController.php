@@ -50,94 +50,60 @@ class ChatController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function index(LoggerInterface $logger): Response
     {
-        $logger->info('Accessing chat index');
-        
-        try {
-            $user = $this->getUser();
-            $logger->info('Current user:', ['id' => $user?->getId()]);
-
-            if (!$user) {
-                return $this->redirectToRoute('app_login');
-            }
-
-            // For students, check premium status and setup
-            if ($this->isGranted('ROLE_STUDENT')) {
-                $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
-                if (!$student) {
-                    throw $this->createAccessDeniedException('Student account not found.');
-                }
-
-                // Check premium status first
-                $payments = $this->paymentRepository->findBy([
-                    'eleve' => $student,
-                    'status' => 'SUCCESS',
-                    'isExpired' => false
-                ]);
-
-                $hasPremiumAccess = false;
-                $today = new \DateTimeImmutable();
-                foreach ($payments as $payment) {
-                    if ($payment->getExpiredAt() > $today) {
-                        $hasPremiumAccess = true;
-                        break;
-                    }
-                }
-
-                if (!$hasPremiumAccess) {
-                    return $this->redirectToRoute('app_plan', ['message' => 'chat']);
-                }
-
-                // Get all classes and specializations for setup if needed
-                $classes = $this->classeRepository->findAll();
-                $specialites = $this->specialiteRepository->findAll();
-
-                // Check if student needs setup - either no class or missing required specialization
-                $needsSetup = !$student->getClasse();
-                $chats = [];
-
-                if (!$needsSetup) {
-                    // For second cycle students, check specialization requirement
-                    $secondCycleSkillLevels = [5, 6, 7]; // Adjust these IDs based on your database
-                    $currentSkillLevel = $student->getClasse()->getSkillLevel()->getId();
-                    
-                    if (in_array($currentSkillLevel, $secondCycleSkillLevels) && !$student->getClasse()->getSpecialite()) {
-                        $needsSetup = true;
-                    } else {
-                        // Only load chats if all setup requirements are met
-                        $chats = array_map(function($chat) {
-                            return [
-                                'id' => $chat->getId(),
-                                'matiere' => [
-                                    'name' => $chat->getMatiere()->getName(),
-                                    'icon' => $this->getSubjectIcon($chat->getMatiere())
-                                ],
-                                'teacherName' => $this->getTeacherName($chat->getMatiere())
-                            ];
-                        }, $this->subjectChatRepository->findByStudent($student));
-                    }
-                }
-
-                // Always render the template - the setup modal will show automatically if needed
-                return $this->render('student/chat/index.html.twig', [
-                    'needsSetup' => $needsSetup,
-                    'classes' => $classes,
-                    'specialites' => $specialites,
-                    'chats' => $chats,
-                    'token' => $this->generateWebSocketToken($student)
-                ]);
-            }
-
-            // For non-student users (e.g., teachers)
-            return $this->render('student/chat/index.html.twig', [
-                'chats' => []
-            ]);
-        } catch (\Exception $e) {
-            $logger->error('Error in chat index:', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            throw $e;
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
         }
+
+        $logger->info('User accessing chat', [
+            'user_id' => $user->getId(),
+            'username' => $user->getUsername()
+        ]);
+
+        // Generate WebSocket token
+        $token = $this->generateToken($user);
+        
+        // Get WebSocket URL from environment
+        $websocketHost = $_ENV['WEBSOCKET_HOST'] ?? $_SERVER['HTTP_HOST'];
+        $websocketPort = $_ENV['WEBSOCKET_PORT'] ?? '9000';
+        $websocketUrl = "ws://{$websocketHost}:{$websocketPort}";
+
+        $logger->info('WebSocket configuration', [
+            'host' => $websocketHost,
+            'port' => $websocketPort,
+            'url' => $websocketUrl
+        ]);
+
+        // Get subjects for the user
+        $subjects = $this->getSubjectsForUser($user);
+        $logger->info('Retrieved subjects for user', [
+            'count' => count($subjects),
+            'subjects' => array_map(fn($s) => $s->getId(), $subjects)
+        ]);
+
+        // Format subjects for frontend
+        $formattedSubjects = array_map(function($subject) {
+            return [
+                'id' => $subject->getId(),
+                'name' => $subject->getMatiere()->getName(),
+                'icon' => $subject->getMatiere()->getIcon(),
+                'matiere' => [
+                    'name' => $subject->getMatiere()->getName(),
+                    'icon' => $subject->getMatiere()->getIcon()
+                ],
+                'teacherName' => $subject->getTeacher() ? $subject->getTeacher()->getFullName() : null
+            ];
+        }, $subjects);
+
+        // Get recent messages
+        $messages = [];  // You can implement this based on your needs
+
+        return $this->render('student/chat/index.html.twig', [
+            'websocket_url' => $websocketUrl,
+            'token' => $token,
+            'subjects' => $formattedSubjects,
+            'messages' => $messages
+        ]);
     }
 
     /**
