@@ -13,7 +13,7 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({ onSubjectSelect }) => 
 
     const filteredSubjects = subjects.filter(subject =>
         subject.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        subject.teacherName.toLowerCase().includes(searchQuery.toLowerCase())
+        (subject.teacherName?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false)
     );
 
     return (
@@ -60,9 +60,11 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({ onSubjectSelect }) => 
                             </div>
                             <div className="chat-item-info">
                                 <div className="chat-item-name">{subject.name}</div>
-                                <div className="chat-item-preview">
-                                    Prof. {subject.teacherName}
-                                </div>
+                                {subject.teacherName && (
+                                    <div className="chat-item-preview">
+                                        Prof. {subject.teacherName}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))
