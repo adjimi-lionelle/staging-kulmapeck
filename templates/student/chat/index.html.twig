@@ -6,32 +6,40 @@
             'classes': classes,
             'specialites': specialites
         } %}
-        <div class="row">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-                    <div class="card-body p-0">
-                        <div class="text-center my-5">
-                            <i class="bi bi-chat-dots-fill" style="font-size: 64px; color: #0d6efd;"></i>
-                            <h3 class="mt-4">{% trans %}WELCOME_TO_CHAT_KEY{% endtrans %}</h3>
-                            <p class="text-muted">{% trans %}PLEASE_SETUP_PROFILE_KEY{% endtrans %}</p>
-                            <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#setup-modal">
-                                <i class="bi bi-gear-fill me-2"></i>{% trans %}SETUP_PROFILE{% endtrans %}
-                            </button>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                        <div class="card-body p-0">
+                            <div class="text-center my-5">
+                                <i class="bi bi-chat-dots-fill" style="font-size: 64px; color: #0d6efd;"></i>
+                                <h3 class="mt-4">{% trans %}WELCOME_TO_CHAT_KEY{% endtrans %}</h3>
+                                <p class="text-muted">{% trans %}PLEASE_SETUP_PROFILE_KEY{% endtrans %}</p>
+                                <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#setup-modal">
+                                    <i class="bi bi-gear-fill me-2"></i>{% trans %}SETUP_PROFILE{% endtrans %}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     {% else %}
-        <div class="row">
-            <div class="col-12">
-                <div 
-                    id="react-chat"
-                    data-websocket-url="{{ websocket_url }}"
-                    data-token="{{ token }}"
-                    data-subjects="{{ subjects|json_encode|e('html_attr') }}"
-                    data-messages="{{ messages|json_encode|e('html_attr') }}"
-                ></div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-0">
+                            <div 
+                                id="react-chat"
+                                data-websocket-url="{{ websocket_url }}"
+                                data-token="{{ token }}"
+                                data-subjects="{{ subjects|json_encode|e('html_attr') }}"
+                                data-messages="{{ messages|json_encode|e('html_attr') }}"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     {% endif %}
