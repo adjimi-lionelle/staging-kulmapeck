@@ -1,26 +1,32 @@
 {% extends 'student/base.html.twig' %}
 
-{% block title %}Chat{% endblock %}
+{% block subTitle %}Chat{% endblock %}
 
-{% block encore_stylesheets %}
+{% block stylesheets %}
     {{ parent() }}
     {{ encore_entry_link_tags('chat_styles') }}
 {% endblock %}
 
-{% block content %}
-    <div class="container-fluid py-5">
+{% block studentContent %}
+    {% block instructorBanner %}{% endblock %}
+    
+    <section class="pt-0">
         <div class="container">
-            <div id="react-chat" 
-                 data-websocket-url="{{ websocket_url }}"
-                 data-token="{{ token }}"
-                 data-subjects="{{ subjects|json_encode|e('html_attr') }}"
-                 data-messages="{{ messages|json_encode|e('html_attr') }}">
+            <div class="row">
+                <div class="col-12">
+                    <div id="react-chat" 
+                         data-websocket-url="{{ websocket_url }}"
+                         data-token="{{ token }}"
+                         data-subjects="{{ subjects|json_encode|e('html_attr') }}"
+                         data-messages="{{ messages|json_encode|e('html_attr') }}">
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 {% endblock %}
 
-{% block encore_javascripts %}
+{% block javascripts %}
     {{ parent() }}
     {{ encore_entry_script_tags('chat') }}
 {% endblock %}
