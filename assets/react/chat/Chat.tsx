@@ -36,7 +36,7 @@ export const Chat: React.FC<ChatProps> = ({
                                     key={subject.id}
                                     className="list-group-item list-group-item-action"
                                 >
-                                    {subject.matiere.name}
+                                    {subject.name}
                                 </button>
                             ))}
                         </div>

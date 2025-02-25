@@ -5,7 +5,7 @@ interface ChatStore extends ChatState {
     setMessages: (messages: Message[]) => void;
     addMessage: (message: Message) => void;
     setSubjects: (subjects: Subject[]) => void;
-    setCurrentSubject: (subject: Subject) => void;
+    setCurrentSubject: (subject: Subject | undefined) => void;
     setLoading: (isLoading: boolean) => void;
     setError: (error: string | undefined) => void;
 }
@@ -18,8 +18,8 @@ export const useChatStore = create<ChatStore>((set) => ({
     error: undefined,
 
     setMessages: (messages) => set({ messages }),
-    addMessage: (message) => set((state) => ({ 
-        messages: [...state.messages, message] 
+    addMessage: (message) => set((state) => ({
+        messages: [...state.messages, message]
     })),
     setSubjects: (subjects) => set({ subjects }),
     setCurrentSubject: (subject) => set({ currentSubject: subject }),

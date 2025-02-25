@@ -5,6 +5,8 @@ export interface Matiere {
 
 export interface Subject {
     id: number;
+    name: string;
+    icon?: string;
     matiere: Matiere;
     teacherName?: string;
 }
@@ -20,4 +22,12 @@ export interface Message {
 export interface WebSocketMessage {
     type: 'message' | 'error';
     payload: any;
+}
+
+export interface ChatState {
+    messages: Message[];
+    subjects: Subject[];
+    currentSubject?: Subject;
+    isLoading: boolean;
+    error?: string;
 }
