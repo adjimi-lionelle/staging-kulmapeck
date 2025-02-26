@@ -20,7 +20,7 @@ final class Version20250226114315 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-       $this->addSql('CREATE TABLE subject_chat (id INT AUTO_INCREMENT NOT NULL, matiere_id INT NOT NULL, cycle INT NOT NULL, name VARCHAR(255) NOT NULL, type VARCHAR(20) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_F7577671F46CD258 (matiere_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+     /*  $this->addSql('CREATE TABLE subject_chat (id INT AUTO_INCREMENT NOT NULL, matiere_id INT NOT NULL, cycle INT NOT NULL, name VARCHAR(255) NOT NULL, type VARCHAR(20) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_F7577671F46CD258 (matiere_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE subject_chat ADD CONSTRAINT FK_F7577671F46CD258 FOREIGN KEY (matiere_id) REFERENCES categorie (id)');
         $this->addSql('DROP TABLE group_chat');
 
@@ -48,14 +48,14 @@ final class Version20250226114315 extends AbstractMigration
         $this->addSql('DROP INDEX IDX_7C4108E99C9A2529 ON web_socket_connection');
         $this->addSql('ALTER TABLE web_socket_connection ADD subject_chat_id INT DEFAULT NULL, DROP group_chat_id');
         $this->addSql('ALTER TABLE web_socket_connection ADD CONSTRAINT FK_7C4108E9A76ED395 FOREIGN KEY (user_id) REFERENCES kulmapeck_user (id)');
-        $this->addSql('ALTER TABLE web_socket_connection ADD CONSTRAINT FK_7C4108E9BF18DD87 FOREIGN KEY (subject_chat_id) REFERENCES subject_chat (id)');
+        $this->addSql('ALTER TABLE web_socket_connection ADD CONSTRAINT FK_7C4108E9BF18DD87 FOREIGN KEY (subject_chat_id) REFERENCES subject_chat (id)');*/
         $this->addSql('CREATE INDEX IDX_7C4108E9BF18DD87 ON web_socket_connection (subject_chat_id)');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE message_chat DROP FOREIGN KEY FK_CC086973BF18DD87');
+      /*  $this->addSql('ALTER TABLE message_chat DROP FOREIGN KEY FK_CC086973BF18DD87');
         $this->addSql('ALTER TABLE web_socket_connection DROP FOREIGN KEY FK_7C4108E9BF18DD87');
         $this->addSql('CREATE TABLE group_chat (id INT AUTO_INCREMENT NOT NULL, matiere_id INT NOT NULL, cycle INT NOT NULL, name VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, create_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_4CC7A9DAF46CD258 (matiere_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB COMMENT = \'\' ');
         $this->addSql('ALTER TABLE subject_chat DROP FOREIGN KEY FK_F7577671F46CD258');
@@ -166,6 +166,6 @@ final class Version20250226114315 extends AbstractMigration
         $this->addSql('ALTER TABLE web_socket_connection DROP FOREIGN KEY FK_7C4108E9A76ED395');
         $this->addSql('DROP INDEX IDX_7C4108E9BF18DD87 ON web_socket_connection');
         $this->addSql('ALTER TABLE web_socket_connection ADD group_chat_id INT NOT NULL, DROP subject_chat_id');
-        $this->addSql('CREATE INDEX IDX_7C4108E99C9A2529 ON web_socket_connection (group_chat_id)');
+        $this->addSql('CREATE INDEX IDX_7C4108E99C9A2529 ON web_socket_connection (group_chat_id)');*/
     }
 }

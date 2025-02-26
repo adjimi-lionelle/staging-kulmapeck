@@ -42,3 +42,4 @@ yarn-error.log
 investir/
 oldDeploy/
 site/
+/migrations/Version20250226updateProd.php
