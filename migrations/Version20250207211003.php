@@ -21,7 +21,7 @@ final class Version20250207211003 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         
-        $this->addSql('ALTER TABLE group_chat ADD create_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
+       // $this->addSql('ALTER TABLE group_chat ADD create_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
        
        
     }
@@ -31,7 +31,7 @@ final class Version20250207211003 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
       
        
-        $this->addSql('ALTER TABLE group_chat DROP create_at');
+       // $this->addSql('ALTER TABLE group_chat DROP create_at');
        
        
     }

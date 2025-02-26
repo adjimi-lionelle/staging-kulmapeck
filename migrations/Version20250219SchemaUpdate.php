@@ -19,17 +19,17 @@ final class Version20250219SchemaUpdate extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // Add new columns to group_chat table if they don't exist
-        $this->addSql('
+        // Add new columns to subject_chat table if they don't exist
+       /* $this->addSql('
             SET @column_exists = (
                 SELECT COUNT(*) 
                 FROM information_schema.COLUMNS 
                 WHERE TABLE_SCHEMA = DATABASE()
-                AND TABLE_NAME = "group_chat"
+                AND TABLE_NAME = "subject_chat"
                 AND COLUMN_NAME = "type"
             );
             SET @add_column = IF(@column_exists = 0,
-                "ALTER TABLE group_chat ADD type VARCHAR(20) NOT NULL DEFAULT \'teacher\' AFTER name",
+                "ALTER TABLE subject_chat ADD type VARCHAR(20) NOT NULL DEFAULT \'teacher\' AFTER name",
                 "SELECT 1"
             );
             PREPARE stmt FROM @add_column;
@@ -42,11 +42,11 @@ final class Version20250219SchemaUpdate extends AbstractMigration
                 SELECT COUNT(*) 
                 FROM information_schema.COLUMNS 
                 WHERE TABLE_SCHEMA = DATABASE()
-                AND TABLE_NAME = "group_chat"
-                AND COLUMN_NAME = "g0_create_at"
+                AND TABLE_NAME = "subject_chat"
+                AND COLUMN_NAME = "created_at"
             );
             SET @add_column = IF(@column_exists = 0,
-                "ALTER TABLE group_chat ADD g0_create_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\' AFTER type",
+                "ALTER TABLE subject_chat ADD created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\' AFTER type",
                 "SELECT 1"
             );
             PREPARE stmt FROM @add_column;
@@ -81,7 +81,7 @@ final class Version20250219SchemaUpdate extends AbstractMigration
                     "DROP FOREIGN KEY FK_CC0869739C9A2529, ",
                     "DROP INDEX IDX_CC0869739C9A2529, ",
                     "CHANGE group_chat_id subject_chat_id INT NOT NULL, ",
-                    "ADD CONSTRAINT FK_CC086973BF18DD87 FOREIGN KEY (subject_chat_id) REFERENCES group_chat (id), ",
+                    "ADD CONSTRAINT FK_CC086973BF18DD87 FOREIGN KEY (subject_chat_id) REFERENCES subject_chat (id), ",
                     "CREATE INDEX IDX_CC086973BF18DD87 ON message_chat (subject_chat_id)"
                 ),
                 "SELECT 1"
@@ -132,7 +132,7 @@ final class Version20250219SchemaUpdate extends AbstractMigration
                 CONCAT(
                     "UPDATE web_socket_connection SET subject_chat_id = group_chat_id WHERE group_chat_id IS NOT NULL; ",
                     "ALTER TABLE web_socket_connection DROP group_chat_id, ",
-                    "ADD CONSTRAINT FK_7C4108E9BF18DD87 FOREIGN KEY (subject_chat_id) REFERENCES group_chat (id), ",
+                    "ADD CONSTRAINT FK_7C4108E9BF18DD87 FOREIGN KEY (subject_chat_id) REFERENCES subject_chat (id), ",
                     "CREATE INDEX IDX_7C4108E9BF18DD87 ON web_socket_connection (subject_chat_id)"
                 ),
                 "SELECT 1"
@@ -140,13 +140,13 @@ final class Version20250219SchemaUpdate extends AbstractMigration
             PREPARE stmt FROM @copy_sql;
             EXECUTE stmt;
             DEALLOCATE PREPARE stmt;
-        ');
+        ');*/
     }
 
     public function down(Schema $schema): void
     {
         // Only revert if columns exist in their new form
-        $this->addSql('
+      /*  $this->addSql('
             SET @subject_chat_exists = (
                 SELECT COUNT(*) 
                 FROM information_schema.COLUMNS 
@@ -166,7 +166,7 @@ final class Version20250219SchemaUpdate extends AbstractMigration
                     "ADD group_chat_id INT DEFAULT NULL, ",
                     "UPDATE web_socket_connection SET group_chat_id = subject_chat_id WHERE subject_chat_id IS NOT NULL, ",
                     "DROP subject_chat_id, ",
-                    "ADD CONSTRAINT FK_7C4108E99C9A2529 FOREIGN KEY (group_chat_id) REFERENCES group_chat (id), ",
+                    "ADD CONSTRAINT FK_7C4108E99C9A2529 FOREIGN KEY (group_chat_id) REFERENCES subject_chat (id), ",
                     "CREATE INDEX IDX_7C4108E99C9A2529 ON web_socket_connection (group_chat_id)"
                 ),
                 "SELECT 1"
@@ -195,7 +195,7 @@ final class Version20250219SchemaUpdate extends AbstractMigration
                     "DROP FOREIGN KEY FK_CC086973BF18DD87, ",
                     "DROP INDEX IDX_CC086973BF18DD87, ",
                     "CHANGE subject_chat_id group_chat_id INT NOT NULL, ",
-                    "ADD CONSTRAINT FK_CC0869739C9A2529 FOREIGN KEY (group_chat_id) REFERENCES group_chat (id), ",
+                    "ADD CONSTRAINT FK_CC0869739C9A2529 FOREIGN KEY (group_chat_id) REFERENCES subject_chat (id), ",
                     "CREATE INDEX IDX_CC0869739C9A2529 ON message_chat (group_chat_id)"
                 ),
                 "SELECT 1"
@@ -205,26 +205,26 @@ final class Version20250219SchemaUpdate extends AbstractMigration
             DEALLOCATE PREPARE stmt;
         ');
         
-        // Check group_chat columns before dropping
+        // Check subject_chat columns before dropping
         $this->addSql('
             SET @columns_exist = (
                 SELECT COUNT(*) 
                 FROM information_schema.COLUMNS 
                 WHERE TABLE_SCHEMA = DATABASE()
-                AND TABLE_NAME = "group_chat"
-                AND COLUMN_NAME IN ("type", "g0_create_at")
+                AND TABLE_NAME = "subject_chat"
+                AND COLUMN_NAME IN ("type", "created_at")
             );
         ');
 
-        // Revert group_chat changes if needed
+        // Revert subject_chat changes if needed
         $this->addSql('
             SET @revert_sql = IF(@columns_exist > 0,
-                "ALTER TABLE group_chat DROP type, DROP g0_create_at",
+                "ALTER TABLE subject_chat DROP type, DROP created_at",
                 "SELECT 1"
             );
             PREPARE stmt FROM @revert_sql;
             EXECUTE stmt;
             DEALLOCATE PREPARE stmt;
-        ');
+        ');*/
     }
 }

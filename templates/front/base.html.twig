@@ -236,7 +236,7 @@ gtag('config', 'G-7N7LGGGWT1');
 
 	<body 
         data-user-id="{{ app.user ? app.user.id : '' }}"
-        data-auth-token="{{ app.user ? app.user.chatToken : '' }}"
+		{# data-auth-token="{{ app.user ? app.user.chatToken : '' }}" #}
         data-chat-type="{{ app.request.attributes.get('_route') starts with 'student_' ? 'student' : 'general' }}"
         class="">
 		{% block header %}

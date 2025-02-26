@@ -8,7 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SubjectChatRepository::class)]
-#[ORM\Table(name: 'group_chat')] // Keep the table name for DB compatibility
+#[ORM\Table(name: 'subject_chat')] // Keep the table name for DB compatibility
 class SubjectChat
 {
     #[ORM\Id]
@@ -32,8 +32,8 @@ class SubjectChat
     #[ORM\OneToMany(mappedBy: 'subjectChat', targetEntity: MessageChat::class, orphanRemoval: true)]
     private Collection $messageChats;
 
-    #[ORM\Column(name: 'g0_create_at', type: 'datetime_immutable')]
-    private ?\DateTimeImmutable $createAt = null;
+    #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\OneToMany(mappedBy: 'subjectChat', targetEntity: WebSocketConnection::class, orphanRemoval: true)]
     private Collection $webSocketConnections;
@@ -41,7 +41,7 @@ class SubjectChat
     public function __construct()
     {
         $this->messageChats = new ArrayCollection();
-        $this->createAt = new \DateTimeImmutable;
+        $this->createdAt = new \DateTimeImmutable;
         $this->webSocketConnections = new ArrayCollection();
         $this->type = 'teacher';
     }
@@ -122,14 +122,14 @@ class SubjectChat
         return $this;
     }
 
-    public function getCreateAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->createAt;
+        return $this->createdAt;
     }
 
-    public function setCreateAt(\DateTimeImmutable $createAt): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->createAt = $createAt;
+        $this->createdAt = $createdAt;
         return $this;
     }
 

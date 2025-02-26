@@ -20,7 +20,7 @@ final class Version20250206000421 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE chat_message (id INT AUTO_INCREMENT NOT NULL, student_id INT NOT NULL, subject_id INT NOT NULL, content LONGTEXT NOT NULL, is_from_ai TINYINT(1) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_FAB3FC16CB944F1A (student_id), INDEX IDX_FAB3FC1623EDC87 (subject_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+       /* $this->addSql('CREATE TABLE chat_message (id INT AUTO_INCREMENT NOT NULL, student_id INT NOT NULL, subject_id INT NOT NULL, content LONGTEXT NOT NULL, is_from_ai TINYINT(1) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_FAB3FC16CB944F1A (student_id), INDEX IDX_FAB3FC1623EDC87 (subject_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE group_chat (id INT AUTO_INCREMENT NOT NULL, matiere_id INT NOT NULL, cycle INT NOT NULL, name VARCHAR(255) NOT NULL, INDEX IDX_4CC7A9DAF46CD258 (matiere_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE matiere_cycle (id INT AUTO_INCREMENT NOT NULL, matiere_id INT NOT NULL, cycle INT NOT NULL, INDEX IDX_3C267FE6F46CD258 (matiere_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE chat_message ADD CONSTRAINT FK_FAB3FC16CB944F1A FOREIGN KEY (student_id) REFERENCES eleve (id)');
@@ -123,13 +123,13 @@ final class Version20250206000421 extends AbstractMigration
         $this->addSql('ALTER TABLE review ADD CONSTRAINT FK_794381C6A6CC7B2 FOREIGN KEY (eleve_id) REFERENCES eleve (id)');
         $this->addSql('ALTER TABLE specialite ADD CONSTRAINT FK_E7D6FCC1180AA129 FOREIGN KEY (filiere_id) REFERENCES filiere (id)');
         $this->addSql('ALTER TABLE sujet ADD CONSTRAINT FK_2E13599D6A99F74A FOREIGN KEY (membre_id) REFERENCES membre (id)');
-        $this->addSql('ALTER TABLE sujet ADD CONSTRAINT FK_2E13599D29CCBAD0 FOREIGN KEY (forum_id) REFERENCES forum (id)');
+        $this->addSql('ALTER TABLE sujet ADD CONSTRAINT FK_2E13599D29CCBAD0 FOREIGN KEY (forum_id) REFERENCES forum (id)');*/
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE refresh_token (id INT AUTO_INCREMENT NOT NULL, refresh_token VARCHAR(128) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, username VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, valid DATETIME NOT NULL, UNIQUE INDEX UNIQ_C74F2195C74F2195 (refresh_token), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB COMMENT = \'\' ');
+        /*$this->addSql('CREATE TABLE refresh_token (id INT AUTO_INCREMENT NOT NULL, refresh_token VARCHAR(128) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, username VARCHAR(255) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, valid DATETIME NOT NULL, UNIQUE INDEX UNIQ_C74F2195C74F2195 (refresh_token), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB COMMENT = \'\' ');
         $this->addSql('ALTER TABLE chat_message DROP FOREIGN KEY FK_FAB3FC16CB944F1A');
         $this->addSql('ALTER TABLE chat_message DROP FOREIGN KEY FK_FAB3FC1623EDC87');
         $this->addSql('ALTER TABLE group_chat DROP FOREIGN KEY FK_4CC7A9DAF46CD258');
@@ -232,6 +232,6 @@ final class Version20250206000421 extends AbstractMigration
         $this->addSql('ALTER TABLE sujet DROP FOREIGN KEY FK_2E13599D6A99F74A');
         $this->addSql('ALTER TABLE sujet DROP FOREIGN KEY FK_2E13599D29CCBAD0');
         $this->addSql('ALTER TABLE user_filiere DROP FOREIGN KEY FK_76DD4394A76ED395');
-        $this->addSql('ALTER TABLE user_filiere DROP FOREIGN KEY FK_76DD4394180AA129');
+        $this->addSql('ALTER TABLE user_filiere DROP FOREIGN KEY FK_76DD4394180AA129');*/
     }
 }
