@@ -105,8 +105,15 @@ final class MobileApiService
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
-
+            
         $responseData = json_decode($response, true);
+var_dump([
+    'url' => $apiUrl,
+    'headers' => $headers,
+    'request' => $payOut->toJson(),
+    'httpCode' => $httpCode,
+    'response' => $responseData,
+]);
 
         if ($httpCode === 202) {
             return ['responseData' => $responseData, 'error' => false, 'message' => 'Done'];
