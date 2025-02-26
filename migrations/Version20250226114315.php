@@ -49,7 +49,7 @@ final class Version20250226114315 extends AbstractMigration
         $this->addSql('ALTER TABLE web_socket_connection ADD subject_chat_id INT DEFAULT NULL, DROP group_chat_id');
         $this->addSql('ALTER TABLE web_socket_connection ADD CONSTRAINT FK_7C4108E9A76ED395 FOREIGN KEY (user_id) REFERENCES kulmapeck_user (id)');
         $this->addSql('ALTER TABLE web_socket_connection ADD CONSTRAINT FK_7C4108E9BF18DD87 FOREIGN KEY (subject_chat_id) REFERENCES subject_chat (id)');*/
-        $this->addSql('CREATE INDEX IDX_7C4108E9BF18DD87 ON web_socket_connection (subject_chat_id)');
+        //$this->addSql('CREATE INDEX IDX_7C4108E9BF18DD87 ON web_socket_connection (subject_chat_id)');
     }
 
     public function down(Schema $schema): void
