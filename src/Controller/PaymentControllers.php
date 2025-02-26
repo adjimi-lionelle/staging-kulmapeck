@@ -2,7 +2,7 @@
 namespace App\Controller;
 
 
-use ApiPlatform\OpenApi\Model\Response;
+//use ApiPlatform\OpenApi\Model\Response;
 use App\Entity\Notification;
 use App\Repository\EleveRepository;
 use App\Repository\NetworkConfigRepository;
@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 #[Route('/api/pay')]
 class PaymentControllers extends AbstractController
@@ -38,7 +39,7 @@ class PaymentControllers extends AbstractController
         $this->privateKey = $apiKeys->getPrivateKey();
         $this->cacert = $apiKeys->getCacert();
         //$this->apiUrl = $_ENV['API_PAY_URL'];
-        $this->apiUrl = 'https://pay-kulmapeck.online/api/pay/';
+        $this->apiUrl = 'https://staging-kulmapeck.online/api/pay/';
 
     }
     /**
@@ -48,15 +49,21 @@ class PaymentControllers extends AbstractController
     #[Route('/callback', name: 'app_payment_callback', methods: 'GET')]
     public function handleCallback(Request $request, NotificationRepository $notificationRepository,
      UserRepository $userRepository, NetworkConfigRepository $networkConfigRepository,
-      EleveRepository $eleveRepository, PaymentRepository $paymentRepository, RetraitRepository $retraitRepository, EntityManagerInterface $em)
-    {
+      EleveRepository $eleveRepository, PaymentRepository $paymentRepository, RetraitRepository $retraitRepository, EntityManagerInterface $em):JsonResponse   {
         // Check if Kulmapeck  sender's IP address
-        $senderIp = $request->getClientIp();
-        $expectedIp = '192.162.71.169';
+	   /* $senderIp = $request->getClientIp();
+	  
+
+	    var_dump($senderIp);
+	    //$expectedIp = '145.223.98.53';
+	    $allowedIps = [
+        '145.223.98.53', // IPv4
+        '2a02:4780:41:dbbd::1' // IPv6
+	    ];
 
         if ($senderIp !== $expectedIp) {
-            throw new InvalidArgumentException("Unauthorized sender IP : ".$senderIp);
-        }
+            throw new InvalidArgumentException("IP invalide : ".$expectedIp);
+	}*/
 
         // Get parameters from the URL
         $transactionRef = $request->query->get('transaction_ref');
@@ -120,7 +127,9 @@ class PaymentControllers extends AbstractController
         }
 
         // Return a response if needed
-        return new Response('Callback received successfully');
+//	return new Response('Callback received successfully');
+	return new JsonResponse(['message' => 'Callback received successfully'], 200);
+
     }
     #[Route('/email', name: 'balance', methods: ['GET'])]
     public function emailSender(MailerInterface $mailer )
