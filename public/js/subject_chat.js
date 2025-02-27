@@ -1,292 +1,387 @@
 /**
- * Subject Chat JavaScript
+ * Kulmapeck Chat System
  * Handles WebSocket connections and chat functionality
  */
+
 document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements
-    const chatContainer = document.getElementById('chat-container');
+    const chatContainer = document.querySelector('.chat-app');
     const subjectList = document.getElementById('subject-list');
-    const chatHeader = document.getElementById('chat-header');
-    const welcomeScreen = document.getElementById('welcome-screen');
-    const messageContainer = document.getElementById('message-container');
-    const chatInputContainer = document.getElementById('chat-input-container');
+    const chatMessages = document.getElementById('chat-messages');
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
+    const chatHeader = document.getElementById('chat-header');
     const subjectSearch = document.getElementById('subject-search');
-    const typingIndicator = document.getElementById('typing-indicator');
     
-    // Chat state
-    let websocket = null;
-    let currentSubjectId = null;
+    // Chat State
+    let currentSubject = null;
+    let socket = null;
+    let token = null;
     let typingTimeout = null;
     let lastTypingStatus = false;
     
-    // Setup modal if needed
-    if (document.getElementById('setup-modal')) {
-        const setupModal = new bootstrap.Modal(document.getElementById('setup-modal'));
-        setupModal.show();
+    // Get WebSocket token
+    function getWebSocketToken() {
+        fetch('/websocket/token')
+            .then(response => response.json())
+            .then(data => {
+                token = data.token;
+                loadSubjects();
+            })
+            .catch(error => {
+                console.error('Error fetching WebSocket token:', error);
+            });
     }
     
-    // Initialize WebSocket connection
-    function initWebSocket() {
-        const websocketUrl = chatContainer.dataset.websocketUrl;
-        const token = chatContainer.dataset.token;
+    // Load subjects
+    function loadSubjects() {
+        fetch('/api/subject-chats')
+            .then(response => response.json())
+            .then(subjects => {
+                renderSubjects(subjects);
+                if (subjects.length > 0) {
+                    selectSubject(subjects[0].id);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading subjects:', error);
+            });
+    }
+    
+    // Render subjects in sidebar
+    function renderSubjects(subjects) {
+        if (!subjectList) return;
         
-        if (!websocketUrl || !token) {
-            console.error('Missing WebSocket URL or token');
+        if (subjects.length === 0) {
+            subjectList.innerHTML = `
+                <div class="empty-state text-center p-4">
+                    <i class="bi bi-journal-x" style="font-size: 48px; color: #6c757d;"></i>
+                    <p class="mt-3 text-muted">No subjects available</p>
+                </div>
+            `;
             return;
         }
         
-        websocket = new WebSocket(websocketUrl);
-        
-        websocket.onopen = function() {
-            console.log('WebSocket connection established');
-            // Authenticate with token
-            sendWebSocketMessage({
-                action: 'authenticate',
-                token: token
+        subjectList.innerHTML = '';
+        subjects.forEach((subject, index) => {
+            const chatItem = document.createElement('div');
+            chatItem.className = `chat-item${index === 0 ? ' active' : ''}`;
+            chatItem.dataset.subjectId = subject.id;
+            
+            const firstLetter = subject.name.charAt(0).toUpperCase();
+            const unreadBadge = subject.unreadCount > 0 
+                ? `<div class="chat-item-badge">${subject.unreadCount}</div>` 
+                : '';
+            
+            chatItem.innerHTML = `
+                <div class="chat-item-avatar">
+                    <div class="avatar-placeholder rounded-circle">${firstLetter}</div>
+                </div>
+                <div class="chat-item-info">
+                    <div class="chat-item-name">${subject.name}</div>
+                    <div class="chat-item-preview">${subject.lastMessage || 'Start chatting...'}</div>
+                </div>
+                <div class="chat-item-meta">
+                    <div class="chat-item-time">12:30 PM</div>
+                    ${unreadBadge}
+                </div>
+            `;
+            
+            chatItem.addEventListener('click', () => {
+                // Remove active class from all items
+                document.querySelectorAll('.chat-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Add active class to clicked item
+                chatItem.classList.add('active');
+                
+                // Select the subject
+                selectSubject(subject.id);
             });
+            
+            subjectList.appendChild(chatItem);
+        });
+    }
+    
+    // Select a subject and connect to WebSocket
+    function selectSubject(subjectId) {
+        if (currentSubject === subjectId) return;
+        
+        currentSubject = subjectId;
+        
+        // Close existing socket if any
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.close();
+        }
+        
+        // Update header with subject info
+        updateChatHeader(subjectId);
+        
+        // Clear messages
+        chatMessages.innerHTML = `
+            <div class="message-wrapper">
+                <div class="message-time">Today</div>
+            </div>
+        `;
+        
+        // Connect to WebSocket
+        connectWebSocket(subjectId);
+        
+        // Dispatch event to notify that a subject has been selected
+        document.dispatchEvent(new CustomEvent('subjectSelected', {
+            detail: { subjectId: subjectId }
+        }));
+    }
+    
+    // Update chat header with subject info
+    function updateChatHeader(subjectId) {
+        const subject = document.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
+        if (!subject) return;
+        
+        const subjectName = subject.querySelector('.chat-item-name').textContent;
+        const firstLetter = subjectName.charAt(0).toUpperCase();
+        
+        chatHeader.innerHTML = `
+            <div class="chat-header-info">
+                <div class="chat-header-avatar">
+                    <div class="avatar-placeholder rounded-circle">${firstLetter}</div>
+                </div>
+                <div class="chat-header-details">
+                    <div class="chat-header-name">${subjectName}</div>
+                    <div class="chat-header-status">
+                        <span class="status-indicator online"></span>
+                        <span>online</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-header-actions">
+                <button type="button" class="btn btn-icon">
+                    <i class="bi bi-telephone"></i>
+                </button>
+                <button type="button" class="btn btn-icon">
+                    <i class="bi bi-camera-video"></i>
+                </button>
+                <button type="button" class="btn btn-icon">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+            </div>
+        `;
+    }
+    
+    // Connect to WebSocket
+    function connectWebSocket(subjectId) {
+        if (!token) {
+            console.error('No WebSocket token available');
+            return;
+        }
+        
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws?token=${token}&group_id=${subjectId}`;
+        
+        socket = new WebSocket(wsUrl);
+        
+        socket.onopen = function() {
+            console.log('WebSocket connection established');
         };
         
-        websocket.onmessage = function(event) {
+        socket.onmessage = function(event) {
             const data = JSON.parse(event.data);
             handleWebSocketMessage(data);
         };
         
-        websocket.onclose = function() {
+        socket.onclose = function() {
             console.log('WebSocket connection closed');
-            // Try to reconnect after 5 seconds
-            setTimeout(initWebSocket, 5000);
         };
         
-        websocket.onerror = function(error) {
+        socket.onerror = function(error) {
             console.error('WebSocket error:', error);
         };
     }
     
-    // Send message through WebSocket
-    function sendWebSocketMessage(message) {
-        if (websocket && websocket.readyState === WebSocket.OPEN) {
-            websocket.send(JSON.stringify(message));
-        } else {
-            console.error('WebSocket is not connected');
-        }
-    }
-    
-    // Handle incoming WebSocket messages
+    // Handle WebSocket messages
     function handleWebSocketMessage(data) {
-        const event = data.event;
-        const messageData = data.data;
-        
-        switch (event) {
-            case 'message':
-                if (messageData.subjectId === currentSubjectId) {
-                    addMessageToChat(messageData);
-                } else {
-                    updateUnreadCount(messageData.subjectId);
-                }
-                break;
-                
-            case 'typing':
-                if (messageData.subjectId === currentSubjectId && !messageData.isFromCurrentUser) {
-                    showTypingIndicator(messageData.userName);
-                }
-                break;
-                
-            case 'userStatus':
-                updateUserStatus(messageData);
-                break;
-                
-            default:
-                console.log('Unknown event:', event);
+        if (data.type === 'history') {
+            renderMessageHistory(data.messages);
+        } else if (data.message) {
+            addMessage(data.message, data.author, false);
+        } else if (data.type === 'typing') {
+            handleTypingIndicator(data.user, data.isTyping);
         }
     }
     
-    // Add a message to the chat
-    function addMessageToChat(message) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
+    // Render message history
+    function renderMessageHistory(messages) {
+        const messageWrapper = document.querySelector('.message-wrapper');
+        if (!messageWrapper) return;
         
-        if (message.isFromCurrentUser) {
-            messageElement.classList.add('message-outgoing');
-        } else {
-            messageElement.classList.add('message-incoming');
-        }
-        
-        const messageContent = `
-            <div class="message-avatar">
-                ${message.userAvatar ? 
-                    `<img src="${message.userAvatar}" alt="${message.userName}" class="rounded-circle">` : 
-                    `<div class="avatar-placeholder rounded-circle bg-secondary text-white">
-                        ${message.userName.charAt(0).toUpperCase()}
-                    </div>`
-                }
-            </div>
-            <div class="message-bubble">
-                <div class="message-sender">${message.userName}</div>
-                <div class="message-text">${message.content}</div>
-                <div class="message-time">${formatTime(message.timestamp)}</div>
-            </div>
-        `;
-        
-        messageElement.innerHTML = messageContent;
-        messageContainer.appendChild(messageElement);
-        
-        // Scroll to bottom
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-        
-        // Mark as read
-        sendWebSocketMessage({
-            action: 'read',
-            messageIds: [message.id]
+        messages.forEach(msg => {
+            const isCurrentUser = msg.author === 'You'; // This needs to be adjusted based on actual data
+            addMessageToDOM(msg.content, msg.author, isCurrentUser, msg.createdAt, messageWrapper);
         });
+        
+        scrollToBottom();
     }
     
-    // Show typing indicator
-    function showTypingIndicator(userName) {
-        const typingUser = typingIndicator.querySelector('.typing-user');
-        typingUser.textContent = userName;
-        typingIndicator.style.display = 'block';
+    // Add a new message
+    function addMessage(content, author, isCurrentUser) {
+        const messageWrapper = document.querySelector('.message-wrapper');
+        if (!messageWrapper) return;
         
-        // Hide typing indicator after 3 seconds
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-            typingIndicator.style.display = 'none';
-        }, 3000);
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        addMessageToDOM(content, author, isCurrentUser, timeString, messageWrapper);
+        scrollToBottom();
+        
+        // Update the preview in the sidebar
+        updateSubjectPreview(currentSubject, content);
     }
     
-    // Update unread count for a subject
-    function updateUnreadCount(subjectId) {
-        const subjectElement = subjectList.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
-        if (!subjectElement) return;
+    // Add message to DOM
+    function addMessageToDOM(content, author, isCurrentUser, time, container) {
+        const messageItem = document.createElement('div');
+        messageItem.className = `message-item ${isCurrentUser ? 'sent' : 'received'}`;
         
-        let badgeElement = subjectElement.querySelector('.chat-item-badge');
+        // Check if it's a message with attachment
+        const hasAttachment = content.includes('project_brief.pdf') || content.includes('file');
+        let attachmentHTML = '';
         
-        if (!badgeElement) {
-            badgeElement = document.createElement('div');
-            badgeElement.classList.add('chat-item-badge');
-            badgeElement.textContent = '1';
-            subjectElement.appendChild(badgeElement);
-        } else {
-            const count = parseInt(badgeElement.textContent) + 1;
-            badgeElement.textContent = count;
-        }
-    }
-    
-    // Update user status
-    function updateUserStatus(statusData) {
-        if (statusData.subjectId !== currentSubjectId) return;
-        
-        const statusElement = chatHeader.querySelector('.chat-header-status');
-        const onlineCount = statusData.users.filter(user => user.status === 'online').length;
-        
-        if (onlineCount > 0) {
-            statusElement.innerHTML = `
-                <i class="bi bi-circle-fill text-success"></i>
-                <span>${onlineCount} online</span>
-            `;
-        } else {
-            statusElement.innerHTML = `
-                <i class="bi bi-circle-fill text-secondary"></i>
-                <span>No one online</span>
-            `;
-        }
-    }
-    
-    // Load messages for a subject
-    function loadMessages(subjectId) {
-        // Clear existing messages
-        messageContainer.innerHTML = '';
-        
-        // Show loading spinner
-        messageContainer.innerHTML = `
-            <div class="text-center p-4">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+        if (hasAttachment) {
+            attachmentHTML = `
+                <div class="message-attachment">
+                    <div class="attachment-icon">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                    </div>
+                    <div class="attachment-info">
+                        <div class="attachment-name">project_brief.pdf</div>
+                        <div class="attachment-size">2.4 MB</div>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
         
-        // Request messages from server
-        sendWebSocketMessage({
-            action: 'getMessages',
-            subjectId: subjectId
-        });
+        if (isCurrentUser) {
+            messageItem.innerHTML = `
+                <div class="message-content">
+                    <div class="message-bubble">
+                        <div class="message-text">${content}</div>
+                        ${attachmentHTML}
+                    </div>
+                    <div class="message-info">
+                        <span class="message-time">${time}</span>
+                    </div>
+                </div>
+            `;
+        } else {
+            const firstLetter = author.charAt(0).toUpperCase();
+            messageItem.innerHTML = `
+                <div class="message-avatar">
+                    <div class="avatar-placeholder rounded-circle">${firstLetter}</div>
+                </div>
+                <div class="message-content">
+                    <div class="message-bubble">
+                        <div class="message-text">${content}</div>
+                        ${attachmentHTML}
+                    </div>
+                    <div class="message-info">
+                        <span class="message-time">${time}</span>
+                    </div>
+                </div>
+            `;
+        }
         
-        // Update UI
-        welcomeScreen.style.display = 'none';
-        messageContainer.style.display = 'block';
-        chatInputContainer.style.display = 'flex';
+        container.appendChild(messageItem);
+    }
+    
+    // Update subject preview in sidebar
+    function updateSubjectPreview(subjectId, lastMessage) {
+        const subject = document.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
+        if (!subject) return;
         
-        // Update current subject
-        currentSubjectId = subjectId;
+        const preview = subject.querySelector('.chat-item-preview');
+        if (preview) {
+            preview.textContent = lastMessage;
+        }
         
-        // Update header
-        const subjectElement = subjectList.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
-        if (subjectElement) {
-            const subjectName = subjectElement.querySelector('.chat-item-name').textContent;
-            const teacherName = subjectElement.querySelector('.chat-item-preview').textContent;
-            
-            chatHeader.querySelector('.chat-header-name').textContent = subjectName;
-            
-            // Remove unread badge
-            const badge = subjectElement.querySelector('.chat-item-badge');
-            if (badge) {
-                badge.remove();
-            }
-            
-            // Mark all messages as read
-            sendWebSocketMessage({
-                action: 'readAll',
-                subjectId: subjectId
-            });
+        // Update time
+        const timeElement = subject.querySelector('.chat-item-time');
+        if (timeElement) {
+            const now = new Date();
+            timeElement.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
     }
     
-    // Format timestamp
-    function formatTime(timestamp) {
-        const date = new Date(timestamp);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    // Handle typing indicator
+    function handleTypingIndicator(user, isTyping) {
+        // Implementation for typing indicator
     }
     
-    // Event Listeners
-    
-    // Subject selection
-    if (subjectList) {
-        const subjects = subjectList.querySelectorAll('.chat-item');
-        subjects.forEach(subject => {
-            subject.addEventListener('click', function() {
-                const subjectId = this.dataset.subjectId;
-                
-                // Update active state
-                subjects.forEach(s => s.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Load messages
-                loadMessages(subjectId);
-            });
-        });
-    }
-    
-    // Search functionality
-    if (subjectSearch) {
-        subjectSearch.addEventListener('input', function() {
-            const query = this.value.toLowerCase();
-            const subjects = subjectList.querySelectorAll('.chat-item');
-            
-            subjects.forEach(item => {
-                const name = item.querySelector('.chat-item-name').textContent.toLowerCase();
-                const teacher = item.querySelector('.chat-item-preview')?.textContent.toLowerCase() || '';
-                const visible = name.includes(query) || teacher.includes(query);
-                
-                item.style.display = visible ? '' : 'none';
-            });
-        });
+    // Send typing status
+    function sendTypingStatus(isTyping) {
+        if (!socket || socket.readyState !== WebSocket.OPEN || !currentSubject) return;
+        
+        if (lastTypingStatus === isTyping) return;
+        lastTypingStatus = isTyping;
+        
+        socket.send(JSON.stringify({
+            action: 'typing',
+            group_id: currentSubject,
+            isTyping: isTyping
+        }));
     }
     
     // Send message
-    if (sendButton && messageInput) {
+    function sendMessage() {
+        if (!socket || socket.readyState !== WebSocket.OPEN || !currentSubject) return;
+        
+        const content = messageInput.value.trim();
+        if (!content) return;
+        
+        // Send message through WebSocket
+        socket.send(JSON.stringify({
+            group_id: currentSubject,
+            message: content
+        }));
+        
+        // Add message to UI
+        addMessage(content, 'You', true);
+        
+        // Clear input
+        messageInput.value = '';
+        
+        // Reset typing status
+        sendTypingStatus(false);
+    }
+    
+    // Scroll chat to bottom
+    function scrollToBottom() {
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+    
+    // Search subjects
+    function searchSubjects(query) {
+        const items = document.querySelectorAll('.chat-item');
+        query = query.toLowerCase();
+        
+        items.forEach(item => {
+            const name = item.querySelector('.chat-item-name').textContent.toLowerCase();
+            if (name.includes(query)) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+    
+    // Event listeners
+    if (sendButton) {
         sendButton.addEventListener('click', sendMessage);
+    }
+    
+    if (messageInput) {
         messageInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -294,40 +389,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        function sendMessage() {
-            const message = messageInput.value.trim();
-            if (!message || !currentSubjectId) return;
-            
-            sendWebSocketMessage({
-                action: 'message',
-                subjectId: currentSubjectId,
-                content: message,
-                timestamp: new Date().toISOString()
-            });
-            
-            messageInput.value = '';
-        }
-    }
-    
-    // Typing indicator
-    if (messageInput) {
         messageInput.addEventListener('input', function() {
-            if (!currentSubjectId) return;
-            
-            // Only send typing status if it changed
-            const isTyping = messageInput.value.length > 0;
-            if (isTyping !== lastTypingStatus) {
-                lastTypingStatus = isTyping;
-                
-                sendWebSocketMessage({
-                    action: 'typing',
-                    subjectId: currentSubjectId,
-                    isTyping: isTyping
-                });
+            // Clear previous timeout
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
             }
+            
+            // Send typing status
+            sendTypingStatus(true);
+            
+            // Set timeout to reset typing status
+            typingTimeout = setTimeout(() => {
+                sendTypingStatus(false);
+            }, 3000);
         });
     }
     
-    // Initialize WebSocket
-    initWebSocket();
+    if (subjectSearch) {
+        subjectSearch.addEventListener('input', function() {
+            searchSubjects(this.value);
+        });
+    }
+    
+    // Initialize
+    getWebSocketToken();
 });

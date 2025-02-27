@@ -7,7 +7,8 @@ This document outlines the data exchange requirements between the frontend and b
 The frontend expects the following data to be provided by the backend:
 
 - `websocket_url`: The WebSocket server URL
-- `token`: Authentication token for the current user's WebSocket connection
+- `token`: Authentication token for the current user's WebSocket connection (obtained from `/websocket/token` endpoint)
+- `group_id`: The subject chat ID to connect to
 
 ## Data Structures
 
@@ -20,9 +21,14 @@ The backend should provide an array of subject objects with the following struct
   {
     "id": 123,
     "name": "Mathematics",
-    "icon": "/path/to/icon.png",
-    "teacherName": "Prof. Smith",
-    "unreadCount": 5
+    "matiere": {
+      "id": 456,
+      "name": "Math"
+    },
+    "type": "teacher",
+    "cycle": 2,
+    "unreadCount": 5,
+    "lastMessage": "Last message preview"
   }
 ]
 ```
@@ -34,146 +40,124 @@ Messages should have the following structure:
 ```json
 {
   "id": 456,
-  "subjectId": 123,
-  "userId": 789,
-  "userName": "John Doe",
-  "userAvatar": "/path/to/avatar.jpg",
   "content": "Hello, this is a message",
-  "timestamp": "2025-02-27T12:30:45+01:00",
+  "sender": {
+    "id": 789,
+    "pseudo": "John Doe",
+    "avatar": "/path/to/avatar.jpg"
+  },
+  "subjectChat": {
+    "id": 123
+  },
+  "isFromAI": false,
   "isRead": false,
-  "isFromCurrentUser": true
+  "createdAt": "2025-02-27T12:30:45+01:00"
 }
 ```
 
 ## WebSocket Communication
 
+### Connection Parameters
+
+When connecting to WebSocket, the following query parameters are required:
+- `token`: JWT token obtained from the `/websocket/token` endpoint
+- `group_id`: The ID of the subject chat to connect to
+
 ### Messages Sent by Frontend
 
-1. **Authentication**
+1. **New Message**
 ```json
 {
-  "action": "authenticate",
-  "token": "user_auth_token"
+  "group_id": 123,
+  "message": "This is my message"
+}
+```
+
+2. **Typing Indicator**
+```json
+{
+  "action": "typing",
+  "group_id": 123,
+  "isTyping": true
+}
+```
+
+### Messages Received by Frontend
+
+1. **Message History on Connection**
+```json
+{
+  "type": "history",
+  "messages": [
+    {
+      "id": 456,
+      "content": "Hello, this is a message",
+      "author": "John Doe",
+      "createdAt": "2025-02-27 12:30:45"
+    },
+    // More messages...
+  ]
 }
 ```
 
 2. **New Message**
 ```json
 {
-  "action": "message",
-  "subjectId": 123,
-  "content": "This is my message",
-  "timestamp": "2025-02-27T12:35:22+01:00"
+  "message": "New message from someone else",
+  "author": "Jane Smith"
 }
 ```
 
 3. **Typing Indicator**
 ```json
 {
-  "action": "typing",
-  "subjectId": 123,
+  "type": "typing",
+  "user": "Jane Smith",
   "isTyping": true
 }
 ```
 
-4. **Read Receipt**
-```json
-{
-  "action": "read",
-  "messageIds": [456, 457, 458]
-}
-```
+## REST API Endpoints
 
-5. **Read All Messages in Subject**
-```json
-{
-  "action": "readAll",
-  "subjectId": 123
-}
-```
+1. **Get WebSocket Token**
+   - URL: `/websocket/token`
+   - Method: `GET`
+   - Response:
+     ```json
+     {
+       "token": "jwt_token_here"
+     }
+     ```
 
-6. **Get Messages for Subject**
-```json
-{
-  "action": "getMessages",
-  "subjectId": 123
-}
-```
-
-### Messages Received by Frontend
-
-1. **New Message**
-```json
-{
-  "event": "message",
-  "data": {
-    "id": 459,
-    "subjectId": 123,
-    "userId": 790,
-    "userName": "Jane Smith",
-    "userAvatar": "/path/to/avatar.jpg",
-    "content": "New message from someone else",
-    "timestamp": "2025-02-27T12:36:10+01:00",
-    "isRead": false,
-    "isFromCurrentUser": false
-  }
-}
-```
-
-2. **User Typing**
-```json
-{
-  "event": "typing",
-  "data": {
-    "subjectId": 123,
-    "userId": 790,
-    "userName": "Jane Smith",
-    "isTyping": true
-  }
-}
-```
-
-3. **User Status Update**
-```json
-{
-  "event": "userStatus",
-  "data": {
-    "subjectId": 123,
-    "users": [
-      {"id": 789, "status": "online"},
-      {"id": 790, "status": "offline"}
-    ]
-  }
-}
-```
-
-4. **Messages List Response**
-```json
-{
-  "event": "messagesList",
-  "data": {
-    "subjectId": 123,
-    "messages": [
-      {
-        "id": 456,
-        "userId": 789,
-        "userName": "John Doe",
-        "userAvatar": "/path/to/avatar.jpg",
-        "content": "Hello, this is a message",
-        "timestamp": "2025-02-27T12:30:45+01:00",
-        "isRead": true,
-        "isFromCurrentUser": true
-      },
-      // More messages...
-    ]
-  }
-}
-```
+2. **Get Subject Chats**
+   - URL: `/api/subject-chats`
+   - Method: `GET`
+   - Response:
+     ```json
+     [
+       {
+         "id": 123,
+         "name": "Mathematics",
+         "matiere": {
+           "id": 456,
+           "name": "Math"
+         },
+         "type": "teacher",
+         "cycle": 2,
+         "unreadCount": 5
+       },
+       // More subjects...
+     ]
+     ```
 
 ## Implementation Notes
 
 1. The frontend expects the backend to maintain WebSocket connections and handle authentication.
-2. Messages should be stored persistently and retrieved when a user selects a subject.
-3. Read status should be tracked per user and per message.
-4. Typing indicators should be ephemeral and not stored in the database.
-5. User online status should be tracked and broadcast to all users in the same subject chat.
+2. Messages should be stored in the `message_chat` table with references to `subject_chat` and `user`.
+3. WebSocket connections are tracked in the `web_socket_connection` table.
+4. The backend should handle:
+   - User authentication via JWT tokens
+   - Message persistence
+   - Message history retrieval
+   - Typing indicators (ephemeral, not stored permanently)
+   - Broadcasting messages to all connected users in the same subject chat
