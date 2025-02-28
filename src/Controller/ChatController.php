@@ -41,7 +41,7 @@ class ChatController extends AbstractController
         if (!$user) {
             return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
         }
-        return $this->render('front/chat/index.html.twig');
+        return $this->render('student/chat/index.html.twig');
     }
 
 
