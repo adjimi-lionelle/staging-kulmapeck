@@ -1,0 +1,77 @@
+{% extends 'student/chat/base_chat.html.twig' %}
+
+{% block subTitle %}{% trans %}CHAT_TITLE_KEY{% endtrans %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('chat_styles') }}
+    <link rel="stylesheet" href="{{ asset('css/subject_chat.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block studentContent %}
+    {% if needsSetup %}
+        {{ include('student/chat/_setup_modal.html.twig') }}
+    {% endif %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="chat-app">
+                <div class="chat-sidebar">
+                    <div class="sidebar-header">
+                        <h5>Messages</h5>
+                        <button type="button" class="btn btn-icon">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar-search">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="subject-search" class="form-control" placeholder="Search subjects...">
+                        </div>
+                    </div>
+                    <div class="sidebar-content">
+                        <div id="subject-list" class="chat-list">
+                            <!-- Subject list will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-content">
+                    <div id="chat-header" class="chat-header">
+                        <!-- Chat header will be populated by JavaScript -->
+                    </div>
+                    <div id="chat-messages" class="chat-body">
+                        <!-- Messages will be populated by JavaScript -->
+                        <div class="message-wrapper">
+                            <div class="message-time">Today</div>
+                        </div>
+                    </div>
+                    <div class="chat-footer">
+                        <div class="chat-input-container">
+                            <button type="button" class="btn btn-icon">
+                                <i class="bi bi-emoji-smile"></i>
+                            </button>
+                            <button type="button" class="btn btn-icon">
+                                <i class="bi bi-paperclip"></i>
+                            </button>
+                            <div class="input-wrapper">
+                                <textarea id="message-input" class="form-control" placeholder="Type a message..."></textarea>
+                            </div>
+                            <button id="send-message" type="button" class="btn btn-primary">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('chat') }}
+    <script src="{{ asset('js/subject_chat.js') }}"></script>
+{% endblock %}

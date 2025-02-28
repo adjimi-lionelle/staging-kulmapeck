@@ -1,0 +1,18 @@
+{% extends 'student/base.html.twig' %}
+
+{% block title %}{% trans %}CHAT_TITLE_KEY{% endtrans %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/subject_chat.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+{% endblock %}
+
+{% block studentContent %}
+    {% block body %}{% endblock %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/subject_chat.js') }}"></script>
+{% endblock %}
