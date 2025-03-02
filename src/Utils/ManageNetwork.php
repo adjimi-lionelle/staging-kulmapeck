@@ -46,7 +46,7 @@ class ManageNetwork
         $abonnement->getNbrePoint() : $networkConfig->getNombreDePointsParInvitaton();
         $pourcentage = 100;
         // dd($personne);
-        while ($personne->getParent() !== null && $cmp <= 2) {
+        while ($personne->getParent() !== null && $cmp <= 5) {
             $parent = $personne->getParent();
             // dump("Parent");dd($parent);
             if ($parent->getUtilisateur()->getEleve() && $cmp > 1) {
