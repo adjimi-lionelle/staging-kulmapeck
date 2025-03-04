@@ -16,8 +16,9 @@ class ChatServer implements MessageComponentInterface
 {
 
     private $entityManager;
-    private $clients;
+   // private $clients;
     private $jwtSecret;
+    private \SplObjectStorage $clients;
 
     public function __construct(EntityManagerInterface $entityManager, string $jwtSecret)
     {
@@ -29,119 +30,88 @@ class ChatServer implements MessageComponentInterface
 
     public function onOpen(ConnectionInterface $conn)
 {
-    $query = $conn->httpRequest->getUri()->getQuery();
-    parse_str($query, $queryParams);
+     $queryParams = [];
+     parse_str(parse_url($conn->httpRequest->getUri(), PHP_URL_QUERY), $queryParams);
 
-    if (!isset($queryParams['token']) || !isset($queryParams['group_id'])) {
-        echo "Aucun token ou group_id fourni !\n";
-        $conn->close();
-        return;
-    }
+     if (!isset($queryParams['token']) || !isset($queryParams['subjectChat_id'])) {
+         echo "Connexion refusée : paramètre manquant.\n";
+         $conn->close();
+         return;
+     }$token = $queryParams['token'];
+     $subjectChatId = $queryParams['subjectChat_id'];
 
-    try {
-        // Décodage du token JWT
-        $decoded = JWT::decode($queryParams['token'], new Key($this->jwtSecret, 'HS256'));
-        echo "Token décodé avec succès : " . print_r($decoded, true) . "\n";
+     try {
+        
+         $decoded = JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
+         $userId = $decoded->user_id;
 
-        // Vérifier si l'utilisateur existe
-        $user = $this->entityManager->getRepository(User::class)->find($decoded->user_id);
-        if (!$user) {
-            echo "Utilisateur introuvable !\n";
-            $conn->close();
-            return;
-        }
+         $user = $this->entityManager->getRepository(User::class)->find($userId);
+         if (!$user) {
+             echo "Utilisateur introuvable.\n";
+             $conn->close();
+             return;
+         }
 
-        // Vérifier si le groupe existe
-        $SubjectChat = $this->entityManager->getRepository(SubjectChat::class)->find($queryParams['group_id']);
-        if (!$SubjectChat) {
-            echo "Groupe introuvable !\n";
-            $conn->close();
-            return;
-        }
+         $subjectChat = $this->entityManager->getRepository(SubjectChat::class)->find($subjectChatId);
+         if (!$subjectChat) {
+             echo "Discussion introuvable.\n";
+             $conn->close();
+             return;
+         }
 
-        echo "Nouvelle connexion WebSocket : Utilisateur " . $user->getId() . " connecté au groupe " . $SubjectChat->getId() . "\n";
+        $existingConnection = $this->entityManager->getRepository(WebSocketConnection::class)
+        ->findOneBy(['user' => $user, 'subjectChat' => $subjectChat]);
 
-        // **Récupérer l'historique des messages**
-        $messages = $this->entityManager->getRepository(MessageChat::class)
-            ->findBy(['SubjectChat' => $SubjectChat], ['createAt' => 'ASC']);
+    if (!$existingConnection) {
+        $webSocketConnection = new WebSocketConnection();
+        $webSocketConnection->setUser($user);
+        $webSocketConnection->setSubjectChat($subjectChat);
+        $webSocketConnection->setLastActivity(new \DateTime());
 
-        $history = [];
-        foreach ($messages as $msg) {
-            $history[] = [
-                'id' => $msg->getId(),
-                'content' => $msg->getContent(),
-                'author' => $msg->getSender()->getPersonne()->getPseudo(),
-                'createdAt' => $msg->getCreateAt()->format('Y-m-d H:i:s')
-            ];
-        }
-
-        // **Envoyer l'historique des messages au nouvel utilisateur**
-        $conn->send(json_encode([
-            'type' => 'history',
-            'messages' => $history
-        ]));
-
-        // **Attacher l'utilisateur et le groupe au WebSocket**
-        $this->clients->attach($conn, ['user' => $user, 'SubjectChat' => $SubjectChat]);
-
-        // ** Enregistrement en base de données de la connexion**
-        $wsConnection = new WebSocketConnection();
-        $wsConnection->setUser($user);
-        $wsConnection->setSubjectChat($SubjectChat);
-        $wsConnection->setIsTyping(false);
-        $wsConnection->setLastActivity(new \DateTime());
-        $this->entityManager->persist($wsConnection);
+        $this->entityManager->persist($webSocketConnection);
         $this->entityManager->flush();
-
-    } catch (\Exception $e) {
-        echo "Erreur de décodage du token : " . $e->getMessage() . "\n";
-        $conn->close();
+    } else {
+        $existingConnection->setLastActivity(new \DateTime());
+        $this->entityManager->flush();
     }
-}
 
+         $this->clients->attach($conn, ['user' => $user, 'subjectChat' => $subjectChat]);
+         echo "Nouvelle connexion : Utilisateur #{$userId} dans la discussion #{$subjectChatId}.\n";
+
+         // Envoyer un message de bienvenue
+         $conn->send(json_encode([
+             'type' => 'success',
+             'message' => "Connexion réussie à la discussion #{$subjectChatId}."
+         ]));
+
+     } catch (\Exception $e) {
+         echo "Erreur lors de la connexion WebSocket : " . $e->getMessage() . "\n";
+         $conn->close();
+     }
+ }
+
+    /**
+     * Quand un message est reçu
+    */
     public function onMessage(ConnectionInterface $from, $msg)
-{
-
-    echo "Message reçu : " . $msg . "\n";
-    try {
+    {
+        echo "Message reçu : " . $msg . "\n";
         $data = json_decode($msg, true);
 
-        if (!isset($data['group_id']) || !isset($data['message'])) {
-            throw new \Exception("Données de message invalides");
+        if (!isset($data['message'])) {
+            echo "Message invalide.\n";
+            return;
         }
 
-        $SubjectChat = $this->entityManager->getRepository(SubjectChat::class)->find($data['group_id']);
-
-        if (!$SubjectChat) {
-            throw new \Exception("Groupe introuvable");
-        }
-
-        if (!isset($this->clients[$from]['user'])) {
-            throw new \Exception("Utilisateur non trouvé dans la session WebSocket");
-        }
-
-        $message = new MessageChat();
-        $message->setSender($this->clients[$from]['user']);
-        $message->setSubjectChat($SubjectChat);
-        $message->setContent($data['message']);
-        $this->entityManager->persist($message);
-        $this->entityManager->flush();
-
-        // Diffuser le message aux autres clients du même groupe
         foreach ($this->clients as $client) {
-            if ($this->clients[$client]['SubjectChat'] === $SubjectChat) {
+            if ($client !== $from) {
                 $client->send(json_encode([
                     'message' => $data['message'],
-                    'author' => $this->clients[$from]['user']->getPersonne()->getPseudo(),
+                    'author' => "User"
                 ]));
-            }    
+            }
         }
-
-    } catch (\Exception $e) {
-        echo "Erreur WebSocket : " . $e->getMessage() . "\n";
-        $from->close(); // Fermer la connexion en cas d'erreur
     }
-}
 
 
     public function onClose(ConnectionInterface $conn)

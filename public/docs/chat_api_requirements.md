@@ -61,7 +61,7 @@ Messages should have the following structure:
 
 When connecting to WebSocket, the following query parameters are required:
 - `token`: JWT token obtained from the `/websocket/token` endpoint
-- `group_id`: The ID of the subject chat to connect to
+- `subjectChat_id`: The ID of the subject chat to connect to
 
 ### Messages Sent by Frontend
 

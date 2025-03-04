@@ -159,9 +159,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: WebSocketConnection::class, orphanRemoval: true)]
     private Collection $webSocketConnections;
 
-   /* #[ORM\Column(name: 't0_chat_token', length: 255, nullable: true)]
-    private ?string $chatToken = null;*/
-
     public function __construct()
     {
         $this->roles = [];
@@ -180,7 +177,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->contacts = new ArrayCollection();
         $this->messageChats = new ArrayCollection();
         $this->webSocketConnections = new ArrayCollection();
-        //$this->generateChatToken();
+       
     }
 
     public function getId(): ?int
@@ -702,22 +699,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-   /* public function generateChatToken(): void
-    {
-        $this->chatToken = bin2hex(random_bytes(32));
-    }
 
-    public function getChatToken(): ?string
-    {
-        if (!$this->chatToken) {
-            $this->generateChatToken();
-        }
-        return $this->chatToken;
-    }
-
-    public function setChatToken(?string $chatToken): self
-    {
-        $this->chatToken = $chatToken;
-        return $this;
-    }*/
 }
