@@ -32,7 +32,7 @@ security:
            # jwt: ~
      
            
-       # websocket:  # ✅ Ajout d'un firewall spécifique uniquement pour WebSocket
+       # websocket:  # Ajout d'un firewall spécifique uniquement pour WebSocket
          #   pattern: ^/websocket/
             #stateless: true
          #   provider: chain_provider
@@ -71,7 +71,7 @@ security:
         - { path: ^/firebase/, roles: IS_AUTHENTICATED_FULLY}
         - { path: ^/chat, roles: IS_AUTHENTICATED_FULLY }
         #- { path: ^/api/login_check, roles: PUBLIC_ACCESS }
-        - { path: ^/websocket/token, roles: IS_AUTHENTICATED_FULLY }
+        #- { path: ^/websocket/token, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/chat/groupchat/init, roles: PUBLIC_ACCESS }
 
 when@test:
