@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-
 use App\Entity\MessageChat;
 use App\Entity\MatiereCycle;    
 use App\Entity\SubjectChat;
@@ -21,9 +20,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Security;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Psr\Log\LoggerInterface;
 
 class ChatController extends AbstractController
 {
@@ -217,40 +217,61 @@ class ChatController extends AbstractController
      */
     #[Route('/subjectChats', name: 'api_chat_subjectChats', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function getMyGroups(SubjectChatRepository $groupChatRepository,
-                                PersonneRepository $personneRepository): JsonResponse
+    public function getMyGroups(SubjectChatRepository $groupChatRepository, EleveRepository $eleveRepository, LoggerInterface $logger): JsonResponse
     {
         $user = $this->getUser();
-        //echo $user->getId();
+        $logger->info('API: /subjectChats request received', ['user_id' => $user ? $user->getId() : null]);
 
         if (!$user) {
+            $logger->error('API: User not authenticated');
             return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
         }
 
-        $personne = $personneRepository->findOneBy(['utilisateur' => $user]);
-
-        if (!$personne) {
-            return new JsonResponse(['error' => 'Aucune entité Personne trouvée pour cet utilisateur'], 403);
+        // For teachers, return their subjects
+        if (in_array('ROLE_INSTRUCTOR', $user->getRoles())) {
+            $logger->info('API: User is an instructor, fetching all subjects');
+            $subjectChats = $groupChatRepository->findAll();
+            
+            $data = array_map(function ($subjectChat) use ($user) {
+                return [
+                    'id' => $subjectChat->getId(),
+                    'name' => $subjectChat->getName(),
+                    'type' => $subjectChat->getType(),
+                    'unreadCount' => $this->getUnreadCount($subjectChat, $user)
+                ];
+            }, $subjectChats);
+            
+            $logger->info('API: Returning subjects for instructor', ['count' => count($data)]);
+            return new JsonResponse($data);
         }
 
-        $eleve = $personne->getUtilisateur()->getEleve();
-        if (!$eleve) {
-            return new JsonResponse(['error' => 'L\'utilisateur n\'est pas un élève'], 403);
+        // For students
+        $logger->info('API: User is a student, fetching student data');
+        $student = $eleveRepository->findOneBy(['utilisateur' => $user]);
+        
+        if (!$student) {
+            $logger->error('API: Student account not found', ['user_id' => $user->getId()]);
+            return new JsonResponse(['error' => 'Student account not found'], 403);
         }
-
+        
         // Check premium access
-        $redirect = $this->checkPremiumAccess($eleve);
+        $logger->info('API: Checking premium access for student', ['student_id' => $student->getId()]);
+        $redirect = $this->checkPremiumAccess($student);
         if ($redirect instanceof RedirectResponse) {
-            // For API endpoints, we should never get here due to isApiRequest check
-            // but just in case, return a proper JSON response
-            return new JsonResponse(['error' => 'Accès refusé : vous devez être premium pour accéder au chat', 'redirect' => 'app_student_subscriptions'], 403);
+            $logger->warning('API: Premium access denied for student', ['student_id' => $student->getId()]);
+            return new JsonResponse([
+                'error' => 'Accès refusé : vous devez être premium pour accéder au chat', 
+                'redirect' => 'app_student_subscriptions'
+            ], 403);
         }
-
-        $classe = $eleve->getClasse();
-        if (!$classe || !$classe->getSkillLevel()) {
-            return new JsonResponse(['error' => 'Aucune classe ou niveau de compétence trouvé'], 400);
+        
+        // Check if student has a class
+        $classe = $student->getClasse();
+        if (!$classe) {
+            $logger->error('API: Student has no class', ['student_id' => $student->getId()]);
+            return new JsonResponse(['error' => 'Aucune classe trouvée'], 400);
         }
-
+        
         $skill_level = $classe->getSkillLevel()->getId();
         
         if ($skill_level >= 5 && $skill_level <= 7) {
@@ -287,20 +308,26 @@ class ChatController extends AbstractController
 
     
         $data = array_map(function ($subjectChat) use ($user) {
-            return [
-                'id' => $subjectChat->getId(),
-                'name' => $subjectChat->getName(),
-                'type' => $subjectChat->getType(),
+                return [
+                    'id' => $subjectChat->getId(),
+                    'name' => $subjectChat->getName(),
+                    'type' => $subjectChat->getType(),
                 'cycle' => $subjectChat->getCycle(),
-                'unreadCount' => $this->getUnreadCount($subjectChat, $user)
-            ];
-        }, $subjectChats);
-
-    
-
-        return new JsonResponse($data);
+                    'unreadCount' => $this->getUnreadCount($subjectChat, $user)
+                ];
+            }, $subjectChats);
+            
+            $logger->info('API: Returning subjects for student', ['count' => count($data)]);
+            return new JsonResponse($data);
+        } catch (\Exception $e) {
+            $logger->error('API: Error fetching subjects', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return new JsonResponse(['error' => 'Error fetching subjects: ' . $e->getMessage()], 500);
+        }
     }
-
+    
     /**
      * Send a message to a subject chat
      */

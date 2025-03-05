@@ -66,37 +66,29 @@
             </div>
             <div class="sidebar-content">
                 <div id="subject-list" class="chat-list">
-                    {% if subjects is defined %}
-                        {% if subjects is empty %}
-                            <div class="empty-state text-center p-4">
-                                <i class="bi bi-journal-x" style="font-size: 48px; color: #6c757d;"></i>
-                                <p class="mt-3 text-muted">{% trans %}NO_SUBJECTS_YET_KEY{% endtrans %}</p>
-                            </div>
-                        {% else %}
-                            {% for subject in subjects %}
-                                <div class="chat-item{% if loop.first %} active{% endif %}" data-subject-id="{{ subject.id }}">
-                                    <div class="chat-item-avatar">
-                                        {% if subject.icon is defined and subject.icon %}
-                                            <img src="{{ asset(subject.icon) }}" alt="{{ subject.name }}" class="rounded-circle">
-                                        {% else %}
-                                            <div class="avatar-placeholder rounded-circle">
-                                                {{ subject.name|first|upper }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="chat-item-info">
-                                        <div class="chat-item-name">{{ subject.name }}</div>
-                                        <div class="chat-item-preview">{{ subject.lastMessage|default('Start chatting...') }}</div>
-                                    </div>
-                                    <div class="chat-item-meta">
-                                        <div class="chat-item-time">12:30 PM</div>
-                                        {% if subject.unreadCount > 0 %}
-                                            <div class="chat-item-badge">{{ subject.unreadCount }}</div>
-                                        {% endif %}
-                                    </div>
+                    {% if subjects is defined and subjects is not empty %}
+                        {% for subject in subjects %}
+                            <div class="chat-item{% if loop.first %} active{% endif %}" data-subject-id="{{ subject.id }}">
+                                <div class="chat-item-avatar">
+                                    {% if subject.icon is defined and subject.icon %}
+                                        <img src="{{ asset(subject.icon) }}" alt="{{ subject.name }}" class="rounded-circle">
+                                    {% else %}
+                                        <div class="avatar-placeholder rounded-circle">
+                                            {{ subject.name|first|upper }}
+                                        </div>
+                                    {% endif %}
                                 </div>
-                            {% endfor %}
-                        {% endif %}
+                                <div class="chat-item-info">
+                                    <div class="chat-item-name">{{ subject.name }}</div>
+                                    <div class="chat-item-preview">{{ subject.lastMessage|default('Start chatting...') }}</div>
+                                </div>
+                                <div class="chat-item-meta">
+                                    {% if subject.unreadCount > 0 %}
+                                        <div class="chat-item-badge">{{ subject.unreadCount }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
                     {% else %}
                         <div class="loading-state text-center p-4">
                             <div class="spinner-border text-primary" role="status">

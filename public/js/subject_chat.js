@@ -22,29 +22,63 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize the chat system
     function initialize() {
-        console.log('Initializing chat system...');
+        console.log('DEBUG: Initializing chat system...');
+        
+        // Check if required elements exist
+        if (!subjectList) {
+            console.error('DEBUG: Subject list element not found');
+        }
+        
+        if (!chatMessages) {
+            console.error('DEBUG: Chat messages element not found');
+        }
+        
+        if (!messageInput) {
+            console.error('DEBUG: Message input element not found');
+        }
+        
+        if (!sendButton) {
+            console.error('DEBUG: Send button element not found');
+        }
         
         // If subjects are not pre-loaded in the template, fetch them
         if (subjectList) {
-            if (subjectList.querySelector('.loading-state')) {
-                console.log('Loading subjects from API...');
+            console.log('DEBUG: Checking subject list content');
+            
+            if (subjectList.querySelector('.loading-state') || subjectList.children.length === 0) {
+                console.log('DEBUG: Subject list is empty or has loading state, fetching subjects from API');
                 loadSubjects();
             } else {
-                console.log('Subjects already in DOM, attaching event listeners...');
+                console.log('DEBUG: Subjects already in DOM, attaching event listeners');
                 // Subjects are already in the DOM, attach event listeners
                 attachSubjectEventListeners();
             }
-        } else {
-            console.error('Subject list element not found');
         }
         
         // Initialize message input and send button
         if (messageInput && sendButton) {
+            console.log('DEBUG: Setting up message input and send button event listeners');
+            
             messageInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
                 }
+            });
+            
+            messageInput.addEventListener('input', function() {
+                // Clear previous timeout
+                if (typingTimeout) {
+                    clearTimeout(typingTimeout);
+                }
+                
+                // Send typing status
+                sendTypingStatus(true);
+                
+                // Set timeout to reset typing status
+                typingTimeout = setTimeout(() => {
+                    sendTypingStatus(false);
+                }, 3000);
             });
             
             sendButton.addEventListener('click', sendMessage);
@@ -80,19 +114,39 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Get WebSocket token for a specific subject
     function getWebSocketToken(subjectId) {
-        if (!subjectId) return;
+        console.log(`DEBUG: getWebSocketToken() called for subject ${subjectId}`);
         
+        if (!subjectId) {
+            console.error('DEBUG: No subject ID provided');
+            return;
+        }
+        
+        console.log(`DEBUG: Fetching WebSocket token from /websocket/token/${subjectId}`);
         fetch(`/websocket/token/${subjectId}`)
             .then(response => {
+                console.log('DEBUG: WebSocket token response received', {
+                    status: response.status,
+                    statusText: response.statusText
+                });
+                
                 if (!response.ok) {
                     // Check if we need to redirect (for premium access)
                     if (response.status === 403) {
-                        return response.json().then(data => {
-                            if (data.redirect) {
-                                window.location.href = `/${data.redirect}`;
-                                return null;
+                        return response.text().then(text => {
+                            console.log('DEBUG: 403 response text:', text);
+                            try {
+                                const data = JSON.parse(text);
+                                console.log('DEBUG: 403 response data:', data);
+                                if (data.redirect) {
+                                    console.log(`DEBUG: Redirecting to /${data.redirect}`);
+                                    window.location.href = `/${data.redirect}`;
+                                    return null;
+                                }
+                                throw new Error(data.error || 'Access denied');
+                            } catch (e) {
+                                console.error('DEBUG: Error parsing 403 response:', e);
+                                throw new Error('Access denied');
                             }
-                            throw new Error(data.error || 'Access denied');
                         });
                     }
                     throw new Error('Network response was not ok');
@@ -101,52 +155,92 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 if (data) {
+                    console.log('DEBUG: WebSocket token received', { token: data.token ? '***' : 'null' });
                     token = data.token;
                     connectWebSocket(subjectId);
+                } else {
+                    console.warn('DEBUG: No WebSocket token data received');
                 }
             })
             .catch(error => {
-                console.error('Error fetching WebSocket token:', error);
+                console.error('DEBUG: Error fetching WebSocket token:', error);
                 showError('Could not connect to chat. Please try again later.');
             });
     }
     
-    // Load subjects
+    // Load subjects from API
     function loadSubjects() {
-        console.log('Loading subjects...');
+        console.log('DEBUG: loadSubjects() called');
+        
+        if (!subjectList) {
+            console.error('DEBUG: Subject list element not found in DOM');
+            return;
+        }
+        
+        // Show loading state
+        subjectList.innerHTML = `
+            <div class="loading-state text-center p-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading subjects...</span>
+                </div>
+                <p class="mt-3 text-muted">Loading subjects...</p>
+            </div>
+        `;
+        
+        console.log('DEBUG: Fetching subjects from API endpoint: /subjectChats');
         fetch('/subjectChats')
             .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response headers:', [...response.headers.entries()]);
+                console.log('DEBUG: API response received', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries([...response.headers.entries()])
+                });
                 
                 if (!response.ok) {
-                    // Check if we need to redirect (for premium access)
-                    if (response.status === 403) {
-                        return response.json().then(data => {
-                            console.log('403 response data:', data);
-                            if (data.redirect) {
-                                window.location.href = `/${data.redirect}`;
-                                return null;
-                            }
-                            throw new Error(data.error || 'Access denied');
-                        });
-                    }
-                    throw new Error('Network response was not ok');
+                    return response.text().then(text => {
+                        console.error('DEBUG: API error response', { text });
+                        try {
+                            return JSON.parse(text); // Try to parse as JSON
+                        } catch (e) {
+                            throw new Error(`Server error: ${response.status} ${text}`);
+                        }
+                    });
                 }
                 return response.json();
             })
-            .then(subjects => {
-                console.log('Subjects received:', subjects);
-                if (subjects) {
-                    renderSubjects(subjects);
-                    if (subjects.length > 0) {
-                        selectSubject(subjects[0].id);
+            .then(data => {
+                console.log('DEBUG: Subjects data received', data);
+                
+                if (data.error) {
+                    console.error('DEBUG: API returned error', data.error);
+                    if (data.redirect) {
+                        console.log('DEBUG: Redirecting to', data.redirect);
+                        window.location.href = `/${data.redirect}`;
+                        return;
                     }
+                    throw new Error(data.error);
                 }
+                
+                if (!Array.isArray(data)) {
+                    console.error('DEBUG: API did not return an array', data);
+                    throw new Error('Invalid data format received from server');
+                }
+                
+                console.log(`DEBUG: Rendering ${data.length} subjects`);
+                renderSubjects(data);
             })
             .catch(error => {
-                console.error('Error loading subjects:', error);
-                showError('Could not load subjects. Please try again later.');
+                console.error('DEBUG: Error loading subjects:', error);
+                subjectList.innerHTML = `
+                    <div class="error-state text-center p-4">
+                        <i class="bi bi-exclamation-triangle" style="font-size: 48px; color: #dc3545;"></i>
+                        <p class="mt-3 text-muted">Failed to load subjects</p>
+                        <p class="text-danger">${error.message}</p>
+                        <button class="btn btn-outline-primary mt-3" onclick="loadSubjects()">
+                            <i class="bi bi-arrow-clockwise"></i> Try Again
+                        </button>
+                    </div>
+                `;
             });
     }
     
@@ -164,9 +258,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Render subjects in sidebar
     function renderSubjects(subjects) {
-        if (!subjectList) return;
+        console.log('DEBUG: renderSubjects() called with', subjects);
+        
+        if (!subjectList) {
+            console.error('DEBUG: Subject list element not found in DOM');
+            return;
+        }
+        
+        if (!Array.isArray(subjects)) {
+            console.error('DEBUG: subjects is not an array', subjects);
+            subjects = [];
+        }
         
         if (subjects.length === 0) {
+            console.log('DEBUG: No subjects to render');
             subjectList.innerHTML = `
                 <div class="empty-state text-center p-4">
                     <i class="bi bi-journal-x" style="font-size: 48px; color: #6c757d;"></i>
@@ -176,8 +281,17 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        console.log(`DEBUG: Rendering ${subjects.length} subjects`);
         subjectList.innerHTML = '';
+        
         subjects.forEach((subject, index) => {
+            console.log(`DEBUG: Rendering subject #${index}`, subject);
+            
+            if (!subject || !subject.id || !subject.name) {
+                console.error('DEBUG: Invalid subject data', subject);
+                return;
+            }
+            
             const chatItem = document.createElement('div');
             chatItem.className = `chat-item${index === 0 ? ' active' : ''}`;
             chatItem.dataset.subjectId = subject.id;
@@ -201,6 +315,8 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             
             chatItem.addEventListener('click', () => {
+                console.log(`DEBUG: Subject clicked: ${subject.id} - ${subject.name}`);
+                
                 // Remove active class from all items
                 document.querySelectorAll('.chat-item').forEach(item => {
                     item.classList.remove('active');
@@ -215,23 +331,43 @@ document.addEventListener('DOMContentLoaded', function() {
             
             subjectList.appendChild(chatItem);
         });
+        
+        // Select the first subject by default
+        if (subjects.length > 0) {
+            console.log(`DEBUG: Auto-selecting first subject: ${subjects[0].id}`);
+            selectSubject(subjects[0].id);
+        }
     }
     
     // Select a subject and connect to WebSocket
     function selectSubject(subjectId) {
-        if (currentSubject === subjectId) return;
+        console.log(`DEBUG: selectSubject() called with id: ${subjectId}`);
         
+        if (!subjectId) {
+            console.error('DEBUG: No subject ID provided');
+            return;
+        }
+        
+        if (currentSubject === subjectId) {
+            console.log(`DEBUG: Subject ${subjectId} already selected, skipping`);
+            return;
+        }
+        
+        console.log(`DEBUG: Changing selected subject from ${currentSubject || 'none'} to ${subjectId}`);
         currentSubject = subjectId;
         
         // Close existing socket if any
         if (socket && socket.readyState === WebSocket.OPEN) {
+            console.log('DEBUG: Closing existing WebSocket connection');
             socket.close();
         }
         
         // Update header with subject info
+        console.log('DEBUG: Updating chat header');
         updateChatHeader(subjectId);
         
         // Clear messages
+        console.log('DEBUG: Clearing message container');
         chatMessages.innerHTML = `
             <div class="message-wrapper">
                 <div class="message-time">Today</div>
@@ -239,12 +375,15 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         // Load messages via REST API first
+        console.log(`DEBUG: Loading messages for subject ${subjectId}`);
         loadMessages(subjectId);
         
         // Get WebSocket token and connect
+        console.log(`DEBUG: Getting WebSocket token for subject ${subjectId}`);
         getWebSocketToken(subjectId);
         
         // Dispatch event to notify that a subject has been selected
+        console.log('DEBUG: Dispatching subjectSelected event');
         document.dispatchEvent(new CustomEvent('subjectSelected', {
             detail: { subjectId: subjectId }
         }));
@@ -688,6 +827,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Initialize
-    initialize();
+    // Call initialize when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DEBUG: DOMContentLoaded event fired, initializing chat');
+        initialize();
+    });
 });
