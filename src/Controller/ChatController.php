@@ -344,7 +344,7 @@ class ChatController extends AbstractController
         $message->setSubjectChat($chat);
         $message->setIsRead(false);
         $message->setIsFromAI(false);
-        $message->setCreatedAt(new \DateTimeImmutable());
+        $message->setCreateAt(new \DateTimeImmutable());
         
         $entityManager->persist($message);
         $entityManager->flush();
@@ -355,7 +355,7 @@ class ChatController extends AbstractController
                 'id' => $message->getId(),
                 'content' => $message->getContent(),
                 'sender' => $user->getId(),
-                'createdAt' => $message->getCreatedAt()->format('c')
+                'createdAt' => $message->getCreateAt()->format('c')
             ]
         ]);
     }
@@ -408,7 +408,7 @@ class ChatController extends AbstractController
                 'sender' => $message->getSender()->getId(),
                 'isFromAI' => $message->isIsFromAI(),
                 'isRead' => $message->isIsRead(),
-                'createdAt' => $message->getCreatedAt()->format('c')
+                'createdAt' => $message->getCreateAt()->format('c')
             ];
         }, $messages);
         
