@@ -93,12 +93,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load subjects
     function loadSubjects() {
+        console.log('Loading subjects...');
         fetch('/subjectChats')
             .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
                 if (!response.ok) {
                     // Check if we need to redirect (for premium access)
                     if (response.status === 403) {
                         return response.json().then(data => {
+                            console.log('403 response data:', data);
                             if (data.redirect) {
                                 window.location.href = `/${data.redirect}`;
                                 return null;
@@ -111,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(subjects => {
+                console.log('Subjects received:', subjects);
                 if (subjects) {
                     renderSubjects(subjects);
                     if (subjects.length > 0) {
