@@ -219,106 +219,107 @@ class ChatController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function getMyGroups(SubjectChatRepository $groupChatRepository, EleveRepository $eleveRepository, LoggerInterface $logger): JsonResponse
     {
-        $user = $this->getUser();
-        $logger->info('API: /subjectChats request received', ['user_id' => $user ? $user->getId() : null]);
+        try {
+            $user = $this->getUser();
+            $logger->info('API: /subjectChats request received', ['user_id' => $user ? $user->getId() : null]);
 
-        if (!$user) {
-            $logger->error('API: User not authenticated');
-            return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
-        }
-
-        // For teachers, return their subjects
-        if (in_array('ROLE_INSTRUCTOR', $user->getRoles())) {
-            $logger->info('API: User is an instructor, fetching all subjects');
-            $subjectChats = $groupChatRepository->findAll();
-            
-            $data = array_map(function ($subjectChat) use ($user) {
-                return [
-                    'id' => $subjectChat->getId(),
-                    'name' => $subjectChat->getName(),
-                    'type' => $subjectChat->getType(),
-                    'unreadCount' => $this->getUnreadCount($subjectChat, $user)
-                ];
-            }, $subjectChats);
-            
-            $logger->info('API: Returning subjects for instructor', ['count' => count($data)]);
-            return new JsonResponse($data);
-        }
-
-        // For students
-        $logger->info('API: User is a student, fetching student data');
-        $student = $eleveRepository->findOneBy(['utilisateur' => $user]);
-        
-        if (!$student) {
-            $logger->error('API: Student account not found', ['user_id' => $user->getId()]);
-            return new JsonResponse(['error' => 'Student account not found'], 403);
-        }
-        
-        // Check premium access
-        $logger->info('API: Checking premium access for student', ['student_id' => $student->getId()]);
-        $redirect = $this->checkPremiumAccess($student);
-        if ($redirect instanceof RedirectResponse) {
-            $logger->warning('API: Premium access denied for student', ['student_id' => $student->getId()]);
-            return new JsonResponse([
-                'error' => 'Accès refusé : vous devez être premium pour accéder au chat', 
-                'redirect' => 'app_student_subscriptions'
-            ], 403);
-        }
-        
-        // Check if student has a class
-        $classe = $student->getClasse();
-        if (!$classe) {
-            $logger->error('API: Student has no class', ['student_id' => $student->getId()]);
-            return new JsonResponse(['error' => 'Aucune classe trouvée'], 400);
-        }
-        
-        $skill_level = $classe->getSkillLevel()->getId();
-        
-        if ($skill_level >= 5 && $skill_level <= 7) {
-            $subjectChats = $groupChatRepository->findBy(['cycle' => 2]);
-        } elseif ($skill_level == 1 || $skill_level ==2) {
-            $subjectChats = $groupChatRepository->findBy(['cycle' => 1]);
-        } elseif ($skill_level == 3 || $skill_level == 4) {
-            if($classe->getName() == "Quatrième ALL- 4ème ALL" || $classe->getName() == "Troisième ALL- 3ème ALL" || $classe->getName() == "Troisième Bilingue Allemand- 3ème BIL. ALL"){
-                $subjectChats = $groupChatRepository->createQueryBuilder('sc')
-                ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                ->setParameter('cycle1', 1)
-                ->setParameter('cycle2', 11)
-                ->getQuery()
-                ->getResult();
-            } elseif ($classe->getName() == "Quatrième ESP- 4ème ESP" || $classe->getName() == "Troisième ESP- 3ème ESP" || $classe->getName() == "Troisième Bilingue Espagnol- 3ème BIL. ESP"){
-                $subjectChats = $groupChatRepository->createQueryBuilder('sc')
-                ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                ->setParameter('cycle1', 1)
-                ->setParameter('cycle2', 12)
-                ->getQuery()
-                ->getResult();
-            } elseif ($classe->getName() == "Troisième Chinois- 3ème Chinois"){
-                $subjectChats = $groupChatRepository->createQueryBuilder('sc')
-                ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                ->setParameter('cycle1', 1)
-                ->setParameter('cycle2', 14)
-                ->getQuery()
-                ->getResult();
+            if (!$user) {
+                $logger->error('API: User not authenticated');
+                return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
             }
-        
-        } else {
-            return new JsonResponse(['error' => 'Niveau de compétence non valide'], 400);
-        }
 
-    
-        $data = array_map(function ($subjectChat) use ($user) {
-                return [
-                    'id' => $subjectChat->getId(),
-                    'name' => $subjectChat->getName(),
-                    'type' => $subjectChat->getType(),
-                'cycle' => $subjectChat->getCycle(),
-                    'unreadCount' => $this->getUnreadCount($subjectChat, $user)
-                ];
-            }, $subjectChats);
+            // For teachers, return their subjects
+            if (in_array('ROLE_INSTRUCTOR', $user->getRoles())) {
+                $logger->info('API: User is an instructor, fetching all subjects');
+                $subjectChats = $groupChatRepository->findAll();
+                
+                $data = array_map(function ($subjectChat) use ($user) {
+                    return [
+                        'id' => $subjectChat->getId(),
+                        'name' => $subjectChat->getName(),
+                        'type' => $subjectChat->getType(),
+                        'unreadCount' => $this->getUnreadCount($subjectChat, $user)
+                    ];
+                }, $subjectChats);
+                
+                $logger->info('API: Returning subjects for instructor', ['count' => count($data)]);
+                return new JsonResponse($data);
+            }
+
+            // For students
+            $logger->info('API: User is a student, fetching student data');
+            $student = $eleveRepository->findOneBy(['utilisateur' => $user]);
             
-            $logger->info('API: Returning subjects for student', ['count' => count($data)]);
-            return new JsonResponse($data);
+            if (!$student) {
+                $logger->error('API: Student account not found', ['user_id' => $user->getId()]);
+                return new JsonResponse(['error' => 'Student account not found'], 403);
+            }
+            
+            // Check premium access
+            $logger->info('API: Checking premium access for student', ['student_id' => $student->getId()]);
+            $redirect = $this->checkPremiumAccess($student);
+            if ($redirect instanceof RedirectResponse) {
+                $logger->warning('API: Premium access denied for student', ['student_id' => $student->getId()]);
+                return new JsonResponse([
+                    'error' => 'Accès refusé : vous devez être premium pour accéder au chat', 
+                    'redirect' => 'app_student_subscriptions'
+                ], 403);
+            }
+            
+            // Check if student has a class
+            $classe = $student->getClasse();
+            if (!$classe) {
+                $logger->error('API: Student has no class', ['student_id' => $student->getId()]);
+                return new JsonResponse(['error' => 'Aucune classe trouvée'], 400);
+            }
+            
+            $skill_level = $classe->getSkillLevel()->getId();
+            
+            if ($skill_level >= 5 && $skill_level <= 7) {
+                $subjectChats = $groupChatRepository->findBy(['cycle' => 2]);
+            } elseif ($skill_level == 1 || $skill_level ==2) {
+                $subjectChats = $groupChatRepository->findBy(['cycle' => 1]);
+            } elseif ($skill_level == 3 || $skill_level == 4) {
+                if($classe->getName() == "Quatrième ALL- 4ème ALL" || $classe->getName() == "Troisième ALL- 3ème ALL" || $classe->getName() == "Troisième Bilingue Allemand- 3ème BIL. ALL"){
+                    $subjectChats = $groupChatRepository->createQueryBuilder('sc')
+                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                    ->setParameter('cycle1', 1)
+                    ->setParameter('cycle2', 11)
+                    ->getQuery()
+                    ->getResult();
+                } elseif ($classe->getName() == "Quatrième ESP- 4ème ESP" || $classe->getName() == "Troisième ESP- 3ème ESP" || $classe->getName() == "Troisième Bilingue Espagnol- 3ème BIL. ESP"){
+                    $subjectChats = $groupChatRepository->createQueryBuilder('sc')
+                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                    ->setParameter('cycle1', 1)
+                    ->setParameter('cycle2', 12)
+                    ->getQuery()
+                    ->getResult();
+                } elseif ($classe->getName() == "Troisième Chinois- 3ème Chinois"){
+                    $subjectChats = $groupChatRepository->createQueryBuilder('sc')
+                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                    ->setParameter('cycle1', 1)
+                    ->setParameter('cycle2', 14)
+                    ->getQuery()
+                    ->getResult();
+                }
+            
+            } else {
+                return new JsonResponse(['error' => 'Niveau de compétence non valide'], 400);
+            }
+
+        
+            $data = array_map(function ($subjectChat) use ($user) {
+                    return [
+                        'id' => $subjectChat->getId(),
+                        'name' => $subjectChat->getName(),
+                        'type' => $subjectChat->getType(),
+                        'cycle' => $subjectChat->getCycle(),
+                        'unreadCount' => $this->getUnreadCount($subjectChat, $user)
+                    ];
+                }, $subjectChats);
+                
+                $logger->info('API: Returning subjects for student', ['count' => count($data)]);
+                return new JsonResponse($data);
         } catch (\Exception $e) {
             $logger->error('API: Error fetching subjects', [
                 'error' => $e->getMessage(),
