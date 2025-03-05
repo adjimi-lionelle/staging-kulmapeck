@@ -20,32 +20,120 @@ document.addEventListener('DOMContentLoaded', function() {
     let typingTimeout = null;
     let lastTypingStatus = false;
     
-    // Get WebSocket token
-    function getWebSocketToken() {
-        fetch('/websocket/token')
-            .then(response => response.json())
+    // Initialize the chat system
+    function initialize() {
+        // If subjects are not pre-loaded in the template, fetch them
+        if (subjectList && subjectList.querySelector('.loading-state')) {
+            loadSubjects();
+        } else {
+            // Subjects are already in the DOM, attach event listeners
+            attachSubjectEventListeners();
+        }
+    }
+    
+    // Attach event listeners to pre-loaded subjects
+    function attachSubjectEventListeners() {
+        const subjects = document.querySelectorAll('.chat-item');
+        if (subjects.length > 0) {
+            subjects.forEach(subject => {
+                subject.addEventListener('click', () => {
+                    // Remove active class from all items
+                    document.querySelectorAll('.chat-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked item
+                    subject.classList.add('active');
+                    
+                    // Select the subject
+                    selectSubject(subject.dataset.subjectId);
+                });
+            });
+            
+            // Select the first subject by default
+            const firstSubject = subjects[0];
+            if (firstSubject) {
+                selectSubject(firstSubject.dataset.subjectId);
+            }
+        }
+    }
+    
+    // Get WebSocket token for a specific subject
+    function getWebSocketToken(subjectId) {
+        if (!subjectId) return;
+        
+        fetch(`/websocket/token/${subjectId}`)
+            .then(response => {
+                if (!response.ok) {
+                    // Check if we need to redirect (for premium access)
+                    if (response.status === 403) {
+                        return response.json().then(data => {
+                            if (data.redirect) {
+                                window.location.href = `/${data.redirect}`;
+                                return null;
+                            }
+                            throw new Error(data.error || 'Access denied');
+                        });
+                    }
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
-                token = data.token;
-                loadSubjects();
+                if (data) {
+                    token = data.token;
+                    connectWebSocket(subjectId);
+                }
             })
             .catch(error => {
                 console.error('Error fetching WebSocket token:', error);
+                showError('Could not connect to chat. Please try again later.');
             });
     }
     
     // Load subjects
     function loadSubjects() {
-        fetch('/api/subject-chats')
-            .then(response => response.json())
+        fetch('/subjectChats')
+            .then(response => {
+                if (!response.ok) {
+                    // Check if we need to redirect (for premium access)
+                    if (response.status === 403) {
+                        return response.json().then(data => {
+                            if (data.redirect) {
+                                window.location.href = `/${data.redirect}`;
+                                return null;
+                            }
+                            throw new Error(data.error || 'Access denied');
+                        });
+                    }
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(subjects => {
-                renderSubjects(subjects);
-                if (subjects.length > 0) {
-                    selectSubject(subjects[0].id);
+                if (subjects) {
+                    renderSubjects(subjects);
+                    if (subjects.length > 0) {
+                        selectSubject(subjects[0].id);
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error loading subjects:', error);
+                showError('Could not load subjects. Please try again later.');
             });
+    }
+    
+    // Show error message
+    function showError(message) {
+        if (subjectList) {
+            subjectList.innerHTML = `
+                <div class="error-state text-center p-4">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 48px; color: #dc3545;"></i>
+                    <p class="mt-3 text-muted">${message}</p>
+                </div>
+            `;
+        }
     }
     
     // Render subjects in sidebar
@@ -125,13 +213,44 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        // Connect to WebSocket
-        connectWebSocket(subjectId);
+        // Load messages via REST API first
+        loadMessages(subjectId);
+        
+        // Get WebSocket token and connect
+        getWebSocketToken(subjectId);
         
         // Dispatch event to notify that a subject has been selected
         document.dispatchEvent(new CustomEvent('subjectSelected', {
             detail: { subjectId: subjectId }
         }));
+    }
+    
+    // Load messages via REST API
+    function loadMessages(subjectId) {
+        fetch(`/chat/messages/${subjectId}`)
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        return response.json().then(data => {
+                            if (data.redirect) {
+                                window.location.href = `/${data.redirect}`;
+                                return null;
+                            }
+                            throw new Error(data.error || 'Access denied');
+                        });
+                    }
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.messages) {
+                    renderMessageHistory(data.messages);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading messages:', error);
+            });
     }
     
     // Update chat header with subject info
@@ -216,11 +335,17 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!messageWrapper) return;
         
         messages.forEach(msg => {
-            const isCurrentUser = msg.author === 'You'; // This needs to be adjusted based on actual data
-            addMessageToDOM(msg.content, msg.author, isCurrentUser, msg.createdAt, messageWrapper);
+            const isCurrentUser = msg.sender && msg.sender.id === getCurrentUserId();
+            addMessageToDOM(msg.content, msg.sender ? msg.sender.name : 'Unknown', isCurrentUser, msg.createdAt, messageWrapper);
         });
         
         scrollToBottom();
+    }
+    
+    // Get current user ID from meta tag
+    function getCurrentUserId() {
+        const userIdMeta = document.querySelector('meta[name="user-id"]');
+        return userIdMeta ? userIdMeta.getAttribute('content') : null;
     }
     
     // Add a new message
@@ -333,25 +458,68 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Send message
     function sendMessage() {
-        if (!socket || socket.readyState !== WebSocket.OPEN || !currentSubject) return;
+        if (!currentSubject) return;
         
         const content = messageInput.value.trim();
         if (!content) return;
         
-        // Send message through WebSocket
-        socket.send(JSON.stringify({
-            group_id: currentSubject,
-            message: content
-        }));
-        
-        // Add message to UI
-        addMessage(content, 'You', true);
-        
-        // Clear input
-        messageInput.value = '';
-        
-        // Reset typing status
-        sendTypingStatus(false);
+        // Try WebSocket first
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            // Send message through WebSocket
+            socket.send(JSON.stringify({
+                group_id: currentSubject,
+                message: content
+            }));
+            
+            // Add message to UI
+            addMessage(content, 'You', true);
+            
+            // Clear input
+            messageInput.value = '';
+            
+            // Reset typing status
+            sendTypingStatus(false);
+        } else {
+            // Fallback to REST API
+            fetch('/chat/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: currentSubject,
+                    content: content
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        return response.json().then(data => {
+                            if (data.redirect) {
+                                window.location.href = `/${data.redirect}`;
+                                return null;
+                            }
+                            throw new Error(data.error || 'Access denied');
+                        });
+                    }
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    // Add message to UI
+                    addMessage(content, 'You', true);
+                    
+                    // Clear input
+                    messageInput.value = '';
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                alert('Failed to send message. Please try again.');
+            });
+        }
     }
     
     // Scroll chat to bottom
@@ -412,5 +580,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialize
-    getWebSocketToken();
+    initialize();
 });
