@@ -22,12 +22,32 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize the chat system
     function initialize() {
+        console.log('Initializing chat system...');
+        
         // If subjects are not pre-loaded in the template, fetch them
-        if (subjectList && subjectList.querySelector('.loading-state')) {
-            loadSubjects();
+        if (subjectList) {
+            if (subjectList.querySelector('.loading-state')) {
+                console.log('Loading subjects from API...');
+                loadSubjects();
+            } else {
+                console.log('Subjects already in DOM, attaching event listeners...');
+                // Subjects are already in the DOM, attach event listeners
+                attachSubjectEventListeners();
+            }
         } else {
-            // Subjects are already in the DOM, attach event listeners
-            attachSubjectEventListeners();
+            console.error('Subject list element not found');
+        }
+        
+        // Initialize message input and send button
+        if (messageInput && sendButton) {
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            sendButton.addEventListener('click', sendMessage);
         }
     }
     
@@ -176,7 +196,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="chat-item-preview">${subject.lastMessage || 'Start chatting...'}</div>
                 </div>
                 <div class="chat-item-meta">
-                    <div class="chat-item-time">12:30 PM</div>
                     ${unreadBadge}
                 </div>
             `;
@@ -233,6 +252,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load messages via REST API
     function loadMessages(subjectId) {
+        // Show loading indicator
+        chatMessages.innerHTML = `
+            <div class="loading-messages text-center p-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading messages...</span>
+                </div>
+                <p class="mt-3 text-muted">Loading messages...</p>
+            </div>
+        `;
+        
+        // Show chat UI
+        document.getElementById('welcome-screen').style.display = 'none';
+        chatHeader.style.display = 'flex';
+        chatMessages.style.display = 'block';
+        document.getElementById('chat-input-container').style.display = 'flex';
+        
         fetch(`/chat/messages/${subjectId}`)
             .then(response => {
                 if (!response.ok) {
@@ -249,13 +284,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 return response.json();
             })
-            .then(data => {
-                if (data && data.messages) {
-                    renderMessageHistory(data.messages);
+            .then(messages => {
+                if (messages) {
+                    // Reset messages container
+                    chatMessages.innerHTML = `
+                        <div class="message-wrapper">
+                            <div class="message-time">Today</div>
+                        </div>
+                    `;
+                    
+                    // Render messages
+                    if (messages.length > 0) {
+                        renderMessageHistory(messages);
+                    } else {
+                        // No messages yet
+                        const emptyState = document.createElement('div');
+                        emptyState.className = 'empty-messages text-center p-4';
+                        emptyState.innerHTML = `
+                            <i class="bi bi-chat" style="font-size: 48px; color: #6c757d;"></i>
+                            <p class="mt-3 text-muted">No messages yet. Start the conversation!</p>
+                        `;
+                        chatMessages.appendChild(emptyState);
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error loading messages:', error);
+                chatMessages.innerHTML = `
+                    <div class="error-messages text-center p-4">
+                        <i class="bi bi-exclamation-triangle" style="font-size: 48px; color: #dc3545;"></i>
+                        <p class="mt-3 text-muted">Could not load messages. Please try again later.</p>
+                    </div>
+                `;
             });
     }
     
@@ -340,9 +400,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const messageWrapper = document.querySelector('.message-wrapper');
         if (!messageWrapper) return;
         
+        // Get current user ID
+        const currentUserId = getCurrentUserId();
+        
         messages.forEach(msg => {
-            const isCurrentUser = msg.sender && msg.sender.id === getCurrentUserId();
-            addMessageToDOM(msg.content, msg.sender ? msg.sender.name : 'Unknown', isCurrentUser, msg.createdAt, messageWrapper);
+            // Check if this message is from the current user
+            const isCurrentUser = msg.sender === parseInt(currentUserId);
+            
+            // Format the timestamp
+            let timestamp = 'Just now';
+            if (msg.createdAt) {
+                try {
+                    const msgDate = new Date(msg.createdAt);
+                    timestamp = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                } catch (e) {
+                    console.error('Error parsing date:', e);
+                }
+            }
+            
+            // Add the message to the DOM
+            addMessageToDOM(
+                msg.content, 
+                isCurrentUser ? 'You' : (msg.isFromAI ? 'AI Teacher' : 'User'), 
+                isCurrentUser, 
+                timestamp, 
+                messageWrapper
+            );
         });
         
         scrollToBottom();
@@ -464,13 +547,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Send message
     function sendMessage() {
-        if (!currentSubject) return;
+        if (!currentSubject) {
+            console.error('No subject selected');
+            return;
+        }
         
         const content = messageInput.value.trim();
         if (!content) return;
         
         // Try WebSocket first
         if (socket && socket.readyState === WebSocket.OPEN) {
+            console.log('Sending message via WebSocket');
+            
             // Send message through WebSocket
             socket.send(JSON.stringify({
                 group_id: currentSubject,
@@ -486,6 +574,31 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reset typing status
             sendTypingStatus(false);
         } else {
+            console.log('WebSocket not available, using REST API');
+            
+            // Show sending indicator
+            const tempId = 'msg-' + Date.now();
+            const messageWrapper = document.querySelector('.message-wrapper');
+            
+            // Add temporary message with sending indicator
+            const tempMsg = document.createElement('div');
+            tempMsg.className = 'message-item sent';
+            tempMsg.id = tempId;
+            tempMsg.innerHTML = `
+                <div class="message-content">
+                    <div class="message-bubble">
+                        <div class="message-text">${content}</div>
+                    </div>
+                    <div class="message-info">
+                        <span class="message-time">
+                            <i class="bi bi-clock" title="Sending..."></i>
+                        </span>
+                    </div>
+                </div>
+            `;
+            messageWrapper.appendChild(tempMsg);
+            scrollToBottom();
+            
             // Fallback to REST API
             fetch('/chat/send', {
                 method: 'POST',
@@ -514,7 +627,13 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(data => {
                 if (data) {
-                    // Add message to UI
+                    // Remove temporary message
+                    const tempMessage = document.getElementById(tempId);
+                    if (tempMessage) {
+                        tempMessage.remove();
+                    }
+                    
+                    // Add confirmed message to UI
                     addMessage(content, 'You', true);
                     
                     // Clear input
@@ -523,7 +642,19 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error sending message:', error);
-                alert('Failed to send message. Please try again.');
+                
+                // Update temporary message to show error
+                const tempMessage = document.getElementById(tempId);
+                if (tempMessage) {
+                    const timeElement = tempMessage.querySelector('.message-time');
+                    if (timeElement) {
+                        timeElement.innerHTML = `
+                            <i class="bi bi-exclamation-triangle-fill text-danger" title="Failed to send"></i>
+                        `;
+                    }
+                }
+                
+                showError('Failed to send message. Please try again.');
             });
         }
     }
@@ -551,34 +682,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Event listeners
-    if (sendButton) {
-        sendButton.addEventListener('click', sendMessage);
-    }
-    
-    if (messageInput) {
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-        
-        messageInput.addEventListener('input', function() {
-            // Clear previous timeout
-            if (typingTimeout) {
-                clearTimeout(typingTimeout);
-            }
-            
-            // Send typing status
-            sendTypingStatus(true);
-            
-            // Set timeout to reset typing status
-            typingTimeout = setTimeout(() => {
-                sendTypingStatus(false);
-            }, 3000);
-        });
-    }
-    
     if (subjectSearch) {
         subjectSearch.addEventListener('input', function() {
             searchSubjects(this.value);
