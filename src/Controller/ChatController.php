@@ -9,9 +9,11 @@ use App\Entity\SubjectChat;
 use App\Repository\EleveRepository;
 use App\Repository\SubjectChatRepository;
 use App\Repository\PersonneRepository;
+use App\Repository\MessageChatRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -19,22 +21,27 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Security;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ChatController extends AbstractController
 {
 
     private string $jwtSecret;
     private JWTTokenManagerInterface $jwtManager;
-
+    private RequestStack $requestStack;
 
     public function __construct(string $jwtSecret,
     private EleveRepository $eleveRepository,
-    private SubjectChatRepository $subjectChatRepository)
+    private SubjectChatRepository $subjectChatRepository,
+    private MessageChatRepository $messageChatRepository,
+    RequestStack $requestStack)
     {
         
         $this->jwtSecret = $jwtSecret;
         $this->subjectChatRepository = $subjectChatRepository;
+        $this->requestStack = $requestStack;
     }  
 
     
@@ -48,6 +55,48 @@ class ChatController extends AbstractController
         if (!$user) {
             return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
         }
+        
+        // Check profile completeness
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        if (!$student) {
+            throw $this->createAccessDeniedException('Student account not found.');
+        }
+        
+        // Skip premium check for teachers
+        if (in_array('ROLE_INSTRUCTOR', $user->getRoles())) {
+            return $this->render('student/chat/index.html.twig');
+        }
+        
+        // Check if student has complete information (classe)
+        $isProfileComplete = $student->getClasse() !== null;
+        
+        // For secondary cycle classes, check if the class has a specialization when needed
+        if ($isProfileComplete && $student->getClasse()->getSkillLevel()) {
+            $skillLevelId = $student->getClasse()->getSkillLevel()->getId();
+            $secondaryCycleLevels = [5, 6, 7]; // Adjust based on your database
+            
+            // If student is in secondary cycle, their class must have a specialization
+            if (in_array($skillLevelId, $secondaryCycleLevels) && 
+                $student->getClasse()->getSpecialite() === null) {
+                $isProfileComplete = false;
+            }
+        }
+        
+        // If profile is incomplete, show setup modal
+        if (!$isProfileComplete) {
+            return $this->render('student/chat/index.html.twig', [
+                'showSetupModal' => true,
+                'isPremium' => $student->isIsPremium(),
+                'isProfileComplete' => $isProfileComplete
+            ]);
+        }
+        
+        // Check premium access
+        $redirect = $this->checkPremiumAccess($student);
+        if ($redirect instanceof RedirectResponse) {
+            return $redirect;
+        }
+        
         return $this->render('student/chat/index.html.twig');
     }
 
@@ -96,6 +145,14 @@ class ChatController extends AbstractController
         if (!$student) {
             throw $this->createAccessDeniedException('Student account not found.');
         }
+        
+        // Check premium access
+        $redirect = $this->checkPremiumAccess($student);
+        if ($redirect instanceof RedirectResponse) {
+            // For API endpoints, we should never get here due to isApiRequest check
+            // but just in case, return a proper JSON response
+            return new JsonResponse(['error' => 'Accès refusé : vous devez être premium pour accéder au chat', 'redirect' => 'app_student_subscriptions'], 403);
+        }
 
         // Vérifier que la discussion existe
         $subjectChat = $entityManager->getRepository(SubjectChat::class)->find($subjectChatId);
@@ -103,7 +160,7 @@ class ChatController extends AbstractController
             return new JsonResponse(['error' => 'Discussion non trouvée'], 404);
         }
 
-        // Vérifier que l’élève appartient bien à cette discussion
+        // Vérifier que l'élève appartient bien à cette discussion
        /* if ($subjectChat->getCycle()->getId() !== $student->getClasse()->getSkillLevel()->getId()) {
             return new JsonResponse(['error' => 'Accès refusé à cette discussion'], 403);
         }*/
@@ -161,8 +218,7 @@ class ChatController extends AbstractController
     #[Route('/subjectChats', name: 'api_chat_subjectChats', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function getMyGroups(SubjectChatRepository $groupChatRepository,
-                                PersonneRepository $personneRepository,
-                                /*essageChatRepository $messageChatRepository*/): JsonResponse
+                                PersonneRepository $personneRepository): JsonResponse
     {
         $user = $this->getUser();
         //echo $user->getId();
@@ -182,8 +238,12 @@ class ChatController extends AbstractController
             return new JsonResponse(['error' => 'L\'utilisateur n\'est pas un élève'], 403);
         }
 
-        if (!$eleve->isIsPremium()) {
-            return new JsonResponse(['error' => 'Accès refusé : vous devez être premium pour accéder au chat'], 403);
+        // Check premium access
+        $redirect = $this->checkPremiumAccess($eleve);
+        if ($redirect instanceof RedirectResponse) {
+            // For API endpoints, we should never get here due to isApiRequest check
+            // but just in case, return a proper JSON response
+            return new JsonResponse(['error' => 'Accès refusé : vous devez être premium pour accéder au chat', 'redirect' => 'app_student_subscriptions'], 403);
         }
 
         $classe = $eleve->getClasse();
@@ -226,14 +286,13 @@ class ChatController extends AbstractController
         }
 
     
-        $data = array_map(function ($subjectChat) {
+        $data = array_map(function ($subjectChat) use ($user) {
             return [
                 'id' => $subjectChat->getId(),
                 'name' => $subjectChat->getName(),
                 'type' => $subjectChat->getType(),
-                //'matiere' => $subjectChat->getMatiere()->getName(),
-                //'matiere' => $subjectChat->getMatiere(),
-                'cycle' => $subjectChat->getCycle()
+                'cycle' => $subjectChat->getCycle(),
+                'unreadCount' => $this->getUnreadCount($subjectChat, $user)
             ];
         }, $subjectChats);
 
@@ -242,5 +301,182 @@ class ChatController extends AbstractController
         return new JsonResponse($data);
     }
 
-
+    /**
+     * Send a message to a subject chat
+     */
+    #[Route('/chat/send', name: 'app_chat_send', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function sendMessage(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
+        }
+        
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        if (!$student) {
+            throw $this->createAccessDeniedException('Student account not found.');
+        }
+        
+        // Check premium access
+        $redirect = $this->checkPremiumAccess($student);
+        if ($redirect instanceof RedirectResponse) {
+            // For API endpoints, we should never get here due to isApiRequest check
+            // but just in case, return a proper JSON response
+            return new JsonResponse(['error' => 'Accès refusé : vous devez être premium pour accéder au chat', 'redirect' => 'app_student_subscriptions'], 403);
+        }
+        
+        $data = json_decode($request->getContent(), true);
+        
+        if (!isset($data['chat_id']) || !isset($data['content'])) {
+            return new JsonResponse(['error' => 'Incomplete data'], 400);
+        }
+        
+        $chat = $this->subjectChatRepository->find($data['chat_id']);
+        if (!$chat) {
+            return new JsonResponse(['error' => 'Chat not found'], 404);
+        }
+        
+        // Create and save the message
+        $message = new MessageChat();
+        $message->setContent($data['content']);
+        $message->setSender($user);
+        $message->setSubjectChat($chat);
+        $message->setIsRead(false);
+        $message->setIsFromAI(false);
+        $message->setCreatedAt(new \DateTimeImmutable());
+        
+        $entityManager->persist($message);
+        $entityManager->flush();
+        
+        return new JsonResponse([
+            'success' => true,
+            'message' => [
+                'id' => $message->getId(),
+                'content' => $message->getContent(),
+                'sender' => $user->getId(),
+                'createdAt' => $message->getCreatedAt()->format('c')
+            ]
+        ]);
+    }
+    
+    /**
+     * Get messages for a specific chat
+     */
+    #[Route('/chat/messages/{chatId}', name: 'app_chat_messages', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function getMessages(int $chatId, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
+        }
+        
+        $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+        if (!$student) {
+            throw $this->createAccessDeniedException('Student account not found.');
+        }
+        
+        // Check premium access
+        $redirect = $this->checkPremiumAccess($student);
+        if ($redirect instanceof RedirectResponse) {
+            // For API endpoints, we should never get here due to isApiRequest check
+            // but just in case, return a proper JSON response
+            return new JsonResponse(['error' => 'Accès refusé : vous devez être premium pour accéder au chat', 'redirect' => 'app_student_subscriptions'], 403);
+        }
+        
+        $chat = $this->subjectChatRepository->find($chatId);
+        if (!$chat) {
+            return new JsonResponse(['error' => 'Chat not found'], 404);
+        }
+        
+        // Get messages
+        $messages = $this->messageChatRepository->findBy(['subjectChat' => $chat], ['createdAt' => 'ASC']);
+        
+        // Mark messages as read
+        foreach ($messages as $message) {
+            if (!$message->isIsRead() && $message->getSender()->getId() !== $user->getId()) {
+                $message->setIsRead(true);
+            }
+        }
+        $entityManager->flush();
+        
+        $data = array_map(function($message) {
+            return [
+                'id' => $message->getId(),
+                'content' => $message->getContent(),
+                'sender' => $message->getSender()->getId(),
+                'isFromAI' => $message->isIsFromAI(),
+                'isRead' => $message->isIsRead(),
+                'createdAt' => $message->getCreatedAt()->format('c')
+            ];
+        }, $messages);
+        
+        return new JsonResponse($data);
+    }
+    
+    /**
+     * Get unread message count for a chat
+     */
+    private function getUnreadCount($chat, $user): int
+    {
+        return $this->messageChatRepository->createQueryBuilder('m')
+            ->select('COUNT(m.id)')
+            ->where('m.subjectChat = :chat')
+            ->andWhere('m.sender != :user')
+            ->andWhere('m.isRead = :isRead')
+            ->setParameter('chat', $chat)
+            ->setParameter('user', $user)
+            ->setParameter('isRead', false)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+    
+    /**
+     * Check if a student has premium access to chat features
+     * 
+     * @param object $student The student entity to check
+     * @throws AccessDeniedHttpException If the student doesn't have premium access
+     * @return RedirectResponse|null Returns a redirect response if student is not premium, null otherwise
+     */
+    private function checkPremiumAccess($student): ?RedirectResponse
+    {
+        // Get the current user
+        $user = $this->getUser();
+        
+        // Skip premium check for teachers/instructors
+        if ($user && in_array('ROLE_INSTRUCTOR', $user->getRoles())) {
+            return null;
+        }
+        
+        // Only check premium status for students
+        if ($student && !$student->isIsPremium()) {
+            // For API endpoints, throw an exception
+            if ($this->isApiRequest()) {
+                throw new AccessDeniedHttpException('Accès refusé : vous devez être premium pour accéder au chat');
+            }
+            
+            // For regular web requests, redirect to subscription page
+            $this->addFlash('error', 'Accès refusé : vous devez être premium pour accéder au chat');
+            return $this->redirectToRoute('app_student_subscriptions');
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Determine if the current request is an API request
+     * 
+     * @return bool True if this is an API request, false otherwise
+     */
+    private function isApiRequest(): bool
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        
+        // Check if it's an AJAX request or if it expects JSON response
+        return $request->isXmlHttpRequest() || 
+               $request->getRequestFormat() === 'json' ||
+               strpos($request->getPathInfo(), '/api/') === 0 ||
+               in_array('application/json', $request->getAcceptableContentTypes());
+    }
 }
