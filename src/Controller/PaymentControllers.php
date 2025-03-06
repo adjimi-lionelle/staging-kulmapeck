@@ -131,6 +131,7 @@ class PaymentControllers extends AbstractController
 	return new JsonResponse(['message' => 'Callback received successfully'], 200);
 
     }
+    
     #[Route('/email', name: 'balance', methods: ['GET'])]
     public function emailSender(MailerInterface $mailer )
     {

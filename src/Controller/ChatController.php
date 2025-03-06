@@ -458,7 +458,7 @@ class ChatController extends AbstractController
             
             // For regular web requests, redirect to subscription page
             $this->addFlash('error', 'Accès refusé : vous devez être premium pour accéder au chat');
-            return $this->redirectToRoute('app_student_subscriptions');
+            return $this->redirectToRoute('app_plan');
         }
         
         return null;

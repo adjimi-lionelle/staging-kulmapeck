@@ -26,9 +26,6 @@ class SubjectChat
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(name: 'type', length: 20)]
-    private ?string $type = 'teacher';
-
     #[ORM\OneToMany(mappedBy: 'subjectChat', targetEntity: MessageChat::class, orphanRemoval: true)]
     private Collection $messageChats;
 
@@ -38,12 +35,20 @@ class SubjectChat
     #[ORM\OneToMany(mappedBy: 'subjectChat', targetEntity: WebSocketConnection::class, orphanRemoval: true)]
     private Collection $webSocketConnections;
 
+    #[ORM\ManyToOne(inversedBy: 'subjectChats')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Eleve $eleve = null;
+
+    #[ORM\ManyToOne(inversedBy: 'subjectChats')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Enseignant $teacherPersona = null;
+
+
     public function __construct()
     {
         $this->messageChats = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable;
         $this->webSocketConnections = new ArrayCollection();
-        $this->type = 'teacher';
     }
 
     public function getId(): ?int
@@ -81,17 +86,6 @@ class SubjectChat
     public function setName(string $name): static
     {
         $this->name = $name;
-        return $this;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): static
-    {
-        $this->type = $type;
         return $this;
     }
 
@@ -159,4 +153,29 @@ class SubjectChat
         }
         return $this;
     }
+
+    public function getEleve(): ?Eleve
+    {
+        return $this->eleve;
+    }
+
+    public function setEleve(?Eleve $eleve): static
+    {
+        $this->eleve = $eleve;
+
+        return $this;
+    }
+
+    public function getTeacherPersona(): ?Enseignant
+    {
+        return $this->teacherPersona;
+    }
+
+    public function setTeacherPersona(?Enseignant $teacherPersona): static
+    {
+        $this->teacherPersona = $teacherPersona;
+
+        return $this;
+    }
+
 }
