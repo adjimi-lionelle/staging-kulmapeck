@@ -699,9 +699,12 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Sending message via WebSocket');
             
             // Send message through WebSocket
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             socket.send(JSON.stringify({
                 group_id: currentSubject,
-                message: content
+                message: content,
+                timestamp: timeString
             }));
             
             // Add message to UI

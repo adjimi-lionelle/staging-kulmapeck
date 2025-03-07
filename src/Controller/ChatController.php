@@ -419,7 +419,7 @@ class ChatController extends AbstractController
         }
         
         // Get messages
-        $messages = $this->messageChatRepository->findBy(['subjectChat' => $chat], ['createdAt' => 'ASC']);
+        $messages = $this->messageChatRepository->findBy(['subjectChat' => $chat], ['createAt' => 'ASC']);
         
         // Mark messages as read
         foreach ($messages as $message) {
