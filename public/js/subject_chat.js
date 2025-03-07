@@ -301,13 +301,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? `<div class="chat-item-badge">${subject.unreadCount}</div>` 
                 : '';
             
+            // Get last message or default text based on what's available
+            const previewText = subject.lastMessage || 'Start chatting...';
+            
             chatItem.innerHTML = `
                 <div class="chat-item-avatar">
                     <div class="avatar-placeholder rounded-circle">${firstLetter}</div>
                 </div>
                 <div class="chat-item-info">
                     <div class="chat-item-name">${subject.name}</div>
-                    <div class="chat-item-preview">${subject.lastMessage || 'Start chatting...'}</div>
+                    <div class="chat-item-preview">${previewText}</div>
                 </div>
                 <div class="chat-item-meta">
                     ${unreadBadge}
@@ -510,8 +513,13 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         socket.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            handleWebSocketMessage(data);
+            console.log('WebSocket message received:', event.data);
+            try {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            } catch (e) {
+                console.error('Error parsing WebSocket message:', e);
+            }
         };
         
         socket.onclose = function() {
@@ -528,7 +536,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (data.type === 'history') {
             renderMessageHistory(data.messages);
         } else if (data.message) {
-            addMessage(data.message, data.author, false);
+            // If timestamp is provided, use it for message time display
+            const timestamp = data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null;
+            addMessage(data.message, data.author || 'User', false, timestamp);
         } else if (data.type === 'typing') {
             handleTypingIndicator(data.user, data.isTyping);
         }
@@ -547,10 +557,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const isCurrentUser = msg.sender === parseInt(currentUserId);
             
             // Format the timestamp
-            let timestamp = 'Just now';
-            if (msg.createdAt) {
+            let timestamp = '8.Just now';
+            // Handle both createdAt and createAt field names for compatibility
+            const dateField = msg.createdAt || msg.createAt;
+            if (dateField) {
                 try {
-                    const msgDate = new Date(msg.createdAt);
+                    const msgDate = new Date(dateField);
                     timestamp = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 } catch (e) {
                     console.error('Error parsing date:', e);
@@ -577,12 +589,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add a new message
-    function addMessage(content, author, isCurrentUser) {
+    function addMessage(content, author, isCurrentUser, timestamp) {
         const messageWrapper = document.querySelector('.message-wrapper');
         if (!messageWrapper) return;
         
         const now = new Date();
-        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const timeString = timestamp || now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         
         addMessageToDOM(content, author, isCurrentUser, timeString, messageWrapper);
         scrollToBottom();
@@ -699,12 +711,10 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Sending message via WebSocket');
             
             // Send message through WebSocket
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             socket.send(JSON.stringify({
                 group_id: currentSubject,
                 message: content,
-                timestamp: timeString
+                timestamp: new Date().toISOString()
             }));
             
             // Add message to UI
