@@ -40,7 +40,7 @@ class SubjectChat
     private ?Eleve $eleve = null;
 
     #[ORM\ManyToOne(inversedBy: 'subjectChats')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Enseignant $teacherPersona = null;
 
 

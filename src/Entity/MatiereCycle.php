@@ -20,6 +20,9 @@ class MatiereCycle
     #[ORM\Column]
     private ?int $cycle = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -45,6 +48,18 @@ class MatiereCycle
     public function setCycle(int $cycle): static
     {
         $this->cycle = $cycle;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
 
         return $this;
     }
