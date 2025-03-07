@@ -33,6 +33,16 @@ class MessageChat
     #[ORM\Column]
     private ?\DateTimeImmutable $createAt = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $expiresAt = null;
+
+    #[ORM\ManyToOne(inversedBy: 'messageChats')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Enseignant $teacherPersona = null;
+
+    #[ORM\Column]
+    private ?bool $isModerated = false;
+
     public function __construct()
     {
         $this->createAt = new \DateTimeImmutable();
@@ -106,6 +116,42 @@ class MessageChat
     public function setCreateAt(\DateTimeImmutable $createAt): static
     {
         $this->createAt = $createAt;
+        return $this;
+    }
+
+    public function getExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->expiresAt;
+    }
+
+    public function setExpiresAt(\DateTimeImmutable $expiresAt): static
+    {
+        $this->expiresAt = $expiresAt;
+
+        return $this;
+    }
+
+    public function getTeacherPersona(): ?Enseignant
+    {
+        return $this->teacherPersona;
+    }
+
+    public function setTeacherPersona(?Enseignant $teacherPersona): static
+    {
+        $this->teacherPersona = $teacherPersona;
+
+        return $this;
+    }
+
+    public function isIsModerated(): ?bool
+    {
+        return $this->isModerated;
+    }
+
+    public function setIsModerated(bool $isModerated): static
+    {
+        $this->isModerated = $isModerated;
+
         return $this;
     }
 }

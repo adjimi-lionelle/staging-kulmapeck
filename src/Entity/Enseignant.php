@@ -102,12 +102,20 @@ class Enseignant
     #[ORM\OneToMany(mappedBy: 'relation', targetEntity: Evaluation::class)]
     private Collection $evaluations;
 
+    #[ORM\OneToMany(mappedBy: 'teacherPersona', targetEntity: SubjectChat::class, orphanRemoval: true)]
+    private Collection $subjectChats;
+
+    #[ORM\OneToMany(mappedBy: 'teacherPersona', targetEntity: MessageChat::class, orphanRemoval: true)]
+    private Collection $messageChats;
+
 
     public function __construct()
     {
         $this->cours = new ArrayCollection();
         $this->isValidated = false;
         $this->evaluations = new ArrayCollection();
+        $this->subjectChats = new ArrayCollection();
+        $this->messageChats = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -367,6 +375,66 @@ class Enseignant
             // set the owning side to null (unless already changed)
             if ($evaluation->getRelation() === $this) {
                 $evaluation->setRelation(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SubjectChat>
+     */
+    public function getSubjectChats(): Collection
+    {
+        return $this->subjectChats;
+    }
+
+    public function addSubjectChat(SubjectChat $subjectChat): static
+    {
+        if (!$this->subjectChats->contains($subjectChat)) {
+            $this->subjectChats->add($subjectChat);
+            $subjectChat->setTeacherPersona($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubjectChat(SubjectChat $subjectChat): static
+    {
+        if ($this->subjectChats->removeElement($subjectChat)) {
+            // set the owning side to null (unless already changed)
+            if ($subjectChat->getTeacherPersona() === $this) {
+                $subjectChat->setTeacherPersona(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MessageChat>
+     */
+    public function getMessageChats(): Collection
+    {
+        return $this->messageChats;
+    }
+
+    public function addMessageChat(MessageChat $messageChat): static
+    {
+        if (!$this->messageChats->contains($messageChat)) {
+            $this->messageChats->add($messageChat);
+            $messageChat->setTeacherPersona($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessageChat(MessageChat $messageChat): static
+    {
+        if ($this->messageChats->removeElement($messageChat)) {
+            // set the owning side to null (unless already changed)
+            if ($messageChat->getTeacherPersona() === $this) {
+                $messageChat->setTeacherPersona(null);
             }
         }
 

@@ -372,7 +372,7 @@ class ChatController extends AbstractController
         $message->setSubjectChat($chat);
         $message->setIsRead(false);
         $message->setIsFromAI(false);
-        $message->setCreatedAt(new \DateTimeImmutable());
+        $message->setCreateAt(new \DateTimeImmutable());
         
         $entityManager->persist($message);
         $entityManager->flush();
@@ -383,7 +383,7 @@ class ChatController extends AbstractController
                 'id' => $message->getId(),
                 'content' => $message->getContent(),
                 'sender' => $user->getId(),
-                'createdAt' => $message->getCreatedAt()->format('c')
+                'createdAt' => $message->getCreateAt()->format('c')
             ]
         ]);
     }
@@ -436,7 +436,7 @@ class ChatController extends AbstractController
                 'sender' => $message->getSender()->getId(),
                 'isFromAI' => $message->isIsFromAI(),
                 'isRead' => $message->isIsRead(),
-                'createdAt' => $message->getCreatedAt()->format('c')
+                'createdAt' => $message->getCreateAt()->format('c')
             ];
         }, $messages);
         
@@ -486,7 +486,7 @@ class ChatController extends AbstractController
             
             // For regular web requests, redirect to subscription page
             $this->addFlash('error', 'Accès refusé : vous devez être premium pour accéder au chat');
-            return $this->redirectToRoute('app_student_subscriptions');
+            return $this->redirectToRoute('app_plan');
         }
         
         return null;

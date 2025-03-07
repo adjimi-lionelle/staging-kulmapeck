@@ -75,6 +75,9 @@ class Eleve
     #[ ORM\OneToMany( mappedBy: 'eleve', targetEntity: EvaluationResultat::class, orphanRemoval: true ) ]
     private Collection $evaluationResultats;
 
+    #[ORM\OneToMany(mappedBy: 'eleve', targetEntity: SubjectChat::class, orphanRemoval: true)]
+    private Collection $subjectChats;
+
     public function __construct()
  {
         $this->cours = new ArrayCollection();
@@ -89,6 +92,7 @@ class Eleve
         $this->quizLosts = new ArrayCollection();
         $this->evaluations = new ArrayCollection();
         $this->evaluationResultats = new ArrayCollection();
+        $this->subjectChats = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -469,5 +473,35 @@ class Eleve
     public function getSkillLevel(): ?SkillLevel
     {
         return $this->classe ? $this->classe->getSkillLevel() : null;
+    }
+
+    /**
+     * @return Collection<int, SubjectChat>
+     */
+    public function getSubjectChats(): Collection
+    {
+        return $this->subjectChats;
+    }
+
+    public function addSubjectChat(SubjectChat $subjectChat): static
+    {
+        if (!$this->subjectChats->contains($subjectChat)) {
+            $this->subjectChats->add($subjectChat);
+            $subjectChat->setEleve($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubjectChat(SubjectChat $subjectChat): static
+    {
+        if ($this->subjectChats->removeElement($subjectChat)) {
+            // set the owning side to null (unless already changed)
+            if ($subjectChat->getEleve() === $this) {
+                $subjectChat->setEleve(null);
+            }
+        }
+
+        return $this;
     }
 }
