@@ -49,7 +49,6 @@ class SubjectChatRepository extends ServiceEntityRepository
         $chat->setMatiere($subject->getMatiere());
         $chat->setCycle($subject->getCycle());
         $chat->setName($this->getTeacherPersonaName($subject->getMatiere()->getName()));
-        $chat->setType('teacher');
         
         $this->getEntityManager()->persist($chat);
         $this->getEntityManager()->flush();
@@ -134,4 +133,16 @@ class SubjectChatRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findByEleveOrderedLimited(int $eleveId, int $limit = 11)
+{
+    return $this->createQueryBuilder('sc')
+        ->where('sc.eleve = :eleveId')
+        ->setParameter('eleveId', $eleveId)
+        ->orderBy('sc.id', 'DESC') // Trier par ordre croissant (modifiable selon besoin)
+        ->setMaxResults($limit) // Limiter à 5 résultats
+        ->getQuery()
+        ->getResult();
+}
+
 }

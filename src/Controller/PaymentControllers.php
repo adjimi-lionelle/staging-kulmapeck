@@ -4,8 +4,10 @@ namespace App\Controller;
 
 //use ApiPlatform\OpenApi\Model\Response;
 use App\Entity\Notification;
+use App\Entity\SubjectChat;
 use App\Repository\EleveRepository;
-use App\Repository\NetworkConfigRepository;
+use App\Repository\NetworkConfigRepository; 
+use App\Repository\MatiereCycleRepository;          
 use App\Repository\NotificationRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\RetraitRepository;
@@ -49,7 +51,8 @@ class PaymentControllers extends AbstractController
     #[Route('/callback', name: 'app_payment_callback', methods: 'GET')]
     public function handleCallback(Request $request, NotificationRepository $notificationRepository,
      UserRepository $userRepository, NetworkConfigRepository $networkConfigRepository,
-      EleveRepository $eleveRepository, PaymentRepository $paymentRepository, RetraitRepository $retraitRepository, EntityManagerInterface $em):JsonResponse   {
+      EleveRepository $eleveRepository, PaymentRepository $paymentRepository, RetraitRepository $retraitRepository, EntityManagerInterface $em,
+      MatiereCycleRepository $MatiereCycleRepository):JsonResponse   {
         // Check if Kulmapeck  sender's IP address
 	   /* $senderIp = $request->getClientIp();
 	  
@@ -79,6 +82,7 @@ class PaymentControllers extends AbstractController
                 $eleve->setIsPremium(true);
                 //$payment->getEleve()->setIsPremium(true);
                 $eleveRepository->save($eleve, true);
+                $this->manageSubjectChats($eleve, $em, $MatiereCycleRepository);
             }elseif ($payment->getCours() !== null) {
                 $eleve->addCour($payment->getCours());
             }
@@ -99,7 +103,7 @@ class PaymentControllers extends AbstractController
             $notificationRepository->save($notification, true);
 
             // On gère la distribution des points pour le reseau
-            if ($eleve !== null) {
+            /*if ($eleve !== null) {
                 // On cherche tous les payments effectués par l'eleve et qui ont abouti
                 $payments = $paymentRepository->findBy(['eleve' => $eleve, 'status' => $status]);
                 // S'il a moins de deux payments abouti alors on cherche à partager les points
@@ -110,7 +114,7 @@ class PaymentControllers extends AbstractController
                          $userRepository, $em,$payment->getAbonnement());
                     }
                // }
-            }
+            }*/
             
         }
         elseif ($payment !== null) {
@@ -131,7 +135,7 @@ class PaymentControllers extends AbstractController
 	return new JsonResponse(['message' => 'Callback received successfully'], 200);
 
     }
-    
+
     #[Route('/email', name: 'balance', methods: ['GET'])]
     public function emailSender(MailerInterface $mailer )
     {
@@ -153,6 +157,82 @@ class PaymentControllers extends AbstractController
         }
     }
 
+   private function manageSubjectChats($eleve,$entityManager,$MatiereCycleRepository): void
+    {
+        // Récupérer la classe et le cycle de l'élève
+        $classe = $eleve->getClasse();
+        if (!$classe || !$classe->getSkillLevel()) {
+            return; // Si la classe ou le niveau de compétence n'est pas défini, on arrête
+        }
+
+        $skill_level = $classe->getSkillLevel()->getId();
+            
+            if ($skill_level >= 5 && $skill_level <= 7) {
+                $matieres = $MatiereCycleRepository->findBy(['cycle' => 2]);
+            } elseif ($skill_level == 1 || $skill_level ==2) {
+                $matieres = $MatiereCycleRepository->findBy(['cycle' => 1]);
+            } elseif ($skill_level == 3 || $skill_level == 4) {
+                if($classe->getName() == "Quatrième ALL- 4ème ALL" || $classe->getName() == "Troisième ALL- 3ème ALL" || $classe->getName() == "Troisième Bilingue Allemand- 3ème BIL. ALL"){
+                    $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
+                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                    ->setParameter('cycle1', 1)
+                    ->setParameter('cycle2', 11)
+                    ->getQuery()
+                    ->getResult();
+                } elseif ($classe->getName() == "Quatrième ESP- 4ème ESP" || $classe->getName() == "Troisième ESP- 3ème ESP" || $classe->getName() == "Troisième Bilingue Espagnol- 3ème BIL. ESP"){
+                    $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
+                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                    ->setParameter('cycle1', 1)
+                    ->setParameter('cycle2', 12)
+                    ->getQuery()
+                    ->getResult();
+                } elseif ($classe->getName() == "Troisième Chinois- 3ème Chinois"){
+                    $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
+                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                    ->setParameter('cycle1', 1)
+                    ->setParameter('cycle2', 14)
+                    ->getQuery()
+                    ->getResult();
+                }
+            
+            } else {
+                return;
+            }
+
+        // Récupérer toutes les matières liées à son cycle
+        //$matieres = $entityManager->getRepository(Categorie::class)->findBy(['cycle' => $cycle]);
+
+        foreach ($matieres as $matiere) {
+            // Vérifier si un SubjectChat existe déjà pour cette matière et cet élève
+            $existingSubjectChat = $entityManager->getRepository(SubjectChat::class)
+                ->findOneBy(['eleve' => $eleve, 'matiere' => $matiere->getMatiere()]);
+
+            if ($existingSubjectChat) {
+                // Mettre à jour la date de dernière activité pour réactiver la discussion
+                $existingSubjectChat->setCreatedAt(new \DateTimeImmutable());
+                $entityManager->persist($existingSubjectChat);
+            } else {
+                // Créer un nouveau SubjectChat pour cette matière
+                $subjectChat = new SubjectChat();
+                $subjectChat->setEleve($eleve);
+                $subjectChat->setMatiere($matiere->getMatiere());
+                $subjectChat->setCycle($matiere->getCycle());
+                $subjectChat->setName($matiere->getName());
+                $subjectChat->setCreatedAt(new \DateTimeImmutable());
+
+                // Récupérer un enseignant par défaut pour cette matière (si applicable)
+           /* $teacherPersona = $entityManager->getRepository(Enseignant::class)->findOneBy(['matiere' => $matiere]);
+                if ($teacherPersona) {
+                    $subjectChat->setTeacherPersona($teacherPersona);
+                }*/
+
+             $entityManager->persist($subjectChat);
+            }
+        }
+
+        // Exécuter les changements en base de données
+        $entityManager->flush();
+    }
 
 
 }

@@ -7,7 +7,9 @@ use App\Entity\MessageChat;
 use App\Entity\MatiereCycle;    
 use App\Entity\SubjectChat;
 use App\Repository\EleveRepository;
+use App\Repository\MatiereCycleRepository;
 use App\Repository\SubjectChatRepository;
+use App\Repository\CategorieRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\MessageChatRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,12 +38,14 @@ class ChatController extends AbstractController
     private EleveRepository $eleveRepository,
     private SubjectChatRepository $subjectChatRepository,
     private MessageChatRepository $messageChatRepository,
+    private EntityManagerInterface $entityManager,
     RequestStack $requestStack)
     {
         
         $this->jwtSecret = $jwtSecret;
         $this->subjectChatRepository = $subjectChatRepository;
         $this->requestStack = $requestStack;
+        $this->entityManager = $entityManager;
     }  
 
     
@@ -101,38 +105,9 @@ class ChatController extends AbstractController
     }
 
 
-     /* Création d'un token temporaire */
-    /* #[Route('/websocket/token', name: 'api_websocket_token', methods: ['GET'])]*/
-   /*  #[IsGranted('ROLE_USER')]*/
-    /* public function generateWebSocketToken(): JsonResponse
-     {
-        $user = $this->getUser();
- 
-         if (!$user) {
-             return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
-         }
-
-          /** @var Eleve $student */
-       /* $student = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
-        if (!$student) {
-            throw $this->createAccessDeniedException('Student account not found.');
-        }
- 
-         // Générer un token sécurisé avec expiration
-         $payload = [
-             'user_id' => $student->getId(),
-             'exp' => time() + 3600,
-         ];
- 
-         // Génération du token avec Firebase JWT
-         $token = JWT::encode($payload, $this->jwtSecret, 'HS256');
- 
-         return new JsonResponse(['token' => $token]);
-     }*/
-
     #[Route('/websocket/token/{subjectChatId}', name: 'api_websocket_token', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function generateWebSocketToken(int $subjectChatId, EntityManagerInterface $entityManager): JsonResponse
+    public function generateWebSocketToken(int $subjectChatId): JsonResponse
     {
         $user = $this->getUser();
 
@@ -155,7 +130,7 @@ class ChatController extends AbstractController
         }
 
         // Vérifier que la discussion existe
-        $subjectChat = $entityManager->getRepository(SubjectChat::class)->find($subjectChatId);
+        $subjectChat = $this->entityManager->getRepository(SubjectChat::class)->find($subjectChatId);
         if (!$subjectChat) {
             return new JsonResponse(['error' => 'Discussion non trouvée'], 404);
         }
@@ -178,12 +153,11 @@ class ChatController extends AbstractController
         return new JsonResponse(['token' => $token]);
     }
 
-
      #[Route('/subjectchat/init', name: 'api_groupchat_init')]
-     public function createSubjectChats(EntityManagerInterface $entityManager): JsonResponse
+     public function createSubjectChats(): JsonResponse
     {
 
-        $matiereCycles = $entityManager->getRepository(MatiereCycle::class)
+        $matiereCycles = $this->entityManager->getRepository(MatiereCycle::class)
             ->createQueryBuilder('mc')
             ->setMaxResults(15)
             ->getQuery()
@@ -202,13 +176,32 @@ class ChatController extends AbstractController
             // Définir le type par défaut (enseignant ou IA)
             //$subjectChat->setType('teacher'); // Change en 'ai' si nécessaire
             
-            $entityManager->persist($subjectChat);
+            $this->entityManager->persist($subjectChat);
         }
 
-        $entityManager->flush();
+        $this->entityManager->flush();
         
         return $this->json(['message' => '15 SubjectChats créés avec succès !']);
     }
+
+    #[Route('/matiereCycle/update', name: 'matiereCycle')]
+    public function updateMatiereCycle(MatiereCycleRepository $MatiereCycleRepository,
+                                       CategorieRepository $CategorieRepository): JsonResponse
+   {
+
+       $matiereCycles = $MatiereCycleRepository->findAll();
+
+       foreach ($matiereCycles as $matiereCycle) {
+           $matiereCycle->setName($matiereCycle->getMatiere()->getName());
+           
+           $this->entityManager->persist($matiereCycle);
+       }
+
+
+       $this->entityManager->flush();
+       
+       return $this->json(['message' => 'matiere cycle modifie !']);
+   }
 
         /**
      * Récupérer les groupes auxquels un élève connecté appartient/ completer  
@@ -217,8 +210,7 @@ class ChatController extends AbstractController
      */
     #[Route('/subjectChats', name: 'api_chat_subjectChats', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
-    public function getMyGroups(SubjectChatRepository $groupChatRepository,
-                                PersonneRepository $personneRepository): JsonResponse
+    public function getMyGroups(PersonneRepository $personneRepository): JsonResponse
     {
         $user = $this->getUser();
         //echo $user->getId();
@@ -245,52 +237,15 @@ class ChatController extends AbstractController
             // but just in case, return a proper JSON response
             return new JsonResponse(['error' => 'Accès refusé : vous devez être premium pour accéder au chat', 'redirect' => 'app_student_subscriptions'], 403);
         }
-
-        $classe = $eleve->getClasse();
-        if (!$classe || !$classe->getSkillLevel()) {
-            return new JsonResponse(['error' => 'Aucune classe ou niveau de compétence trouvé'], 400);
-        }
-
-        $skill_level = $classe->getSkillLevel()->getId();
         
-        if ($skill_level >= 5 && $skill_level <= 7) {
-            $subjectChats = $groupChatRepository->findBy(['cycle' => 2]);
-        } elseif ($skill_level == 1 || $skill_level ==2) {
-            $subjectChats = $groupChatRepository->findBy(['cycle' => 1]);
-        } elseif ($skill_level == 3 || $skill_level == 4) {
-            if($classe->getName() == "Quatrième ALL- 4ème ALL" || $classe->getName() == "Troisième ALL- 3ème ALL" || $classe->getName() == "Troisième Bilingue Allemand- 3ème BIL. ALL"){
-                $subjectChats = $groupChatRepository->createQueryBuilder('sc')
-                ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                ->setParameter('cycle1', 1)
-                ->setParameter('cycle2', 11)
-                ->getQuery()
-                ->getResult();
-            } elseif ($classe->getName() == "Quatrième ESP- 4ème ESP" || $classe->getName() == "Troisième ESP- 3ème ESP" || $classe->getName() == "Troisième Bilingue Espagnol- 3ème BIL. ESP"){
-                $subjectChats = $groupChatRepository->createQueryBuilder('sc')
-                ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                ->setParameter('cycle1', 1)
-                ->setParameter('cycle2', 12)
-                ->getQuery()
-                ->getResult();
-            } elseif ($classe->getName() == "Troisième Chinois- 3ème Chinois"){
-                $subjectChats = $groupChatRepository->createQueryBuilder('sc')
-                ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                ->setParameter('cycle1', 1)
-                ->setParameter('cycle2', 14)
-                ->getQuery()
-                ->getResult();
-            }
         
-        } else {
-            return new JsonResponse(['error' => 'Niveau de compétence non valide'], 400);
-        }
-
+        $subjectChats = $this->subjectChatRepository->findByEleveOrderedLimited($eleve->getId());
     
         $data = array_map(function ($subjectChat) use ($user) {
             return [
                 'id' => $subjectChat->getId(),
                 'name' => $subjectChat->getName(),
-                'type' => $subjectChat->getType(),
+                'eleve' => $subjectChat->getEleve(),
                 'cycle' => $subjectChat->getCycle(),
                 'unreadCount' => $this->getUnreadCount($subjectChat, $user)
             ];

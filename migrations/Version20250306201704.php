@@ -89,8 +89,8 @@ final class Version20250306201704 extends AbstractMigration
         $this->addSql('ALTER TABLE membre_forum ADD CONSTRAINT FK_330DB14C6A99F74A FOREIGN KEY (membre_id) REFERENCES membre (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE membre_forum ADD CONSTRAINT FK_330DB14C29CCBAD0 FOREIGN KEY (forum_id) REFERENCES forum (id) ON DELETE CASCADE');*/
 
-        $this->addSql('ALTER TABLE message_chat ADD teacher_persona_id INT NOT NULL, ADD expires_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', ADD is_moderated TINYINT(1) NOT NULL');
-        $this->addSql('ALTER TABLE message_chat ADD CONSTRAINT FK_CC0869737FE72F19 FOREIGN KEY (teacher_persona_id) REFERENCES enseignant (id)');
+        /*$this->addSql('ALTER TABLE message_chat ADD teacher_persona_id INT NOT NULL, ADD expires_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', ADD is_moderated TINYINT(1) NOT NULL');
+        $this->addSql('ALTER TABLE message_chat ADD CONSTRAINT FK_CC0869737FE72F19 FOREIGN KEY (teacher_persona_id) REFERENCES enseignant (id)');*/
         
         /*$this->addSql('CREATE INDEX IDX_CC0869737FE72F19 ON message_chat (teacher_persona_id)');
         $this->addSql('ALTER TABLE notification ADD CONSTRAINT FK_BF5476CAA4F84F6E FOREIGN KEY (destinataire_id) REFERENCES kulmapeck_user (id)');
@@ -123,11 +123,11 @@ final class Version20250306201704 extends AbstractMigration
         $this->addSql('ALTER TABLE review ADD CONSTRAINT FK_794381C6A6CC7B2 FOREIGN KEY (eleve_id) REFERENCES eleve (id)');
         $this->addSql('ALTER TABLE specialite ADD CONSTRAINT FK_E7D6FCC1180AA129 FOREIGN KEY (filiere_id) REFERENCES filiere (id)');*/
        
-        $this->addSql('ALTER TABLE subject_chat ADD eleve_id INT NOT NULL, ADD teacher_persona_id INT NOT NULL, DROP type');
+       /* $this->addSql('ALTER TABLE subject_chat ADD eleve_id INT NOT NULL, ADD teacher_persona_id INT NOT NULL, DROP type');
         $this->addSql('ALTER TABLE subject_chat ADD CONSTRAINT FK_F7577671A6CC7B2 FOREIGN KEY (eleve_id) REFERENCES eleve (id)');
         $this->addSql('ALTER TABLE subject_chat ADD CONSTRAINT FK_F75776717FE72F19 FOREIGN KEY (teacher_persona_id) REFERENCES enseignant (id)');
         $this->addSql('CREATE INDEX IDX_F7577671A6CC7B2 ON subject_chat (eleve_id)');
-        $this->addSql('CREATE INDEX IDX_F75776717FE72F19 ON subject_chat (teacher_persona_id)');
+        $this->addSql('CREATE INDEX IDX_F75776717FE72F19 ON subject_chat (teacher_persona_id)');*/
 
         /*$this->addSql('ALTER TABLE sujet ADD CONSTRAINT FK_2E13599D6A99F74A FOREIGN KEY (membre_id) REFERENCES membre (id)');
         $this->addSql('ALTER TABLE sujet ADD CONSTRAINT FK_2E13599D29CCBAD0 FOREIGN KEY (forum_id) REFERENCES forum (id)');*/
