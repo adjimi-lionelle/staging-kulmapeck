@@ -240,6 +240,7 @@ class ChatController extends AbstractController
         
         
         $subjectChats = $this->subjectChatRepository->findByEleveOrderedLimited($eleve->getId());
+
     
         $data = array_map(function ($subjectChat) use ($user) {
             return [
