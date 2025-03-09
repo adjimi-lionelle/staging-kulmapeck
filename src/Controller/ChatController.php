@@ -12,6 +12,7 @@ use App\Repository\SubjectChatRepository;
 use App\Repository\CategorieRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\MessageChatRepository;
+use App\Service\DeepSeekAIService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,12 +34,14 @@ class ChatController extends AbstractController
     private string $jwtSecret;
     private JWTTokenManagerInterface $jwtManager;
     private RequestStack $requestStack;
+    private DeepSeekAIService $aiService;
 
     public function __construct(string $jwtSecret,
     private EleveRepository $eleveRepository,
     private SubjectChatRepository $subjectChatRepository,
     private MessageChatRepository $messageChatRepository,
     private EntityManagerInterface $entityManager,
+    DeepSeekAIService $aiService,
     RequestStack $requestStack)
     {
         
@@ -46,6 +49,7 @@ class ChatController extends AbstractController
         $this->subjectChatRepository = $subjectChatRepository;
         $this->requestStack = $requestStack;
         $this->entityManager = $entityManager;
+        $this->aiService = $aiService;
     }  
 
     
@@ -305,7 +309,24 @@ class ChatController extends AbstractController
         $entityManager->persist($message);
         $entityManager->flush();
         
-        return new JsonResponse([
+        // Check if this chat should have AI responses
+        $aiResponse = null;
+        if ($this->isAIEnabledChat($chat)) {
+            // Process AI response
+            $aiMessage = $this->processAIResponse($chat, $data['content'], $user);
+            
+            if ($aiMessage) {
+                $aiResponse = [
+                    'id' => $aiMessage->getId(),
+                    'content' => $aiMessage->getContent(),
+                    'sender' => $user->getId(),
+                    'isFromAI' => true,
+                    'createdAt' => $aiMessage->getCreateAt()->format('c')
+                ];
+            }
+        }
+        
+        $response = [
             'success' => true,
             'message' => [
                 'id' => $message->getId(),
@@ -313,7 +334,75 @@ class ChatController extends AbstractController
                 'sender' => $user->getId(),
                 'createdAt' => $message->getCreateAt()->format('c')
             ]
-        ]);
+        ];
+        
+        if ($aiResponse) {
+            $response['aiResponse'] = $aiResponse;
+        }
+        
+        return new JsonResponse($response);
+    }
+    
+    /**
+     * Process and generate an AI response for a message
+     */
+    private function processAIResponse(SubjectChat $chat, string $userMessage, $user): ?MessageChat
+    {
+        try {
+            // Get recent messages for context (last 10)
+            $recentMessages = $this->messageChatRepository->findBy(
+                ['subjectChat' => $chat],
+                ['createAt' => 'DESC'],
+                10
+            );
+            
+            // Format messages for the AI
+            $messageHistory = array_map(function($msg) {
+                return [
+                    'content' => $msg->getContent(),
+                    'isFromAI' => $msg->isIsFromAI()
+                ];
+            }, array_reverse($recentMessages));
+            
+            // Get subject name
+            $subjectName = $chat->getMatiere()->getName();
+            
+            // Generate AI response
+            $aiResponse = $this->aiService->generateResponse(
+                $userMessage,
+                $subjectName,
+                $messageHistory
+            );
+            
+            // Create and save AI message
+            $message = new MessageChat();
+            $message->setContent($aiResponse);
+            $message->setSender($user); // Use the same user but mark as AI
+            $message->setSubjectChat($chat);
+            $message->setIsRead(false);
+            $message->setIsFromAI(true);
+            $message->setCreateAt(new \DateTimeImmutable());
+            
+            $this->entityManager->persist($message);
+            $this->entityManager->flush();
+            
+            return $message;
+        } catch (\Exception $e) {
+            // Log the error
+            error_log('Error generating AI response: ' . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Determine if a subject chat should have AI responses
+     * This is a placeholder implementation - you might want to add a field to the SubjectChat entity
+     */
+    private function isAIEnabledChat(SubjectChat $chat): bool
+    {
+        // For now, we'll enable AI for all chats
+        // In the future, you might want to check a field on the SubjectChat entity
+        return true;
     }
     
     /**

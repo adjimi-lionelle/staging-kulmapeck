@@ -538,7 +538,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (data.message) {
             // If timestamp is provided, use it for message time display
             const timestamp = data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null;
-            addMessage(data.message, data.author || 'User', false, timestamp);
+            
+            // Check if message is from AI
+            const isFromAI = data.isFromAI || false;
+            const author = isFromAI ? 'AI Teacher' : (data.author || 'User');
+            
+            // Add message with appropriate styling
+            addMessage(data.message, author, false, timestamp, isFromAI);
         } else if (data.type === 'typing') {
             handleTypingIndicator(data.user, data.isTyping);
         }
@@ -575,7 +581,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 isCurrentUser ? 'You' : (msg.isFromAI ? 'AI Teacher' : 'User'), 
                 isCurrentUser, 
                 timestamp, 
-                messageWrapper
+                messageWrapper,
+                msg.isFromAI || false
             );
         });
         
@@ -589,14 +596,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add a new message
-    function addMessage(content, author, isCurrentUser, timestamp) {
+    function addMessage(content, author, isCurrentUser, timestamp, isFromAI = false) {
         const messageWrapper = document.querySelector('.message-wrapper');
         if (!messageWrapper) return;
         
         const now = new Date();
         const timeString = timestamp || now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         
-        addMessageToDOM(content, author, isCurrentUser, timeString, messageWrapper);
+        addMessageToDOM(content, author, isCurrentUser, timeString, messageWrapper, isFromAI);
         scrollToBottom();
         
         // Update the preview in the sidebar
@@ -604,9 +611,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add message to DOM
-    function addMessageToDOM(content, author, isCurrentUser, time, container) {
+    function addMessageToDOM(content, author, isCurrentUser, time, container, isFromAI = false) {
         const messageItem = document.createElement('div');
-        messageItem.className = `message-item ${isCurrentUser ? 'sent' : 'received'}`;
+        messageItem.className = `message-item ${isCurrentUser ? 'sent' : 'received'} ${isFromAI ? 'ai-message' : ''}`;
         
         // Check if it's a message with attachment
         const hasAttachment = content.includes('project_brief.pdf') || content.includes('file');
@@ -790,6 +797,33 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Clear input
                     messageInput.value = '';
+                    
+                    // Handle AI response if present
+                    if (data.aiResponse) {
+                        setTimeout(() => {
+                            // Show typing indicator for AI
+                            const typingIndicator = document.createElement('div');
+                            typingIndicator.className = 'typing-indicator';
+                            typingIndicator.innerHTML = '<span>AI is typing</span><span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>';
+                            messageWrapper.appendChild(typingIndicator);
+                            scrollToBottom();
+                            
+                            // After a short delay, show the AI response
+                            setTimeout(() => {
+                                // Remove typing indicator
+                                typingIndicator.remove();
+                                
+                                // Add AI message
+                                addMessage(
+                                    data.aiResponse.content,
+                                    'AI Teacher',
+                                    false,
+                                    new Date(data.aiResponse.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                                    true // isFromAI
+                                );
+                            }, 1500); // Simulate typing time
+                        }, 500); // Small delay before AI starts "typing"
+                    }
                 }
             })
             .catch(error => {
