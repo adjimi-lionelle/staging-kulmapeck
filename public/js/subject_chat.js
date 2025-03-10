@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let token = null;
     let typingTimeout = null;
     let lastTypingStatus = false;
+    let isMobileView = window.innerWidth <= 768;
     
     // Initialize the chat system
     function initialize() {
@@ -40,6 +41,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!sendButton) {
             console.error('DEBUG: Send button element not found');
         }
+        
+        // Setup mobile view if needed
+        setupMobileView();
         
         // If subjects are not pre-loaded in the template, fetch them
         if (subjectList) {
@@ -82,6 +86,50 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             sendButton.addEventListener('click', sendMessage);
+        }
+        
+        // Handle window resize for mobile view
+        window.addEventListener('resize', function() {
+            const wasMobileView = isMobileView;
+            isMobileView = window.innerWidth <= 768;
+            
+            // If mobile state changed, update the view
+            if (wasMobileView !== isMobileView) {
+                setupMobileView();
+            }
+        });
+    }
+    
+    // Setup mobile view
+    function setupMobileView() {
+        if (chatContainer) {
+            if (isMobileView) {
+                chatContainer.classList.add('mobile-view');
+                
+                // Create back button if it doesn't exist
+                if (!document.querySelector('.mobile-back-button')) {
+                    const backButton = document.createElement('button');
+                    backButton.className = 'mobile-back-button';
+                    backButton.innerHTML = '<i class="bi bi-arrow-left"></i> Back to Subjects';
+                    backButton.addEventListener('click', function() {
+                        chatContainer.classList.remove('chat-active');
+                    });
+                    
+                    // Insert before chat header
+                    if (chatHeader && chatHeader.parentNode) {
+                        chatHeader.parentNode.insertBefore(backButton, chatHeader);
+                    }
+                }
+            } else {
+                chatContainer.classList.remove('mobile-view');
+                chatContainer.classList.remove('chat-active');
+                
+                // Remove back button if it exists
+                const backButton = document.querySelector('.mobile-back-button');
+                if (backButton) {
+                    backButton.remove();
+                }
+            }
         }
     }
     
@@ -344,52 +392,49 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Select a subject and connect to WebSocket
     function selectSubject(subjectId) {
-        console.log(`DEBUG: selectSubject() called with id: ${subjectId}`);
+        console.log(`DEBUG: selectSubject() called with ID ${subjectId}`);
         
         if (!subjectId) {
             console.error('DEBUG: No subject ID provided');
             return;
         }
         
-        if (currentSubject === subjectId) {
-            console.log(`DEBUG: Subject ${subjectId} already selected, skipping`);
-            return;
+        // Update UI for selected subject
+        document.querySelectorAll('.chat-item').forEach(item => {
+            if (item.dataset.subjectId === subjectId) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+        
+        // Disconnect from previous WebSocket if any
+        if (socket) {
+            console.log('DEBUG: Disconnecting from previous WebSocket');
+            socket.close();
+            socket = null;
         }
         
-        console.log(`DEBUG: Changing selected subject from ${currentSubject || 'none'} to ${subjectId}`);
+        // Update current subject
         currentSubject = subjectId;
         
-        // Close existing socket if any
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            console.log('DEBUG: Closing existing WebSocket connection');
-            socket.close();
-        }
-        
-        // Update header with subject info
-        console.log('DEBUG: Updating chat header');
+        // Update chat header
         updateChatHeader(subjectId);
         
-        // Clear messages
-        console.log('DEBUG: Clearing message container');
-        chatMessages.innerHTML = `
-            <div class="message-wrapper">
-                <div class="message-time">Today</div>
-            </div>
-        `;
-        
-        // Load messages via REST API first
-        console.log(`DEBUG: Loading messages for subject ${subjectId}`);
+        // Load messages
         loadMessages(subjectId);
         
-        // Get WebSocket token and connect
-        console.log(`DEBUG: Getting WebSocket token for subject ${subjectId}`);
+        // Get WebSocket token
         getWebSocketToken(subjectId);
         
-        // Dispatch event to notify that a subject has been selected
-        console.log('DEBUG: Dispatching subjectSelected event');
-        document.dispatchEvent(new CustomEvent('subjectSelected', {
-            detail: { subjectId: subjectId }
-        }));
+        // Dispatch event that a subject was selected
+        const event = new CustomEvent('subjectSelected', { detail: { subjectId } });
+        document.dispatchEvent(event);
+        
+        // For mobile view, show chat content
+        if (isMobileView && chatContainer) {
+            chatContainer.classList.add('chat-active');
+        }
     }
     
     // Load messages via REST API
