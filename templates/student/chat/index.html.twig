@@ -30,7 +30,7 @@
                     </div>
                     <div class="modal-footer">
                         {% if not isProfileComplete %}
-                            <a href="{{ path('app_student_profile') }}" class="btn btn-primary">Update Profile</a>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#setupModal" class="btn btn-primary">Update Profile</a>
                         {% endif %}
                         {% if not isPremium %}
                             <a href="{{ path('app_student_subscriptions') }}" class="btn btn-success">Upgrade Account</a>
@@ -47,6 +47,8 @@
             });
         </script>
     {% endif %}
+
+    {% include 'student/chat/_setup_modal.html.twig' %}
 
     <div class="chat-app">
         <div class="chat-sidebar">
