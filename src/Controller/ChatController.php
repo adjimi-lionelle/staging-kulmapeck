@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
-
 use App\Entity\MessageChat;
 use App\Entity\MatiereCycle;    
 use App\Entity\SubjectChat;
+use App\Repository\ClasseRepository;
+use App\Repository\SpecialiteRepository;
 use App\Repository\EleveRepository;
 use App\Repository\MatiereCycleRepository;
 use App\Repository\SubjectChatRepository;
@@ -13,19 +14,19 @@ use App\Repository\CategorieRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\MessageChatRepository;
 use App\Service\DeepSeekAIService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Core\Security;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Security\Core\Security;
-use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ChatController extends AbstractController
@@ -520,5 +521,66 @@ class ChatController extends AbstractController
                $request->getRequestFormat() === 'json' ||
                strpos($request->getPathInfo(), '/api/') === 0 ||
                in_array('application/json', $request->getAcceptableContentTypes());
+    }
+
+    #[Route('/student/chat/update-profile', name: 'app_student_chat_update_profile', methods: ['POST'])]
+    public function updateProfile(Request $request, EleveRepository $eleveRepository, ClasseRepository $classeRepository, SpecialiteRepository $specialiteRepository, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $student = $user->getEleve();
+        if (!$student) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $classeId = $request->request->get('classe');
+        $specialiteId = $request->request->get('specialite');
+        
+        $success = false;
+        $message = '';
+        
+        try {
+            if ($classeId) {
+                $classe = $classeRepository->find($classeId);
+                if (!$classe) {
+                    $message = 'Class not found';
+                } else {
+                    $student->setClasse($classe);
+                    
+                    // If specialite is provided and the class requires it
+                    if ($specialiteId) {
+                        $specialite = $specialiteRepository->find($specialiteId);
+                        if ($specialite) {
+                            $classe->setSpecialite($specialite);
+                        }
+                    }
+                    
+                    $entityManager->persist($student);
+                    $entityManager->flush();
+                    
+                    $success = true;
+                    $message = 'Profile updated successfully';
+                }
+            } else {
+                $message = 'Class ID is required';
+            }
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+        }
+        
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => $success, 'message' => $message]);
+        }
+        
+        if ($success) {
+            $this->addFlash('success', $message);
+        } else {
+            $this->addFlash('error', $message);
+        }
+        
+        return $this->redirectToRoute('app_student_chat');
     }
 }

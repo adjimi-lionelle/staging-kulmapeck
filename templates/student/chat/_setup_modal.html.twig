@@ -10,7 +10,7 @@
                 <div class="profile-setup-section mb-4">
                     <h6>{% trans %}COMPLETE_YOUR_PROFILE{% endtrans %}</h6>
                     <p>{% trans %}SELECT_CLASS_DESCRIPTION{% endtrans %}</p>
-                    <form id="setup-form" method="POST">
+                    <form id="setup-form" method="POST" action="{{ path('app_student_chat_update_profile') }}">
                         <div class="mb-3">
                             <label for="classe" class="form-label">{% trans %}SELECT_CLASS{% endtrans %}</label>
                             <select class="form-select" id="classe" name="classe" required>
@@ -158,40 +158,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Prepare form data
-        const formData = new FormData();
-        formData.append('classe', classeSelect.value);
-        
-        if (specialiteSelect.value) {
-            formData.append('specialite', specialiteSelect.value);
-        }
-
-        // Submit form data via AJAX
-        fetch('{{ path('app_student_profile_edit') }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Reload the page to reflect changes
-                window.location.reload();
-            } else {
-                alert(data.message || '{% trans %}ERROR_UPDATING_PROFILE{% endtrans %}');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('{% trans %}ERROR_UPDATING_PROFILE{% endtrans %}');
-        });
+        // Submit the form directly
+        this.submit();
     });
     {% endif %}
 });
