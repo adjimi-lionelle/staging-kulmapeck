@@ -169,7 +169,7 @@ class PaymentControllers extends AbstractController
             
             if ($skill_level >= 5 && $skill_level <= 7) {
                 $matieres = $MatiereCycleRepository->findBy(['cycle' => 2]);
-            } elseif ($skill_level == 1 || $skill_level ==2) {
+            } elseif ($skill_level == 1 || $skill_level == 2) {
                 $matieres = $MatiereCycleRepository->findBy(['cycle' => 1]);
             } elseif ($skill_level == 3 || $skill_level == 4) {
                 if($classe->getName() == "Quatrième ALL- 4ème ALL" || $classe->getName() == "Troisième ALL- 3ème ALL" || $classe->getName() == "Troisième Bilingue Allemand- 3ème BIL. ALL"){
