@@ -103,7 +103,7 @@ class PaymentControllers extends AbstractController
             $notificationRepository->save($notification, true);
 
             // On gère la distribution des points pour le reseau
-            /*if ($eleve !== null) {
+            if ($eleve !== null) {
                 // On cherche tous les payments effectués par l'eleve et qui ont abouti
                 $payments = $paymentRepository->findBy(['eleve' => $eleve, 'status' => $status]);
                 // S'il a moins de deux payments abouti alors on cherche à partager les points
@@ -114,7 +114,7 @@ class PaymentControllers extends AbstractController
                          $userRepository, $em,$payment->getAbonnement());
                     }
                // }
-            }*/
+            }
             
         }
         elseif ($payment !== null) {
