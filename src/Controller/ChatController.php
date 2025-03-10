@@ -581,6 +581,6 @@ class ChatController extends AbstractController
             $this->addFlash('error', $message);
         }
         
-        return $this->redirectToRoute('app_student_chat');
+        return $this->redirectToRoute('app_chat');
     }
 }
