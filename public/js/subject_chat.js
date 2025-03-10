@@ -2,8 +2,10 @@
  * Kulmapeck Chat System
  * Handles WebSocket connections and chat functionality
  */
+console.log("DEBUG: Script subject_chat.js chargé !");
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DEBUG: DOMContentLoaded event fired, initializing chat");
     // DOM Elements
     const chatContainer = document.querySelector('.chat-app');
     const subjectList = document.getElementById('subject-list');
@@ -236,7 +238,13 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         console.log('DEBUG: Fetching subjects from API endpoint: /subjectChats');
-        fetch('/subjectChats')
+        fetch('/api/chat/subjectChats', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include' // ✅ S'assure que les cookies de session sont envoyés
+            })
             .then(response => {
                 console.log('DEBUG: API response received', {
                     status: response.status,

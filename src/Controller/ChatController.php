@@ -210,7 +210,7 @@ class ChatController extends AbstractController
      * cette fonction pour envoyer le nombbre de message non lu pr un user connecté dans chacun de ses groupe 
      * exempele groupe 1 nombre de message non lu groupe 2 nombre de message non lu groupe 3 nombre de message non lu
      */
-    #[Route('/subjectChats', name: 'api_chat_subjectChats', methods: ['GET'])]
+    #[Route('/api/chat/subjectChats', name: 'api_chat_subjectChats', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function getMyGroups(PersonneRepository $personneRepository): JsonResponse
     {
