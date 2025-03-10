@@ -57,6 +57,10 @@ services:
     App\Twig\TwigTimeExtension:
         tags: ['twig.extension']
 
+    App\Service\DeepSeekAIService:
+        arguments:
+            $deepseekApiKey: '%env(DEEPSEEK_API_KEY)%'
+
     # WebSocket Server Command
     App\Command\WebSocketServerCommand:
         arguments:

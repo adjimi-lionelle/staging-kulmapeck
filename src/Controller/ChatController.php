@@ -2,29 +2,31 @@
 
 namespace App\Controller;
 
-
 use App\Entity\MessageChat;
 use App\Entity\MatiereCycle;    
 use App\Entity\SubjectChat;
+use App\Repository\ClasseRepository;
+use App\Repository\SpecialiteRepository;
 use App\Repository\EleveRepository;
 use App\Repository\MatiereCycleRepository;
 use App\Repository\SubjectChatRepository;
 use App\Repository\CategorieRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\MessageChatRepository;
+use App\Service\DeepSeekAIService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Security\Core\Security;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Security\Core\Security;
-use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ChatController extends AbstractController
@@ -33,12 +35,14 @@ class ChatController extends AbstractController
     private string $jwtSecret;
     private JWTTokenManagerInterface $jwtManager;
     private RequestStack $requestStack;
+    private DeepSeekAIService $aiService;
 
     public function __construct(string $jwtSecret,
     private EleveRepository $eleveRepository,
     private SubjectChatRepository $subjectChatRepository,
     private MessageChatRepository $messageChatRepository,
     private EntityManagerInterface $entityManager,
+    DeepSeekAIService $aiService,
     RequestStack $requestStack)
     {
         
@@ -46,6 +50,7 @@ class ChatController extends AbstractController
         $this->subjectChatRepository = $subjectChatRepository;
         $this->requestStack = $requestStack;
         $this->entityManager = $entityManager;
+        $this->aiService = $aiService;
     }  
 
     
@@ -86,19 +91,16 @@ class ChatController extends AbstractController
             }
         }
         
-        // If profile is incomplete, show setup modal
-        if (!$isProfileComplete) {
+        // Check if premium status is required
+        $isPremium = $student->isIsPremium();
+        
+        // If profile is incomplete or not premium, show setup modal
+        if (!$isProfileComplete || !$isPremium) {
             return $this->render('student/chat/index.html.twig', [
                 'showSetupModal' => true,
-                'isPremium' => $student->isIsPremium(),
+                'isPremium' => $isPremium,
                 'isProfileComplete' => $isProfileComplete
             ]);
-        }
-        
-        // Check premium access
-        $redirect = $this->checkPremiumAccess($student);
-        if ($redirect instanceof RedirectResponse) {
-            return $redirect;
         }
         
         return $this->render('student/chat/index.html.twig');
@@ -305,7 +307,24 @@ class ChatController extends AbstractController
         $entityManager->persist($message);
         $entityManager->flush();
         
-        return new JsonResponse([
+        // Check if this chat should have AI responses
+        $aiResponse = null;
+        if ($this->isAIEnabledChat($chat)) {
+            // Process AI response
+            $aiMessage = $this->processAIResponse($chat, $data['content'], $user);
+            
+            if ($aiMessage) {
+                $aiResponse = [
+                    'id' => $aiMessage->getId(),
+                    'content' => $aiMessage->getContent(),
+                    'sender' => $user->getId(),
+                    'isFromAI' => true,
+                    'createdAt' => $aiMessage->getCreateAt()->format('c')
+                ];
+            }
+        }
+        
+        $response = [
             'success' => true,
             'message' => [
                 'id' => $message->getId(),
@@ -313,7 +332,75 @@ class ChatController extends AbstractController
                 'sender' => $user->getId(),
                 'createdAt' => $message->getCreateAt()->format('c')
             ]
-        ]);
+        ];
+        
+        if ($aiResponse) {
+            $response['aiResponse'] = $aiResponse;
+        }
+        
+        return new JsonResponse($response);
+    }
+    
+    /**
+     * Process and generate an AI response for a message
+     */
+    private function processAIResponse(SubjectChat $chat, string $userMessage, $user): ?MessageChat
+    {
+        try {
+            // Get recent messages for context (last 10)
+            $recentMessages = $this->messageChatRepository->findBy(
+                ['subjectChat' => $chat],
+                ['createAt' => 'DESC'],
+                10
+            );
+            
+            // Format messages for the AI
+            $messageHistory = array_map(function($msg) {
+                return [
+                    'content' => $msg->getContent(),
+                    'isFromAI' => $msg->isIsFromAI()
+                ];
+            }, array_reverse($recentMessages));
+            
+            // Get subject name
+            $subjectName = $chat->getMatiere()->getName();
+            
+            // Generate AI response
+            $aiResponse = $this->aiService->generateResponse(
+                $userMessage,
+                $subjectName,
+                $messageHistory
+            );
+            
+            // Create and save AI message
+            $message = new MessageChat();
+            $message->setContent($aiResponse);
+            $message->setSender($user); // Use the same user but mark as AI
+            $message->setSubjectChat($chat);
+            $message->setIsRead(false);
+            $message->setIsFromAI(true);
+            $message->setCreateAt(new \DateTimeImmutable());
+            
+            $this->entityManager->persist($message);
+            $this->entityManager->flush();
+            
+            return $message;
+        } catch (\Exception $e) {
+            // Log the error
+            error_log('Error generating AI response: ' . $e->getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Determine if a subject chat should have AI responses
+     * This is a placeholder implementation - you might want to add a field to the SubjectChat entity
+     */
+    private function isAIEnabledChat(SubjectChat $chat): bool
+    {
+        // For now, we'll enable AI for all chats
+        // In the future, you might want to check a field on the SubjectChat entity
+        return true;
     }
     
     /**
@@ -434,5 +521,66 @@ class ChatController extends AbstractController
                $request->getRequestFormat() === 'json' ||
                strpos($request->getPathInfo(), '/api/') === 0 ||
                in_array('application/json', $request->getAcceptableContentTypes());
+    }
+
+    #[Route('/student/chat/update-profile', name: 'app_student_chat_update_profile', methods: ['POST'])]
+    public function updateProfile(Request $request, EleveRepository $eleveRepository, ClasseRepository $classeRepository, SpecialiteRepository $specialiteRepository, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $student = $user->getEleve();
+        if (!$student) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $classeId = $request->request->get('classe');
+        $specialiteId = $request->request->get('specialite');
+        
+        $success = false;
+        $message = '';
+        
+        try {
+            if ($classeId) {
+                $classe = $classeRepository->find($classeId);
+                if (!$classe) {
+                    $message = 'Class not found';
+                } else {
+                    $student->setClasse($classe);
+                    
+                    // If specialite is provided and the class requires it
+                    if ($specialiteId) {
+                        $specialite = $specialiteRepository->find($specialiteId);
+                        if ($specialite) {
+                            $classe->setSpecialite($specialite);
+                        }
+                    }
+                    
+                    $entityManager->persist($student);
+                    $entityManager->flush();
+                    
+                    $success = true;
+                    $message = 'Profile updated successfully';
+                }
+            } else {
+                $message = 'Class ID is required';
+            }
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+        }
+        
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['success' => $success, 'message' => $message]);
+        }
+        
+        if ($success) {
+            $this->addFlash('success', $message);
+        } else {
+            $this->addFlash('error', $message);
+        }
+        
+        return $this->redirectToRoute('app_chat');
     }
 }
