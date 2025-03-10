@@ -107,7 +107,6 @@ class AIMessageHandler
     private function isAIEnabledChat(SubjectChat $chat): bool
     {
         // For now, we'll enable AI for all chats
-        // In the future, you might want to check a field on the SubjectChat entity
         return true;
     }
 }
