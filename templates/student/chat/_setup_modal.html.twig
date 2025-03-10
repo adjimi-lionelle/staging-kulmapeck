@@ -11,22 +11,20 @@
                         <label for="classe" class="form-label">{% trans %}SELECT_CLASS{% endtrans %}</label>
                         <select class="form-select" id="classe" name="classe" required>
                             <option value="">{% trans %}CHOOSE_CLASS{% endtrans %}</option>
-                            {% set classes = render(controller('App\\Controller\\Front\\CoursesController::getClasses')) %}
-                            {% for classe in classes %}
-                                <option value="{{ classe.id }}" data-skill-level="{{ classe.skillLevel.id }}">{{ classe.name }}</option>
-                            {% endfor %}
                         </select>
+                        <div class="invalid-feedback">
+                            {% trans %}PLEASE_SELECT_CLASS{% endtrans %}
+                        </div>
                     </div>
 
                     <div class="mb-3" id="specialization-group" style="display: none;">
-                        <label for="specialization" class="form-label">{% trans %}SELECT_SPECIALIZATION{% endtrans %}</label>
-                        <select class="form-select" id="specialization" name="specialite">
+                        <label for="specialite" class="form-label">{% trans %}SELECT_SPECIALIZATION{% endtrans %}</label>
+                        <select class="form-select" id="specialite" name="specialite">
                             <option value="">{% trans %}CHOOSE_SPECIALIZATION{% endtrans %}</option>
-                            {% set specialites = render(controller('App\\Controller\\Front\\CoursesController::getSpecialites')) %}
-                            {% for specialite in specialites %}
-                                <option value="{{ specialite.id }}">{{ specialite.name }}</option>
-                            {% endfor %}
                         </select>
+                        <div class="invalid-feedback">
+                            {% trans %}PLEASE_SELECT_SPECIALIZATION{% endtrans %}
+                        </div>
                     </div>
 
                     <div class="text-end">
@@ -41,26 +39,66 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const classeSelect = document.getElementById('classe');
-    const specializationGroup = document.getElementById('specialization-group');
-    const specializationSelect = document.getElementById('specialization');
+    const specialiteGroup = document.getElementById('specialization-group');
+    const specialiteSelect = document.getElementById('specialite');
     const setupForm = document.getElementById('setup-form');
 
-    // Get the skill level IDs for classes that require specialization (2nde to Terminal)
-    const secondCycleSkillLevels = [5, 6, 7]; // Adjust these IDs based on your database
+    // Define the skill level IDs for second cycle classes (2nde to Terminale)
+    const secondCycleSkillLevels = [5, 6, 7]; // Adjust based on your database
+
+    // Fetch classes from API
+    fetch('/api/classes')
+        .then(response => response.json())
+        .then(data => {
+            // Add classes to select dropdown
+            data['hydra:member'].forEach(classe => {
+                const option = document.createElement('option');
+                option.value = classe.id;
+                option.textContent = classe.name;
+                option.dataset.skillLevel = classe.skillLevel?.id || null;
+                classeSelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching classes:', error);
+        });
+
+    // Fetch specializations from API
+    fetch('/api/specialites')
+        .then(response => response.json())
+        .then(data => {
+            // Add specializations to select dropdown
+            data['hydra:member'].forEach(specialite => {
+                const option = document.createElement('option');
+                option.value = specialite.id;
+                option.textContent = specialite.name;
+                option.dataset.filiere = specialite.filiere?.id || null;
+                specialiteSelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching specializations:', error);
+        });
 
     // Handle class selection change
     classeSelect.addEventListener('change', function() {
+        if (!this.value) {
+            specialiteGroup.style.display = 'none';
+            specialiteSelect.required = false;
+            return;
+        }
+
         const selectedOption = this.options[this.selectedIndex];
         const skillLevelId = parseInt(selectedOption.dataset.skillLevel);
         
-        // Show specialization only for second cycle classes
+        // Show specialization only for second cycle classes (2nde to Terminale)
         if (secondCycleSkillLevels.includes(skillLevelId)) {
-            specializationGroup.style.display = 'block';
-            specializationSelect.required = true;
+            specialiteGroup.style.display = 'block';
+            specialiteSelect.required = true;
         } else {
-            specializationGroup.style.display = 'none';
-            specializationSelect.required = false;
-            specializationSelect.value = ''; // Reset selection
+            specialiteGroup.style.display = 'none';
+            specialiteSelect.required = false;
+            specialiteSelect.value = ''; // Reset selection
         }
     });
 
@@ -68,25 +106,44 @@ document.addEventListener('DOMContentLoaded', function() {
     setupForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
+        let isValid = true;
+        
+        // Validate class selection
         if (!classeSelect.value) {
-            alert('{% trans %}PLEASE_SELECT_CLASS{% endtrans %}');
+            classeSelect.classList.add('is-invalid');
+            isValid = false;
+        } else {
+            classeSelect.classList.remove('is-invalid');
+        }
+        
+        // Validate specialization if required
+        const selectedOption = classeSelect.options[classeSelect.selectedIndex];
+        if (selectedOption) {
+            const skillLevelId = parseInt(selectedOption.dataset.skillLevel);
+            
+            if (secondCycleSkillLevels.includes(skillLevelId)) {
+                if (!specialiteSelect.value) {
+                    specialiteSelect.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    specialiteSelect.classList.remove('is-invalid');
+                }
+            }
+        }
+        
+        if (!isValid) {
             return;
         }
 
-        const skillLevelId = parseInt(classeSelect.options[classeSelect.selectedIndex].dataset.skillLevel);
-        if (secondCycleSkillLevels.includes(skillLevelId) && !specializationSelect.value) {
-            alert('{% trans %}PLEASE_SELECT_SPECIALIZATION{% endtrans %}');
-            return;
-        }
-
-        // Collect form data
+        // Prepare form data
         const formData = new FormData();
         formData.append('classe', classeSelect.value);
-        if (specializationSelect.value) {
-            formData.append('specialite', specializationSelect.value);
+        
+        if (specialiteSelect.value) {
+            formData.append('specialite', specialiteSelect.value);
         }
 
-        // Submit form data via AJAX to update profile
+        // Submit form data via AJAX
         fetch('{{ path('app_student_profile_edit') }}', {
             method: 'POST',
             body: formData,
@@ -104,7 +161,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 // Close the modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('setupModal'));
-                modal.hide();
+                if (modal) {
+                    modal.hide();
+                }
                 
                 // Reload the page to reflect changes
                 window.location.reload();
