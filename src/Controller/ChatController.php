@@ -90,19 +90,16 @@ class ChatController extends AbstractController
             }
         }
         
-        // If profile is incomplete, show setup modal
-        if (!$isProfileComplete) {
+        // Check if premium status is required
+        $isPremium = $student->isIsPremium();
+        
+        // If profile is incomplete or not premium, show setup modal
+        if (!$isProfileComplete || !$isPremium) {
             return $this->render('student/chat/index.html.twig', [
                 'showSetupModal' => true,
-                'isPremium' => $student->isIsPremium(),
+                'isPremium' => $isPremium,
                 'isProfileComplete' => $isProfileComplete
             ]);
-        }
-        
-        // Check premium access
-        $redirect = $this->checkPremiumAccess($student);
-        if ($redirect instanceof RedirectResponse) {
-            return $redirect;
         }
         
         return $this->render('student/chat/index.html.twig');

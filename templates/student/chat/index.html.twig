@@ -10,45 +10,11 @@
 
 {% block body %}
     {% if showSetupModal is defined and showSetupModal %}
-        <div class="modal fade" id="setupModal" tabindex="-1" aria-labelledby="setupModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="setupModalLabel">Complete Your Profile</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>To access the chat feature, please complete your profile information:</p>
-                        <ul>
-                            {% if not isProfileComplete %}
-                                <li>Select your class</li>
-                            {% endif %}
-                            {% if not isPremium %}
-                                <li>Upgrade to a premium account</li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                    <div class="modal-footer">
-                        {% if not isProfileComplete %}
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#setupModal" class="btn btn-primary">Update Profile</a>
-                        {% endif %}
-                        {% if not isPremium %}
-                            <a href="{{ path('app_student_subscriptions') }}" class="btn btn-success">Upgrade Account</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var setupModal = new bootstrap.Modal(document.getElementById('setupModal'));
-                setupModal.show();
-            });
-        </script>
+        {% include 'student/chat/_setup_modal.html.twig' with {
+            'isProfileComplete': isProfileComplete is defined ? isProfileComplete : null,
+            'isPremium': isPremium is defined ? isPremium : null
+        } %}
     {% endif %}
-
-    {% include 'student/chat/_setup_modal.html.twig' %}
 
     <div class="chat-app">
         <div class="chat-sidebar">

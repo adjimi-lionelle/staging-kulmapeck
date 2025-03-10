@@ -6,31 +6,47 @@
                 <h5 class="modal-title" id="setupModalLabel">{% trans %}SETUP_PROFILE{% endtrans %}</h5>
             </div>
             <div class="modal-body">
-                <form id="setup-form" method="POST">
-                    <div class="mb-3">
-                        <label for="classe" class="form-label">{% trans %}SELECT_CLASS{% endtrans %}</label>
-                        <select class="form-select" id="classe" name="classe" required>
-                            <option value="">{% trans %}CHOOSE_CLASS{% endtrans %}</option>
-                        </select>
-                        <div class="invalid-feedback">
-                            {% trans %}PLEASE_SELECT_CLASS{% endtrans %}
+                {% if not isProfileComplete %}
+                <div class="profile-setup-section mb-4">
+                    <h6>{% trans %}COMPLETE_YOUR_PROFILE{% endtrans %}</h6>
+                    <p>{% trans %}SELECT_CLASS_DESCRIPTION{% endtrans %}</p>
+                    <form id="setup-form" method="POST">
+                        <div class="mb-3">
+                            <label for="classe" class="form-label">{% trans %}SELECT_CLASS{% endtrans %}</label>
+                            <select class="form-select" id="classe" name="classe" required>
+                                <option value="">{% trans %}CHOOSE_CLASS{% endtrans %}</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                {% trans %}PLEASE_SELECT_CLASS{% endtrans %}
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-3" id="specialization-group" style="display: none;">
-                        <label for="specialite" class="form-label">{% trans %}SELECT_SPECIALIZATION{% endtrans %}</label>
-                        <select class="form-select" id="specialite" name="specialite">
-                            <option value="">{% trans %}CHOOSE_SPECIALIZATION{% endtrans %}</option>
-                        </select>
-                        <div class="invalid-feedback">
-                            {% trans %}PLEASE_SELECT_SPECIALIZATION{% endtrans %}
+                        <div class="mb-3" id="specialization-group" style="display: none;">
+                            <label for="specialite" class="form-label">{% trans %}SELECT_SPECIALIZATION{% endtrans %}</label>
+                            <select class="form-select" id="specialite" name="specialite">
+                                <option value="">{% trans %}CHOOSE_SPECIALIZATION{% endtrans %}</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                {% trans %}PLEASE_SELECT_SPECIALIZATION{% endtrans %}
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="text-end">
-                        <button type="submit" class="btn btn-primary">{% trans %}SAVE{% endtrans %}</button>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">{% trans %}SAVE{% endtrans %}</button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+
+                {% if not isPremium %}
+                <div class="premium-upgrade-section">
+                    <h6>{% trans %}PREMIUM_REQUIRED{% endtrans %}</h6>
+                    <p>{% trans %}PREMIUM_CHAT_DESCRIPTION{% endtrans %}</p>
+                    <div class="text-center mt-3">
+                        <a href="{{ path('app_student_subscriptions') }}" class="btn btn-success">{% trans %}UPGRADE_ACCOUNT{% endtrans %}</a>
                     </div>
-                </form>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -38,6 +54,13 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const setupModal = document.getElementById('setupModal');
+    if (!setupModal) return;
+
+    const modal = new bootstrap.Modal(setupModal);
+    modal.show();
+
+    {% if not isProfileComplete %}
     const classeSelect = document.getElementById('classe');
     const specialiteGroup = document.getElementById('specialization-group');
     const specialiteSelect = document.getElementById('specialite');
@@ -159,12 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.success) {
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('setupModal'));
-                if (modal) {
-                    modal.hide();
-                }
-                
                 // Reload the page to reflect changes
                 window.location.reload();
             } else {
@@ -176,5 +193,6 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('{% trans %}ERROR_UPDATING_PROFILE{% endtrans %}');
         });
     });
+    {% endif %}
 });
 </script>
