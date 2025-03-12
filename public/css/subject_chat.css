@@ -54,6 +54,7 @@
     background: #f8f9fa;
     border: 1px solid #dee2e6;
     height: 40px;
+    color: #000;
 }
 
 .sidebar-search .form-control:focus {
@@ -440,6 +441,7 @@
     padding: 10px 16px;
     border: 1px solid #dee2e6;
     background-color: #f8f9fa;
+    color: #000;
 }
 
 .chat-input input:focus {
@@ -467,12 +469,6 @@
 /* Welcome screen text */
 #welcome-screen h3,
 #welcome-screen p {
-    color: #000;
-}
-
-/* Search input and message input text color */
-#subject-search,
-#message-input {
     color: #000;
 }
 
