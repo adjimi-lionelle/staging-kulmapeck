@@ -48,16 +48,17 @@
     color: #6c757d;
 }
 
+.sidebar-search input {
+    color: #000;
+}
+
 .sidebar-search .form-control {
     padding-left: 35px;
     border-radius: 20px;
     background: #f8f9fa;
     border: 1px solid #dee2e6;
     height: 40px;
-}
-
-#subject-search {
-    color: #000 !important;
+    color: #000;
 }
 
 .sidebar-search .form-control:focus {
@@ -444,7 +445,7 @@
     border-radius: 20px;
     padding: 10px 16px;
     border: 1px solid #dee2e6;
-    background-color: #f8f9fa;
+    background-color: #fff;
     color: #000;
 }
 
