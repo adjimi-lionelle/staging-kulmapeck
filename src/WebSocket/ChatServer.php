@@ -96,9 +96,60 @@ class ChatServer implements MessageComponentInterface
     public function onMessage(ConnectionInterface $from, $msg)
     {
         echo "Message reçu : " . $msg . "\n";
-        $data = json_decode($msg, true);
+        try {
+            $data = json_decode($msg, true);
 
-        if (!isset($data['message'])) {
+            if (!isset($data['message']) || empty(trim($data['message']))) {
+                echo "Message invalide ou vide.\n";
+                return;
+            }
+
+            if (!isset($this->clients[$from])) {
+                echo "Erreur : Connexion non trouvée.\n";
+                return;
+            }
+
+            $user = $this->clients[$from]['user'];
+            $subjectChat = $this->clients[$from]['subjectChat'];
+
+            $student = $subjectChat->getEleve();
+            $studentUser = $student ? $student->getUtilisateur() : null;
+
+            echo "DEBUG: ID de l'élève dans le chat: " . ($student ? $student->getId() : 'NULL') . "\n";
+            echo "DEBUG: ID de l'utilisateur associé à l'élève: " . ($studentUser ? $studentUser->getId() : 'NULL') . "\n";
+            echo "DEBUG: ID de l'utilisateur connecté: " . $user->getId() . "\n";
+
+            if (!$student || $studentUser != $user) {
+                echo "Seul l'élève peut poser des questions.\n";
+                return;
+            }
+            
+
+            
+                $message = new MessageChat();
+                $message->setSender($user);
+                $message->setSubjectChat($subjectChat);
+                $message->setContent($data['message']);
+            // $message->setCreateAt(new \DateTimeImmutable());
+                $message->setIsFromAI(false);
+                $message->setIsRead(false);
+                $message->setExpiresAt((new \DateTimeImmutable())->modify('+30 days'));
+                $message->setTeacherPersona(null); // Aucun enseignant assigné par défaut
+            
+                echo "DEBUG: Message prêt à être enregistré en BD.\n";
+            
+                $this->entityManager->persist($message);
+                $this->entityManager->flush();
+            
+                echo "Message sauvegardé en BD avec ID : " . $message->getId() . "\n";
+        
+        } catch (\Exception $e) {
+            echo "Erreur lors de la sauvegarde du message : " . $e->getMessage() . "\n";
+        }
+        
+
+    }
+       /* if (!isset($data['message'])) {
             echo "Message invalide.\n";
             return;
         }
@@ -110,8 +161,8 @@ class ChatServer implements MessageComponentInterface
                     'author' => "User"
                 ]));
             }
-        }
-    }
+        }*/
+    
 
 
     public function onClose(ConnectionInterface $conn)
