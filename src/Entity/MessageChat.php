@@ -37,7 +37,7 @@ class MessageChat
     private ?\DateTimeImmutable $expiresAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'messageChats')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Enseignant $teacherPersona = null;
 
     #[ORM\Column]

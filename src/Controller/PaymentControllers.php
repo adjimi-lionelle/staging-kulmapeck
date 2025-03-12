@@ -166,9 +166,30 @@ class PaymentControllers extends AbstractController
         }
 
         $skill_level = $classe->getSkillLevel()->getId();
+        $specialite = $classe->getSpecialite()->getId();
+        //var_dump($specialite); die();
             
-            if ($skill_level >= 5 && $skill_level <= 7) {
-                $matieres = $MatiereCycleRepository->findBy(['cycle' => 2]);
+            if ($specialite == 1 || $specialite == 2) {
+                $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
+                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                    ->setParameter('cycle1', 2)
+                    ->setParameter('cycle2', 21)
+                    ->getQuery()
+                    ->getResult();
+            } elseif($specialite == 4 && ($classe->getName() == 'Seconde A4 ESP - 2nde A4 ESP' || $classe->getName() == 'Première A4 ESP - 1ère A4 ESP' || $classe->getName() == 'Terminale A4 ESP - Tle A4 ESP')) {
+                $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
+                ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                ->setParameter('cycle1', 2)
+                ->setParameter('cycle2', 22)
+                ->getQuery()
+                ->getResult();
+            } elseif($specialite == 4 && ($classe->getName() == 'Seconde A4 ALL - 2nde  A4 ALL' || $classe->getName() == 'Première A4 ALL - 1ère A4 ALL' || $classe->getName() == 'Terminale A4 ALL - Tle A4 ALL')) {
+                $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
+                ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                ->setParameter('cycle1', 2)
+                ->setParameter('cycle2', 23)
+                ->getQuery()
+                ->getResult();
             } elseif ($skill_level == 1 || $skill_level == 2) {
                 $matieres = $MatiereCycleRepository->findBy(['cycle' => 1]);
             } elseif ($skill_level == 3 || $skill_level == 4) {

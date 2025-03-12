@@ -144,7 +144,7 @@ class ChatController extends AbstractController
 
         // Générer un token sécurisé avec expiration
         $payload = [
-            'user_id' => $student->getId(),
+            'user_id' => $user->getId(),
             'discussion_id' => $subjectChat->getId(),
             'exp' => time() + 3600, // Expire dans 1 heure
         ];
@@ -241,7 +241,7 @@ class ChatController extends AbstractController
         }
         
         
-        $subjectChats = $this->subjectChatRepository->findByEleveOrderedLimited($eleve->getId());
+        $subjectChats = $this->subjectChatRepository->findByEleve($eleve->getId());
 
     
         $data = array_map(function ($subjectChat) use ($user) {
