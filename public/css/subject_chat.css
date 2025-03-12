@@ -464,6 +464,18 @@
     background-color: #3867e0;
 }
 
+/* Welcome screen text */
+#welcome-screen h3,
+#welcome-screen p {
+    color: #000;
+}
+
+/* Search input and message input text color */
+#subject-search,
+#message-input {
+    color: #000;
+}
+
 /* AI Chat Styling */
 
 /* AI Message Styling */
