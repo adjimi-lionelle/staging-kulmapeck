@@ -54,7 +54,10 @@
     background: #f8f9fa;
     border: 1px solid #dee2e6;
     height: 40px;
-    color: #000;
+}
+
+#subject-search {
+    color: #000 !important;
 }
 
 .sidebar-search .form-control:focus {
@@ -377,6 +380,7 @@
 
 .message-text {
     word-break: break-word;
+    color: #000;
 }
 
 .message-info {
