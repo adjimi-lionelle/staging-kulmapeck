@@ -435,6 +435,8 @@
 .chat-input {
     flex: 1;
     margin: 0 12px;
+    width: 100%; /* Ensure it takes full width */
+    max-width: calc(100% - 24px); /* Account for margins */
 }
 
 .chat-input input {
@@ -442,12 +444,21 @@
     padding: 10px 16px;
     border: 1px solid #dee2e6;
     background-color: #fff;
+    width: 100%; /* Make input take full width of container */
+    min-height: 40px; /* Minimum height for better touch targets */
+    font-size: 14px; /* Readable font size */
 }
 
-.chat-input input:focus {
-    background-color: #fff;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
-    border-color: #86b7fe;
+@media (max-width: 768px) {
+    .chat-input {
+        margin: 0 8px; /* Smaller margins on mobile */
+        max-width: calc(100% - 16px);
+    }
+    
+    .chat-input input {
+        padding: 8px 12px; /* Slightly smaller padding on mobile */
+        font-size: 16px; /* Larger font for better mobile readability */
+    }
 }
 
 .btn-send {
