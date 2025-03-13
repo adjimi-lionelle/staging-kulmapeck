@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        console.log('DEBUG: Fetching subjects from API endpoint: /subjectChats');
+        console.log('DEBUG: Fetching subjects from API endpoint: /api/chat/subjectChats');
         fetch('/api/chat/subjectChats', {
                 method: 'GET',
                 headers: {
@@ -326,6 +326,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 console.log(`DEBUG: Rendering ${data.length} subjects`);
                 renderSubjects(data);
+                
+                // Select the first subject by default if available
+                if (data.length > 0) {
+                    console.log(`DEBUG: Auto-selecting first subject: ${data[0].id}`);
+                    selectSubject(data[0].id);
+                }
             })
             .catch(error => {
                 console.error('DEBUG: Error loading subjects:', error);
@@ -433,11 +439,7 @@ document.addEventListener('DOMContentLoaded', function() {
             subjectList.appendChild(chatItem);
         });
         
-        // Select the first subject by default
-        if (subjects.length > 0) {
-            console.log(`DEBUG: Auto-selecting first subject: ${subjects[0].id}`);
-            selectSubject(subjects[0].id);
-        }
+        // The auto-selection is now handled in loadSubjects
     }
     
     // Select a subject and connect to WebSocket
@@ -594,7 +596,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Connect to WebSocket
     function connectWebSocket(subjectId) {
-        console.log(`DEBUG: Ouverture de la connexion WebSocket...`);
+        console.log(`DEBUG: Opening WebSocket connection for subject ${subjectId}...`);
         
         if (!token) {
             console.error('DEBUG: No WebSocket token available');
@@ -603,7 +605,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Disconnect from previous WebSocket if any
         if (socket) {
-            console.log("DEBUG: Fermeture de l'ancienne connexion WebSocket...");
+            console.log("DEBUG: Closing previous WebSocket connection...");
             socket.close();
             socket = null;
         }
@@ -615,25 +617,34 @@ document.addEventListener('DOMContentLoaded', function() {
         socket = new WebSocket(wsUrl);
         
         socket.onopen = function() {
-            console.log("WebSocket connecté avec succès !");
+            console.log("DEBUG: WebSocket connected successfully!");
+            
+            // Request message history
+            const historyRequest = {
+                type: 'history_request',
+                subject_id: subjectId
+            };
+            socket.send(JSON.stringify(historyRequest));
+            console.log("DEBUG: Sent history request:", historyRequest);
         };
         
         socket.onmessage = function(event) {
-            console.log("Message WebSocket reçu :", event.data);
+            console.log("DEBUG: WebSocket message received:", event.data);
             try {
                 const data = JSON.parse(event.data);
                 handleWebSocketMessage(data);
             } catch (e) {
-                console.error("Erreur lors du parsing du message WebSocket :", e);
+                console.error("DEBUG: Error parsing WebSocket message:", e);
             }
         };
         
         socket.onerror = function(error) {
-            console.error("Erreur WebSocket :", error);
+            console.error("DEBUG: WebSocket error:", error);
+            showError("Connection error. Please try again later.");
         };
         
         socket.onclose = function() {
-            console.warn("Connexion WebSocket fermée !");
+            console.warn("DEBUG: WebSocket connection closed!");
         };
     }
     
