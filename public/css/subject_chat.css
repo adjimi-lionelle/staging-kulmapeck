@@ -526,6 +526,7 @@
   }
   
   /* Hide welcome screen on mobile by default */
+  #welcome-screen,
   .welcome-screen {
     display: none;
   }

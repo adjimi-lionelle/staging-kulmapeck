@@ -47,91 +47,130 @@ document.addEventListener('DOMContentLoaded', function() {
         // Setup mobile view if needed
         setupMobileView();
         
-        // If subjects are not pre-loaded in the template, fetch them
-        if (subjectList) {
-            console.log('DEBUG: Checking subject list content');
-            
-            if (subjectList.querySelector('.loading-state') || subjectList.children.length === 0) {
-                console.log('DEBUG: Subject list is empty or has loading state, fetching subjects from API');
-                loadSubjects();
-            } else {
-                console.log('DEBUG: Subjects already in DOM, attaching event listeners');
-                // Subjects are already in the DOM, attach event listeners
-                attachSubjectEventListeners();
-            }
+        // Setup mobile back button
+        const mobileBackButton = document.querySelector('.mobile-back-button');
+        if (mobileBackButton) {
+            mobileBackButton.addEventListener('click', function() {
+                if (chatContainer) {
+                    chatContainer.classList.remove('chat-active');
+                }
+            });
         }
         
-        // Initialize message input and send button
-        if (messageInput && sendButton) {
-            console.log('DEBUG: Setting up message input and send button event listeners');
-            
+        // Load subjects
+        loadSubjects();
+        
+        // Setup event listeners
+        if (messageInput) {
             messageInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
                 }
-            });
-            
-            messageInput.addEventListener('input', function() {
-                // Clear previous timeout
-                if (typingTimeout) {
-                    clearTimeout(typingTimeout);
-                }
                 
                 // Send typing status
-                sendTypingStatus(true);
-                
-                // Set timeout to reset typing status
-                typingTimeout = setTimeout(() => {
-                    sendTypingStatus(false);
-                }, 3000);
+                handleTyping();
             });
-            
+        }
+        
+        if (sendButton) {
             sendButton.addEventListener('click', sendMessage);
+        }
+        
+        if (subjectSearch) {
+            subjectSearch.addEventListener('input', function() {
+                filterSubjects(this.value);
+            });
         }
         
         // Handle window resize for mobile view
         window.addEventListener('resize', function() {
-            const wasMobileView = isMobileView;
-            isMobileView = window.innerWidth <= 768;
-            
-            // If mobile state changed, update the view
-            if (wasMobileView !== isMobileView) {
+            const newIsMobileView = window.innerWidth <= 768;
+            if (newIsMobileView !== isMobileView) {
+                isMobileView = newIsMobileView;
                 setupMobileView();
             }
         });
     }
     
+    // Get current user ID from data attribute
+    function getCurrentUserId() {
+        const userIdElement = document.getElementById('current-user-id');
+        if (userIdElement && userIdElement.dataset.userId) {
+            return userIdElement.dataset.userId;
+        }
+        
+        // Fallback: try to get from chat container
+        if (chatContainer && chatContainer.dataset.userId) {
+            return chatContainer.dataset.userId;
+        }
+        
+        console.warn('DEBUG: Could not find current user ID');
+        return null;
+    }
+    
+    // Update subject preview in sidebar
+    function updateSubjectPreview(subjectId, message) {
+        const subjectItem = document.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
+        if (subjectItem) {
+            const previewElement = subjectItem.querySelector('.chat-item-preview');
+            if (previewElement) {
+                // Truncate message if too long
+                const maxLength = 30;
+                const preview = message.length > maxLength ? 
+                    message.substring(0, maxLength) + '...' : 
+                    message;
+                
+                previewElement.textContent = preview;
+                
+                // Update timestamp
+                const timeElement = subjectItem.querySelector('.chat-item-time');
+                if (timeElement) {
+                    timeElement.textContent = 'Just now';
+                }
+                
+                // Move subject to top of list if not already
+                const parent = subjectItem.parentNode;
+                if (parent && parent.firstChild !== subjectItem) {
+                    parent.insertBefore(subjectItem, parent.firstChild);
+                }
+            }
+        }
+    }
+    
     // Setup mobile view
     function setupMobileView() {
         if (chatContainer) {
+            // We no longer need to add/remove the mobile-back-button dynamically
+            // since it's now part of the HTML template
+            
+            // Update isMobileView based on current window width
+            isMobileView = window.innerWidth <= 768;
+            
             if (isMobileView) {
+                // Add mobile-view class for any additional mobile styling
                 chatContainer.classList.add('mobile-view');
                 
-                // Create back button if it doesn't exist
-                if (!document.querySelector('.mobile-back-button')) {
-                    const backButton = document.createElement('button');
-                    backButton.className = 'mobile-back-button';
-                    backButton.innerHTML = '<i class="bi bi-arrow-left"></i> Back to Subjects';
-                    backButton.addEventListener('click', function() {
-                        chatContainer.classList.remove('chat-active');
-                    });
-                    
-                    // Insert before chat header
-                    if (chatHeader && chatHeader.parentNode) {
-                        chatHeader.parentNode.insertBefore(backButton, chatHeader);
-                    }
+                // If a subject is already selected, show the chat view
+                if (currentSubject) {
+                    chatContainer.classList.add('chat-active');
                 }
             } else {
+                // Remove mobile classes on desktop
                 chatContainer.classList.remove('mobile-view');
                 chatContainer.classList.remove('chat-active');
-                
-                // Remove back button if it exists
-                const backButton = document.querySelector('.mobile-back-button');
-                if (backButton) {
-                    backButton.remove();
-                }
             }
+            
+            // Add window resize listener
+            window.addEventListener('resize', function() {
+                const wasInMobileView = isMobileView;
+                isMobileView = window.innerWidth <= 768;
+                
+                // Only update if view type changed
+                if (wasInMobileView !== isMobileView) {
+                    setupMobileView();
+                }
+            });
         }
     }
     
@@ -442,6 +481,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // For mobile view, show chat content
         if (isMobileView && chatContainer) {
             chatContainer.classList.add('chat-active');
+            chatContainer.classList.remove('mobile-back-button');
         }
     }
     
@@ -551,53 +591,75 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Connect to WebSocket
     function connectWebSocket(subjectId) {
+        console.log(`DEBUG: Ouverture de la connexion WebSocket...`);
+        
         if (!token) {
-            console.error('No WebSocket token available');
+            console.error('DEBUG: No WebSocket token available');
             return;
         }
         
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}/ws?token=${token}&group_id=${subjectId}`;
+        // Disconnect from previous WebSocket if any
+        if (socket) {
+            console.log("DEBUG: Fermeture de l'ancienne connexion WebSocket...");
+            socket.close();
+            socket = null;
+        }
         
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//127.0.0.1:9000/ws?token=${token}&subjectChat_id=${subjectId}`;
+        
+        console.log(`DEBUG: Connecting to WebSocket URL: ${wsUrl}`);
         socket = new WebSocket(wsUrl);
         
         socket.onopen = function() {
-            console.log('WebSocket connection established');
+            console.log("WebSocket connecté avec succès !");
         };
         
         socket.onmessage = function(event) {
-            console.log('WebSocket message received:', event.data);
+            console.log("Message WebSocket reçu :", event.data);
             try {
                 const data = JSON.parse(event.data);
                 handleWebSocketMessage(data);
             } catch (e) {
-                console.error('Error parsing WebSocket message:', e);
+                console.error("Erreur lors du parsing du message WebSocket :", e);
             }
         };
         
-        socket.onclose = function() {
-            console.log('WebSocket connection closed');
+        socket.onerror = function(error) {
+            console.error("Erreur WebSocket :", error);
         };
         
-        socket.onerror = function(error) {
-            console.error('WebSocket error:', error);
+        socket.onclose = function() {
+            console.warn("Connexion WebSocket fermée !");
         };
     }
     
     // Handle WebSocket messages
     function handleWebSocketMessage(data) {
+        console.log('DEBUG: Handling WebSocket message:', data);
+        
         if (data.type === 'history') {
+            console.log('DEBUG: Received message history');
             renderMessageHistory(data.messages);
-        } else if (data.message) {
+        } else if (data.type === 'message' || data.message) {
             // If timestamp is provided, use it for message time display
             const timestamp = data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null;
             
+            // Check if message is from current user
+            const currentUserId = getCurrentUserId();
+            const isCurrentUser = data.user_id === currentUserId || data.userId === currentUserId;
+            
             // Check if message is from AI
             const isFromAI = data.isFromAI || false;
-            const author = isFromAI ? 'AI Teacher' : (data.author || 'User');
+            const author = isFromAI ? 'AI Teacher' : (data.author || (isCurrentUser ? 'You' : 'User'));
             
             // Add message with appropriate styling
-            addMessage(data.message, author, false, timestamp, isFromAI);
+            addMessage(data.message || data.content, author, isCurrentUser, timestamp, isFromAI);
+            
+            // Update subject preview in sidebar
+            if (data.subject_id) {
+                updateSubjectPreview(data.subject_id, data.message || data.content);
+            }
         } else if (data.type === 'typing') {
             handleTypingIndicator(data.user, data.isTyping);
         }
@@ -640,12 +702,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         scrollToBottom();
-    }
-    
-    // Get current user ID from meta tag
-    function getCurrentUserId() {
-        const userIdMeta = document.querySelector('meta[name="user-id"]');
-        return userIdMeta ? userIdMeta.getAttribute('content') : null;
     }
     
     // Add a new message
@@ -720,20 +776,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Update subject preview in sidebar
-    function updateSubjectPreview(subjectId, lastMessage) {
-        const subject = document.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
-        if (!subject) return;
-        
-        const preview = subject.querySelector('.chat-item-preview');
-        if (preview) {
-            preview.textContent = lastMessage;
-        }
-        
-        // Update time
-        const timeElement = subject.querySelector('.chat-item-time');
-        if (timeElement) {
-            const now = new Date();
-            timeElement.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    function updateSubjectPreview(subjectId, message) {
+        const subjectItem = document.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
+        if (subjectItem) {
+            const previewElement = subjectItem.querySelector('.chat-item-preview');
+            if (previewElement) {
+                // Truncate message if too long
+                const maxLength = 30;
+                const preview = message.length > maxLength ? 
+                    message.substring(0, maxLength) + '...' : 
+                    message;
+                
+                previewElement.textContent = preview;
+                
+                // Update timestamp
+                const timeElement = subjectItem.querySelector('.chat-item-time');
+                if (timeElement) {
+                    timeElement.textContent = 'Just now';
+                }
+                
+                // Move subject to top of list if not already
+                const parent = subjectItem.parentNode;
+                if (parent && parent.firstChild !== subjectItem) {
+                    parent.insertBefore(subjectItem, parent.firstChild);
+                }
+            }
         }
     }
     
@@ -759,7 +826,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Send message
     function sendMessage() {
         if (!currentSubject) {
-            console.error('No subject selected');
+            console.error('DEBUG: No subject selected');
             return;
         }
         
@@ -768,11 +835,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Try WebSocket first
         if (socket && socket.readyState === WebSocket.OPEN) {
-            console.log('Sending message via WebSocket');
+            console.log('DEBUG: Sending message via WebSocket');
             
             // Send message through WebSocket
             socket.send(JSON.stringify({
-                group_id: currentSubject,
+                subject_id: currentSubject,
                 message: content,
                 timestamp: new Date().toISOString()
             }));
@@ -786,7 +853,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reset typing status
             sendTypingStatus(false);
         } else {
-            console.log('WebSocket not available, using REST API');
+            console.log('DEBUG: WebSocket not available, using REST API');
             
             // Show sending indicator
             const tempId = 'msg-' + Date.now();
@@ -880,7 +947,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                console.error('Error sending message:', error);
+                console.error('DEBUG: Error sending message:', error);
                 
                 // Update temporary message to show error
                 const tempMessage = document.getElementById(tempId);
@@ -928,8 +995,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Call initialize when the DOM is fully loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DEBUG: DOMContentLoaded event fired, initializing chat');
-        initialize();
-    });
+    initialize();
 });

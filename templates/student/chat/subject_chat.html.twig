@@ -39,6 +39,9 @@
                     </div>
                 </div>
                 <div class="chat-content">
+                    <button type="button" class="mobile-back-button">
+                        <i class="bi bi-arrow-left"></i> Back to subjects
+                    </button>
                     <div id="chat-header" class="chat-header">
                         <!-- Chat header will be populated by JavaScript -->
                     </div>
@@ -74,4 +77,41 @@
     {{ parent() }}
     {{ encore_entry_script_tags('chat') }}
     <script src="{{ asset('js/subject_chat.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile back button functionality
+            const chatApp = document.querySelector('.chat-app');
+            const mobileBackButton = document.querySelector('.mobile-back-button');
+            
+            // Check if we're on mobile
+            const isMobile = window.innerWidth <= 768;
+            
+            // Handle subject selection
+            document.addEventListener('subjectSelected', function(event) {
+                if (isMobile) {
+                    chatApp.classList.add('chat-active');
+                }
+            });
+            
+            // Mobile back button
+            if (mobileBackButton) {
+                mobileBackButton.addEventListener('click', function() {
+                    chatApp.classList.remove('chat-active');
+                });
+            }
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                const newIsMobile = window.innerWidth <= 768;
+                
+                // If switching between mobile and desktop
+                if (newIsMobile !== isMobile) {
+                    // Reset the view
+                    if (!newIsMobile) {
+                        chatApp.classList.remove('chat-active');
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}

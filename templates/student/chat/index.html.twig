@@ -69,6 +69,9 @@
             </div>
         </div>
         <div class="chat-content">
+            <button type="button" class="mobile-back-button">
+                <i class="bi bi-arrow-left"></i> Back to subjects
+            </button>
             <div class="welcome-screen" id="welcome-screen">
                 <div class="welcome-content">
                     <div class="welcome-icon">
@@ -134,18 +137,61 @@
     <script src="{{ asset('js/chat.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Show welcome screen by default
+            // Elements
+            const chatApp = document.querySelector('.chat-app');
             const welcomeScreen = document.getElementById('welcome-screen');
             const chatHeader = document.getElementById('chat-header');
             const chatMessages = document.getElementById('chat-messages');
             const chatFooter = document.getElementById('chat-footer');
+            const chatItems = document.querySelectorAll('.chat-item');
+            const mobileBackButton = document.querySelector('.mobile-back-button');
             
-            // When a subject is selected, hide welcome screen and show chat
-            document.addEventListener('subjectSelected', function() {
-                if (welcomeScreen) welcomeScreen.style.display = 'none';
-                if (chatHeader) chatHeader.style.display = 'flex';
-                if (chatMessages) chatMessages.style.display = 'block';
-                if (chatFooter) chatFooter.style.display = 'flex';
+            // Check if we're on mobile
+            const isMobile = window.innerWidth <= 768;
+            
+            // When a subject is clicked
+            chatItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Mark this item as active
+                    chatItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // On mobile, show chat view
+                    if (isMobile) {
+                        chatApp.classList.add('chat-active');
+                    }
+                    
+                    // Hide welcome screen, show chat
+                    if (welcomeScreen) welcomeScreen.style.display = 'none';
+                    if (chatHeader) chatHeader.style.display = 'flex';
+                    if (chatMessages) chatMessages.style.display = 'block';
+                    if (chatFooter) chatFooter.style.display = 'flex';
+                    
+                    // Dispatch event for other components
+                    document.dispatchEvent(new CustomEvent('subjectSelected', {
+                        detail: { subjectId: this.dataset.subjectId }
+                    }));
+                });
+            });
+            
+            // Mobile back button
+            if (mobileBackButton) {
+                mobileBackButton.addEventListener('click', function() {
+                    chatApp.classList.remove('chat-active');
+                });
+            }
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                const newIsMobile = window.innerWidth <= 768;
+                
+                // If switching between mobile and desktop
+                if (newIsMobile !== isMobile) {
+                    // Reset the view
+                    if (!newIsMobile) {
+                        chatApp.classList.remove('chat-active');
+                    }
+                }
             });
         });
     </script>
