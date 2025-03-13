@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Chat State
     let currentSubject = null;
     let socket = null;
-    let token = null;
     let isMobileView = window.innerWidth <= 768;
     
     // Check if required elements exist
@@ -54,24 +53,28 @@ document.addEventListener('DOMContentLoaded', function() {
      * Setup mobile view based on screen size
      */
     function setupMobileView() {
-        console.log(`DEBUG: Setting up mobile view (isMobile: ${isMobileView})`);
+        console.log("DEBUG: Setting up mobile view, current width:", window.innerWidth);
         
         const mobileBackButton = document.querySelector('.mobile-back-button');
         
         if (mobileBackButton) {
             mobileBackButton.addEventListener('click', function() {
-                if (chatContainer) {
-                    chatContainer.classList.remove('chat-active');
-                }
+                chatContainer.classList.remove('chat-active');
             });
         }
         
-        // Handle window resize for mobile view
+        // Update mobile view state on resize
         window.addEventListener('resize', function() {
             const newIsMobileView = window.innerWidth <= 768;
+            
             if (newIsMobileView !== isMobileView) {
                 isMobileView = newIsMobileView;
-                console.log(`DEBUG: View changed to ${isMobileView ? 'mobile' : 'desktop'}`);
+                console.log("DEBUG: View changed to:", isMobileView ? "mobile" : "desktop");
+                
+                // Reset UI if switching to desktop from mobile
+                if (!isMobileView && chatContainer.classList.contains('chat-active')) {
+                    chatContainer.classList.remove('chat-active');
+                }
             }
         });
     }
@@ -80,6 +83,12 @@ document.addEventListener('DOMContentLoaded', function() {
      * Setup all event listeners
      */
     function setupEventListeners() {
+        // Send message button
+        if (sendButton) {
+            sendButton.addEventListener('click', sendMessage);
+        }
+        
+        // Enter key to send message
         if (messageInput) {
             messageInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -89,13 +98,10 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        if (sendButton) {
-            sendButton.addEventListener('click', sendMessage);
-        }
-        
+        // Subject search
         if (subjectSearch) {
             subjectSearch.addEventListener('input', function() {
-                filterSubjects(this.value);
+                filterSubjects(this.value.trim().toLowerCase());
             });
         }
     }
@@ -104,46 +110,26 @@ document.addEventListener('DOMContentLoaded', function() {
      * Load subjects from API
      */
     function loadSubjects() {
-        console.log('DEBUG: Loading subjects from API');
+        console.log("DEBUG: Loading subjects from API...");
         
-        // Show loading state
-        subjectList.innerHTML = `
-            <div class="loading-state text-center p-4">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading subjects...</span>
-                </div>
-                <p class="mt-3 text-muted">Loading subjects...</p>
-            </div>
-        `;
-        
-        fetch('/api/chat/subjectChats', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include'
+        fetch("/api/chat/subjectChats", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
+                throw new Error('Network response was not ok');
             }
             return response.json();
         })
         .then(data => {
-            console.log('DEBUG: Subjects data received', data);
-            
-            if (!Array.isArray(data)) {
-                throw new Error('Invalid data format received from server');
-            }
-            
+            console.log("DEBUG: Subjects data received", data);
             renderSubjects(data);
-            
-            // Select the first subject by default if available
-            if (data.length > 0) {
-                selectSubject(data[0].id);
-            }
         })
         .catch(error => {
-            console.error('DEBUG: Error loading subjects:', error);
-            showError(`Failed to load subjects: ${error.message}`);
+            console.error("DEBUG ERROR: Error loading subjects", error);
+            showError('Could not load subjects. Please try again later.');
         });
     }
     
@@ -151,99 +137,83 @@ document.addEventListener('DOMContentLoaded', function() {
      * Render subjects in sidebar
      */
     function renderSubjects(subjects) {
-        console.log(`DEBUG: Rendering ${subjects.length} subjects`);
+        console.log("DEBUG: renderSubjects() called with", subjects);
         
-        if (subjects.length === 0) {
-            subjectList.innerHTML = `
-                <div class="empty-state text-center p-4">
-                    <i class="bi bi-journal-x" style="font-size: 48px; color: #6c757d;"></i>
-                    <p class="mt-3 text-muted">No subjects available</p>
-                </div>
-            `;
+        if (!Array.isArray(subjects)) {
+            console.error("DEBUG: Subjects data is not an array", subjects);
             return;
         }
         
-        subjectList.innerHTML = '';
+        subjectList.innerHTML = "";
         
-        subjects.forEach((subject, index) => {
-            const chatItem = document.createElement('div');
-            chatItem.className = `chat-item${index === 0 ? ' active' : ''}`;
+        subjects.forEach((subject) => {
+            const chatItem = document.createElement("div");
+            chatItem.className = "chat-item";
             chatItem.dataset.subjectId = subject.id;
-            
-            const firstLetter = subject.name.charAt(0).toUpperCase();
-            const unreadBadge = subject.unreadCount > 0 
-                ? `<div class="chat-item-badge">${subject.unreadCount}</div>` 
-                : '';
-            
-            const previewText = subject.lastMessage || 'Start chatting...';
             
             chatItem.innerHTML = `
                 <div class="chat-item-avatar">
-                    <div class="avatar-placeholder rounded-circle">${firstLetter}</div>
+                    <div class="avatar-placeholder rounded-circle">${subject.name.charAt(0).toUpperCase()}</div>
                 </div>
                 <div class="chat-item-info">
                     <div class="chat-item-name">${subject.name}</div>
-                    <div class="chat-item-preview">${previewText}</div>
-                </div>
-                <div class="chat-item-meta">
-                    ${unreadBadge}
+                    <div class="chat-item-preview">${subject.lastMessage || "Start chatting..."}</div>
                 </div>
             `;
             
-            chatItem.addEventListener('click', () => {
-                // Remove active class from all items
-                document.querySelectorAll('.chat-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                
-                // Add active class to clicked item
-                chatItem.classList.add('active');
-                
-                // Select the subject
+            chatItem.addEventListener("click", () => {
+                document.querySelectorAll(".chat-item").forEach(item => item.classList.remove("active"));
+                chatItem.classList.add("active");
                 selectSubject(subject.id);
             });
             
             subjectList.appendChild(chatItem);
         });
+        
+        // If no subjects, show empty state
+        if (subjects.length === 0) {
+            const emptyState = document.createElement('div');
+            emptyState.className = 'empty-subjects text-center p-4';
+            emptyState.innerHTML = `
+                <i class="bi bi-book" style="font-size: 48px; color: #6c757d;"></i>
+                <p class="mt-3 text-muted">No subjects available</p>
+            `;
+            subjectList.appendChild(emptyState);
+        }
     }
     
     /**
      * Select a subject and connect to WebSocket
      */
     function selectSubject(subjectId) {
-        console.log(`DEBUG: Selecting subject ${subjectId}`);
+        console.log(`DEBUG: selectSubject() called with ID ${subjectId}`);
         
-        // Update UI for selected subject
-        document.querySelectorAll('.chat-item').forEach(item => {
-            if (item.dataset.subjectId === subjectId) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
-        });
-        
-        // Disconnect from previous WebSocket if any
-        if (socket) {
-            socket.close();
-            socket = null;
+        if (!subjectId) {
+            console.error("DEBUG: No subject ID provided!");
+            return;
         }
         
-        // Update current subject
         currentSubject = subjectId;
+        
+        // Update UI for mobile
+        if (isMobileView) {
+            chatContainer.classList.add('chat-active');
+        }
         
         // Update chat header
         updateChatHeader(subjectId);
         
-        // Load messages
-        loadMessages(subjectId);
-        
-        // Get WebSocket token
+        // Get WebSocket token and connect
         getWebSocketToken(subjectId);
         
-        // For mobile view, show chat content
-        if (isMobileView && chatContainer) {
-            chatContainer.classList.add('chat-active');
-        }
+        // Show chat UI
+        if (welcomeScreen) welcomeScreen.style.display = 'none';
+        if (chatHeader) chatHeader.style.display = 'flex';
+        if (chatMessages) chatMessages.style.display = 'block';
+        if (chatInputContainer) chatInputContainer.style.display = 'flex';
+        
+        // Load messages
+        loadMessages(subjectId);
     }
     
     /**
@@ -253,14 +223,17 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`DEBUG: Getting WebSocket token for subject ${subjectId}`);
         
         fetch(`/websocket/token/${subjectId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.token) {
-                    token = data.token;
-                    connectWebSocket(subjectId);
-                } else {
-                    console.warn('DEBUG: No WebSocket token received');
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { 
+                        throw new Error(data.error || "Unknown error"); 
+                    });
                 }
+                return response.json();
+            })
+            .then(data => {
+                console.log("DEBUG: WebSocket token received", data.token);
+                connectWebSocket(subjectId, data.token);
             })
             .catch(error => {
                 console.error('DEBUG: Error fetching WebSocket token:', error);
@@ -271,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Connect to WebSocket
      */
-    function connectWebSocket(subjectId) {
+    function connectWebSocket(subjectId, token) {
         console.log(`DEBUG: Connecting to WebSocket for subject ${subjectId}`);
         
         if (!token) {
@@ -279,23 +252,25 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Close existing connection if any
+        if (socket) {
+            console.log("DEBUG: Closing existing WebSocket connection");
+            socket.close();
+            socket = null;
+        }
+        
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${protocol}//127.0.0.1:9000/ws?token=${token}&subjectChat_id=${subjectId}`;
         
+        console.log(`DEBUG: Opening WebSocket connection to ${wsUrl}`);
         socket = new WebSocket(wsUrl);
         
         socket.onopen = function() {
             console.log("DEBUG: WebSocket connected successfully");
-            
-            // Request message history
-            const historyRequest = {
-                type: 'history_request',
-                subject_id: subjectId
-            };
-            socket.send(JSON.stringify(historyRequest));
         };
         
         socket.onmessage = function(event) {
+            console.log("DEBUG: WebSocket message received:", event.data);
             try {
                 const data = JSON.parse(event.data);
                 handleWebSocketMessage(data);
@@ -306,6 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         socket.onerror = function(error) {
             console.error("DEBUG: WebSocket error:", error);
+            showError('Connection error. Please try again later.');
         };
         
         socket.onclose = function() {
@@ -323,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
             renderMessageHistory(data.messages);
         } else if (data.type === 'message' || data.message) {
             // Get timestamp if provided
-            const timestamp = data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null;
+            const timestamp = data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
             // Check if message is from current user
             const currentUserId = getCurrentUserId();
@@ -337,8 +313,8 @@ document.addEventListener('DOMContentLoaded', function() {
             addMessage(data.message || data.content, author, isCurrentUser, timestamp, isFromAI);
             
             // Update subject preview in sidebar
-            if (data.subject_id) {
-                updateSubjectPreview(data.subject_id, data.message || data.content);
+            if (data.subject_id || currentSubject) {
+                updateSubjectPreview(data.subject_id || currentSubject, data.message || data.content);
             }
         }
     }
@@ -359,12 +335,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
         
-        // Show chat UI
-        if (welcomeScreen) welcomeScreen.style.display = 'none';
-        if (chatHeader) chatHeader.style.display = 'flex';
-        if (chatMessages) chatMessages.style.display = 'block';
-        if (chatInputContainer) chatInputContainer.style.display = 'flex';
-        
         fetch(`/chat/messages/${subjectId}`)
             .then(response => {
                 if (!response.ok) {
@@ -373,6 +343,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(messages => {
+                console.log("DEBUG: Messages loaded:", messages);
+                
                 // Reset messages container
                 chatMessages.innerHTML = `
                     <div class="message-wrapper">
@@ -393,6 +365,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
                     chatMessages.appendChild(emptyState);
                 }
+                
+                // Scroll to bottom
+                scrollToBottom();
             })
             .catch(error => {
                 console.error('DEBUG: Error loading messages:', error);
@@ -404,37 +379,39 @@ document.addEventListener('DOMContentLoaded', function() {
      * Render message history
      */
     function renderMessageHistory(messages) {
-        console.log(`DEBUG: Rendering ${messages.length} messages`);
+        console.log('DEBUG: Rendering message history:', messages);
         
-        const messageWrapper = document.querySelector('.message-wrapper');
-        if (!messageWrapper) return;
+        if (!Array.isArray(messages)) {
+            console.error('DEBUG: Messages data is not an array', messages);
+            return;
+        }
         
-        const currentUserId = getCurrentUserId();
+        // Clear messages container first
+        chatMessages.innerHTML = `
+            <div class="message-wrapper">
+                <div class="message-time">Today</div>
+            </div>
+        `;
         
-        messages.forEach(msg => {
-            // Check if this message is from the current user
-            const isCurrentUser = msg.sender === parseInt(currentUserId);
-            
-            // Format the timestamp
-            let timestamp = 'Just now';
-            const dateField = msg.createdAt || msg.createAt;
-            if (dateField) {
-                try {
-                    const msgDate = new Date(dateField);
-                    timestamp = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                } catch (e) {
-                    console.error('DEBUG: Error parsing date', e);
-                }
-            }
-            
-            // Check if message is from AI
-            const isFromAI = msg.isFromAI || false;
-            
-            // Add message to DOM
-            addMessage(msg.content || msg.message, msg.author || (isCurrentUser ? 'You' : 'User'), isCurrentUser, timestamp, isFromAI);
+        // Sort messages by timestamp if available
+        const sortedMessages = [...messages].sort((a, b) => {
+            const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+            const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+            return timeA - timeB;
         });
         
-        // Scroll to bottom after rendering messages
+        // Add each message to the DOM
+        sortedMessages.forEach(msg => {
+            const currentUserId = getCurrentUserId();
+            const isCurrentUser = msg.user_id === currentUserId || msg.userId === currentUserId;
+            const isFromAI = msg.isFromAI || false;
+            const author = isFromAI ? 'AI Teacher' : (msg.author || (isCurrentUser ? 'You' : 'User'));
+            const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+            
+            addMessage(msg.message || msg.content, author, isCurrentUser, time, isFromAI);
+        });
+        
+        // Scroll to bottom
         scrollToBottom();
     }
     
@@ -442,10 +419,12 @@ document.addEventListener('DOMContentLoaded', function() {
      * Add a new message
      */
     function addMessage(content, author, isCurrentUser, timestamp, isFromAI = false) {
-        const messageWrapper = document.querySelector('.message-wrapper');
-        if (!messageWrapper) return;
+        if (!content) return;
         
-        addMessageToDOM(content, author, isCurrentUser, timestamp || 'Just now', messageWrapper, isFromAI);
+        // Add message to DOM
+        addMessageToDOM(content, author, isCurrentUser, timestamp, chatMessages, isFromAI);
+        
+        // Scroll to bottom
         scrollToBottom();
     }
     
@@ -453,37 +432,37 @@ document.addEventListener('DOMContentLoaded', function() {
      * Add message to DOM
      */
     function addMessageToDOM(content, author, isCurrentUser, time, container, isFromAI = false) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${isCurrentUser ? 'message-out' : 'message-in'} ${isFromAI ? 'ai-message' : ''}`;
+        const messageElement = document.createElement('div');
+        messageElement.className = `message ${isCurrentUser ? 'message-out' : 'message-in'}`;
         
-        messageDiv.innerHTML = `
-            <div class="message-avatar">
-                <div class="avatar-placeholder rounded-circle">${author.charAt(0).toUpperCase()}</div>
-            </div>
+        let authorDisplay = '';
+        if (!isCurrentUser) {
+            authorDisplay = `<div class="message-author">${author}</div>`;
+        }
+        
+        messageElement.innerHTML = `
+            ${authorDisplay}
             <div class="message-content">
-                <div class="message-bubble">
-                    <div class="message-text">${content}</div>
-                </div>
-                <div class="message-info">
-                    <span class="message-time">${time}</span>
-                    <span class="message-author">${author}</span>
-                </div>
+                <div class="message-text">${content}</div>
+                <div class="message-time">${time || ''}</div>
             </div>
         `;
         
-        container.appendChild(messageDiv);
+        container.appendChild(messageElement);
     }
     
     /**
      * Update subject preview in sidebar
      */
     function updateSubjectPreview(subjectId, message) {
-        const chatItem = document.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
-        if (!chatItem) return;
+        if (!subjectId || !message) return;
         
-        const previewElement = chatItem.querySelector('.chat-item-preview');
-        if (previewElement) {
-            previewElement.textContent = message;
+        const subjectItem = document.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
+        if (subjectItem) {
+            const previewElement = subjectItem.querySelector('.chat-item-preview');
+            if (previewElement) {
+                previewElement.textContent = message;
+            }
         }
     }
     
@@ -491,66 +470,74 @@ document.addEventListener('DOMContentLoaded', function() {
      * Update chat header with subject info
      */
     function updateChatHeader(subjectId) {
-        const chatItem = document.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
-        if (!chatItem || !chatHeader) return;
+        if (!chatHeader || !subjectId) return;
         
-        const subjectName = chatItem.querySelector('.chat-item-name').textContent;
-        const avatarLetter = subjectName.charAt(0).toUpperCase();
+        const subjectItem = document.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
+        if (!subjectItem) return;
+        
+        const subjectName = subjectItem.querySelector('.chat-item-name')?.textContent || 'Subject Chat';
         
         chatHeader.innerHTML = `
-            <div class="chat-header-info">
-                <div class="chat-header-avatar">
-                    <div class="avatar-placeholder rounded-circle">${avatarLetter}</div>
-                </div>
-                <div class="chat-header-details">
-                    <div class="chat-header-name">${subjectName}</div>
-                    <div class="chat-header-status">
-                        <span class="status-indicator online"></span>
-                        <span>online</span>
-                    </div>
-                </div>
-            </div>
-            <div class="chat-header-actions">
-                <button type="button" class="btn btn-icon">
-                    <i class="bi bi-three-dots-vertical"></i>
+            <div class="d-flex align-items-center">
+                <button class="mobile-back-button btn btn-sm btn-icon me-2 d-md-none">
+                    <i class="bi bi-arrow-left"></i>
                 </button>
+                <div class="chat-header-avatar">
+                    <div class="avatar-placeholder rounded-circle">${subjectName.charAt(0).toUpperCase()}</div>
+                </div>
+                <div class="chat-header-info">
+                    <div class="chat-header-name">${subjectName}</div>
+                    <div class="chat-header-status">Subject Chat</div>
+                </div>
             </div>
         `;
+        
+        // Re-attach mobile back button event
+        const mobileBackButton = chatHeader.querySelector('.mobile-back-button');
+        if (mobileBackButton) {
+            mobileBackButton.addEventListener('click', function() {
+                chatContainer.classList.remove('chat-active');
+            });
+        }
     }
     
     /**
      * Send message
      */
     function sendMessage() {
-        if (!messageInput || !currentSubject || !socket) return;
+        if (!currentSubject) {
+            console.error("DEBUG: No subject selected to send message");
+            return;
+        }
         
-        const message = messageInput.value.trim();
-        if (!message) return;
+        const content = messageInput.value.trim();
+        if (!content) return;
         
-        console.log(`DEBUG: Sending message to subject ${currentSubject}: ${message}`);
+        console.log(`DEBUG: Sending message to subject ${currentSubject}: ${content}`);
         
-        // Clear input
-        messageInput.value = '';
-        
-        // Get current user ID
-        const currentUserId = getCurrentUserId();
-        
-        // Create message object
-        const messageData = {
-            type: 'message',
-            subject_id: currentSubject,
-            message: message,
-            user_id: currentUserId
-        };
-        
-        // Send message via WebSocket
-        socket.send(JSON.stringify(messageData));
-        
-        // Add message to chat (optimistic UI update)
-        addMessage(message, 'You', true);
-        
-        // Update subject preview
-        updateSubjectPreview(currentSubject, message);
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            const message = {
+                subject_id: currentSubject,
+                message: content,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log("DEBUG: Sending WebSocket message:", message);
+            socket.send(JSON.stringify(message));
+            
+            // Clear input
+            messageInput.value = '';
+            
+            // Add message to UI immediately (optimistic UI)
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            addMessage(content, 'You', true, time);
+            
+            // Update subject preview
+            updateSubjectPreview(currentSubject, content);
+        } else {
+            console.error("DEBUG: WebSocket not available, cannot send message");
+            showError('Connection lost. Please refresh the page and try again.');
+        }
     }
     
     /**
@@ -566,17 +553,16 @@ document.addEventListener('DOMContentLoaded', function() {
      * Filter subjects by search query
      */
     function filterSubjects(query) {
-        const items = document.querySelectorAll('.chat-item');
-        if (!items.length) return;
+        const subjects = document.querySelectorAll('.chat-item');
         
-        query = query.toLowerCase();
-        
-        items.forEach(item => {
-            const name = item.querySelector('.chat-item-name').textContent.toLowerCase();
-            if (name.includes(query)) {
-                item.style.display = '';
+        subjects.forEach(subject => {
+            const name = subject.querySelector('.chat-item-name').textContent.toLowerCase();
+            const preview = subject.querySelector('.chat-item-preview').textContent.toLowerCase();
+            
+            if (name.includes(query) || preview.includes(query)) {
+                subject.style.display = 'flex';
             } else {
-                item.style.display = 'none';
+                subject.style.display = 'none';
             }
         });
     }
@@ -585,73 +571,55 @@ document.addEventListener('DOMContentLoaded', function() {
      * Show error message
      */
     function showError(message) {
-        console.error(`DEBUG: Error: ${message}`);
-        if (chatMessages) {
-            chatMessages.innerHTML = `
-                <div class="error-state text-center p-4">
-                    <i class="bi bi-exclamation-triangle" style="font-size: 48px; color: #dc3545;"></i>
-                    <p class="mt-3 text-muted">${message}</p>
+        console.error('DEBUG: Error:', message);
+        
+        // Create error toast
+        const toast = document.createElement('div');
+        toast.className = 'toast align-items-center text-white bg-danger border-0 position-fixed bottom-0 end-0 m-3';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-exclamation-circle me-2"></i> ${message}
                 </div>
-            `;
-        }
-    }
-    
-    /**
-     * Setup theme detection
-     */
-    function setupThemeDetection() {
-        // Theme detection code would go here
-        console.log('DEBUG: Theme detection initialized');
-    }
-    
-    /**
-     * Scroll chat to bottom
-     */
-    function scrollToBottom() {
-        if (chatMessages) {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-    }
-    
-    /**
-     * Filter subjects by search query
-     */
-    function filterSubjects(query) {
-        const items = document.querySelectorAll('.chat-item');
-        if (!items.length) return;
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
         
-        query = query.toLowerCase();
+        document.body.appendChild(toast);
         
-        items.forEach(item => {
-            const name = item.querySelector('.chat-item-name').textContent.toLowerCase();
-            if (name.includes(query)) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
-            }
+        // Show toast
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // Remove toast after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+            document.body.removeChild(toast);
         });
     }
     
     /**
-     * Show error message
-     */
-    function showError(message) {
-        console.error(`DEBUG: Error: ${message}`);
-        if (chatMessages) {
-            chatMessages.innerHTML = `
-                <div class="error-state text-center p-4">
-                    <i class="bi bi-exclamation-triangle" style="font-size: 48px; color: #dc3545;"></i>
-                    <p class="mt-3 text-muted">${message}</p>
-                </div>
-            `;
-        }
-    }
-    
-    /**
      * Setup theme detection
      */
     function setupThemeDetection() {
-        // Theme detection code would go here
-        console.log('DEBUG: Theme detection initialized');
+        const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const htmlElement = document.documentElement;
+        
+        function updateTheme(isDark) {
+            if (isDark) {
+                htmlElement.setAttribute('data-bs-theme', 'dark');
+            } else {
+                htmlElement.setAttribute('data-bs-theme', 'light');
+            }
+        }
+        
+        // Initial setup
+        updateTheme(darkModeMediaQuery.matches);
+        
+        // Listen for changes
+        darkModeMediaQuery.addEventListener('change', e => updateTheme(e.matches));
     }
 });
