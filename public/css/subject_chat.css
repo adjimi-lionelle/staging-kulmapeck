@@ -7,6 +7,12 @@
   --border-color: #f0f0f0;
   --bg-light: #f8f9fa;
   --bg-white: #fff;
+  --shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+  --ai-message-bg: #e6f7ff;
+  --ai-message-border: #91d5ff;
+  --ai-message-color: #1890ff;
+  --ai-message-text-color: #000;
+  --ai-message-author-color: #1890ff;
   --border-radius-sm: 10px;
   --border-radius-md: 16px;
   --border-radius-lg: 20px;
@@ -15,11 +21,25 @@
   --spacing-sm: 8px;
   --spacing-md: 12px;
   --spacing-lg: 16px;
-  --shadow: 0 0 15px rgba(0, 0, 0, 0.05);
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.85rem;
   --font-size-md: 1rem;
   --font-size-lg: 1.25rem;
+}
+
+/* Dark mode variables */
+[data-bs-theme="dark"] {
+  --text-color: #e9ecef;
+  --text-secondary: #adb5bd;
+  --border-color: #2c3237;
+  --bg-light: #212529;
+  --bg-white: #343a40;
+  --shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  --ai-message-bg: #1a3a4a;
+  --ai-message-border: #2a617e;
+  --ai-message-color: #4dabf7;
+  --ai-message-text-color: #e9ecef;
+  --ai-message-author-color: #4dabf7;
 }
 
 /* Global styles */
@@ -455,13 +475,17 @@
 
 /* AI Message Styling */
 .message-item.ai-message .message-bubble {
-  background-color: #e6f7ff;
-  border: 1px solid #91d5ff;
+  background-color: var(--ai-message-bg);
+  border: 1px solid var(--ai-message-border);
 }
 
 .message-item.ai-message .message-author {
-  color: #1890ff;
+  color: var(--ai-message-author-color);
   font-weight: bold;
+}
+
+.message-item.ai-message .message-text {
+  color: var(--ai-message-text-color);
 }
 
 /* Mobile back button */

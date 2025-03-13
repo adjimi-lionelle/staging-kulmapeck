@@ -57,6 +57,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
+        // Setup theme detection
+        setupThemeDetection();
+        
         // Load subjects
         loadSubjects();
         
@@ -992,6 +995,11 @@ document.addEventListener('DOMContentLoaded', function() {
         subjectSearch.addEventListener('input', function() {
             searchSubjects(this.value);
         });
+    }
+    
+    // Setup theme detection
+    function setupThemeDetection() {
+        // Add code for theme detection here
     }
     
     // Call initialize when the DOM is fully loaded
