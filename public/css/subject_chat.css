@@ -499,6 +499,42 @@
   color: var(--ai-message-text-color);
 }
 
+/* Emoji Picker Styles */
+emoji-picker {
+  --background: var(--bg-white);
+  --border-color: var(--border-color);
+  --category-emoji-size: 1.25rem;
+  --emoji-size: 1.5rem;
+  --input-border-color: var(--border-color);
+  --input-font-color: var(--text-color);
+  --input-placeholder-color: var(--text-secondary);
+  --indicator-color: var(--send-button-color);
+  --num-columns: 8;
+  box-shadow: var(--shadow);
+  border-radius: var(--border-radius-md);
+  max-height: 350px;
+}
+
+[data-bs-theme="dark"] emoji-picker {
+  --background: var(--bg-white);
+  --input-font-color: var(--text-color);
+  --input-placeholder-color: var(--text-secondary);
+}
+
+/* Mobile adjustments for emoji picker */
+@media (max-width: 768px) {
+  emoji-picker {
+    --num-columns: 6;
+    max-height: 300px;
+    width: 90%;
+  }
+}
+
+/* Emoji button hover effect */
+#emoji-button:hover {
+  color: var(--send-button-color);
+}
+
 /* Mobile back button */
 .mobile-back-button {
   display: none;
