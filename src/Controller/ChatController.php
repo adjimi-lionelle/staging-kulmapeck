@@ -259,12 +259,34 @@ class ChatController extends AbstractController
         return new JsonResponse($data);
     }
 
+    #[Route('/api/chat/messages/{subjectId}', name: 'chat_messages', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function getChatMessages(int $subjectId): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Unauthorized'], 403);
+        }
+
+        $messages = $this->entityManager->getRepository(MessageChat::class)
+            ->findBy(['subjectChat' => $subjectId], ['createAt' => 'ASC']);
+
+        $messagesArray = array_map(fn($msg) => [
+            'id' => $msg->getId(),
+            'content' => $msg->getContent(),
+            'sender_id' => $msg->getSender()->getId(),
+            'createdAt' => $msg->getCreateAt()->format('Y-m-d H:i:s'),
+        ], $messages);
+
+        return new JsonResponse($messagesArray);
+    }
+
     /**
      * Send a message to a subject chat
      */
-    #[Route('/chat/send', name: 'app_chat_send', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function sendMessage(Request $request, EntityManagerInterface $entityManager): JsonResponse
+   // #[Route('/chat/send', name: 'app_chat_send', methods: ['POST'])]
+   // #[IsGranted('ROLE_USER')]
+   /* public function sendMessage(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $user = $this->getUser();
         if (!$user) {
@@ -339,7 +361,7 @@ class ChatController extends AbstractController
         }
         
         return new JsonResponse($response);
-    }
+    }*/
     
     /**
      * Process and generate an AI response for a message
@@ -406,9 +428,9 @@ class ChatController extends AbstractController
     /**
      * Get messages for a specific chat
      */
-    #[Route('/chat/messages/{chatId}', name: 'app_chat_messages', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
-    public function getMessages(int $chatId, EntityManagerInterface $entityManager): JsonResponse
+   // #[Route('/chat/messages/{chatId}', name: 'app_chat_messages', methods: ['GET'])]
+   // #[IsGranted('ROLE_USER')]
+   /* public function getMessages(int $chatId, EntityManagerInterface $entityManager): JsonResponse
     {
         $user = $this->getUser();
         if (!$user) {
@@ -456,7 +478,7 @@ class ChatController extends AbstractController
         }, $messages);
         
         return new JsonResponse($data);
-    }
+    }*/
     
     /**
      * Get unread message count for a chat

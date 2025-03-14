@@ -1,10 +1,10 @@
-console.log("DEBUG: Script chat.js chargé !");
 
 // Initialisation après chargement du DOM
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DEBUG: DOMContentLoaded event fired, initializing chat");
 
     const subjectList = document.getElementById("subject-list");
+    const chatContainer = document.querySelector('.chat-app');
     let currentSubject = null;
     let socket = null;
 
@@ -13,10 +13,41 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    console.log("DEBUG: L'élément #subject-list est bien trouvé dans le DOM");
+    //setupMobileView();
 
     // Charger les sujets au démarrage
     loadSubjects();
+
+
+      /**
+     * Setup mobile view based on screen size
+     */
+     /* function setupMobileView() {
+        console.log("DEBUG: Setting up mobile view, current width:", window.innerWidth);
+        
+        const mobileBackButton = document.querySelector('.mobile-back-button');
+        
+        if (mobileBackButton) {
+            mobileBackButton.addEventListener('click', function() {
+                chatContainer.classList.remove('chat-active');
+            });
+        }
+        
+        // Update mobile view state on resize
+        window.addEventListener('resize', function() {
+            const newIsMobileView = window.innerWidth <= 768;
+            
+            if (newIsMobileView !== isMobileView) {
+                isMobileView = newIsMobileView;
+                console.log("DEBUG: View changed to:", isMobileView ? "mobile" : "desktop");
+                
+                // Reset UI if switching to desktop from mobile
+                if (!isMobileView && chatContainer.classList.contains('chat-active')) {
+                    chatContainer.classList.remove('chat-active');
+                }
+            }
+        });
+    }*/
 
     // Charger les sujets depuis l'API
     function loadSubjects() {
@@ -79,6 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         currentSubject = subjectId;
         getWebSocketToken(subjectId);
+        loadChatHistory(subjectId); // Charger l'historique ici
 
         // Mise à jour de l'affichage du chat
         document.getElementById('welcome-screen').style.display = 'none';
@@ -128,6 +160,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         socket.onmessage = function (event) {
             console.log("Message WebSocket reçu :", event.data);
+            try {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === "new_message") {
+                    addMessageToChat(data.message, false); // Afficher le message reçu
+                }
+        
+            } catch (error) {
+                console.error("Erreur lors du traitement du message WebSocket :", error);
+            }
         };
 
         socket.onerror = function (error) {
@@ -137,6 +179,61 @@ document.addEventListener("DOMContentLoaded", function () {
         socket.onclose = function () {
             console.warn("Connexion WebSocket fermée !");
         };
+    }
+
+    function loadChatHistory(subjectId) {
+        console.log(`DEBUG: Chargement de l'historique pour le sujet ${subjectId}`);
+    
+        fetch(`/api/chat/messages/${subjectId}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("DEBUG: Messages reçus", data);
+            displayMessages(data);
+        })
+        .catch(error => {
+            console.error("DEBUG ERROR: Erreur de chargement des messages", error);
+        });
+    }
+
+    function getCurrentUserId() {
+        const metaTag = document.querySelector('meta[name="current-user-id"]');
+        return metaTag ? parseInt(metaTag.getAttribute("content")) : null;
+    }
+
+    // Fonction pour afficher les messages
+    function displayMessages(messages) {
+        const chatMessages = document.getElementById("chat-messages");
+        chatMessages.innerHTML = ""; // Effacer les anciens messages
+
+        const currentUserId = getCurrentUserId();
+        if (!currentUserId) {
+            console.error("DEBUG ERROR: currentUserId non défini !");
+            return;
+        }
+
+        messages.forEach(msg => {
+            const messageElement = document.createElement("div");
+            messageElement.className = msg.sender_id === currentUserId ? "message sent" : "message received";
+            messageElement.innerHTML = `<p>${msg.content}</p>`;
+            chatMessages.appendChild(messageElement);
+        });
+
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Faire défiler vers le bas
+    }
+
+    function addMessageToChat(messageData, isOwnMessage = false) {
+        const chatMessages = document.getElementById("chat-messages");
+    
+        const messageElement = document.createElement("div");
+        messageElement.className = isOwnMessage ? "message sent" : "message received";
+        messageElement.innerHTML = `<p>${messageData.message}</p>`;
+    
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas pour voir le message
     }
 
     // Envoyer un message au serveur WebSocket

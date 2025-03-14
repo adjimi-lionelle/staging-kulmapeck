@@ -62,27 +62,27 @@ class ChatServer implements MessageComponentInterface
         $existingConnection = $this->entityManager->getRepository(WebSocketConnection::class)
         ->findOneBy(['user' => $user, 'subjectChat' => $subjectChat]);
 
-    if (!$existingConnection) {
-        $webSocketConnection = new WebSocketConnection();
-        $webSocketConnection->setUser($user);
-        $webSocketConnection->setSubjectChat($subjectChat);
-        $webSocketConnection->setLastActivity(new \DateTime());
+        if (!$existingConnection) {
+            $webSocketConnection = new WebSocketConnection();
+            $webSocketConnection->setUser($user);
+            $webSocketConnection->setSubjectChat($subjectChat);
+            $webSocketConnection->setLastActivity(new \DateTime());
 
-        $this->entityManager->persist($webSocketConnection);
-        $this->entityManager->flush();
-    } else {
-        $existingConnection->setLastActivity(new \DateTime());
-        $this->entityManager->flush();
-    }
+            $this->entityManager->persist($webSocketConnection);
+            $this->entityManager->flush();
+        } else {
+            $existingConnection->setLastActivity(new \DateTime());
+            $this->entityManager->flush();
+        }
 
-         $this->clients->attach($conn, ['user' => $user, 'subjectChat' => $subjectChat]);
-         echo "Nouvelle connexion : Utilisateur #{$userId} dans la discussion #{$subjectChatId}.\n";
+            $this->clients->attach($conn, ['user' => $user, 'subjectChat' => $subjectChat]);
+            echo "Nouvelle connexion : Utilisateur #{$userId} dans la discussion #{$subjectChatId}.\n";
 
-         // Envoyer un message de bienvenue
-         $conn->send(json_encode([
-             'type' => 'success',
-             'message' => "Connexion réussie à la discussion #{$subjectChatId}."
-         ]));
+            // Envoyer un message de bienvenue
+           /* $conn->send(json_encode([
+                'type' => 'success',
+                'message' => "Connexion réussie à la discussion #{$subjectChatId}."
+            ]));*/
 
      } catch (\Exception $e) {
          echo "Erreur lors de la connexion WebSocket : " . $e->getMessage() . "\n";
@@ -115,33 +115,46 @@ class ChatServer implements MessageComponentInterface
             $student = $subjectChat->getEleve();
             $studentUser = $student ? $student->getUtilisateur() : null;
 
-            echo "DEBUG: ID de l'élève dans le chat: " . ($student ? $student->getId() : 'NULL') . "\n";
-            echo "DEBUG: ID de l'utilisateur associé à l'élève: " . ($studentUser ? $studentUser->getId() : 'NULL') . "\n";
-            echo "DEBUG: ID de l'utilisateur connecté: " . $user->getId() . "\n";
 
             if (!$student || $studentUser != $user) {
                 echo "Seul l'élève peut poser des questions.\n";
                 return;
             }
             
-
             
-                $message = new MessageChat();
-                $message->setSender($user);
-                $message->setSubjectChat($subjectChat);
-                $message->setContent($data['message']);
-            // $message->setCreateAt(new \DateTimeImmutable());
-                $message->setIsFromAI(false);
-                $message->setIsRead(false);
-                $message->setExpiresAt((new \DateTimeImmutable())->modify('+30 days'));
-                $message->setTeacherPersona(null); // Aucun enseignant assigné par défaut
+            $message = new MessageChat();
+            $message->setSender($user);
+            $message->setSubjectChat($subjectChat);
+            $message->setContent($data['message']);
+            //$message->setCreateAt(new \DateTimeImmutable());
+            $message->setIsFromAI(false);
+            $message->setIsRead(false);
+            $message->setExpiresAt((new \DateTimeImmutable())->modify('+30 days'));
+            $message->setTeacherPersona(null); // Aucun enseignant assigné par défaut
             
                 echo "DEBUG: Message prêt à être enregistré en BD.\n";
             
-                $this->entityManager->persist($message);
-                $this->entityManager->flush();
+            $this->entityManager->persist($message);
+            $this->entityManager->flush();
             
                 echo "Message sauvegardé en BD avec ID : " . $message->getId() . "\n";
+
+                // Diffuser le message à tous les utilisateurs connectés
+            $response = json_encode([
+                'type' => 'new_message',
+                'message' => [
+                    'id' => $message->getId(),
+                    'content' => $message->getContent(),
+                    'sender_id' => $user->getId(),
+                    'createdAt' => $message->getCreateAt()->format('Y-m-d H:i:s'),
+                ]
+            ]);
+
+            foreach ($this->clients as $client) {
+                if ($client !== $from && $this->clients[$client]['subjectChat'] === $subjectChat) {
+                    $client->send($response);
+                }
+            }
         
         } catch (\Exception $e) {
             echo "Erreur lors de la sauvegarde du message : " . $e->getMessage() . "\n";
@@ -149,20 +162,6 @@ class ChatServer implements MessageComponentInterface
         
 
     }
-       /* if (!isset($data['message'])) {
-            echo "Message invalide.\n";
-            return;
-        }
-
-        foreach ($this->clients as $client) {
-            if ($client !== $from) {
-                $client->send(json_encode([
-                    'message' => $data['message'],
-                    'author' => "User"
-                ]));
-            }
-        }*/
-    
 
 
     public function onClose(ConnectionInterface $conn)
