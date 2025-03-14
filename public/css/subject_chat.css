@@ -163,6 +163,15 @@
   border-bottom: 1px solid var(--bg-light);
 }
 
+/* Alternate chat item colors */
+.chat-item:nth-child(odd) .avatar-placeholder {
+  background-color: #09139f;
+}
+
+.chat-item:nth-child(even) .avatar-placeholder {
+  background-color: #fd7e14;
+}
+
 .chat-item:hover, 
 .chat-item.active {
   background-color: var(--bg-light);
@@ -182,7 +191,6 @@
   justify-content: center;
   font-weight: 600;
   color: var(--bg-white);
-  background-color: var(--primary-color);
   border-radius: var(--border-radius-full);
 }
 
@@ -462,7 +470,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--primary-color);
+  background-color: #09139f;
   color: var(--bg-white);
   border: none;
   cursor: pointer;
@@ -470,7 +478,18 @@
 }
 
 .btn-send:hover {
-  background-color: var(--primary-hover);
+  background-color: #070c6b;
+}
+
+/* Send button styling */
+#send-message {
+  background-color: #09139f !important;
+  border-color: #09139f !important;
+}
+
+#send-message:hover {
+  background-color: #070c6b !important;
+  border-color: #070c6b !important;
 }
 
 /* AI Message Styling */
