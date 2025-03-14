@@ -25,6 +25,9 @@
   --font-size-sm: 0.85rem;
   --font-size-md: 1rem;
   --font-size-lg: 1.25rem;
+  --chat-color-blue: #09139f;
+  --chat-color-orange: #fd7e14;
+  --send-button-color: #09139f;
 }
 
 /* Dark mode variables */
@@ -168,6 +171,14 @@
   background-color: var(--bg-light);
 }
 
+.chat-item:nth-child(odd) .avatar-placeholder {
+  background-color: var(--chat-color-blue);
+}
+
+.chat-item:nth-child(even) .avatar-placeholder {
+  background-color: var(--chat-color-orange);
+}
+
 .chat-item-avatar {
   margin-right: var(--spacing-md);
   position: relative;
@@ -182,7 +193,6 @@
   justify-content: center;
   font-weight: 600;
   color: var(--bg-white);
-  background-color: var(--primary-color);
   border-radius: var(--border-radius-full);
 }
 
@@ -226,15 +236,6 @@
   justify-content: center;
   font-size: var(--font-size-xs);
   padding: 0 6px;
-}
-
-/* Alternate colors for chat items */
-.chat-item:nth-child(odd) .avatar-placeholder {
-  background-color: #09139f;
-}
-
-.chat-item:nth-child(even) .avatar-placeholder {
-  background-color: #fd7e14;
 }
 
 /* ==================
@@ -471,7 +472,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--primary-color);
+  background-color: var(--send-button-color);
   color: var(--bg-white);
   border: none;
   cursor: pointer;
@@ -479,7 +480,8 @@
 }
 
 .btn-send:hover {
-  background-color: var(--primary-hover);
+  background-color: var(--send-button-color);
+  opacity: 0.9;
 }
 
 /* AI Message Styling */
