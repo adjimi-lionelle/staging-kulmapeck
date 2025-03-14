@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
     let currentSubject = null;
     let socket = null;
     let isMobileView = window.innerWidth <= 768;
-    let emojiPicker = null;
 
     if (!subjectList) {
         console.error("DEBUG ERROR: L'élément #subject-list est introuvable dans le DOM !");
@@ -19,82 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Setup mobile view
     setupMobileView();
     
-    // Setup emoji picker
-    setupEmojiPicker();
-
     // Charger les sujets au démarrage
     loadSubjects();
-
-    /**
-     * Setup emoji picker functionality
-     */
-    function setupEmojiPicker() {
-        console.log("DEBUG: Setting up emoji picker");
-        
-        const emojiButton = document.getElementById('emoji-button');
-        const messageInput = document.getElementById('message-input');
-        
-        if (!emojiButton || !messageInput) {
-            console.error("DEBUG ERROR: Emoji button or message input not found");
-            return;
-        }
-        
-        // Create emoji picker element
-        emojiPicker = document.createElement('emoji-picker');
-        emojiPicker.style.position = 'absolute';
-        emojiPicker.style.bottom = '70px';
-        emojiPicker.style.left = '10px';
-        emojiPicker.style.zIndex = '1000';
-        emojiPicker.style.display = 'none';
-        
-        // Add emoji picker to the DOM
-        document.querySelector('.chat-footer').appendChild(emojiPicker);
-        
-        // Toggle emoji picker visibility when emoji button is clicked
-        emojiButton.addEventListener('click', function() {
-            if (emojiPicker.style.display === 'none') {
-                emojiPicker.style.display = 'block';
-            } else {
-                emojiPicker.style.display = 'none';
-            }
-        });
-        
-        // Handle emoji selection
-        emojiPicker.addEventListener('emoji-click', event => {
-            console.log("DEBUG: Emoji selected:", event.detail);
-            
-            // Get current cursor position
-            const cursorPosition = messageInput.selectionStart;
-            
-            // Insert emoji at cursor position
-            const text = messageInput.value;
-            const newText = 
-                text.substring(0, cursorPosition) + 
-                event.detail.unicode + 
-                text.substring(cursorPosition);
-            
-            messageInput.value = newText;
-            
-            // Set cursor position after the inserted emoji
-            messageInput.selectionStart = cursorPosition + event.detail.unicode.length;
-            messageInput.selectionEnd = cursorPosition + event.detail.unicode.length;
-            
-            // Focus back on the input
-            messageInput.focus();
-            
-            // Hide emoji picker after selection
-            emojiPicker.style.display = 'none';
-        });
-        
-        // Hide emoji picker when clicking outside
-        document.addEventListener('click', function(event) {
-            if (event.target !== emojiButton && 
-                !emojiPicker.contains(event.target) && 
-                emojiPicker.style.display === 'block') {
-                emojiPicker.style.display = 'none';
-            }
-        });
-    }
 
     /**
      * Setup mobile view based on screen size
