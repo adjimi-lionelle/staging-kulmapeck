@@ -109,6 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         currentSubject = subjectId;
+        console.log(`DEBUG: currentSubject mis à jour -> ${currentSubject}`);
         getWebSocketToken(subjectId);
         loadChatHistory(subjectId); // Charger l'historique ici
 

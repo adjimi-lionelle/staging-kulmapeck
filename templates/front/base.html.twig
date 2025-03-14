@@ -12,7 +12,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<meta name="author" content="Webestica.com">
-		<meta name="current-user-id" content="{{ app.user.id }}">
+		<meta name="current-user-id" content="{{ app.user ? app.user.id : '' }}">
+
 
 		<meta
 		name="description" content="Kulmapeck - The Best E-learning platform">
