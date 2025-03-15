@@ -1,4 +1,3 @@
-
 // Initialisation après chargement du DOM
 document.addEventListener("DOMContentLoaded", function () {
     console.log("DEBUG: DOMContentLoaded event fired, initializing chat");
@@ -7,22 +6,25 @@ document.addEventListener("DOMContentLoaded", function () {
     const chatContainer = document.querySelector('.chat-app');
     let currentSubject = null;
     let socket = null;
+    let isMobileView = window.innerWidth <= 768;
 
     if (!subjectList) {
         console.error("DEBUG ERROR: L'élément #subject-list est introuvable dans le DOM !");
         return;
     }
 
-    //setupMobileView();
+    console.log("DEBUG: L'élément #subject-list est bien trouvé dans le DOM");
 
+    // Setup mobile view
+    setupMobileView();
+    
     // Charger les sujets au démarrage
     loadSubjects();
 
-
-      /**
+    /**
      * Setup mobile view based on screen size
      */
-     /* function setupMobileView() {
+    function setupMobileView() {
         console.log("DEBUG: Setting up mobile view, current width:", window.innerWidth);
         
         const mobileBackButton = document.querySelector('.mobile-back-button');
@@ -47,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         });
-    }*/
+    }
 
     // Charger les sujets depuis l'API
     function loadSubjects() {
@@ -118,6 +120,11 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('chat-header').style.display = 'flex';
         document.getElementById('chat-messages').style.display = 'block';
         document.getElementById('chat-footer').style.display = 'flex';
+        
+        // Handle mobile view
+        if (isMobileView) {
+            chatContainer.classList.add('chat-active');
+        }
     }
 
     // Obtenir le token WebSocket
