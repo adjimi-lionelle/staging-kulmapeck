@@ -166,9 +166,8 @@ class PaymentControllers extends AbstractController
         }
 
         $skill_level = $classe->getSkillLevel()->getId();
-        $specialite = $classe->getSpecialite()->getId();
-        //var_dump($specialite); die();
-            
+        if($classe->getSpecialite()){
+            $specialite = $classe->getSpecialite()->getId();
             if ($specialite == 1 || $specialite == 2) {
                 $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
                     ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
@@ -190,7 +189,12 @@ class PaymentControllers extends AbstractController
                 ->setParameter('cycle2', 23)
                 ->getQuery()
                 ->getResult();
-            } elseif ($skill_level == 1 || $skill_level == 2) {
+            } 
+        }
+       
+        //var_dump($specialite); die();
+            
+            if ($skill_level == 1 || $skill_level == 2) {
                 $matieres = $MatiereCycleRepository->findBy(['cycle' => 1]);
             } elseif ($skill_level == 3 || $skill_level == 4) {
                 if($classe->getName() == "Quatrième ALL- 4ème ALL" || $classe->getName() == "Troisième ALL- 3ème ALL" || $classe->getName() == "Troisième Bilingue Allemand- 3ème BIL. ALL"){
