@@ -121,18 +121,15 @@ class ChatServer implements MessageComponentInterface
                 return;
             }
             
-            
             $message = new MessageChat();
             $message->setSender($user);
             $message->setSubjectChat($subjectChat);
             $message->setContent($data['message']);
             //$message->setCreateAt(new \DateTimeImmutable());
             $message->setIsFromAI(false);
-            $message->setIsRead(false);
+            $message->setIsRead(true);
             $message->setExpiresAt((new \DateTimeImmutable())->modify('+30 days'));
-            $message->setTeacherPersona(null); // Aucun enseignant assigné par défaut
-            
-                echo "DEBUG: Message prêt à être enregistré en BD.\n";
+            $message->setTeacherPersona(null);
             
             $this->entityManager->persist($message);
             $this->entityManager->flush();
