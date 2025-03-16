@@ -12,6 +12,7 @@
 /deploy.py
 /docs
 /git_push.bat
+/migrations/Version20250316200336.php
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###

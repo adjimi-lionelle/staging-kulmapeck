@@ -20,10 +20,11 @@ final class Version20250307094728 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE matiere_cycle ADD name VARCHAR(255) NOT NULL');
-        $this->addSql('ALTER TABLE matiere_cycle ADD CONSTRAINT FK_3C267FE6F46CD258 FOREIGN KEY (matiere_id) REFERENCES categorie (id)');
+//        $this->addSql('ALTER TABLE matiere_cycle ADD name VARCHAR(255) NOT NULL');
+      
+//	    $this->addSql('ALTER TABLE matiere_cycle ADD CONSTRAINT FK_3C267FE6F46CD258 FOREIGN KEY (matiere_id) REFERENCES categorie (id)');
     
-        $this->addSql('ALTER TABLE subject_chat CHANGE teacher_persona_id teacher_persona_id INT DEFAULT NULL');
+  //      $this->addSql('ALTER TABLE subject_chat CHANGE teacher_persona_id teacher_persona_id INT DEFAULT NULL');
 
     }
 
