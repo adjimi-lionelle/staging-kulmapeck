@@ -166,7 +166,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }    
 
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const wsUrl = `${protocol}//127.0.0.1:9000/ws?token=${token}&subjectChat_id=${subjectId}`;
+       // const wsUrl = `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
+        const wsUrl = `${protocol}//pay-kulmapeck.online/ws?token=${token}&subjectChat_id=${subjectId}`;
 
         socket = new WebSocket(wsUrl);
 

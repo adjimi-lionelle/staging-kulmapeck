@@ -33,7 +33,7 @@ class WebSocketServerCommand extends Command
         $output->writeln("Démarrage du serveur WebSocket...");
 
         try {
-            $port = $_ENV['WEBSOCKET_PORT'] ?? 9000;
+            $port = $_ENV['WEBSOCKET_PORT'] ?? 8085;
             $host = $_ENV['WEBSOCKET_HOST'] ?? '0.0.0.0';
 
             $server = IoServer::factory(
