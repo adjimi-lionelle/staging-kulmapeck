@@ -69,4 +69,12 @@ services:
     # Controllers with JWT Secret
     App\Controller\ChatController:
         arguments:   
-            $jwtSecret: "%jwt_secret%"       
+            $jwtSecret: "%jwt_secret%"     
+
+    App\WebSocket\AIMessageHandler:
+        arguments:
+            $entityManager: '@doctrine.orm.entity_manager'
+            $subjectChatRepository: '@App\Repository\SubjectChatRepository'
+            $messageChatRepository: '@App\Repository\MessageChatRepository'
+            $aiService: '@App\Service\DeepSeekAIService'
+            $logger: '@logger'          

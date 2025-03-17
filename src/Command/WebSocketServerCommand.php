@@ -6,6 +6,7 @@ use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
 use Ratchet\WebSocket\WsServer;
 use App\WebSocket\ChatServer;
+use App\WebSocket\AIMessageHandler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,13 +17,14 @@ class WebSocketServerCommand extends Command
 {
     protected static $defaultName = 'websocket:start';
     private $entityManager;
-    private $jwtSecret;
+    private $jwtSecret; private $aiMessageHandler;
 
-    public function __construct(EntityManagerInterface $entityManager, string $jwtSecret)
+    public function __construct(EntityManagerInterface $entityManager, string $jwtSecret, AIMessageHandler $aiMessageHandler)
     {
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->jwtSecret = $jwtSecret;
+        $this->aiMessageHandler = $aiMessageHandler;
     }
 
 
@@ -35,7 +37,7 @@ class WebSocketServerCommand extends Command
             $host = $_ENV['WEBSOCKET_HOST'] ?? '0.0.0.0';
 
             $server = IoServer::factory(
-                new HttpServer(new WsServer(new ChatServer($this->entityManager, $this->jwtSecret))),
+                new HttpServer(new WsServer(new ChatServer($this->entityManager, $this->jwtSecret, $this->aiMessageHandler))),
                 $port,
                 $host
             );

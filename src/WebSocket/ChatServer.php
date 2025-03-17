@@ -11,20 +11,23 @@ use App\Entity\MessageChat;
 use App\Entity\User;
 use App\Entity\SubjectChat;
 use App\Entity\WebSocketConnection;
+use App\WebSocket\AIMessageHandler;
 
 class ChatServer implements MessageComponentInterface
 {
 
     private $entityManager;
    // private $clients;
+    private  $aiMessageHandler;
     private $jwtSecret;
     private \SplObjectStorage $clients;
 
-    public function __construct(EntityManagerInterface $entityManager, string $jwtSecret)
+    public function __construct(EntityManagerInterface $entityManager, string $jwtSecret, AIMessageHandler $aiMessageHandler)
     {
         $this->entityManager = $entityManager;
         $this->clients = new \SplObjectStorage();
         $this->jwtSecret = $jwtSecret;
+        $this->aiMessageHandler = $aiMessageHandler;
     }
 
 
@@ -134,9 +137,9 @@ class ChatServer implements MessageComponentInterface
             $this->entityManager->persist($message);
             $this->entityManager->flush();
             
-                echo "Message sauvegardé en BD avec ID : " . $message->getId() . "\n";
+            echo "Message sauvegardé en BD avec ID : " . $message->getId() . "\n";
 
-                // Diffuser le message à tous les utilisateurs connectés
+                
             $response = json_encode([
                 'type' => 'new_message',
                 'message' => [
@@ -152,7 +155,30 @@ class ChatServer implements MessageComponentInterface
                     $client->send($response);
                 }
             }
-        
+
+            // Appel de l'IA pour générer une réponse
+            echo "DEBUG: Appel de l'IA pour générer une réponse...\n";
+        $aiResponse = $this->aiMessageHandler->handleMessage($data, $user);
+
+        if ($aiResponse) {
+            $aiResponseData = [
+                'type' => 'new_message',
+                'message' => [
+                    'id' => null, // Pas d'ID car c'est une réponse temporaire
+                    'content' => $aiResponse['message'],
+                    'sender_id' => $aiResponse['author'],  
+                    'isFromAI'  => $aiResponse['isFromAI'],
+                    'createdAt' => $aiResponse['timestamp'],
+                ]
+            ];
+
+            foreach ($this->clients as $client) {
+                if ($this->clients[$client]['subjectChat'] === $subjectChat) {
+                    $client->send(json_encode($aiResponseData));
+                }
+            }
+        }
+
         } catch (\Exception $e) {
             echo "Erreur lors de la sauvegarde du message : " . $e->getMessage() . "\n";
         }

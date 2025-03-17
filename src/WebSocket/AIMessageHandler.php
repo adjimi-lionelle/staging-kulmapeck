@@ -35,11 +35,11 @@ class AIMessageHandler
     
     public function handleMessage(array $data, User $user): ?array
     {
-        if (!isset($data['group_id']) || !isset($data['message'])) {
+        if (!isset($data['subject_id']) || !isset($data['message'])) {
             return null;
         }
         
-        $subjectChat = $this->subjectChatRepository->find($data['group_id']);
+        $subjectChat = $this->subjectChatRepository->find($data['subject_id']);
         if (!$subjectChat) {
             return null;
         }
@@ -66,7 +66,7 @@ class AIMessageHandler
         }, array_reverse($recentMessages));
         
         // Get subject name
-        $subjectName = $subjectChat->getMatiere()->getName();
+        $subjectName = $subjectChat->getName();
         
         try {
             // Generate AI response
@@ -84,6 +84,7 @@ class AIMessageHandler
             $message->setIsRead(false);
             $message->setIsFromAI(true);
             $message->setCreateAt(new \DateTimeImmutable());
+            $message->setExpiresAt((new \DateTimeImmutable())->modify('+30 days'));
             
             $this->entityManager->persist($message);
             $this->entityManager->flush();

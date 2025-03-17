@@ -275,6 +275,7 @@ class ChatController extends AbstractController
             'id' => $msg->getId(),
             'content' => $msg->getContent(),
             'sender_id' => $msg->getSender()->getId(),
+            'isFromAI' => $msg->isIsFromAI(),
             'createdAt' => $msg->getCreateAt()->format('Y-m-d H:i:s'),
         ], $messages);
 

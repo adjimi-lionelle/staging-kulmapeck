@@ -43,7 +43,7 @@ class DeepSeekAIService
                     'model' => 'deepseek-chat',
                     'messages' => $messages,
                     'temperature' => 0.7,
-                    'max_tokens' => 1000,
+                    'max_tokens' => 200,
                 ],
             ]);
             

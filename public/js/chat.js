@@ -180,13 +180,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 const data = JSON.parse(event.data);
                 
                 if (data.type === "new_message") {
-                    const currentUserId = getCurrentUserId(); 
+                   /* const currentUserId = getCurrentUserId(); 
 
-                    if (data.message.sender_id === currentUserId) {
+                    const isFromAI = data.message.sender_id === "AI Teacher";
+
+                    if (!isFromAI && data.message.sender_id === currentUserId) {
                         console.log("DEBUG: Ignorer l'affichage du message car c'est le nôtre.");
-                        return; 
+                        return;
                     }
-                    addMessageToChat(data.message, false); // Afficher le message reçu
+
+                    addMessageToChat(data.message, isFromAI ? "assistant" : false);*/
+                    const isFromAI = data.message.isFromAI === true;
+
+                    // Ajouter le message avec la bonne classe (IA ou élève)
+                    addMessageToChat(data.message, isFromAI);
+
                 } else {
                     console.log("DEBUG: Autre type de message reçu", data);
                 }
@@ -221,7 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
             //displayMessages(data);
             chatMessages.innerHTML = `
                     <div class="message-wrapper">
-                        <div class="message-time">Today</div>
+                        <div class="message-time">Aujourdhui</div>
                     </div>
                 `;
                 
@@ -250,49 +258,160 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Fonction pour afficher les messages
-    function displayMessages(messages) {
-        const chatMessages = document.getElementById("chat-messages");
-        chatMessages.innerHTML = ""; // Effacer les anciens messages
+   function displayMessages(messages) {
+    const chatMessages = document.getElementById("chat-messages");
+    chatMessages.innerHTML = ""; // Effacer les anciens messages
 
-        const currentUserId = getCurrentUserId();
-        if (!currentUserId) {
-            console.error("DEBUG ERROR: currentUserId non défini !");
+    const currentUserId = getCurrentUserId();
+    if (!currentUserId) {
+        console.error("DEBUG ERROR: currentUserId non défini !");
+        return;
+    }
+
+    messages.forEach(msg => {
+        // Vérification des propriétés
+        if (!msg.content || !msg.createdAt || msg.isFromAI === undefined) {
+            console.warn("DEBUG: Message mal formaté, ignoré :", msg);
             return;
         }
 
-        messages.forEach(msg => {
-            const messageElement = document.createElement("div");
-            messageElement.className = msg.sender_id === currentUserId ? "message sent" : "message received";
-             // Format de la date (ex: "14 mars 2025, 11:45")
-            const messageDate = new Date(msg.createdAt).toLocaleString("fr-FR", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
+        const isFromAI = msg.isFromAI;
+        const isOwnMessage = msg.sender_id === currentUserId;
 
-            // Affichage de l'auteur et de la date
-            messageElement.innerHTML = `
-                <div class="message-header">
-                    <span class="message-date">${messageDate}</span>
-                </div>
-                <p>${msg.content}</p>
-            `;
-            //messageElement.innerHTML = `<p>${msg.content}</p>`;
-            chatMessages.appendChild(messageElement);
-        });
+        // Définition de la classe CSS pour le message
+        let messageClass = isFromAI ? "message assistant" : (isOwnMessage ? "message sent" : "message received");
 
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Faire défiler vers le bas
+        // Formater la date correctement
+        const messageDate = msg.createdAt ? new Date(msg.createdAt).toLocaleString("fr-FR", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }) : "Date inconnue";
+
+        // Créer l'élément HTML du message
+        const messageElement = document.createElement("div");
+        messageElement.className = messageClass;
+        messageElement.innerHTML = `
+            <div class="message-header">
+                <span class="message-date">${messageDate}</span>
+            </div>
+            <p>${msg.content}</p>
+        `;
+
+        chatMessages.appendChild(messageElement);
+    });
+
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas pour voir le message
+}
+/*function displayMessages(messages) {
+    const chatMessages = document.getElementById("chat-messages");
+    chatMessages.innerHTML = ""; // Effacer les anciens messages
+
+    const currentUserId = getCurrentUserId();
+    if (!currentUserId) {
+        console.error("DEBUG ERROR: currentUserId non défini !");
+        return;
     }
 
-    function addMessageToChat(messageData, isOwnMessage = false) {
-        const chatMessages = document.getElementById("chat-messages");
-    
+    messages.forEach(msg => {
+        // Vérification des propriétés
+        if (!msg.content || !msg.createdAt || msg.isFromAI === undefined) {
+            console.warn("DEBUG: Message mal formaté, ignoré :", msg);
+            return;
+        }
+
+        const isFromAI = msg.isFromAI;
+        const isOwnMessage = msg.sender_id === currentUserId;
+
+        // Définition de la classe CSS (seulement "sent" ou "assistant")
+        let messageClass = isFromAI ? "message assistant" : "message sent";
+
+        // Formater la date correctement
+        const messageDate = msg.createdAt ? new Date(msg.createdAt).toLocaleString("fr-FR", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }) : "Date inconnue";
+
+        // Créer l’élément HTML du message
         const messageElement = document.createElement("div");
-        messageElement.className = isOwnMessage ? "message sent" : "message received";
-        //messageElement.innerHTML = `<p>${messageData.message}</p>`;
-         // Format de la date
+        messageElement.className = messageClass;
+        messageElement.innerHTML = `
+            <div class="message-header">
+                <span class="message-date">${messageDate}</span>
+            </div>
+            <p>${msg.content}</p>
+        `;
+
+        chatMessages.appendChild(messageElement);
+    });
+
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas pour voir le message
+}*/
+
+
+function displayMessages(messages) {
+    const chatMessages = document.getElementById("chat-messages");
+    chatMessages.innerHTML = ""; // Effacer les anciens messages
+
+    const currentUserId = getCurrentUserId();
+    if (!currentUserId) {
+        console.error("DEBUG ERROR: currentUserId non défini !");
+        return;
+    }
+
+    messages.forEach(msg => {
+        if (!msg.content || !msg.createdAt || msg.isFromAI === undefined) {
+            console.warn("DEBUG: Message mal formaté, ignoré :", msg);
+            return;
+        }
+
+        const isFromAI = msg.isFromAI;
+        const isOwnMessage = msg.sender_id === currentUserId;
+
+        // Définition des classes CSS
+        let containerClass = isFromAI ? "message-container assistant" : "message-container sent";
+        let messageClass = isFromAI ? "message assistant" : "message sent";
+
+        const messageDate = new Date(msg.createdAt).toLocaleString("fr-FR", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+
+        // Création du conteneur
+        const messageContainer = document.createElement("div");
+        messageContainer.className = containerClass;
+
+        // Création du message
+        const messageElement = document.createElement("div");
+        messageElement.className = messageClass;
+        messageElement.innerHTML = `
+            <div class="message-header">
+                <span class="message-date">${messageDate}</span>
+            </div>
+            <p>${msg.content}</p>
+        `;
+
+        messageContainer.appendChild(messageElement);
+        chatMessages.appendChild(messageContainer);
+    });
+
+    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
+}
+
+    /*function addMessageToChat(messageData, isFromAI = false) {
+        const chatMessages = document.getElementById("chat-messages");
+        const messageElement = document.createElement("div");
+
+        messageElement.className = isFromAI ? "message assistant" : "message sent";
+        
         const messageDate = new Date(messageData.timestamp).toLocaleString("fr-FR", {
             day: "2-digit",
             month: "short",
@@ -301,7 +420,6 @@ document.addEventListener("DOMContentLoaded", function () {
             minute: "2-digit"
         });
 
-        // Affichage de l'auteur et de la date
         messageElement.innerHTML = `
             <div class="message-header">
                 <span class="message-date">${messageDate}</span>
@@ -312,7 +430,49 @@ document.addEventListener("DOMContentLoaded", function () {
         chatMessages.appendChild(messageElement);
         chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas pour voir le message
 
-    }
+    }*/
+
+        function addMessageToChat(messageData, isFromAI = false) {
+            const chatMessages = document.getElementById("chat-messages");
+        
+            // Déterminer si le message vient de l'IA ou de l'élève
+            const isSentByStudent = !isFromAI;
+        
+            // Création du conteneur pour le message
+            const messageContainer = document.createElement("div");
+            messageContainer.className = isSentByStudent ? "message-container sent" : "message-container assistant";
+        
+            // Création du bloc du message
+            const messageElement = document.createElement("div");
+            messageElement.className = isSentByStudent ? "message sent" : "message assistant";
+        
+            // Format de la date
+            const messageDate = new Date(messageData.timestamp).toLocaleString("fr-FR", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        
+            // Contenu du message
+            messageElement.innerHTML = `
+                <div class="message-header">
+                    <span class="message-date">${messageDate}</span>
+                </div>
+                <p>${messageData.message}</p>
+            `;
+        
+            // Ajouter le message dans son conteneur
+            messageContainer.appendChild(messageElement);
+        
+            // Ajouter au chat
+            chatMessages.appendChild(messageContainer);
+        
+            // Scroll automatique vers le bas
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
 
     // Envoyer un message au serveur WebSocket
     document.getElementById("send-message").addEventListener("click", function () {

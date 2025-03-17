@@ -17,7 +17,7 @@ class MessageChat
     #[ORM\JoinColumn(name: 'subject_chat_id', nullable: false)]
     private ?SubjectChat $subjectChat = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: "text")]
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'messageChats')]
