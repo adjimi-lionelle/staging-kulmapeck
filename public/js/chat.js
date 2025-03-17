@@ -258,161 +258,74 @@ document.addEventListener("DOMContentLoaded", function () {
         return metaTag ? parseInt(metaTag.getAttribute("content")) : null;
     }
 
-    // Fonction pour afficher les messages
-   function displayMessages(messages) {
-    const chatMessages = document.getElementById("chat-messages");
-    chatMessages.innerHTML = ""; // Effacer les anciens messages
 
-    const currentUserId = getCurrentUserId();
-    if (!currentUserId) {
-        console.error("DEBUG ERROR: currentUserId non défini !");
-        return;
-    }
+    function displayMessages(messages) {
+        const chatMessages = document.getElementById("chat-messages");
+        chatMessages.innerHTML = ""; // Effacer les anciens messages
 
-    messages.forEach(msg => {
-        // Vérification des propriétés
-        if (!msg.content || !msg.createdAt || msg.isFromAI === undefined) {
-            console.warn("DEBUG: Message mal formaté, ignoré :", msg);
+        const currentUserId = getCurrentUserId();
+        if (!currentUserId) {
+            console.error("DEBUG ERROR: currentUserId non défini !");
             return;
         }
 
-        const isFromAI = msg.isFromAI;
-        const isOwnMessage = msg.sender_id === currentUserId;
+        messages.forEach(msg => {
+            if (!msg.content || !msg.createdAt || msg.isFromAI === undefined) {
+                console.warn("DEBUG: Message mal formaté, ignoré :", msg);
+                return;
+            }
 
-        // Définition de la classe CSS pour le message
-        let messageClass = isFromAI ? "message assistant" : (isOwnMessage ? "message sent" : "message received");
+            const isFromAI = msg.isFromAI;
+            const isOwnMessage = msg.sender_id === currentUserId;
 
-        // Formater la date correctement
-        const messageDate = msg.createdAt ? new Date(msg.createdAt).toLocaleString("fr-FR", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        }) : "Date inconnue";
+            // Définition des classes CSS
+            let containerClass = isFromAI ? "message-container assistant" : "message-container sent";
+            let messageClass = isFromAI ? "message assistant" : "message sent";
 
-        // Créer l'élément HTML du message
-        const messageElement = document.createElement("div");
-        messageElement.className = messageClass;
-        messageElement.innerHTML = `
-            <div class="message-header">
-                <span class="message-date">${messageDate}</span>
-            </div>
-            <p>${msg.content}</p>
-        `;
+            const messageDate = new Date(msg.createdAt).toLocaleString("fr-FR", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
 
-        chatMessages.appendChild(messageElement);
-    });
+            // Création du conteneur
+            const messageContainer = document.createElement("div");
+            messageContainer.className = containerClass;
 
-    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas pour voir le message
-}
-/*function displayMessages(messages) {
-    const chatMessages = document.getElementById("chat-messages");
-    chatMessages.innerHTML = ""; // Effacer les anciens messages
+            // Création du message
+            const messageElement = document.createElement("div");
+            messageElement.className = messageClass;
+            messageElement.innerHTML = `
+                <div class="message-header">
+                    <span class="message-date">${messageDate}</span>
+                </div>
+                <p>${msg.content}</p>
+            `;
 
-    const currentUserId = getCurrentUserId();
-    if (!currentUserId) {
-        console.error("DEBUG ERROR: currentUserId non défini !");
-        return;
-    }
-
-    messages.forEach(msg => {
-        // Vérification des propriétés
-        if (!msg.content || !msg.createdAt || msg.isFromAI === undefined) {
-            console.warn("DEBUG: Message mal formaté, ignoré :", msg);
-            return;
-        }
-
-        const isFromAI = msg.isFromAI;
-        const isOwnMessage = msg.sender_id === currentUserId;
-
-        // Définition de la classe CSS (seulement "sent" ou "assistant")
-        let messageClass = isFromAI ? "message assistant" : "message sent";
-
-        // Formater la date correctement
-        const messageDate = msg.createdAt ? new Date(msg.createdAt).toLocaleString("fr-FR", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        }) : "Date inconnue";
-
-        // Créer l’élément HTML du message
-        const messageElement = document.createElement("div");
-        messageElement.className = messageClass;
-        messageElement.innerHTML = `
-            <div class="message-header">
-                <span class="message-date">${messageDate}</span>
-            </div>
-            <p>${msg.content}</p>
-        `;
-
-        chatMessages.appendChild(messageElement);
-    });
-
-    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas pour voir le message
-}*/
-
-
-function displayMessages(messages) {
-    const chatMessages = document.getElementById("chat-messages");
-    chatMessages.innerHTML = ""; // Effacer les anciens messages
-
-    const currentUserId = getCurrentUserId();
-    if (!currentUserId) {
-        console.error("DEBUG ERROR: currentUserId non défini !");
-        return;
-    }
-
-    messages.forEach(msg => {
-        if (!msg.content || !msg.createdAt || msg.isFromAI === undefined) {
-            console.warn("DEBUG: Message mal formaté, ignoré :", msg);
-            return;
-        }
-
-        const isFromAI = msg.isFromAI;
-        const isOwnMessage = msg.sender_id === currentUserId;
-
-        // Définition des classes CSS
-        let containerClass = isFromAI ? "message-container assistant" : "message-container sent";
-        let messageClass = isFromAI ? "message assistant" : "message sent";
-
-        const messageDate = new Date(msg.createdAt).toLocaleString("fr-FR", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
+            messageContainer.appendChild(messageElement);
+            chatMessages.appendChild(messageContainer);
         });
 
-        // Création du conteneur
-        const messageContainer = document.createElement("div");
-        messageContainer.className = containerClass;
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
+    }
 
-        // Création du message
-        const messageElement = document.createElement("div");
-        messageElement.className = messageClass;
-        messageElement.innerHTML = `
-            <div class="message-header">
-                <span class="message-date">${messageDate}</span>
-            </div>
-            <p>${msg.content}</p>
-        `;
-
-        messageContainer.appendChild(messageElement);
-        chatMessages.appendChild(messageContainer);
-    });
-
-    chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
-}
-
-    /*function addMessageToChat(messageData, isFromAI = false) {
+    function addMessageToChat(messageData, isFromAI = false) {
         const chatMessages = document.getElementById("chat-messages");
+    
+        // Déterminer si le message vient de l'IA ou de l'élève
+        const isSentByStudent = !isFromAI;
+    
+        // Création du conteneur pour le message
+        const messageContainer = document.createElement("div");
+        messageContainer.className = isSentByStudent ? "message-container sent" : "message-container assistant";
+    
+        // Création du bloc du message
         const messageElement = document.createElement("div");
-
-        messageElement.className = isFromAI ? "message assistant" : "message sent";
-        
+        messageElement.className = isSentByStudent ? "message sent" : "message assistant";
+    
+        // Format de la date
         const messageDate = new Date(messageData.timestamp).toLocaleString("fr-FR", {
             day: "2-digit",
             month: "short",
@@ -420,7 +333,8 @@ function displayMessages(messages) {
             hour: "2-digit",
             minute: "2-digit"
         });
-
+    
+        // Contenu du message
         messageElement.innerHTML = `
             <div class="message-header">
                 <span class="message-date">${messageDate}</span>
@@ -428,53 +342,16 @@ function displayMessages(messages) {
             <p>${messageData.message}</p>
         `;
     
-        chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas pour voir le message
-
-    }*/
-
-        function addMessageToChat(messageData, isFromAI = false) {
-            const chatMessages = document.getElementById("chat-messages");
+        // Ajouter le message dans son conteneur
+        messageContainer.appendChild(messageElement);
+    
+        // Ajouter au chat
+        chatMessages.appendChild(messageContainer);
+    
+        // Scroll automatique vers le bas
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    } 
         
-            // Déterminer si le message vient de l'IA ou de l'élève
-            const isSentByStudent = !isFromAI;
-        
-            // Création du conteneur pour le message
-            const messageContainer = document.createElement("div");
-            messageContainer.className = isSentByStudent ? "message-container sent" : "message-container assistant";
-        
-            // Création du bloc du message
-            const messageElement = document.createElement("div");
-            messageElement.className = isSentByStudent ? "message sent" : "message assistant";
-        
-            // Format de la date
-            const messageDate = new Date(messageData.timestamp).toLocaleString("fr-FR", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-        
-            // Contenu du message
-            messageElement.innerHTML = `
-                <div class="message-header">
-                    <span class="message-date">${messageDate}</span>
-                </div>
-                <p>${messageData.message}</p>
-            `;
-        
-            // Ajouter le message dans son conteneur
-            messageContainer.appendChild(messageElement);
-        
-            // Ajouter au chat
-            chatMessages.appendChild(messageContainer);
-        
-            // Scroll automatique vers le bas
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        
-
     // Envoyer un message au serveur WebSocket
     document.getElementById("send-message").addEventListener("click", function () {
         sendMessage();
@@ -486,24 +363,14 @@ function displayMessages(messages) {
             sendMessage();
         }
     });
-
-    function ensureWebSocketConnection(subjectId) {
-        if (!socket || socket.readyState !== WebSocket.OPEN) {
-            console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...");
-            getWebSocketToken(subjectId); // 
-        }
-    }
-
     
-    /*function sendMessage() {
+    function sendMessage() {
         let messageInput = document.getElementById("message-input");
         let content = messageInput.value.trim();
     
         if (content === "") return;
     
-        // Récupération de l'élément actif
         let activeChatItem = document.querySelector(".chat-item.active");
-    
         if (!activeChatItem) {
             console.error("DEBUG: Aucun sujet sélectionné !");
             return;
@@ -518,24 +385,15 @@ function displayMessages(messages) {
     
         console.log("DEBUG: État actuel du WebSocket avant envoi :", socket ? socket.readyState : "Socket non défini");
     
+        // Si le WebSocket n'est pas disponible, on tente une reconnexion propre
         if (!socket || socket.readyState !== WebSocket.OPEN) {
             console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...");
-            getWebSocketToken(subjectChatId);
+            
+            // Ajoute le message à une file d'attente pour qu'il soit envoyé après la reconnexion
+            pendingMessages.push(messageData);
     
-            // Vérifier toutes les 500ms si WebSocket est prêt (max 10 tentatives)
-            let attempts = 0;
-            let checkWebSocket = setInterval(() => {
-                if (socket && socket.readyState === WebSocket.OPEN) {
-                    console.log("DEBUG: Envoi du message via WebSocket après reconnexion");
-                    socket.send(JSON.stringify(messageData));
-                    addMessageToChat(messageData, true);
-                    clearInterval(checkWebSocket);
-                } else if (attempts >= 10) {
-                    console.error("DEBUG: WebSocket toujours indisponible après plusieurs tentatives, échec de l'envoi.");
-                    clearInterval(checkWebSocket);
-                }
-                attempts++;
-            }, 500);
+            // Reconnecte WebSocket et envoie les messages après reconnexion
+            reconnectWebSocket(subjectChatId);
         } else {
             console.log("DEBUG: Envoi du message via WebSocket");
             socket.send(JSON.stringify(messageData));
@@ -543,68 +401,29 @@ function displayMessages(messages) {
         }
     
         messageInput.value = "";
-    }*/
-   
-        function sendMessage() {
-            let messageInput = document.getElementById("message-input");
-            let content = messageInput.value.trim();
+    }
         
-            if (content === "") return;
+     // File d'attente des messages en cas de reconnexion
+    let pendingMessages = [];
         
-            let activeChatItem = document.querySelector(".chat-item.active");
-            if (!activeChatItem) {
-                console.error("DEBUG: Aucun sujet sélectionné !");
-                return;
-            }
-        
-            let subjectChatId = activeChatItem.dataset.subjectId;
-            let messageData = {
-                subject_id: parseInt(subjectChatId),
-                message: content,
-                timestamp: new Date().toISOString()
-            };
-        
-            console.log("DEBUG: État actuel du WebSocket avant envoi :", socket ? socket.readyState : "Socket non défini");
-        
-            // Si le WebSocket n'est pas disponible, on tente une reconnexion propre
-            if (!socket || socket.readyState !== WebSocket.OPEN) {
-                console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...");
+    // Fonction pour reconnecter WebSocket et envoyer les messages en attente
+    function reconnectWebSocket(subjectChatId) {
+        getWebSocketToken(subjectChatId);
+    
+        let checkInterval = setInterval(() => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                console.log("DEBUG: WebSocket reconnecté, envoi des messages en attente...");
                 
-                // Ajoute le message à une file d'attente pour qu'il soit envoyé après la reconnexion
-                pendingMessages.push(messageData);
-        
-                // Reconnecte WebSocket et envoie les messages après reconnexion
-                reconnectWebSocket(subjectChatId);
-            } else {
-                console.log("DEBUG: Envoi du message via WebSocket");
-                socket.send(JSON.stringify(messageData));
-                addMessageToChat(messageData, true);
-            }
-        
-            messageInput.value = "";
-        }
-        
-        // File d'attente des messages en cas de reconnexion
-        let pendingMessages = [];
-        
-        // Fonction pour reconnecter WebSocket et envoyer les messages en attente
-        function reconnectWebSocket(subjectChatId) {
-            getWebSocketToken(subjectChatId);
-        
-            let checkInterval = setInterval(() => {
-                if (socket && socket.readyState === WebSocket.OPEN) {
-                    console.log("DEBUG: WebSocket reconnecté, envoi des messages en attente...");
-                    
-                    // Envoie tous les messages en attente
-                    while (pendingMessages.length > 0) {
-                        let msg = pendingMessages.shift();
-                        socket.send(JSON.stringify(msg));
-                        addMessageToChat(msg, true);
-                    }
-        
-                    clearInterval(checkInterval);
+                // Envoie tous les messages en attente
+                while (pendingMessages.length > 0) {
+                    let msg = pendingMessages.shift();
+                    socket.send(JSON.stringify(msg));
+                    addMessageToChat(msg, true);
                 }
-            }, 500); // Vérifie la connexion toutes les 500ms jusqu'à ce que WebSocket soit ouvert
-        }
+    
+                clearInterval(checkInterval);
+            }
+        }, 500); // Vérifie la connexion toutes les 500ms jusqu'à ce que WebSocket soit ouvert
+    }
         
 });
