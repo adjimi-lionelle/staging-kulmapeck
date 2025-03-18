@@ -267,6 +267,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         socket.onopen = function() {
             console.log("DEBUG: WebSocket connected successfully");
+            // Clear any connection errors
+            const errorBanner = document.querySelector('.error-message');
+            if (errorBanner) {
+                errorBanner.remove();
+            }
         };
         
         socket.onmessage = function(event) {
@@ -281,11 +286,36 @@ document.addEventListener('DOMContentLoaded', function() {
         
         socket.onerror = function(error) {
             console.error("DEBUG: WebSocket error:", error);
-            showError('Connection error. Please try again later.');
+            showError('Connection error. Attempting to reconnect...');
+            
+            // Try to reconnect after a short delay
+            setTimeout(() => {
+                if (socket.readyState === WebSocket.CLOSED || socket.readyState === WebSocket.CLOSING) {
+                    console.log("DEBUG: Attempting to reconnect WebSocket after error");
+                    getWebSocketToken(subjectId)
+                        .then(newToken => connectWebSocket(subjectId, newToken))
+                        .catch(err => console.error("DEBUG: Failed to get new token for reconnection:", err));
+                }
+            }, 3000);
         };
         
-        socket.onclose = function() {
-            console.warn("DEBUG: WebSocket connection closed");
+        socket.onclose = function(event) {
+            console.warn(`DEBUG: WebSocket connection closed with code ${event.code}`);
+            
+            // If the close wasn't initiated by our code (e.g., when switching chats)
+            if (currentSubject === subjectId) {
+                console.log("DEBUG: Unexpected connection close. Attempting to reconnect...");
+                
+                // Wait a bit before reconnecting to avoid rapid reconnection attempts
+                setTimeout(() => {
+                    if (currentSubject === subjectId) {
+                        console.log("DEBUG: Attempting to reconnect WebSocket after close");
+                        getWebSocketToken(subjectId)
+                            .then(newToken => connectWebSocket(subjectId, newToken))
+                            .catch(err => console.error("DEBUG: Failed to get new token for reconnection:", err));
+                    }
+                }, 5000);
+            }
         };
     }
     
@@ -297,25 +327,60 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (data.type === 'history') {
             renderMessageHistory(data.messages);
-        } else if (data.type === 'message' || data.message) {
-            // Get timestamp if provided
-            const timestamp = data.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else if (data.type === 'new_message' || data.type === 'message' || data.message) {
+            console.log('DEBUG: Handling individual message:', data);
             
-            // Check if message is from current user
-            const currentUserId = getCurrentUserId();
-            const isCurrentUser = data.user_id === currentUserId || data.userId === currentUserId;
+            // Extract message content based on different possible formats
+            let messageContent, userId, timestamp, isFromAI, author;
             
-            // Check if message is from AI
-            const isFromAI = data.isFromAI || false;
-            const author = isFromAI ? 'AI Teacher' : (data.author || (isCurrentUser ? 'You' : 'User'));
+            // Handle nested message structure (AI responses from server)
+            if (data.type === 'new_message' && data.message && typeof data.message === 'object') {
+                console.log('DEBUG: Processing message with nested format');
+                messageContent = data.message.content;
+                userId = data.message.sender_id;
+                timestamp = data.message.createdAt;
+                isFromAI = data.message.isFromAI === true;
+                author = isFromAI ? 'AI Teacher' : (data.message.author || 'User');
+            } else {
+                // Handle flat message structure (regular messages)
+                console.log('DEBUG: Processing message with flat format');
+                messageContent = data.message || data.content;
+                userId = data.user_id || data.userId;
+                timestamp = data.timestamp;
+                isFromAI = data.isFromAI === true;
+                
+                // Check if message is from current user
+                const currentUserId = getCurrentUserId();
+                const isCurrentUser = userId === currentUserId;
+                
+                author = isFromAI ? 'AI Teacher' : (data.author || (isCurrentUser ? 'You' : 'User'));
+            }
+            
+            // Format timestamp
+            const formattedTime = timestamp ? 
+                new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 
+                new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            console.log(`DEBUG: Processed message - Content: "${messageContent}", Author: ${author}, isFromAI: ${isFromAI}`);
+            
+            // If this is an AI response, remove the typing indicator
+            if (isFromAI) {
+                removeAITypingIndicator();
+            }
             
             // Add message with appropriate styling
-            addMessage(data.message || data.content, author, isCurrentUser, timestamp, isFromAI);
-            
-            // Update subject preview in sidebar
-            if (data.subject_id || currentSubject) {
-                updateSubjectPreview(data.subject_id || currentSubject, data.message || data.content);
+            if (messageContent) {
+                addMessage(messageContent, author, author === 'You', formattedTime, isFromAI);
+                
+                // Update subject preview in sidebar
+                if (data.subject_id || currentSubject) {
+                    updateSubjectPreview(data.subject_id || currentSubject, messageContent);
+                }
+            } else {
+                console.error('DEBUG: Message content is empty or undefined');
             }
+        } else {
+            console.warn('DEBUG: Unknown message format received:', data);
         }
     }
     
@@ -534,9 +599,82 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Update subject preview
             updateSubjectPreview(currentSubject, content);
+            
+            // Show AI is typing indicator
+            showAITypingIndicator();
         } else {
-            console.error("DEBUG: WebSocket not available, cannot send message");
-            showError('Connection lost. Please refresh the page and try again.');
+            console.error("DEBUG: WebSocket not available, attempting to reconnect");
+            
+            // Try to reconnect WebSocket
+            getWebSocketToken(currentSubject)
+                .then(token => {
+                    connectWebSocket(currentSubject, token);
+                    
+                    // Give the socket a moment to connect before retrying
+                    setTimeout(() => {
+                        if (socket && socket.readyState === WebSocket.OPEN) {
+                            console.log("DEBUG: WebSocket reconnected successfully, retrying send");
+                            sendMessage();
+                        } else {
+                            console.error("DEBUG: WebSocket reconnection failed");
+                            showError('Connection lost. Please refresh the page and try again.');
+                        }
+                    }, 1000);
+                })
+                .catch(error => {
+                    console.error("DEBUG: Failed to get WebSocket token:", error);
+                    showError('Connection lost. Please refresh the page and try again.');
+                });
+        }
+    }
+    
+    /**
+     * Show AI typing indicator
+     */
+    function showAITypingIndicator() {
+        console.log("DEBUG: Showing AI typing indicator");
+        
+        // Remove any existing typing indicators
+        removeAITypingIndicator();
+        
+        // Create typing indicator
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'message message-in';
+        typingIndicator.id = 'ai-typing-indicator';
+        typingIndicator.innerHTML = `
+            <div class="message-author">AI Teacher</div>
+            <div class="message-content">
+                <div class="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        `;
+        
+        // Add to chat
+        chatMessages.appendChild(typingIndicator);
+        
+        // Scroll to bottom
+        scrollToBottom();
+        
+        // Set timeout to remove typing indicator if no response received
+        setTimeout(() => {
+            if (document.getElementById('ai-typing-indicator')) {
+                console.log("DEBUG: AI response timeout, removing typing indicator");
+                removeAITypingIndicator();
+            }
+        }, 30000); // Remove after 30 seconds if no response
+    }
+    
+    /**
+     * Remove AI typing indicator
+     */
+    function removeAITypingIndicator() {
+        const existingIndicator = document.getElementById('ai-typing-indicator');
+        if (existingIndicator) {
+            console.log("DEBUG: Removing existing typing indicator");
+            existingIndicator.remove();
         }
     }
     
