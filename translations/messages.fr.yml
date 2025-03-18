@@ -111,10 +111,12 @@ SELECT_CLASS_DESCRIPTION_KEY: 'Veuillez sélectionner votre classe pour continue
 SELECT_CLASS_KEY: 'Sélectionner Classe'
 PLEASE_SELECT_CLASS_KEY: 'Veuillez sélectionner une classe'
 PLEASE_SELECT_SPECIALIZATION_KEY: 'Veuillez sélectionner une spécialisation'
-ERROR_UPDATING_PROFILE_KEY: 'Erreur lors de la mise à jour du profil'
+ERROR_UPDATING_PROFILE_KEY: 'Une erreur est survenue lors de la mise à jour de votre profil. Veuillez réessayer.'
 PREMIUM_REQUIRED_KEY: 'Premium Requis'
 PREMIUM_CHAT_DESCRIPTION_KEY: 'Passez à la version premium pour accéder à toutes les fonctionnalités de chat et obtenir un support illimité de nos enseignants.'
 UPGRADE_ACCOUNT_KEY: 'Mettre à Niveau le Compte'
+SETUP_COMPLETE_KEY: 'Configuration Terminée'
+SETUP_COMPLETE_DESCRIPTION_KEY: 'Votre profil a été configuré avec succès. Vous pouvez maintenant commencer à discuter avec nos enseignants.'
 
 # Chat Interface
 CHAT_INTERFACE_KEY: 'Interface de chat'
@@ -225,7 +227,7 @@ CATEGORY_KEY: Catégorie
 SKILLLEVEL_KEY: Niveau de compétence
 FILTERRESULTS_KEY: Filtrer les résultats
 SHOWANSWER_KEY: Montrer la réponse
-BACKTOSUBJECT_KEY: Retour au sujet
+BACKTOSUBJECT_KEY: Retour à la matière
 
 # EMAIL TEMPLATES
 INVITATION_CODE_USED_TITLE_KEY: Code d'invitation utilisé

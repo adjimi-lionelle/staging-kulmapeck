@@ -34,6 +34,9 @@ document.addEventListener("DOMContentLoaded", function () {
             mobileBackButton.addEventListener('click', function() {
                 chatContainer.classList.remove('chat-active');
             });
+            
+            // Make sure we don't override the translated text from the template
+            // The text is already set with {% trans %}BACKTOSUBJECT_KEY{% endtrans %} in the template
         }
         
         // Update mobile view state on resize
@@ -151,71 +154,130 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Établir la connexion WebSocket
     function connectWebSocket(subjectId, token) {
-       // console.log(`DEBUG: Ouverture de la connexion WebSocket...`);
         console.log(`DEBUG: Ouverture de la connexion WebSocket pour subjectChat ${subjectId}...`);
 
-        /*if (socket) {
+        // Fermer l'ancienne connexion si elle existe
+        if (socket) {
             console.log("DEBUG: Fermeture de l'ancienne connexion WebSocket...");
             socket.close();
             socket = null;
-        }*/
-
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                console.log("DEBUG: WebSocket déjà ouvert, inutile de le recréer.");
-                return; // Éviter la recréation du WebSocket
-            }    
+        }    
 
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-       // const wsUrl = `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
-        const wsUrl = `${protocol}//pay-kulmapeck.online/ws?token=${token}&subjectChat_id=${subjectId}`;
-
+        // Update the WebSocket URL to match the one in subject_chat.js
+        const wsUrl = `${protocol}//127.0.0.1:9000/ws?token=${token}&subjectChat_id=${subjectId}`;
+        
+        console.log(`DEBUG: Opening WebSocket connection to ${wsUrl}`);
         socket = new WebSocket(wsUrl);
 
         socket.onopen = function () {
             console.log("WebSocket connecté avec succès !");
+            // Effacer les erreurs éventuelles
+            const errorBanner = document.querySelector('.error-message');
+            if (errorBanner) {
+                errorBanner.remove();
+            }
         };
 
         socket.onmessage = function (event) {
-            console.log("Message WebSocket reçu :", event.data);
+            console.log("DEBUG: Message WebSocket reçu :", event.data);
             try {
                 const data = JSON.parse(event.data);
-                
-                if (data.type === "new_message") {
-                   /* const currentUserId = getCurrentUserId(); 
-
-                    const isFromAI = data.message.sender_id === "AI Teacher";
-
-                    if (!isFromAI && data.message.sender_id === currentUserId) {
-                        console.log("DEBUG: Ignorer l'affichage du message car c'est le nôtre.");
-                        return;
-                    }
-
-                    addMessageToChat(data.message, isFromAI ? "assistant" : false);*/
-                    const isFromAI = data.message.isFromAI === true;
-
-                    // Ajouter le message avec la bonne classe (IA ou élève)
-                    addMessageToChat(data.message, isFromAI);
-
-                } else {
-                    console.log("DEBUG: Autre type de message reçu", data);
-                }
-        
+                handleWebSocketMessage(data);
             } catch (error) {
-                console.error("Erreur lors du traitement du message WebSocket :", error);
+                console.error("DEBUG: Erreur lors du traitement du message WebSocket :", error);
             }
         };
 
         socket.onerror = function (error) {
-            console.error("Erreur WebSocket :", error);
+            console.error("DEBUG: Erreur WebSocket :", error);
+            showError('Erreur de connexion. Tentative de reconnexion...');
+            
+            // Essayer de se reconnecter après un court délai
+            setTimeout(() => {
+                if (socket.readyState === WebSocket.CLOSED || socket.readyState === WebSocket.CLOSING) {
+                    console.log("DEBUG: Tentative de reconnexion WebSocket après erreur");
+                    getWebSocketToken(subjectId);
+                }
+            }, 3000);
         };
 
-        socket.onclose = function () {
-            console.warn("Connexion WebSocket fermée !");
+        socket.onclose = function (event) {
+            console.warn(`DEBUG: Connexion WebSocket fermée avec le code ${event.code}`);
+            
+            // Si la fermeture n'était pas initiée par notre code (par exemple, lors du changement de chats)
+            if (currentSubject === subjectId) {
+                console.log("DEBUG: Fermeture inattendue de la connexion. Tentative de reconnexion...");
+                
+                // Attendre un peu avant de se reconnecter pour éviter les tentatives rapides de reconnexion
+                setTimeout(() => {
+                    if (currentSubject === subjectId) {
+                        console.log("DEBUG: Tentative de reconnexion WebSocket après fermeture");
+                        getWebSocketToken(subjectId);
+                    }
+                }, 5000);
+            }
         };
 
         console.log("DEBUG: WebSocket après initialisation ->", socket);
     }
-
+    
+    /**
+     * Gérer les messages WebSocket
+     */
+    function handleWebSocketMessage(data) {
+        console.log('DEBUG: Traitement du message WebSocket:', data);
+        
+        if (data.type === 'history') {
+            // Historique du chat
+            displayMessages(data.messages);
+        } else if (data.type === 'new_message' || data.type === 'message' || data.message) {
+            console.log('DEBUG: Traitement du message individuel:', data);
+            
+            // Extraire le contenu du message selon différents formats possibles
+            let messageContent, userId, timestamp, isFromAI;
+            
+            // Gérer la structure de message imbriquée (réponses AI du serveur)
+            if (data.type === 'new_message' && data.message && typeof data.message === 'object') {
+                console.log('DEBUG: Traitement du message avec format imbriqué');
+                messageContent = data.message.content;
+                userId = data.message.sender_id;
+                timestamp = data.message.createdAt || data.message.timestamp;
+                isFromAI = data.message.isFromAI === true;
+            } else {
+                // Gérer la structure de message plate (messages standards)
+                console.log('DEBUG: Traitement du message avec format plat');
+                messageContent = data.message || data.content;
+                userId = data.user_id || data.userId;
+                timestamp = data.timestamp;
+                isFromAI = data.isFromAI === true;
+            }
+            
+            console.log(`DEBUG: Message traité - Contenu: "${messageContent}", isFromAI: ${isFromAI}`);
+            
+            // Si c'est une réponse AI, supprimer l'indicateur de frappe
+            if (isFromAI) {
+                removeAITypingIndicator();
+            }
+            
+            // Ajouter le message avec le style approprié
+            if (messageContent) {
+                const messageData = {
+                    content: messageContent,
+                    timestamp: timestamp,
+                    sender_id: userId,
+                    isFromAI: isFromAI
+                };
+                
+                addMessageToChat(messageData, isFromAI);
+            } else {
+                console.error('DEBUG: Le contenu du message est vide ou non défini');
+            }
+        } else {
+            console.warn('DEBUG: Format de message inconnu reçu:', data);
+        }
+    }
+    
     function loadChatHistory(subjectId) {
         console.log(`DEBUG: Chargement de l'historique pour le sujet ${subjectId}`);
     
@@ -313,18 +375,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function addMessageToChat(messageData, isFromAI = false) {
         const chatMessages = document.getElementById("chat-messages");
-    
+        
         // Déterminer si le message vient de l'IA ou de l'élève
         const isSentByStudent = !isFromAI;
-    
+        
         // Création du conteneur pour le message
         const messageContainer = document.createElement("div");
         messageContainer.className = isSentByStudent ? "message-container sent" : "message-container assistant";
-    
+        
         // Création du bloc du message
         const messageElement = document.createElement("div");
         messageElement.className = isSentByStudent ? "message sent" : "message assistant";
-    
+        
         // Format de la date
         const messageDate = new Date(messageData.timestamp).toLocaleString("fr-FR", {
             day: "2-digit",
@@ -333,37 +395,25 @@ document.addEventListener("DOMContentLoaded", function () {
             hour: "2-digit",
             minute: "2-digit"
         });
-    
+        
         // Contenu du message
         messageElement.innerHTML = `
             <div class="message-header">
                 <span class="message-date">${messageDate}</span>
             </div>
-            <p>${messageData.message}</p>
+            <p>${messageData.content}</p>
         `;
-    
+        
         // Ajouter le message dans son conteneur
         messageContainer.appendChild(messageElement);
-    
+        
         // Ajouter au chat
         chatMessages.appendChild(messageContainer);
-    
+        
         // Scroll automatique vers le bas
         chatMessages.scrollTop = chatMessages.scrollHeight;
-    } 
-        
-    // Envoyer un message au serveur WebSocket
-    document.getElementById("send-message").addEventListener("click", function () {
-        sendMessage();
-    });
+    }
 
-    document.getElementById("message-input").addEventListener("keypress", function (e) {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-    
     function sendMessage() {
         let messageInput = document.getElementById("message-input");
         let content = messageInput.value.trim();
@@ -385,7 +435,6 @@ document.addEventListener("DOMContentLoaded", function () {
     
         console.log("DEBUG: État actuel du WebSocket avant envoi :", socket ? socket.readyState : "Socket non défini");
     
-        // Si le WebSocket n'est pas disponible, on tente une reconnexion propre
         if (!socket || socket.readyState !== WebSocket.OPEN) {
             console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...");
             
@@ -397,19 +446,123 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             console.log("DEBUG: Envoi du message via WebSocket");
             socket.send(JSON.stringify(messageData));
-            addMessageToChat(messageData, true);
+            
+            // Ajouter le message immédiatement à l'interface utilisateur
+            const optimisticMessageData = {
+                content: content,
+                timestamp: new Date().toISOString(),
+                sender_id: getCurrentUserId(),
+                isFromAI: false
+            };
+            addMessageToChat(optimisticMessageData, false);
+            
+            // Afficher l'indicateur de frappe de l'IA
+            showAITypingIndicator();
         }
     
         messageInput.value = "";
     }
+    
+    /**
+     * Affiche l'indicateur de frappe de l'IA
+     */
+    function showAITypingIndicator() {
+        console.log("DEBUG: Affichage de l'indicateur de frappe de l'IA");
         
-     // File d'attente des messages en cas de reconnexion
+        // Supprimer les indicateurs de frappe existants
+        removeAITypingIndicator();
+        
+        // Créer l'indicateur de frappe
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'message-container assistant';
+        typingIndicator.id = 'ai-typing-indicator';
+        typingIndicator.innerHTML = `
+            <div class="message assistant">
+                <div class="message-header">
+                    <span class="message-date">En cours...</span>
+                </div>
+                <p>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </p>
+            </div>
+        `;
+        
+        // Ajouter au chat
+        const chatMessages = document.getElementById("chat-messages");
+        chatMessages.appendChild(typingIndicator);
+        
+        // Scroll vers le bas
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Définir un délai pour supprimer l'indicateur de frappe si aucune réponse n'est reçue
+        setTimeout(() => {
+            if (document.getElementById('ai-typing-indicator')) {
+                console.log("DEBUG: Délai d'attente de la réponse de l'AI dépassé, suppression de l'indicateur de frappe");
+                removeAITypingIndicator();
+            }
+        }, 30000); // Supprimer après 30 secondes si aucune réponse
+    }
+    
+    /**
+     * Supprime l'indicateur de frappe de l'IA
+     */
+    function removeAITypingIndicator() {
+        const existingIndicator = document.getElementById('ai-typing-indicator');
+        if (existingIndicator) {
+            console.log("DEBUG: Suppression de l'indicateur de frappe existant");
+            existingIndicator.remove();
+        }
+    }
+    
+    // Afficher un message d'erreur
+    function showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = message;
+        
+        // Supprimer les messages d'erreur existants
+        const existingErrors = document.querySelectorAll('.error-message');
+        existingErrors.forEach(el => el.remove());
+        
+        // Ajouter le nouveau message d'erreur
+        document.body.prepend(errorDiv);
+        
+        // Faire disparaître le message après 5 secondes
+        setTimeout(() => {
+            if (errorDiv.parentNode) {
+                errorDiv.remove();
+            }
+        }, 5000);
+    }
+
+    // Envoyer un message au serveur WebSocket
+    document.getElementById("send-message").addEventListener("click", function () {
+        sendMessage();
+    });
+
+    document.getElementById("message-input").addEventListener("keypress", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    function ensureWebSocketConnection(subjectId) {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...");
+            getWebSocketToken(subjectId); // 
+        }
+    }
+
+    // File d'attente des messages en cas de reconnexion
     let pendingMessages = [];
         
     // Fonction pour reconnecter WebSocket et envoyer les messages en attente
     function reconnectWebSocket(subjectChatId) {
         getWebSocketToken(subjectChatId);
-    
+        
         let checkInterval = setInterval(() => {
             if (socket && socket.readyState === WebSocket.OPEN) {
                 console.log("DEBUG: WebSocket reconnecté, envoi des messages en attente...");
@@ -420,7 +573,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     socket.send(JSON.stringify(msg));
                     addMessageToChat(msg, true);
                 }
-    
+        
                 clearInterval(checkInterval);
             }
         }, 500); // Vérifie la connexion toutes les 500ms jusqu'à ce que WebSocket soit ouvert
