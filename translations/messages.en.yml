@@ -83,7 +83,7 @@ PREMIUM_CHAT_DESCRIPTION_KEY: 'Upgrade to premium to access all chat features an
 UPGRADE_ACCOUNT_KEY: 'Upgrade Account'
 SETUP_COMPLETE_KEY: 'Setup Complete'
 SETUP_COMPLETE_DESCRIPTION_KEY: 'Your profile has been set up successfully. You can now start chatting with our teachers.'
-CONTINUE_KEY: 'Continue'
+
 
 # WELCOME SCREEN
 MAINMESSAGE_KEY: WELCOME TO 

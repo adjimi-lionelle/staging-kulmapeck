@@ -117,7 +117,6 @@ PREMIUM_CHAT_DESCRIPTION_KEY: 'Passez à la version premium pour accéder à tou
 UPGRADE_ACCOUNT_KEY: 'Mettre à Niveau le Compte'
 SETUP_COMPLETE_KEY: 'Configuration Terminée'
 SETUP_COMPLETE_DESCRIPTION_KEY: 'Votre profil a été configuré avec succès. Vous pouvez maintenant commencer à discuter avec nos enseignants.'
-CONTINUE_KEY: 'Continuer'
 
 # Chat Interface
 CHAT_INTERFACE_KEY: 'Interface de chat'
