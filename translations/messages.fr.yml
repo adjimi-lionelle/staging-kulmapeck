@@ -227,7 +227,7 @@ CATEGORY_KEY: Catégorie
 SKILLLEVEL_KEY: Niveau de compétence
 FILTERRESULTS_KEY: Filtrer les résultats
 SHOWANSWER_KEY: Montrer la réponse
-BACKTOSUBJECT_KEY: Retour au sujet
+BACKTOSUBJECT_KEY: Retour à la matière
 
 # EMAIL TEMPLATES
 INVITATION_CODE_USED_TITLE_KEY: Code d'invitation utilisé
