@@ -61,6 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
             mobileBackButton.addEventListener('click', function() {
                 chatContainer.classList.remove('chat-active');
             });
+            
+            // Make sure we don't override the translated text from the template
+            // The text is already set with {% trans %}BACKTOSUBJECT_KEY{% endtrans %} in the template
         }
         
         // Update mobile view state on resize
@@ -542,10 +545,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const subjectName = subjectItem.querySelector('.chat-item-name')?.textContent || 'Subject Chat';
         
+        // Get the translated back button text from the existing button
+        const existingBackButton = document.querySelector('.mobile-back-button');
+        const backButtonText = existingBackButton ? existingBackButton.textContent.trim() : '';
+        
         chatHeader.innerHTML = `
             <div class="d-flex align-items-center">
                 <button class="mobile-back-button btn btn-sm btn-icon me-2 d-md-none">
-                    <i class="bi bi-arrow-left"></i>
+                    <i class="bi bi-arrow-left"></i> ${backButtonText}
                 </button>
                 <div class="chat-header-avatar">
                     <div class="avatar-placeholder rounded-circle">${subjectName.charAt(0).toUpperCase()}</div>

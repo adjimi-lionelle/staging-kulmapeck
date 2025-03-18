@@ -34,6 +34,9 @@ document.addEventListener("DOMContentLoaded", function () {
             mobileBackButton.addEventListener('click', function() {
                 chatContainer.classList.remove('chat-active');
             });
+            
+            // Make sure we don't override the translated text from the template
+            // The text is already set with {% trans %}BACKTOSUBJECT_KEY{% endtrans %} in the template
         }
         
         // Update mobile view state on resize
