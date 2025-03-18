@@ -577,8 +577,11 @@ class ChatController extends AbstractController
                     if ($specialiteId) {
                         $specialite = $specialiteRepository->find($specialiteId);
                         if ($specialite) {
-                            $classe->setSpecialite($specialite);
+                            $student->setSpecialite($specialite);
                         }
+                    } else {
+                        // Clear specialite if not provided
+                        $student->setSpecialite(null);
                     }
                     
                     $entityManager->persist($student);
@@ -595,7 +598,11 @@ class ChatController extends AbstractController
         }
         
         if ($request->isXmlHttpRequest()) {
-            return new JsonResponse(['success' => $success, 'message' => $message]);
+            return new JsonResponse([
+                'success' => $success, 
+                'message' => $message,
+                'isProfileComplete' => true
+            ]);
         }
         
         if ($success) {

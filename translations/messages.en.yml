@@ -77,10 +77,13 @@ SELECT_CLASS_DESCRIPTION_KEY: 'Please select your class to continue. This helps 
 SELECT_CLASS_KEY: 'Select Class'
 PLEASE_SELECT_CLASS_KEY: 'Please select a class'
 PLEASE_SELECT_SPECIALIZATION_KEY: 'Please select a specialization'
-ERROR_UPDATING_PROFILE_KEY: 'Error updating profile'
+ERROR_UPDATING_PROFILE_KEY: 'An error occurred while updating your profile. Please try again.'
 PREMIUM_REQUIRED_KEY: 'Premium Required'
 PREMIUM_CHAT_DESCRIPTION_KEY: 'Upgrade to premium to access all chat features and get unlimited support from our teachers.'
 UPGRADE_ACCOUNT_KEY: 'Upgrade Account'
+SETUP_COMPLETE_KEY: 'Setup Complete'
+SETUP_COMPLETE_DESCRIPTION_KEY: 'Your profile has been set up successfully. You can now start chatting with our teachers.'
+CONTINUE_KEY: 'Continue'
 
 # WELCOME SCREEN
 MAINMESSAGE_KEY: WELCOME TO 
