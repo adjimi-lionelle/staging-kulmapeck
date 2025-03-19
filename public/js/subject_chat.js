@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="chat-header-info">
                     <div class="chat-header-name">${subjectName}</div>
-                    <div class="chat-header-status">Subject Chat</div>
+                    <div class="chat-header-status d-none">${subjectName}</div>
                 </div>
             </div>
         `;
