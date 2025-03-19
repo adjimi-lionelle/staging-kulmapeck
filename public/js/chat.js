@@ -57,8 +57,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Charger les sujets depuis l'API
     function loadSubjects() {
-        console.log("DEBUG: Chargement des sujets depuis l'API...");
-
         fetch("/api/chat/subjectChats", {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -74,9 +72,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    function getCurrentUserId() {
+        const metaTag = document.querySelector('meta[name="current-user-id"]');
+        return metaTag ? parseInt(metaTag.getAttribute("content")) : null;
+    }
+
     // Afficher les sujets dans la liste
     function renderSubjects(subjects) {
-        console.log("DEBUG: renderSubjects() called with", subjects);
 
         subjectList.innerHTML = "";
 
@@ -106,178 +108,39 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Sélectionner un sujet et établir la connexion WebSocket
-    function selectSubject(subjectId) {
-        console.log(`DEBUG: selectSubject() appelé avec ID ${subjectId}`);
-
-        if (!subjectId) {
-            console.error("DEBUG: Aucun subject ID fourni !");
-            return;
-        }
-
-        currentSubject = subjectId;
-       //localStorage.setItem("currentSubject", subjectId);
-        console.log(`DEBUG: currentSubject mis à jour -> ${currentSubject}`);
-        getWebSocketToken(subjectId);
-        loadChatHistory(subjectId); // Charger l'historique ici
-
-        // Mise à jour de l'affichage du chat
-        document.getElementById('welcome-screen').style.display = 'none';
-        document.getElementById('chat-header').style.display = 'flex';
-        document.getElementById('chat-messages').style.display = 'block';
-        document.getElementById('chat-footer').style.display = 'flex';
-        
-        // Handle mobile view
-        if (isMobileView) {
-            chatContainer.classList.add('chat-active');
-        }
-    }
-
-    // Obtenir le token WebSocket
-    function getWebSocketToken(subjectId) {
-        console.log(`DEBUG: getWebSocketToken() called for subject ${subjectId}`);
-
-        fetch(`/websocket/token/${subjectId}`)
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => { throw new Error(data.error || "Erreur inconnue"); });
+  
+        async function selectSubject(subjectId) {
+            console.log(`DEBUG: selectSubject() appelé avec ID ${subjectId}`);
+            if (!subjectId) {
+                console.error("DEBUG: Aucun subject ID fourni !");
+                return;
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log("DEBUG: Token WebSocket reçu", data.token);
-            connectWebSocket(subjectId, data.token);
-        })
-        .catch(error => {
-            console.error("DEBUG: Erreur lors de la récupération du token WebSocket :", error);
-        });
-    }
-
-    // Établir la connexion WebSocket
-    function connectWebSocket(subjectId, token) {
-        console.log(`DEBUG: Ouverture de la connexion WebSocket pour subjectChat ${subjectId}...`);
-
-        // Fermer l'ancienne connexion si elle existe
-        if (socket) {
-            console.log("DEBUG: Fermeture de l'ancienne connexion WebSocket...");
-            socket.close();
-            socket = null;
-        }    
-
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        // Update the WebSocket URL to match the one in subject_chat.js
-        const wsUrl = `${protocol}//127.0.0.1:9000/ws?token=${token}&subjectChat_id=${subjectId}`;
-        
-        console.log(`DEBUG: Opening WebSocket connection to ${wsUrl}`);
-        socket = new WebSocket(wsUrl);
-
-        socket.onopen = function () {
-            console.log("WebSocket connecté avec succès !");
-            // Effacer les erreurs éventuelles
-            const errorBanner = document.querySelector('.error-message');
-            if (errorBanner) {
-                errorBanner.remove();
-            }
-        };
-
-        socket.onmessage = function (event) {
-            console.log("DEBUG: Message WebSocket reçu :", event.data);
+            
+            currentSubject = subjectId;
+            console.log(`DEBUG: currentSubject mis à jour -> ${currentSubject}`);
+            
             try {
-                const data = JSON.parse(event.data);
-                handleWebSocketMessage(data);
+                await getWebSocketToken(subjectId); // Assurer que la connexion WebSocket est établie avec un token valide
+                console.log(`DEBUG: connexion okay`);
+                console.log(`DEBUG: currentSubject mis à jour -> ${currentSubject}`);
             } catch (error) {
-                console.error("DEBUG: Erreur lors du traitement du message WebSocket :", error);
-            }
-        };
-
-        socket.onerror = function (error) {
-            console.error("DEBUG: Erreur WebSocket :", error);
-            showError('Erreur de connexion. Tentative de reconnexion...');
-            
-            // Essayer de se reconnecter après un court délai
-            setTimeout(() => {
-                if (socket.readyState === WebSocket.CLOSED || socket.readyState === WebSocket.CLOSING) {
-                    console.log("DEBUG: Tentative de reconnexion WebSocket après erreur");
-                    getWebSocketToken(subjectId);
-                }
-            }, 3000);
-        };
-
-        socket.onclose = function (event) {
-            console.warn(`DEBUG: Connexion WebSocket fermée avec le code ${event.code}`);
-            
-            // Si la fermeture n'était pas initiée par notre code (par exemple, lors du changement de chats)
-            if (currentSubject === subjectId) {
-                console.log("DEBUG: Fermeture inattendue de la connexion. Tentative de reconnexion...");
-                
-                // Attendre un peu avant de se reconnecter pour éviter les tentatives rapides de reconnexion
-                setTimeout(() => {
-                    if (currentSubject === subjectId) {
-                        console.log("DEBUG: Tentative de reconnexion WebSocket après fermeture");
-                        getWebSocketToken(subjectId);
-                    }
-                }, 5000);
-            }
-        };
-
-        console.log("DEBUG: WebSocket après initialisation ->", socket);
-    }
-    
-    /**
-     * Gérer les messages WebSocket
-     */
-    function handleWebSocketMessage(data) {
-        console.log('DEBUG: Traitement du message WebSocket:', data);
-        
-        if (data.type === 'history') {
-            // Historique du chat
-            displayMessages(data.messages);
-        } else if (data.type === 'new_message' || data.type === 'message' || data.message) {
-            console.log('DEBUG: Traitement du message individuel:', data);
-            
-            // Extraire le contenu du message selon différents formats possibles
-            let messageContent, userId, timestamp, isFromAI;
-            
-            // Gérer la structure de message imbriquée (réponses AI du serveur)
-            if (data.type === 'new_message' && data.message && typeof data.message === 'object') {
-                console.log('DEBUG: Traitement du message avec format imbriqué');
-                messageContent = data.message.content;
-                userId = data.message.sender_id;
-                timestamp = data.message.createdAt || data.message.timestamp;
-                isFromAI = data.message.isFromAI === true;
-            } else {
-                // Gérer la structure de message plate (messages standards)
-                console.log('DEBUG: Traitement du message avec format plat');
-                messageContent = data.message || data.content;
-                userId = data.user_id || data.userId;
-                timestamp = data.timestamp;
-                isFromAI = data.isFromAI === true;
+                console.error("DEBUG: Échec de la récupération du token WebSocket, annulation de la connexion WebSocket.", error);
+                return;
             }
             
-            console.log(`DEBUG: Message traité - Contenu: "${messageContent}", isFromAI: ${isFromAI}`);
+            loadChatHistory(subjectId); // Charger l'historique ici
             
-            // Si c'est une réponse AI, supprimer l'indicateur de frappe
-            if (isFromAI) {
-                removeAITypingIndicator();
-            }
+            // Mise à jour de l'affichage du chat
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('chat-header').style.display = 'flex';
+            document.getElementById('chat-messages').style.display = 'block';
+            document.getElementById('chat-footer').style.display = 'flex';
             
-            // Ajouter le message avec le style approprié
-            if (messageContent) {
-                const messageData = {
-                    content: messageContent,
-                    timestamp: timestamp,
-                    sender_id: userId,
-                    isFromAI: isFromAI
-                };
-                
-                addMessageToChat(messageData, isFromAI);
-            } else {
-                console.error('DEBUG: Le contenu du message est vide ou non défini');
+            // Handle mobile view
+            if (isMobileView) {
+                chatContainer.classList.add('chat-active');
             }
-        } else {
-            console.warn('DEBUG: Format de message inconnu reçu:', data);
         }
-    }
-    
     function loadChatHistory(subjectId) {
         console.log(`DEBUG: Chargement de l'historique pour le sujet ${subjectId}`);
     
@@ -314,12 +177,6 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("DEBUG ERROR: Erreur de chargement des messages", error);
         });
     }
-
-    function getCurrentUserId() {
-        const metaTag = document.querySelector('meta[name="current-user-id"]');
-        return metaTag ? parseInt(metaTag.getAttribute("content")) : null;
-    }
-
 
     function displayMessages(messages) {
         const chatMessages = document.getElementById("chat-messages");
@@ -371,6 +228,163 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
+    }
+
+    // Obtenir le token WebSocket
+    function getWebSocketToken(subjectId) {
+        console.log(`DEBUG: getWebSocketToken() called for subject ${subjectId}`);
+
+        fetch(`/websocket/token/${subjectId}`)
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => { throw new Error(data.error || "Erreur inconnue"); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("DEBUG: Token WebSocket reçu", data.token);
+            connectWebSocket(subjectId, data.token);
+        })
+        .catch(error => {
+            console.error("DEBUG: Erreur lors de la récupération du token WebSocket :", error);
+        });
+    }
+
+    // Établir la connexion WebSocket
+    function connectWebSocket(subjectId, token) {
+        console.log(`DEBUG: Ouverture de la connexion WebSocket pour subjectChat ${subjectId}...`);
+
+        //  Vérifier si une connexion est déjà active et ouverte
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            console.log("DEBUG: Une connexion WebSocket est déjà active, annulation de la nouvelle connexion.");
+            return;
+        }
+
+        // Fermer proprement l'ancienne connexion avant d'en ouvrir une nouvelle
+        if (socket) {
+            console.log("DEBUG: Fermeture de l'ancienne connexion WebSocket...");
+            socket.onclose = null;
+            socket.onerror = null;
+            socket.onmessage = null;
+            socket.close();
+        }  
+
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const wsUrl = `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
+        
+        console.log(`DEBUG: Opening WebSocket connection to ${wsUrl}`);
+        socket = new WebSocket(wsUrl);
+
+        socket.onopen = function () {
+            console.log("WebSocket connecté avec succès !");
+            // Effacer les erreurs éventuelles
+            const errorBanner = document.querySelector('.error-message');
+            if (errorBanner) {
+                errorBanner.remove();
+            }
+        };
+
+        socket.onmessage = function (event) {
+            console.log("DEBUG: Message WebSocket reçu :", event.data);
+            try {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            } catch (error) {
+                console.error("DEBUG: Erreur lors du traitement du message WebSocket :", error);
+            }
+        };
+
+        socket.onerror = function (error) {
+            console.error("DEBUG: Erreur WebSocket :", error);
+            showError('Erreur de connexion. Tentative de reconnexion...');
+            setTimeout(() => getWebSocketToken(subjectId), 3000);
+        };
+        
+        socket.onclose = function (event) {
+            console.warn(`DEBUG: Connexion WebSocket fermée avec le code ${event.code}`);
+            
+            if (currentSubject === subjectId) {
+                console.log("DEBUG: Tentative de reconnexion WebSocket après fermeture...");
+                setTimeout(() => getWebSocketToken(subjectId), 5000);
+            }
+        };
+        
+
+        console.log("DEBUG: WebSocket après initialisation ->", socket);
+    }
+    
+    /**
+     * Gérer les messages WebSocket
+     */
+    function handleWebSocketMessage(data) {
+        console.log('DEBUG: Traitement du message WebSocket:', data);
+        
+        if (data.type === 'new_message' || data.type === 'message' || data.message) {
+            console.log('DEBUG: Traitement du message individuel:', data);
+            
+            let messageContent = "";
+            let userId = null;
+            let timestamp = "";
+            let isFromAI = false;
+            let messageId = null;
+
+            //  Vérifier si la structure du message est imbriquée (cas des réponses AI)
+            if (data.type === 'new_message' && data.message && typeof data.message === 'object') {
+                console.log('DEBUG: Traitement du message avec format imbriqué');
+                messageContent = data.message.content;
+                userId = data.message.sender_id;
+                timestamp = data.message.createdAt || data.message.timestamp;
+                isFromAI = data.message.isFromAI === true;
+                messageId = data.message.id; //  Utilisé pour éviter les doublons
+            } else {
+                //  Vérifier si le message est dans un format simple (messages standards)
+                console.log('DEBUG: Traitement du message avec format plat');
+                messageContent = data.message || data.content;
+                userId = data.user_id || data.userId;
+                timestamp = data.timestamp;
+                isFromAI = data.isFromAI === true;
+                messageId = data.id || null; //  Utilisé pour éviter les doublons
+            }
+            
+            console.log(`DEBUG: Message traité - Contenu: "${messageContent}", isFromAI: ${isFromAI}`);
+
+            // Vérifier si le message est déjà affiché pour éviter les doublons
+            if (messageId) {
+                const existingMessages = document.querySelectorAll('.message[data-id]');
+                for (let msg of existingMessages) {
+                    if (msg.getAttribute("data-id") === messageId) {
+                        console.warn(`DEBUG: Message déjà affiché (ID ${messageId}), ignoré.`);
+                        return;
+                    }
+                }
+            }
+
+            if (userId === getCurrentUserId() && !isFromAI) {
+                console.log("DEBUG: Ignoré - L'utilisateur actuel a déjà affiché ce message.");
+                return;
+            }
+            
+            // Si c'est une réponse AI, supprimer l'indicateur de frappe
+            if (isFromAI) {
+                removeAITypingIndicator();
+            }
+            
+            // Ajouter le message avec le style approprié
+            if (messageContent) {
+                const messageData = {
+                    content: messageContent,
+                    timestamp: timestamp,
+                    sender_id: userId,
+                    isFromAI: isFromAI
+                };
+                
+                addMessageToChat(messageData, isFromAI);
+            } else {
+                console.error('DEBUG: Le contenu du message est vide ou non défini');
+            }
+        } else {
+            console.warn('DEBUG: Format de message inconnu reçu:', data);
+        }
     }
 
     function addMessageToChat(messageData, isFromAI = false) {
@@ -439,10 +453,11 @@ document.addEventListener("DOMContentLoaded", function () {
             console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...");
             
             // Ajoute le message à une file d'attente pour qu'il soit envoyé après la reconnexion
-            pendingMessages.push(messageData);
+            //pendingMessages.push(messageData);
     
             // Reconnecte WebSocket et envoie les messages après reconnexion
-            reconnectWebSocket(subjectChatId);
+           // reconnectWebSocket(subjectChatId);
+           getWebSocketToken(subjectChatId);
         } else {
             console.log("DEBUG: Envoi du message via WebSocket");
             socket.send(JSON.stringify(messageData));
