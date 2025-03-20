@@ -6,6 +6,49 @@
 	
 {% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .pdf-container {
+            position: relative;
+            width: 100%;
+            height: 800px;
+            overflow: hidden;
+        }
+        .pdf-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        /* Disable text selection and context menu */
+        .pdf-container {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        /* Overlay to prevent touch interactions on mobile */
+        .mobile-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            z-index: 10;
+        }
+        /* Only show overlay on mobile devices */
+        @media (max-width: 767px) {
+            .mobile-overlay {
+                display: block;
+            }
+        }
+    </style>
+{% endblock %}
+
 {% block mainContent %}
 
     <!-- Main Content START -->
@@ -64,14 +107,18 @@
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
                                             {% if data ends with '.pdf' %}
-                                                <div class="card overflow-hidden h-700px rounded-3 text-center">
-                                                    <object data="{{ path('app_front_exam_view', {'reference': exam.reference, 'display': display}) }}" 
-                                                            type="application/pdf" 
-                                                            width="100%" 
-                                                            height="800px">
-                                                        <p>Votre navigateur ne supporte pas l'affichage des PDF. <a href="{{ path('app_front_exam_view', {'reference': exam.reference, 'display': display}) }}">Cliquez ici pour voir le document</a>.</p>
-                                                    </object>
+                                                <div class="pdf-container">
+                                                    <!-- Transparent overlay to prevent download on mobile -->
+                                                    <div class="mobile-overlay"></div>
+                                                    <!-- Secure PDF iframe -->
+                                                    <iframe class="pdf-iframe" 
+                                                            src="{{ path('app_front_exam_view', {'reference': exam.reference, 'display': display}) }}#toolbar=0&navpanes=0&scrollbar=1" 
+                                                            oncontextmenu="return false;" 
+                                                            sandbox="allow-same-origin allow-scripts">
+                                                    </iframe>
                                                 </div>
+                                            {% else %}
+                                                <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0" height="800px" frameborder="0" style="pointer-events: auto; overflow: scroll;" oncontextmenu="return false;"></iframe>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -131,4 +178,30 @@
         <!-- Related blog END -->
     {% endif %}
 
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Prevent right-click on the entire document
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.tagName === 'IFRAME' || e.target.closest('.pdf-container')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // Prevent touch events from being passed to the iframe on mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            var overlay = document.querySelector('.mobile-overlay');
+            if (overlay) {
+                overlay.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                });
+                overlay.addEventListener('touchmove', function(e) {
+                    e.preventDefault();
+                });
+            }
+        });
+    </script>
 {% endblock %}
