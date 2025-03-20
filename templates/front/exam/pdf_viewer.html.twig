@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ exam.title }} - PDF Viewer{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        #pdf-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+        .pdf-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 80px;
+            color: rgba(200, 200, 200, 0.2);
+            z-index: 1000;
+            pointer-events: none;
+            user-select: none;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="watermark">KULMAPECK</div>
+    <div id="pdf-container">
+        <div class="pdf-overlay"></div>
+        <embed 
+            src="{{ path('app_front_exam_view', {'reference': exam.reference, 'display': display}) }}" 
+            type="application/pdf" 
+            width="100%" 
+            height="100%" 
+            style="border: none;">
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Disable right-click
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Disable keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Prevent Ctrl+S, Ctrl+P, Ctrl+Shift+S
+                if ((e.ctrlKey && (e.key === 's' || e.key === 'p')) || 
+                    (e.ctrlKey && e.shiftKey && e.key === 's')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
+{% endblock %}

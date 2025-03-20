@@ -63,7 +63,16 @@
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
-                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0&scrollbar=0" height="800px" frameborder="0" sandbox="allow-same-origin allow-scripts allow-forms" oncontextmenu="return false;"></iframe>
+                                            {% if data ends with '.pdf' %}
+                                                <div class="card overflow-hidden h-700px rounded-3 text-center">
+                                                    <object data="{{ path('app_front_exam_view', {'reference': exam.reference, 'display': display}) }}" 
+                                                            type="application/pdf" 
+                                                            width="100%" 
+                                                            height="800px">
+                                                        <p>Votre navigateur ne supporte pas l'affichage des PDF. <a href="{{ path('app_front_exam_view', {'reference': exam.reference, 'display': display}) }}">Cliquez ici pour voir le document</a>.</p>
+                                                    </object>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
