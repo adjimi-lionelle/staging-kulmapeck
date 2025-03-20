@@ -57,34 +57,17 @@
                     <div class="row mt-4">
                         <div class="col-xl-10 mx-auto">
                             <!-- Card item START -->
-                            {% if data ends with '.pdf' %}
-                                <div class="card overflow-hidden h-700px rounded-3 text-center">
-                                    <iframe src="{{ path('app_front_exam_view', {'reference': exam.reference, 'display': display}) }}" 
-                                            style="width: 100%; height: 800px; border: none;"
-                                            sandbox="allow-same-origin allow-scripts"
-                                            oncontextmenu="return false;">
-                                    </iframe>
-                                </div>
-                            {% else %}
-                                <div class="card overflow-hidden h-700px rounded-3 text-center" style="background-image:url(assets/images/event/10.jpg); background-position: center left; background-size: cover;">
-                                    <!-- Card Image overlay -->
-                                    <div class="bg-overlay bg-dark opacity-4"></div>
-                                    <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
-                                        <div class="w-100 my-auto">
-                                            <div class="row justify-content-center">
-                                                {% if data ends with '.pdf' %}
-                                                    <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0&scrollbar=1" 
-                                                            height="800px" 
-                                                            frameborder="0" 
-                                                            style="width: 100%; overflow: auto;" 
-                                                            oncontextmenu="return false;">
-                                                    </iframe>
-                                                {% endif %}
-                                            </div>
+                             <div class="card overflow-hidden h-700px rounded-3 text-center" style="background-image:url(assets/images/event/10.jpg); background-position: center left; background-size: cover;">
+                                <!-- Card Image overlay -->
+                                <div class="bg-overlay bg-dark opacity-4"></div>
+                                <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
+                                    <div class="w-100 my-auto">
+                                        <div class="row justify-content-center">
+                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0" height="800px" frameborder="0" style="pointer-events: auto; overflow: scroll;" oncontextmenu="return false;"></iframe>
                                         </div>
                                     </div>
                                 </div>
-                            {% endif %}
+                            </div>
                             <!-- Card item END -->
                         </div>
                     </div>

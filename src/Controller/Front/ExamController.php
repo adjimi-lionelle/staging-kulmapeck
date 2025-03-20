@@ -68,22 +68,22 @@ class ExamController extends AbstractController
             
         ]);
     }
-
+    
     #[Route('/exam/file/{filename}', name: 'app_exam_file')]
-    public function servePdfFile(string $filename): Response
-    {
-        $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
+public function servePdfFile(string $filename): Response
+{
+    $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
 
-        if (!file_exists($filePath)) {
-            throw $this->createNotFoundException("Fichier introuvable.");
-        }
-
-        return new Response(file_get_contents($filePath), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline', // Empêche le téléchargement en forçant l'affichage
-            'X-Content-Type-Options' => 'nosniff',
-            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-            'Pragma' => 'no-cache',
-        ]);
+    if (!file_exists($filePath)) {
+        throw $this->createNotFoundException("Fichier introuvable.");
     }
+
+    return new Response(file_get_contents($filePath), 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline', // Empêche le téléchargement en forçant l'affichage
+        'X-Content-Type-Options' => 'nosniff',
+        'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma' => 'no-cache',
+    ]);
+}
 }
