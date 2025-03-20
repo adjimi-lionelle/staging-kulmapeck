@@ -69,21 +69,73 @@ class ExamController extends AbstractController
         ]);
     }
     
-    #[Route('/exam/file/{filename}', name: 'app_exam_file')]
-public function servePdfFile(string $filename): Response
-{
-    $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
+    #[Route('/exam/{reference}/view', name: 'app_front_exam_view')]
+    public function viewExam(Request $request, Exam $exam, PersonneRepository $personneRepository): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-    if (!file_exists($filePath)) {
-        throw $this->createNotFoundException("Fichier introuvable.");
+        $personne = $personneRepository->findOneBy(['utilisateur' => $this->getUser()]);
+        if (!$personne) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $eleve = $personne->getUtilisateur()->getEleve();
+        if ($eleve && !$eleve->isIsPremium()) {
+            throw $this->createAccessDeniedException("Vous devez être premium!");
+        }
+
+        $display = $request->query->get('display', 'subject');
+        $file = $display === 'correction' ? $exam->getCorrection() : $exam->getSujet();
+        $filePath = $this->getParameter('kernel.project_dir') . '/public/uploads/media/exams/files/' . $file;
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException("Fichier introuvable.");
+        }
+
+        // Check if it's a mobile device
+        $userAgent = $request->headers->get('User-Agent');
+        $isMobile = preg_match('/(android|iphone|ipad|mobile)/i', $userAgent);
+
+        // For mobile devices, we'll render a special template that embeds the PDF content
+        if ($isMobile) {
+            return $this->render('front/exam/mobile_view.html.twig', [
+                'exam' => $exam,
+                'file' => $file,
+                'isExamPage' => true,
+                'display' => $display
+            ]);
+        }
+
+        // For desktop browsers, serve the PDF with security headers
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/pdf');
+        $response->headers->set('Content-Disposition', 'inline; filename="' . $file . '"');
+        $response->headers->set('Content-Security-Policy', "default-src 'self'; object-src 'none'");
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+        
+        $response->setContent(file_get_contents($filePath));
+        
+        return $response;
     }
 
-    return new Response(file_get_contents($filePath), 200, [
-        'Content-Type' => 'application/pdf',
-        'Content-Disposition' => 'inline', // Empêche le téléchargement en forçant l'affichage
-        'X-Content-Type-Options' => 'nosniff',
-        'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
-        'Pragma' => 'no-cache',
-    ]);
-}
+    #[Route('/exam/file/{filename}', name: 'app_exam_file')]
+    public function servePdfFile(string $filename): Response
+    {
+        $filePath = $this->getParameter('kernel.project_dir') . '/uploads/media/exams/files/' . $filename;
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException("Fichier introuvable.");
+        }
+
+        return new Response(file_get_contents($filePath), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline', // Empêche le téléchargement en forçant l'affichage
+            'X-Content-Type-Options' => 'nosniff',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+        ]);
+    }
 }
