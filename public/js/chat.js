@@ -428,6 +428,34 @@ document.addEventListener("DOMContentLoaded", function () {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    function updateChatHeader(subjectId) {
+        const chatHeader = document.getElementById('chat-header');
+        if (!chatHeader || !subjectId) return;
+        
+        const subjectItem = document.querySelector(`.chat-item[data-subject-id="${subjectId}"]`);
+        if (!subjectItem) return;
+        
+        const subjectName = subjectItem.querySelector('.chat-item-name')?.textContent || 'Subject Chat';
+        
+        // Update the header with subject name
+        const headerNameElement = chatHeader.querySelector('.chat-header-name');
+        if (headerNameElement) {
+            headerNameElement.textContent = subjectName;
+        }
+        
+        // Update the avatar placeholder
+        const avatarPlaceholder = chatHeader.querySelector('.avatar-placeholder');
+        if (avatarPlaceholder) {
+            avatarPlaceholder.textContent = subjectName.charAt(0).toUpperCase();
+        }
+        
+        // Hide the online status
+        const statusElement = chatHeader.querySelector('.chat-header-status');
+        if (statusElement) {
+            statusElement.classList.add('d-none');
+        }
+    }
+
     function sendMessage() {
         let messageInput = document.getElementById("message-input");
         let content = messageInput.value.trim();
@@ -514,7 +542,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Définir un délai pour supprimer l'indicateur de frappe si aucune réponse n'est reçue
         setTimeout(() => {
             if (document.getElementById('ai-typing-indicator')) {
-                console.log("DEBUG: Délai d'attente de la réponse de l'AI dépassé, suppression de l'indicateur de frappe");
+                console.log("DEBUG: Délai d'attente de la réponse de l'IA dépassé, suppression de l'indicateur de frappe");
                 removeAITypingIndicator();
             }
         }, 30000); // Supprimer après 30 secondes si aucune réponse
