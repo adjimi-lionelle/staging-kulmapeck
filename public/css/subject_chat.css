@@ -275,7 +275,7 @@
   justify-content: center;
   font-weight: 600;
   color: var(--bg-white);
-  background-color: var(--primary-color);
+  background-color: #09139f;
   border-radius: var(--border-radius-full);
 }
 

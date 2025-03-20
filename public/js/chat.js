@@ -1,26 +1,23 @@
-// Initialisation après chargement du DOM
+
+var subjectList;
+var chatMessages;
+var chatContainer;
+var currentSubject;
+var socket = null;
+var isMobileView = window.innerWidth <= 768;
+
+
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("DEBUG: DOMContentLoaded event fired, initializing chat");
-
-    const subjectList = document.getElementById("subject-list");
-    const chatContainer = document.querySelector('.chat-app');
-    const chatMessages = document.getElementById('chat-messages');
-    let currentSubject = null;
-    let socket = null;
-    let isMobileView = window.innerWidth <= 768;
-
-    if (!subjectList) {
-        console.error("DEBUG ERROR: L'élément #subject-list est introuvable dans le DOM !");
-        return;
-    }
-
-    console.log("DEBUG: L'élément #subject-list est bien trouvé dans le DOM");
-
+   
+     chatContainer = document.querySelector('.chat-app');
+     subjectList = document.getElementById("subject-list");
     // Setup mobile view
     setupMobileView();
     
     // Charger les sujets au démarrage
     loadSubjects();
+});
+   
 
     /**
      * Setup mobile view based on screen size
@@ -79,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Afficher les sujets dans la liste
     function renderSubjects(subjects) {
+        
 
         subjectList.innerHTML = "";
 
@@ -118,6 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
             
             currentSubject = subjectId;
             console.log(`DEBUG: currentSubject mis à jour -> ${currentSubject}`);
+            updateChatHeader(subjectId)
             
             try {
                 await getWebSocketToken(subjectId); // Assurer que la connexion WebSocket est établie avec un token valide
@@ -143,6 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     function loadChatHistory(subjectId) {
         console.log(`DEBUG: Chargement de l'historique pour le sujet ${subjectId}`);
+        chatMessages = document.getElementById('chat-messages');
     
         fetch(`/api/chat/messages/${subjectId}`, {
             method: "GET",
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function displayMessages(messages) {
-        const chatMessages = document.getElementById("chat-messages");
+         chatMessages = document.getElementById("chat-messages");
         chatMessages.innerHTML = ""; // Effacer les anciens messages
 
         const currentUserId = getCurrentUserId();
@@ -388,7 +388,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function addMessageToChat(messageData, isFromAI = false) {
-        const chatMessages = document.getElementById("chat-messages");
+
+        console.log("DEBUG: Ajout du message à l'UI:", messageData);
+         chatMessages = document.getElementById("chat-messages");
         
         // Déterminer si le message vient de l'IA ou de l'élève
         const isSentByStudent = !isFromAI;
@@ -428,6 +430,56 @@ document.addEventListener("DOMContentLoaded", function () {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    function sendMessage() {
+        let messageInput = document.getElementById("message-input");
+        let content = messageInput.value.trim();
+    
+        if (content === "") return;
+    
+        let activeChatItem = document.querySelector(".chat-item.active");
+        if (!activeChatItem) {
+            console.error("DEBUG: Aucun sujet sélectionné !");
+            return;
+        }
+    
+        let subjectChatId = activeChatItem.dataset.subjectId;
+        let messageData = {
+            subject_id: parseInt(subjectChatId),
+            message: content,
+            timestamp: new Date().toISOString()
+        };
+    
+        console.log("DEBUG: État actuel du WebSocket avant envoi :", socket ? socket.readyState : "Socket non défini");
+    
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...");
+            let pendingMessages = [];
+            // Ajoute le message à une file d'attente pour qu'il soit envoyé après la reconnexion
+            pendingMessages.push(messageData);
+    
+            // Reconnecte WebSocket et envoie les messages après reconnexion
+           // reconnectWebSocket(subjectChatId);
+           getWebSocketToken(subjectChatId);
+        } else {
+            console.log("DEBUG: Envoi du message via WebSocket");
+            socket.send(JSON.stringify(messageData));
+            
+            // Ajouter le message immédiatement à l'interface utilisateur
+            const optimisticMessageData = {
+                content: content,
+                timestamp: new Date().toISOString(),
+                sender_id: getCurrentUserId(),
+                isFromAI: false
+            };
+            addMessageToChat(optimisticMessageData, false);
+            
+            // Afficher l'indicateur de frappe de l'IA
+            showAITypingIndicator();
+        }
+    
+        messageInput.value = "";
+    }
+
     function updateChatHeader(subjectId) {
         const chatHeader = document.getElementById('chat-header');
         if (!chatHeader || !subjectId) return;
@@ -454,56 +506,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (statusElement) {
             statusElement.classList.add('d-none');
         }
-    }
-
-    function sendMessage() {
-        let messageInput = document.getElementById("message-input");
-        let content = messageInput.value.trim();
-    
-        if (content === "") return;
-    
-        let activeChatItem = document.querySelector(".chat-item.active");
-        if (!activeChatItem) {
-            console.error("DEBUG: Aucun sujet sélectionné !");
-            return;
-        }
-    
-        let subjectChatId = activeChatItem.dataset.subjectId;
-        let messageData = {
-            subject_id: parseInt(subjectChatId),
-            message: content,
-            timestamp: new Date().toISOString()
-        };
-    
-        console.log("DEBUG: État actuel du WebSocket avant envoi :", socket ? socket.readyState : "Socket non défini");
-    
-        if (!socket || socket.readyState !== WebSocket.OPEN) {
-            console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...");
-            
-            // Ajoute le message à une file d'attente pour qu'il soit envoyé après la reconnexion
-            //pendingMessages.push(messageData);
-    
-            // Reconnecte WebSocket et envoie les messages après reconnexion
-           // reconnectWebSocket(subjectChatId);
-           getWebSocketToken(subjectChatId);
-        } else {
-            console.log("DEBUG: Envoi du message via WebSocket");
-            socket.send(JSON.stringify(messageData));
-            
-            // Ajouter le message immédiatement à l'interface utilisateur
-            const optimisticMessageData = {
-                content: content,
-                timestamp: new Date().toISOString(),
-                sender_id: getCurrentUserId(),
-                isFromAI: false
-            };
-            addMessageToChat(optimisticMessageData, false);
-            
-            // Afficher l'indicateur de frappe de l'IA
-            showAITypingIndicator();
-        }
-    
-        messageInput.value = "";
     }
     
     /**
@@ -533,7 +535,7 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         
         // Ajouter au chat
-        const chatMessages = document.getElementById("chat-messages");
+         chatMessages = document.getElementById("chat-messages");
         chatMessages.appendChild(typingIndicator);
         
         // Scroll vers le bas
@@ -600,7 +602,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // File d'attente des messages en cas de reconnexion
-    let pendingMessages = [];
+   
         
     // Fonction pour reconnecter WebSocket et envoyer les messages en attente
     function reconnectWebSocket(subjectChatId) {
@@ -622,4 +624,4 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 500); // Vérifie la connexion toutes les 500ms jusqu'à ce que WebSocket soit ouvert
     }
         
-});
+

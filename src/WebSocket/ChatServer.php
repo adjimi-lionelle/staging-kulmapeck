@@ -147,6 +147,13 @@ class ChatServer implements MessageComponentInterface
             // Appel de l'IA (éviter l'envoi en double)
             echo "DEBUG: Appel de l'IA pour générer une réponse...\n";
             $aiResponse = $this->aiMessageHandler->handleMessage($data, $user, $class);
+            // Vérifie si une réponse a bien été générée
+            if (!$aiResponse) {
+                echo "DEBUG ERROR: Aucune réponse IA générée !\n";
+                return; // Sortie anticipée si pas de réponse IA
+            }
+
+            echo "DEBUG: Réponse de l'IA générée: " . json_encode($aiResponse) . "\n";
 
             if ($aiResponse) {
                 $aiResponseData = [
@@ -159,15 +166,27 @@ class ChatServer implements MessageComponentInterface
                         'createdAt' => $aiResponse['timestamp'],
                     ]
                 ];
+                echo "DEBUG: Nombre de clients connectés : " . count($this->clients) . "\n";
 
                 //  Envoyer la réponse IA uniquement **une seule fois**
-                foreach ($this->clients as $client) {
+               /* foreach ($this->clients as $client) {
+                    echo "DEBUG: Vérification client WebSocket - Utilisateur #" . $this->clients[$client]['user']->getId() . " - Discussion #" . $this->clients[$client]['subjectChat']->getId() . "\n";
                     if ($client !== $from && $this->clients[$client]['subjectChat'] === $subjectChat) {
                         echo "DEBUG: Envoi de la réponse IA à un seul client\n";
                         $client->send(json_encode($aiResponseData));
-                        break; //  Empêche l'envoi multiple
+                       // break; //  Empêche l'envoi multiple
+                    }
+                }*/
+
+                foreach ($this->clients as $client) {
+                    echo "DEBUG: Vérification client WebSocket - Utilisateur #" . $this->clients[$client]['user']->getId() . " - Discussion #" . $this->clients[$client]['subjectChat']->getId() . "\n";
+                    
+                    if ($this->clients[$client]['subjectChat']->getId() === $subjectChat->getId()) {
+                        echo "DEBUG: Envoi de la réponse IA au client WebSocket ID: " . $this->clients[$client]['user']->getId() . "\n";
+                        $client->send(json_encode($aiResponseData));
                     }
                 }
+                
             }
 
         } catch (\Exception $e) {
