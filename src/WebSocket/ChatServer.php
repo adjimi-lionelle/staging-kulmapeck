@@ -98,10 +98,16 @@ class ChatServer implements MessageComponentInterface
     $queryParams = [];
     parse_str(parse_url($conn->httpRequest->getUri(), PHP_URL_QUERY), $queryParams);
 
+     // Afficher les paramètres reçus pour debug
+     echo "DEBUG: Connexion tentée avec paramètres -> " . json_encode($queryParams) . "\n";
+     error_log("DEBUG: Connexion tentée avec paramètres -> " . json_encode($queryParams), 3, "/var/log/websocket.log");
+ 
+  
+
     // 🔍 Vérifier si les paramètres `token` et `subjectChat_id` sont bien envoyés
     if (!isset($queryParams['token']) || !isset($queryParams['subjectChat_id'])) {
-        echo "❌ Connexion refusée : paramètre manquant. Requête reçue: " . json_encode($queryParams) . "\n";
-        error_log("❌ Connexion refusée : paramètre manquant. Query reçu: " . json_encode($queryParams), 3, "/var/log/websocket.log");
+        echo "❌ Connexion refusée pas de token : paramètre manquant. Requête reçue: " . json_encode($queryParams) . "\n";
+        error_log("❌ Connexion refusée pas de token : paramètre manquant. Query reçu: " . json_encode($queryParams), 3, "/var/log/websocket.log");
         $conn->close();
         return;
     }
