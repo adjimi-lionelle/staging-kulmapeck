@@ -6,6 +6,14 @@ var currentSubject;
 var socket = null;
 var isMobileView = window.innerWidth <= 768;
 
+const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+const wsUrl = isLocal
+  ? `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`
+  : `${protocol}//pay-kulmapeck.online:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
+
+console.log(" WS URL :", wsUrl);
 
 document.addEventListener("DOMContentLoaded", function () {
    
@@ -273,15 +281,6 @@ document.addEventListener("DOMContentLoaded", function () {
             socket.onmessage = null;
             socket.close();
         }  
-
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-                // Vérifier si on est en local ou sur le serveur en ligne
-        const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
-
-        // Choisir l'URL WebSocket en fonction de l'environnement
-        const wsUrl = isLocal
-            ? `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`
-            : `${protocol}//pay-kulmapeck.online:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
 
         console.log(`DEBUG: WebSocket URL -> ${wsUrl}`); // Vérification de l'URL utilisée
         
