@@ -284,8 +284,6 @@ document.addEventListener("DOMContentLoaded", function () {
             : `${protocol}//pay-kulmapeck.online:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
 
         console.log(`DEBUG: WebSocket URL -> ${wsUrl}`); // Vérification de l'URL utilisée
-       // const wsUrl = `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
-        //const wsUrl = `${protocol}//pay-kulmapeck.online:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
         
         socket = new WebSocket(wsUrl);
 

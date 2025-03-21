@@ -199,8 +199,9 @@ class ChatServer implements MessageComponentInterface
         if (isset($this->clients[$conn])) {
             $userId = $this->clients[$conn]['user']->getId();
             echo "Connexion WebSocket fermée pour l'utilisateur : " . $userId . "\n";
+            error_log("Connexion WebSocket fermée pour l'utilisateur : " . $userId, 3, "/var/log/websocket.log");
             
-            // ✅ Supprimer le ping automatique pour éviter les erreurs
+            // Supprimer le ping automatique pour éviter les erreurs
             if (isset($conn->pingTimer)) {
                 $conn->getLoop()->cancelTimer($conn->pingTimer);
             }
