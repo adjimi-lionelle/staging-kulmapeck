@@ -201,22 +201,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Profile update response:', data); // Debug logging
                 
                 if (data.success) {
-                    // Show success message
-                    const successDiv = document.createElement('div');
-                    successDiv.className = 'alert alert-success mt-3';
-                    successDiv.textContent = '{% trans %}PROFILE_UPDATED_SUCCESSFULLY_KEY{% endtrans %}';
-                    
-                    // Insert success message at the top of the form
-                    setupForm.insertBefore(successDiv, setupForm.firstChild);
-                    
-                    // Disable form controls during reload
-                    const formControls = setupForm.querySelectorAll('button, select, input');
-                    formControls.forEach(control => control.disabled = true);
-                    
-                    // Refresh the page after a short delay to show the success message
-                    setTimeout(() => {
+                    if (data.needsPremium) {
+                        // First step completed successfully, show premium section
+                        classSetupSection.classList.add('d-none');
+                        premiumSetupSection.classList.remove('d-none');
+                        
+                        // Show success message for first step
+                        const successDiv = document.createElement('div');
+                        successDiv.className = 'alert alert-success mt-3';
+                        successDiv.textContent = '{% trans %}CLASS_SETUP_COMPLETE_KEY{% endtrans %}';
+                        
+                        // Insert success message at the top of the premium section
+                        const premiumContent = premiumSetupSection.querySelector('.premium-upgrade-section') || 
+                                              premiumSetupSection.querySelector('.setup-complete-section');
+                        if (premiumContent) {
+                            premiumContent.insertBefore(successDiv, premiumContent.firstChild);
+                            
+                            // Remove the success message after 5 seconds
+                            setTimeout(() => {
+                                successDiv.remove();
+                            }, 5000);
+                        }
+                    } else if (data.isFullyComplete) {
+                        // Both steps completed, refresh the page
+                        const successDiv = document.createElement('div');
+                        successDiv.className = 'alert alert-success mt-3';
+                        successDiv.textContent = '{% trans %}PROFILE_UPDATED_SUCCESSFULLY_KEY{% endtrans %}';
+                        
+                        // Insert success message at the top of the form
+                        setupForm.insertBefore(successDiv, setupForm.firstChild);
+                        
+                        // Disable form controls during reload
+                        const formControls = setupForm.querySelectorAll('button, select, input');
+                        formControls.forEach(control => control.disabled = true);
+                        
+                        // Refresh the page after a short delay to show the success message
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        // Something unexpected happened, refresh to get the correct state
                         window.location.reload();
-                    }, 1500);
+                    }
                 } else {
                     // Show error message in a more user-friendly way
                     const errorDiv = document.createElement('div');
