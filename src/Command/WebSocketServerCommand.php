@@ -34,6 +34,7 @@ class WebSocketServerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        echo "🧠 Commande websocket:start exécutée\n"; // AJOUTE CETTE LIGNE
         $output->writeln("Démarrage du serveur WebSocket...");
 
         try {
