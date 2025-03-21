@@ -24,6 +24,7 @@ class ChatServer implements MessageComponentInterface
 
     public function __construct(EntityManagerInterface $entityManager, string $jwtSecret, AIMessageHandler $aiMessageHandler, EleveRepository $eleveRepository)
     {
+        echo "✅ ChatServer instancié correctement\n";
         $this->entityManager = $entityManager;
         $this->clients = new \SplObjectStorage();
         $this->jwtSecret = $jwtSecret;
