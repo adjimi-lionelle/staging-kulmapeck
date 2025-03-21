@@ -6,10 +6,10 @@ var currentSubject;
 var socket = null;
 var isMobileView = window.innerWidth <= 768;
 
-const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+var protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+var isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 
-const wsUrl = isLocal
+var wsUrl = isLocal
   ? `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`
   : `${protocol}//pay-kulmapeck.online:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
 
