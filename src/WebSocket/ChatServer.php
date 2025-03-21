@@ -63,14 +63,6 @@ class ChatServer implements MessageComponentInterface
                 return;
             }
 
-            //  Vérification des connexions existantes avant d'attacher la nouvelle
-           /* foreach ($this->clients as $client) {
-                if ($this->clients[$client]['user']->getId() === $userId) {
-                    echo "DEBUG: Utilisateur {$userId} déjà connecté. Annulation de la nouvelle connexion.\n";
-                    return; // On empêche la création d'une nouvelle connexion
-                }
-            }*/
-
             //  Ajout de la nouvelle connexion (uniquement si aucune connexion existante)
             $this->clients->attach($conn, ['user' => $user, 'subjectChat' => $subjectChat]);
             echo "Nouvelle connexion : Utilisateur #{$userId} dans la discussion #{$subjectChatId}.\n";

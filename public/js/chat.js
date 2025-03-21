@@ -93,6 +93,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="chat-item-name">${subject.name}</div>
                     <div class="chat-item-preview">${subject.lastMessage || "Start chatting..."}</div>
                 </div>
+                ${subject.unreadCount > 0 ? `
+                    <div class="chat-item-meta">
+                        <div class="chat-item-badge">${subject.unreadCount}</div>
+                    </div>
+                    ` : ""}
             `;
 
             chatItem.addEventListener("click", () => {
@@ -270,7 +275,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }  
 
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const wsUrl = `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
+        //const wsUrl = `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
+        const wsUrl = `${protocol}//pay-kulmapeck.online:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
         
         console.log(`DEBUG: Opening WebSocket connection to ${wsUrl}`);
         socket = new WebSocket(wsUrl);
