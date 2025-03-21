@@ -67,6 +67,14 @@ class ChatServer implements MessageComponentInterface
             $this->clients->attach($conn, ['user' => $user, 'subjectChat' => $subjectChat]);
             echo "Nouvelle connexion : Utilisateur #{$userId} dans la discussion #{$subjectChatId}.\n";
 
+               // ✅ Ajouter un Timer dans le même event loop de Ratchet
+        $conn->pingTimer = $conn->getLoop()->addPeriodicTimer(30, function() use ($conn) {
+            if ($conn->isWritable()) {
+                echo "Envoi d'un ping au client...\n";
+                $conn->send(json_encode(["type" => "ping"]));
+            }
+        });
+
             //  Mise à jour de la connexion en base de données
             $existingConnection = $this->entityManager->getRepository(WebSocketConnection::class)
                 ->findOneBy(['user' => $user, 'subjectChat' => $subjectChat]);
@@ -191,12 +199,20 @@ class ChatServer implements MessageComponentInterface
         if (isset($this->clients[$conn])) {
             $userId = $this->clients[$conn]['user']->getId();
             echo "Connexion WebSocket fermée pour l'utilisateur : " . $userId . "\n";
+            
+            // ✅ Supprimer le ping automatique pour éviter les erreurs
+            if (isset($conn->pingTimer)) {
+                $conn->getLoop()->cancelTimer($conn->pingTimer);
+            }
+
             $this->clients->detach($conn);
         }
     }
 
+
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
+        echo "Erreur WebSocket : " . $e->getMessage() . "\n";
         $conn->close();
     }
 }

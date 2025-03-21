@@ -275,10 +275,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }  
 
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        //const wsUrl = `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
-        const wsUrl = `${protocol}//pay-kulmapeck.online:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
+                // Vérifier si on est en local ou sur le serveur en ligne
+        const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
+
+        // Choisir l'URL WebSocket en fonction de l'environnement
+        const wsUrl = isLocal
+            ? `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`
+            : `${protocol}//pay-kulmapeck.online:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
+
+        console.log(`DEBUG: WebSocket URL -> ${wsUrl}`); // Vérification de l'URL utilisée
+       // const wsUrl = `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
+        //const wsUrl = `${protocol}//pay-kulmapeck.online:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
         
-        console.log(`DEBUG: Opening WebSocket connection to ${wsUrl}`);
         socket = new WebSocket(wsUrl);
 
         socket.onopen = function () {
