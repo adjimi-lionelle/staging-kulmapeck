@@ -594,14 +594,16 @@ class ChatController extends AbstractController
                 $message = 'Class ID is required';
             }
         } catch (\Exception $e) {
-            $message = $e->getMessage();
+            // Log the error for debugging
+            error_log('Error updating profile: ' . $e->getMessage());
+            $message = 'An error occurred while updating your profile. Please try again.';
         }
         
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse([
                 'success' => $success, 
                 'message' => $message,
-                'isProfileComplete' => true
+                'isProfileComplete' => $success // Only set to true if update was successful
             ]);
         }
         
