@@ -31,7 +31,7 @@ class ChatServer implements MessageComponentInterface
         $this->eleveRepository = $eleveRepository;
     }
 
-    public function onOpen(ConnectionInterface $conn)
+  /*  public function onOpen(ConnectionInterface $conn)
     {
         $queryParams = [];
         parse_str(parse_url($conn->httpRequest->getUri(), PHP_URL_QUERY), $queryParams);
@@ -67,13 +67,7 @@ class ChatServer implements MessageComponentInterface
             $this->clients->attach($conn, ['user' => $user, 'subjectChat' => $subjectChat]);
             echo "Nouvelle connexion : Utilisateur #{$userId} dans la discussion #{$subjectChatId}.\n";
 
-               // ✅ Ajouter un Timer dans le même event loop de Ratchet
-        $conn->pingTimer = $conn->getLoop()->addPeriodicTimer(30, function() use ($conn) {
-            if ($conn->isWritable()) {
-                echo "Envoi d'un ping au client...\n";
-                $conn->send(json_encode(["type" => "ping"]));
-            }
-        });
+            
 
             //  Mise à jour de la connexion en base de données
             $existingConnection = $this->entityManager->getRepository(WebSocketConnection::class)
@@ -96,7 +90,82 @@ class ChatServer implements MessageComponentInterface
             echo "Erreur lors de la connexion WebSocket : " . $e->getMessage() . "\n";
             $conn->close();
         }
+    }*/
+
+    public function onOpen(ConnectionInterface $conn)
+{
+    // Récupération des paramètres de l'URL WebSocket
+    $queryParams = [];
+    parse_str(parse_url($conn->httpRequest->getUri(), PHP_URL_QUERY), $queryParams);
+
+    // 🔍 Vérifier si les paramètres `token` et `subjectChat_id` sont bien envoyés
+    if (!isset($queryParams['token']) || !isset($queryParams['subjectChat_id'])) {
+        echo "❌ Connexion refusée : paramètre manquant. Requête reçue: " . json_encode($queryParams) . "\n";
+        error_log("❌ Connexion refusée : paramètre manquant. Query reçu: " . json_encode($queryParams), 3, "/var/log/websocket.log");
+        $conn->close();
+        return;
     }
+
+    $token = $queryParams['token'];
+    $subjectChatId = $queryParams['subjectChat_id'];
+
+    try {
+        // 🔑 Vérification et décodage du token JWT
+        $decoded = JWT::decode($token, new Key($this->jwtSecret, 'HS256'));
+        $userId = $decoded->user_id;
+        echo "✅ Token décodé avec succès pour l'utilisateur #{$userId}\n";
+
+        // 🔍 Vérifier si l'utilisateur existe en base de données
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
+        if (!$user) {
+            echo "❌ Utilisateur introuvable pour l'ID {$userId}\n";
+            error_log("❌ Utilisateur introuvable: {$userId}", 3, "/var/log/websocket.log");
+            $conn->close();
+            return;
+        }
+
+        // 🔍 Vérifier si le `subjectChat` existe en base de données
+        $subjectChat = $this->entityManager->getRepository(SubjectChat::class)->find($subjectChatId);
+        if (!$subjectChat) {
+            echo "❌ Discussion introuvable pour l'ID {$subjectChatId}\n";
+            error_log("❌ Discussion introuvable: {$subjectChatId}", 3, "/var/log/websocket.log");
+            $conn->close();
+            return;
+        }
+
+        // ✅ Ajouter la nouvelle connexion WebSocket
+        $this->clients->attach($conn, ['user' => $user, 'subjectChat' => $subjectChat]);
+        echo "🔗 Nouvelle connexion : Utilisateur #{$userId} dans la discussion #{$subjectChatId}.\n";
+
+        // 📌 Mise à jour de la connexion dans la base de données
+        $existingConnection = $this->entityManager->getRepository(WebSocketConnection::class)
+            ->findOneBy(['user' => $user, 'subjectChat' => $subjectChat]);
+
+        if (!$existingConnection) {
+            echo "🆕 Création d'une nouvelle entrée WebSocketConnection pour l'utilisateur #{$userId}\n";
+
+            $webSocketConnection = new WebSocketConnection();
+            $webSocketConnection->setUser($user);
+            $webSocketConnection->setSubjectChat($subjectChat);
+            $webSocketConnection->setLastActivity(new \DateTime());
+
+            $this->entityManager->persist($webSocketConnection);
+            $this->entityManager->flush();
+        } else {
+            echo "🔄 Mise à jour de l'activité pour WebSocketConnection de l'utilisateur #{$userId}\n";
+            $existingConnection->setLastActivity(new \DateTime());
+            $this->entityManager->flush();
+        }
+
+    } catch (\Exception $e) {
+        // 🔥 Gérer les erreurs et afficher le message d'erreur
+        echo "❌ Erreur lors de la connexion WebSocket : " . $e->getMessage() . "\n";
+        error_log("❌ Erreur WebSocket: " . $e->getMessage(), 3, "/var/log/websocket.log");
+        $conn->close();
+    }
+}
+
+
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
@@ -199,17 +268,9 @@ class ChatServer implements MessageComponentInterface
         if (isset($this->clients[$conn])) {
             $userId = $this->clients[$conn]['user']->getId();
             echo "Connexion WebSocket fermée pour l'utilisateur : " . $userId . "\n";
-            error_log("Connexion WebSocket fermée pour l'utilisateur : " . $userId, 3, "/var/log/websocket.log");
-            
-            // Supprimer le ping automatique pour éviter les erreurs
-            if (isset($conn->pingTimer)) {
-                $conn->getLoop()->cancelTimer($conn->pingTimer);
-            }
-
             $this->clients->detach($conn);
         }
     }
-
 
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
