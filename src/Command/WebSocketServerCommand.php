@@ -34,7 +34,7 @@ class WebSocketServerCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        echo "🧠 Commande websocket:start exécutée\n"; // AJOUTE CETTE LIGNE
+        echo "Commande websocket:start exécutée\n"; // AJOUTE CETTE LIGNE
         $output->writeln("Démarrage du serveur WebSocket...");
 
         try {
@@ -48,9 +48,18 @@ class WebSocketServerCommand extends Command
             );
 
             $output->writeln("Serveur WebSocket prêt sur ws://{$host}:{$port}");
-            $server->run();
+            //  AJOUTE CE MESSAGE POUR TESTER SI `$server->run();` S'EXÉCUTE
+        echo "DEBUG: Avant d'exécuter server->run()...\n";
+        error_log(" DEBUG: Avant d'exécuter server->run();", 3, "/var/log/websocket.log");
+
+        $server->run();
+
+        //  CETTE LIGNE NE DEVRAIT JAMAIS S'AFFICHER SI LE SERVEUR TOURNE
+        echo " ERREUR: server->run() s'est arrêté !\n";
+        error_log(" ERREUR: server->run() s'est arrêté !", 3, "/var/log/websocket.log");
         } catch (\Exception $e) {
             $output->writeln("Erreur WebSocket : " . $e->getMessage());
+            error_log(" Erreur WebSocket: " . $e->getMessage(), 3, "/var/log/websocket.log");
         }
 
         return Command::SUCCESS;
