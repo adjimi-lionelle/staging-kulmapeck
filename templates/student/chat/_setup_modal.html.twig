@@ -201,9 +201,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Profile update response:', data); // Debug logging
                 
                 if (data.success) {
-                    // Hide class setup and show premium setup
-                    classSetupSection.classList.add('d-none');
-                    premiumSetupSection.classList.remove('d-none');
+                    // Show success message
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'alert alert-success mt-3';
+                    successDiv.textContent = '{% trans %}PROFILE_UPDATED_SUCCESSFULLY_KEY{% endtrans %}';
+                    
+                    // Insert success message at the top of the form
+                    setupForm.insertBefore(successDiv, setupForm.firstChild);
+                    
+                    // Disable form controls during reload
+                    const formControls = setupForm.querySelectorAll('button, select, input');
+                    formControls.forEach(control => control.disabled = true);
+                    
+                    // Refresh the page after a short delay to show the success message
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 } else {
                     // Show error message in a more user-friendly way
                     const errorDiv = document.createElement('div');
