@@ -91,12 +91,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
                 <div class="chat-item-info">
                     <div class="chat-item-name">${subject.name}</div>
-                    <div class="chat-item-preview">${subject.lastMessage || "Start chatting..."}</div>
+                    <div class="chat-item-preview">${subject.lastMessage || "Commencez le chat..."}</div>
                 </div>
                 ${subject.unreadCount > 0 ? `
-                    <div class="chat-item-meta">
+                    <!-- div class="chat-item-meta">
                         <div class="chat-item-badge">${subject.unreadCount}</div>
-                    </div>
+                    </div -->
                     ` : ""}
             `;
 
