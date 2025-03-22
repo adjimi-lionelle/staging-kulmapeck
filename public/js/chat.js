@@ -91,12 +91,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
                 <div class="chat-item-info">
                     <div class="chat-item-name">${subject.name}</div>
-                    <div class="chat-item-preview">${subject.lastMessage || "Start chatting..."}</div>
+                    <div class="chat-item-preview">${subject.lastMessage || "commencze le chat..."}</div>
                 </div>
                 ${subject.unreadCount > 0 ? `
-                    <div class="chat-item-meta">
+                    <!-- div class="chat-item-meta">
                         <div class="chat-item-badge">${subject.unreadCount}</div>
-                    </div>
+                    </div -->
                     ` : ""}
             `;
 
@@ -286,7 +286,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         socket.onopen = function () {
             console.log("WebSocket connecté avec succès !");
-            // Effacer les erreurs éventuelles
             const errorBanner = document.querySelector('.error-message');
             if (errorBanner) {
                 errorBanner.remove();
@@ -373,11 +372,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
             
-            // Si c'est une réponse AI, supprimer l'indicateur de frappe
-            if (isFromAI) {
+           /* if (isFromAI) {
                 removeAITypingIndicator();
-            }
-            
+            }*/            
             // Ajouter le message avec le style approprié
             if (messageContent) {
                 const messageData = {
@@ -463,10 +460,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!socket || socket.readyState !== WebSocket.OPEN) {
             console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...");
             let pendingMessages = [];
-            // Ajoute le message à une file d'attente pour qu'il soit envoyé après la reconnexion
+
             pendingMessages.push(messageData);
     
-            // Reconnecte WebSocket et envoie les messages après reconnexion
            // reconnectWebSocket(subjectChatId);
            getWebSocketToken(subjectChatId);
         } else {
@@ -483,7 +479,7 @@ document.addEventListener("DOMContentLoaded", function () {
             addMessageToChat(optimisticMessageData, false);
             
             // Afficher l'indicateur de frappe de l'IA
-            showAITypingIndicator();
+            //showAITypingIndicator();
         }
     
         messageInput.value = "";

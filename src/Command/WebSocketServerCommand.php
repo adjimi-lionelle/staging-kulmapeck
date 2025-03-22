@@ -47,19 +47,12 @@ class WebSocketServerCommand extends Command
                 $host
             );
 
-            $output->writeln("Serveur WebSocket prêt sur ws://{$host}:{$port}");
-            //  AJOUTE CE MESSAGE POUR TESTER SI `$server->run();` S'EXÉCUTE
-        echo "DEBUG: Avant d'exécuter server->run()...\n";
-        error_log(" DEBUG: Avant d'exécuter server->run();", 3, "/var/log/websocket.log");
+            $output->writeln("Serveur WebSocket prêt sur wss://{$host}:{$port}");
 
         $server->run();
 
-        //  CETTE LIGNE NE DEVRAIT JAMAIS S'AFFICHER SI LE SERVEUR TOURNE
-        echo " ERREUR: server->run() s'est arrêté !\n";
-        error_log(" ERREUR: server->run() s'est arrêté !", 3, "/var/log/websocket.log");
         } catch (\Exception $e) {
             $output->writeln("Erreur WebSocket : " . $e->getMessage());
-            error_log(" Erreur WebSocket: " . $e->getMessage(), 3, "/var/log/websocket.log");
         }
 
         return Command::SUCCESS;
