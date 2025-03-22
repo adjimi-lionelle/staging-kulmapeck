@@ -483,7 +483,7 @@ document.addEventListener("DOMContentLoaded", function () {
             addMessageToChat(optimisticMessageData, false);
             
             // Afficher l'indicateur de frappe de l'IA
-           // showAITypingIndicator();
+           // showAITypingIndicator(); 
         }
     
         messageInput.value = "";
