@@ -279,7 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const wsUrl = isLocal
             ? `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`
-            : `${protocol}//pay-kulmapeck.online:8085/ws?token=${token}&subjectChat_id=${subjectId}`;
+            : `${protocol}//pay-kulmapeck.online/ws?token=${token}&subjectChat_id=${subjectId}`;
 
         console.log(`DEBUG: WebSocket URL -> ${wsUrl}`); 
         socket = new WebSocket(wsUrl);
