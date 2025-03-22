@@ -374,9 +374,9 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             
             // Si c'est une réponse AI, supprimer l'indicateur de frappe
-            if (isFromAI) {
+           /* if (isFromAI) {
                 removeAITypingIndicator();
-            }
+            }*/
             
             // Ajouter le message avec le style approprié
             if (messageContent) {
@@ -483,7 +483,7 @@ document.addEventListener("DOMContentLoaded", function () {
             addMessageToChat(optimisticMessageData, false);
             
             // Afficher l'indicateur de frappe de l'IA
-            showAITypingIndicator();
+           // showAITypingIndicator();
         }
     
         messageInput.value = "";
