@@ -39,6 +39,7 @@
                         </div>
                     </div>
                 </div>
+                <div id="sidebar-resizer" class="sidebar-resizer"></div>
                 <div class="chat-content">
                     <button type="button" class="mobile-back-button">
                         <i class="bi bi-arrow-left"></i> {% trans %}BACKTOSUBJECT_KEY{% endtrans %}
@@ -79,6 +80,7 @@
     {{ encore_entry_script_tags('chat') }}
     <script src="{{ asset('js/chat.js') }}"></script>
     <script src="{{ asset('js/emoji-picker.js') }}"></script>
+    <script src="{{ asset('js/sidebar-resizer.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Mobile back button functionality

@@ -608,14 +608,40 @@ class ChatController extends AbstractController
                 $message = 'Class ID is required';
             }
         } catch (\Exception $e) {
-            $message = $e->getMessage();
+            // Log the error for debugging
+            error_log('Error updating profile: ' . $e->getMessage());
+            $message = 'An error occurred while updating your profile. Please try again.';
         }
+        
+        // Check if student has complete information (classe)
+        $isProfileComplete = $student->getClasse() !== null;
+        
+        // For secondary cycle classes, check if the class has a specialization when needed
+        if ($isProfileComplete && $student->getClasse()->getSkillLevel()) {
+            $skillLevelId = $student->getClasse()->getSkillLevel()->getId();
+            $secondaryCycleLevels = [5, 6, 7]; // Adjust based on your database
+            
+            // If student is in secondary cycle, their class must have a specialization
+            if (in_array($skillLevelId, $secondaryCycleLevels) && 
+                $student->getClasse()->getSpecialite() === null) {
+                $isProfileComplete = false;
+            }
+        }
+        
+        // Check premium status
+        $isPremium = $student->isIsPremium();
+        
+        // Profile is only fully complete if both class is set and premium status is true
+        $isFullyComplete = $isProfileComplete && $isPremium;
         
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse([
                 'success' => $success, 
                 'message' => $message,
-                'isProfileComplete' => true
+                'isProfileComplete' => $isProfileComplete,
+                'isPremium' => $isPremium,
+                'isFullyComplete' => $isFullyComplete,
+                'needsPremium' => $isProfileComplete && !$isPremium // Flag to indicate premium is needed
             ]);
         }
         
