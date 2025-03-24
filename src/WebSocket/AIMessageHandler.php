@@ -67,6 +67,7 @@ class AIMessageHandler
         
         // Get subject name
         $subjectName = $subjectChat->getName();
+        $username = $user->getUsername();
         
         try {
             // Generate AI response
@@ -75,8 +76,9 @@ class AIMessageHandler
                 $subjectName,
                 $messageHistory,
                 $class
+                //$username
             );
-            
+           // echo "IA RESPONSE : " . $aiResponse . "\n";
             // Create and save AI message
             $message = new MessageChat();
             $message->setContent($aiResponse);

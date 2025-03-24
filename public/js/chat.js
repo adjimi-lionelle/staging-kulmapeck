@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Sélectionner un sujet et établir la connexion WebSocket
   
-        async function selectSubject(subjectId) {
+         function selectSubject(subjectId) {
             console.log(`DEBUG: selectSubject() appelé avec ID ${subjectId}`);
             if (!subjectId) {
                 console.error("DEBUG: Aucun subject ID fourni !");
@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
             updateChatHeader(subjectId)
             
             try {
-                await getWebSocketToken(subjectId); // Assurer que la connexion WebSocket est établie avec un token valide
+                 getWebSocketToken(subjectId); // Assurer que la connexion WebSocket est établie avec un token valide
                 console.log(`DEBUG: connexion okay`);
                 console.log(`DEBUG: currentSubject mis à jour -> ${currentSubject}`);
             } catch (error) {
