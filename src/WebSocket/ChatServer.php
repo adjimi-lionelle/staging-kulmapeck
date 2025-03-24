@@ -106,6 +106,7 @@ class ChatServer implements MessageComponentInterface
 
             $user = $this->clients[$from]['user'];
             $subjectChat = $this->clients[$from]['subjectChat'];
+            //echo "subject ID : " .$subjectChat->getId(); die();
             $eleve = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
             $class = $eleve->getClasse()->getName();
 

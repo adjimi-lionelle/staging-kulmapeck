@@ -260,10 +260,10 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(`DEBUG: Ouverture de la connexion WebSocket pour subjectChat ${subjectId}...`);
 
         //  Vérifier si une connexion est déjà active et ouverte
-        if (socket && socket.readyState === WebSocket.OPEN) {
+       /* if (socket && socket.readyState === WebSocket.OPEN) {
             console.log("DEBUG: Une connexion WebSocket est déjà active, annulation de la nouvelle connexion.");
             return;
-        }
+        }*/
 
         // Fermer proprement l'ancienne connexion avant d'en ouvrir une nouvelle
         if (socket) {
@@ -445,15 +445,14 @@ document.addEventListener("DOMContentLoaded", function () {
     
         if (content === "") return;
     
-        let activeChatItem = document.querySelector(".chat-item.active");
-        if (!activeChatItem) {
-            console.error("DEBUG: Aucun sujet sélectionné !");
+        if (!currentSubject) {
+            console.error("DEBUG: Aucun sujet sélectionné (currentSubject manquant) !");
             return;
         }
     
-        let subjectChatId = activeChatItem.dataset.subjectId;
+        const subjectChatId = parseInt(currentSubject);
         let messageData = {
-            subject_id: parseInt(subjectChatId),
+            subject_id: subjectChatId,
             message: content,
             timestamp: new Date().toISOString()
         };
