@@ -5,12 +5,6 @@
 {% block script %}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Disable right-click on the entire page
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            });
-            
             // Disable keyboard shortcuts that could be used to download/print
             document.addEventListener('keydown', function(e) {
                 // Ctrl+S, Ctrl+P, Ctrl+Shift+S
@@ -23,7 +17,7 @@
             // Apply CSS to prevent text selection
             var style = document.createElement('style');
             style.innerHTML = `
-                object[type="application/pdf"] {
+                object[type="application/pdf"], iframe {
                     user-select: none !important;
                     -webkit-user-select: none !important;
                 }
@@ -55,17 +49,18 @@
             document.body.appendChild(tooltip);
             
             // Show tooltip on right click
-            document.addEventListener('mousedown', function(e) {
-                if (e.button === 2) { // Right click
-                    tooltip.style.left = (e.clientX + 10) + 'px';
-                    tooltip.style.top = (e.clientY + 10) + 'px';
-                    tooltip.classList.add('visible');
-                    
-                    // Hide tooltip after a delay
-                    setTimeout(function() {
-                        tooltip.classList.remove('visible');
-                    }, 1500);
-                }
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                tooltip.style.left = (e.clientX + 10) + 'px';
+                tooltip.style.top = (e.clientY + 10) + 'px';
+                tooltip.classList.add('visible');
+                
+                // Hide tooltip after a delay
+                setTimeout(function() {
+                    tooltip.classList.remove('visible');
+                }, 1500);
+                
+                return false;
             });
         });
     </script>
@@ -128,17 +123,12 @@
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
-                                            <div class="position-relative" style="width: 100%; height: 800px; overflow: auto;">
-                                                <object 
-                                                    data="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0" 
-                                                    type="application/pdf" 
-                                                    width="100%" 
-                                                    height="100%"
-                                                    style="pointer-events: auto;"
-                                                >
-                                                    <p>Votre navigateur ne supporte pas les PDF. Veuillez télécharger le PDF pour le visualiser: <a href="{{ asset('uploads/media/exams/files/' ~ data) }}">Télécharger PDF</a>.</p>
-                                                </object>
-                                            </div>
+                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0" 
+                                                    height="800px" 
+                                                    frameborder="0" 
+                                                    style="width: 100%; overflow: auto;" 
+                                                    allowfullscreen>
+                                            </iframe>
                                         </div>
                                     </div>
                                 </div>
