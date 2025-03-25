@@ -3,7 +3,30 @@
 {% block title %} - Courses{% endblock %}
 
 {% block script %}
-	
+	<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Disable right-click on the entire page
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Disable keyboard shortcuts for saving
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+S or Command+S
+                if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.keyCode === 83)) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Ctrl+P or Command+P (print)
+                if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.keyCode === 80)) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block mainContent %}
