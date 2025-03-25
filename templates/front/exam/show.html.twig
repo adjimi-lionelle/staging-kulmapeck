@@ -3,64 +3,27 @@
 {% block title %} - Courses{% endblock %}
 
 {% block script %}
-    <script>
+	<script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Disable keyboard shortcuts that could be used to download/print
+            // Disable right-click on the entire page
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Disable keyboard shortcuts for saving
             document.addEventListener('keydown', function(e) {
-                // Ctrl+S, Ctrl+P, Ctrl+Shift+S
-                if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || e.keyCode === 83 || e.keyCode === 80)) {
+                // Ctrl+S or Command+S
+                if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.keyCode === 83)) {
                     e.preventDefault();
                     return false;
                 }
-            });
-            
-            // Apply CSS to prevent text selection
-            var style = document.createElement('style');
-            style.innerHTML = `
-                object[type="application/pdf"], iframe {
-                    user-select: none !important;
-                    -webkit-user-select: none !important;
+                
+                // Ctrl+P or Command+P (print)
+                if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.keyCode === 80)) {
+                    e.preventDefault();
+                    return false;
                 }
-                
-                /* Custom tooltip shown when right-clicking */
-                .no-download-tooltip {
-                    position: fixed;
-                    background: rgba(0,0,0,0.8);
-                    color: white;
-                    padding: 5px 10px;
-                    border-radius: 3px;
-                    z-index: 1000;
-                    font-size: 14px;
-                    pointer-events: none;
-                    opacity: 0;
-                    transition: opacity 0.3s;
-                }
-                
-                .no-download-tooltip.visible {
-                    opacity: 1;
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Create a tooltip element to show when right-clicking
-            var tooltip = document.createElement('div');
-            tooltip.className = 'no-download-tooltip';
-            tooltip.innerText = 'Le téléchargement n\'est pas autorisé';
-            document.body.appendChild(tooltip);
-            
-            // Show tooltip on right click
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                tooltip.style.left = (e.clientX + 10) + 'px';
-                tooltip.style.top = (e.clientY + 10) + 'px';
-                tooltip.classList.add('visible');
-                
-                // Hide tooltip after a delay
-                setTimeout(function() {
-                    tooltip.classList.remove('visible');
-                }, 1500);
-                
-                return false;
             });
         });
     </script>
@@ -123,12 +86,65 @@
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
-                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0" 
-                                                    height="800px" 
-                                                    frameborder="0" 
-                                                    style="width: 100%; overflow: auto;" 
-                                                    allowfullscreen>
-                                            </iframe>
+                                            <iframe id="examFrame" src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0" height="800px" width="100%" frameborder="0" style="overflow: auto;" oncontextmenu="return false;"></iframe>
+                                            
+                                            <script>
+                                                document.addEventListener('DOMContentLoaded', function() {
+                                                    var examFrame = document.getElementById('examFrame');
+                                                    
+                                                    // Prevent right-click on the iframe
+                                                    examFrame.addEventListener('contextmenu', function(e) {
+                                                        e.preventDefault();
+                                                        return false;
+                                                    });
+                                                    
+                                                    // Also prevent context menu in the parent document
+                                                    document.addEventListener('contextmenu', function(e) {
+                                                        if (e.target === examFrame || examFrame.contains(e.target)) {
+                                                            e.preventDefault();
+                                                            return false;
+                                                        }
+                                                    });
+                                                    
+                                                    // Disable keyboard shortcuts that could be used to download/print
+                                                    document.addEventListener('keydown', function(e) {
+                                                        // Ctrl+S, Ctrl+P, Ctrl+Shift+S
+                                                        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || e.keyCode === 83 || e.keyCode === 80)) {
+                                                            e.preventDefault();
+                                                            return false;
+                                                        }
+                                                    });
+                                                    
+                                                    // Create a tooltip element to show when right-clicking
+                                                    var tooltip = document.createElement('div');
+                                                    tooltip.style.position = 'fixed';
+                                                    tooltip.style.background = 'rgba(0,0,0,0.8)';
+                                                    tooltip.style.color = 'white';
+                                                    tooltip.style.padding = '5px 10px';
+                                                    tooltip.style.borderRadius = '3px';
+                                                    tooltip.style.zIndex = '1000';
+                                                    tooltip.style.fontSize = '14px';
+                                                    tooltip.style.pointerEvents = 'none';
+                                                    tooltip.style.opacity = '0';
+                                                    tooltip.style.transition = 'opacity 0.3s';
+                                                    tooltip.innerText = 'Le téléchargement n\'est pas autorisé';
+                                                    document.body.appendChild(tooltip);
+                                                    
+                                                    // Show tooltip on right click
+                                                    document.addEventListener('mousedown', function(e) {
+                                                        if (e.button === 2 && (e.target === examFrame || examFrame.contains(e.target))) {
+                                                            tooltip.style.left = (e.clientX + 10) + 'px';
+                                                            tooltip.style.top = (e.clientY + 10) + 'px';
+                                                            tooltip.style.opacity = '1';
+                                                            
+                                                            // Hide tooltip after a delay
+                                                            setTimeout(function() {
+                                                                tooltip.style.opacity = '0';
+                                                            }, 1500);
+                                                        }
+                                                    });
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                 </div>
