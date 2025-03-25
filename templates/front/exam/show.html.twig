@@ -3,7 +3,7 @@
 {% block title %} - Courses{% endblock %}
 
 {% block script %}
-	<script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Disable right-click on the entire page
             document.addEventListener('contextmenu', function(e) {
@@ -11,20 +11,31 @@
                 return false;
             });
             
-            // Disable keyboard shortcuts for saving
+            // Disable keyboard shortcuts that could be used to download/print
             document.addEventListener('keydown', function(e) {
-                // Ctrl+S or Command+S
-                if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.keyCode === 83)) {
-                    e.preventDefault();
-                    return false;
-                }
-                
-                // Ctrl+P or Command+P (print)
-                if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.keyCode === 80)) {
+                // Ctrl+S, Ctrl+P, Ctrl+Shift+S
+                if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || e.keyCode === 83 || e.keyCode === 80)) {
                     e.preventDefault();
                     return false;
                 }
             });
+            
+            // Add extra protection to the iframe
+            var examIframe = document.querySelector('iframe');
+            if (examIframe) {
+                examIframe.onload = function() {
+                    try {
+                        var iframeDoc = examIframe.contentDocument || examIframe.contentWindow.document;
+                        iframeDoc.addEventListener('contextmenu', function(e) {
+                            e.preventDefault();
+                            return false;
+                        });
+                    } catch(e) {
+                        // Cross-origin restrictions may prevent this
+                        console.log('Could not access iframe document');
+                    }
+                };
+            }
         });
     </script>
 {% endblock %}
@@ -86,7 +97,7 @@
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
-                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0" height="800px" frameborder="0" style="pointer-events: auto; overflow: scroll;" oncontextmenu="return false;"></iframe>
+                                            <iframe id="exam-content" src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0" height="800px" frameborder="0" style="pointer-events: auto; overflow: scroll; user-select: none; -webkit-user-select: none;" oncontextmenu="return false;"></iframe>
                                         </div>
                                     </div>
                                 </div>
