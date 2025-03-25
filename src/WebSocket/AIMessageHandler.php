@@ -33,7 +33,7 @@ class AIMessageHandler
         $this->logger = $logger;
     }
     
-    public function handleMessage(array $data, User $user): ?array
+    public function handleMessage(array $data, User $user, string $class): ?array
     {
         if (!isset($data['subject_id']) || !isset($data['message'])) {
             return null;
@@ -67,15 +67,18 @@ class AIMessageHandler
         
         // Get subject name
         $subjectName = $subjectChat->getName();
+        $username = $user->getUsername();
         
         try {
             // Generate AI response
             $aiResponse = $this->aiService->generateResponse(
                 $data['message'],
                 $subjectName,
-                $messageHistory
+                $messageHistory,
+                $class
+                //$username
             );
-            
+           // echo "IA RESPONSE : " . $aiResponse . "\n";
             // Create and save AI message
             $message = new MessageChat();
             $message->setContent($aiResponse);

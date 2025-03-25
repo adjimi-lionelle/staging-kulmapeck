@@ -250,7 +250,7 @@ class ChatController extends AbstractController
                 'name' => $subjectChat->getName(),
                 'eleve' => $subjectChat->getEleve(),
                 'cycle' => $subjectChat->getCycle(),
-                'unreadCount' => $this->getUnreadCount($subjectChat, $user)
+                'unreadCount' => $this->getUnreadCount($subjectChat)
             ];
         }, $subjectChats);
 
@@ -271,6 +271,9 @@ class ChatController extends AbstractController
         $messages = $this->entityManager->getRepository(MessageChat::class)
             ->findBy(['subjectChat' => $subjectId], ['createAt' => 'ASC']);
 
+        $lastMessage = $this->entityManager->getRepository(MessageChat::class)
+            ->findOneBy(['subjectChat' => $subjectId], ['createAt' => 'DESC']);    
+
         $messagesArray = array_map(fn($msg) => [
             'id' => $msg->getId(),
             'content' => $msg->getContent(),
@@ -279,6 +282,14 @@ class ChatController extends AbstractController
             'createdAt' => $msg->getCreateAt()->format('Y-m-d H:i:s'),
         ], $messages);
 
+        $lastMessageArray = $lastMessage ? [
+            'id' => $lastMessage->getId(),
+            'content' => $lastMessage->getContent(),
+            'sender_id' => $lastMessage->getSender()->getId(),
+            'isFromAI' => $lastMessage->isIsFromAI(),
+            'createdAt' => $lastMessage->getCreateAt()->format('Y-m-d H:i:s'),
+        ] : null;
+    
         return new JsonResponse($messagesArray);
     }
 
@@ -484,15 +495,18 @@ class ChatController extends AbstractController
     /**
      * Get unread message count for a chat
      */
-    private function getUnreadCount($chat, $user): int
+    private function getUnreadCount($chat): int
     {
+        //$teacher = "null";
         return $this->messageChatRepository->createQueryBuilder('m')
             ->select('COUNT(m.id)')
             ->where('m.subjectChat = :chat')
-            ->andWhere('m.sender != :user')
+            //->andWhere('m.teacherPersona != :teacher')
+            //->andWhere('m.sender != :user')
             ->andWhere('m.isRead = :isRead')
             ->setParameter('chat', $chat)
-            ->setParameter('user', $user)
+           // ->setParameter('teacher', $teacher)
+           // ->setParameter('user', $user)
             ->setParameter('isRead', false)
             ->getQuery()
             ->getSingleScalarResult();

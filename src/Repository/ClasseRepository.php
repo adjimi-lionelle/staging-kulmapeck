@@ -63,4 +63,31 @@ class ClasseRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+
+    /**
+     * Récupère toutes les classes qui se terminent par "A4 ESP"
+     */
+    public function findAllA4ESP(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.name')
+            ->where('c.name LIKE :esp')
+            ->setParameter('esp', '%ESP')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Récupère toutes les classes qui se terminent par "A4 ALL"
+     */
+    public function findAllA4ALL(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.name')
+            ->where('c.name LIKE :all')
+            ->setParameter('all', '%ALL')
+            ->getQuery()
+            ->getResult();
+    }
 }

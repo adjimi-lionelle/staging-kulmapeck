@@ -11,6 +11,7 @@ use App\Repository\MatiereCycleRepository;
 use App\Repository\NotificationRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\RetraitRepository;
+use App\Repository\ClasseRepository;
 use App\Repository\UserRepository;
 use App\Service\SendAllUsersEmailService;
 use App\Utils\Keys;
@@ -52,7 +53,7 @@ class PaymentControllers extends AbstractController
     public function handleCallback(Request $request, NotificationRepository $notificationRepository,
      UserRepository $userRepository, NetworkConfigRepository $networkConfigRepository,
       EleveRepository $eleveRepository, PaymentRepository $paymentRepository, RetraitRepository $retraitRepository, EntityManagerInterface $em,
-      MatiereCycleRepository $MatiereCycleRepository):JsonResponse   {
+      MatiereCycleRepository $MatiereCycleRepository, ClasseRepository $classeRepository):JsonResponse   {
         // Check if Kulmapeck  sender's IP address
 	   /* $senderIp = $request->getClientIp();
 	  
@@ -82,7 +83,7 @@ class PaymentControllers extends AbstractController
                 $eleve->setIsPremium(true);
                 //$payment->getEleve()->setIsPremium(true);
                 $eleveRepository->save($eleve, true);
-                $this->manageSubjectChats($eleve, $em, $MatiereCycleRepository);
+                $this->manageSubjectChats($eleve, $em, $MatiereCycleRepository, $classeRepository);
             }elseif ($payment->getCours() !== null) {
                 $eleve->addCour($payment->getCours());
             }
@@ -130,8 +131,6 @@ class PaymentControllers extends AbstractController
             }
         }
 
-        // Return a response if needed
-//	return new Response('Callback received successfully');
 	return new JsonResponse(['message' => 'Callback received successfully'], 200);
 
     }
@@ -157,107 +156,109 @@ class PaymentControllers extends AbstractController
         }
     }
 
-   private function manageSubjectChats($eleve,$entityManager,$MatiereCycleRepository): void
+    private function manageSubjectChats($eleve, $entityManager, $MatiereCycleRepository, $classeRepository): void
     {
         // Récupérer la classe et le cycle de l'élève
         $classe = $eleve->getClasse();
         if (!$classe || !$classe->getSkillLevel()) {
-            return; // Si la classe ou le niveau de compétence n'est pas défini, on arrête
+            echo " Classe ou niveau de compétence non défini. Arrêt du traitement.<br>";
+            return;
         }
-
-        $skill_level = $classe->getSkillLevel()->getId();
-        if($classe->getSpecialite()){
+    
+        $matieres = []; 
+        $classesA4ESP = array_map(fn($c) => $c['name'], $classeRepository->findAllA4ESP());
+        $classesA4ALL = array_map(fn($c) => $c['name'], $classeRepository->findAllA4ALL());
+    
+        if ($classe->getSpecialite()) {
             $specialite = $classe->getSpecialite()->getId();
+            
             if ($specialite == 1 || $specialite == 2) {
-                $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
+                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
                     ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
                     ->setParameter('cycle1', 2)
                     ->setParameter('cycle2', 21)
                     ->getQuery()
-                    ->getResult();
-            } elseif($specialite == 4 && ($classe->getName() == 'Seconde A4 ESP - 2nde A4 ESP' || $classe->getName() == 'Première A4 ESP - 1ère A4 ESP' || $classe->getName() == 'Terminale A4 ESP - Tle A4 ESP')) {
-                $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
-                ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                ->setParameter('cycle1', 2)
-                ->setParameter('cycle2', 22)
-                ->getQuery()
-                ->getResult();
-            } elseif($specialite == 4 && ($classe->getName() == 'Seconde A4 ALL - 2nde  A4 ALL' || $classe->getName() == 'Première A4 ALL - 1ère A4 ALL' || $classe->getName() == 'Terminale A4 ALL - Tle A4 ALL')) {
-                $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
-                ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                ->setParameter('cycle1', 2)
-                ->setParameter('cycle2', 23)
-                ->getQuery()
-                ->getResult();
-            } 
+                    ->getResult());
+            } elseif ($specialite == 4 && in_array($classe->getName(), $classesA4ESP)) {
+                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
+                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                    ->setParameter('cycle1', 2)
+                    ->setParameter('cycle2', 22)
+                    ->getQuery()
+                    ->getResult());
+            } elseif ($specialite == 4 && in_array($classe->getName(), $classesA4ALL)) {
+                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
+                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                    ->setParameter('cycle1', 2)
+                    ->setParameter('cycle2', 23)
+                    ->getQuery()
+                    ->getResult());
+            }
         }
-       
-        //var_dump($specialite); die();
-            
-            if ($skill_level == 1 || $skill_level == 2) {
-                $matieres = $MatiereCycleRepository->findBy(['cycle' => 1]);
-            } elseif ($skill_level == 3 || $skill_level == 4) {
-                if($classe->getName() == "Quatrième ALL- 4ème ALL" || $classe->getName() == "Troisième ALL- 3ème ALL" || $classe->getName() == "Troisième Bilingue Allemand- 3ème BIL. ALL"){
-                    $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
+        
+
+        $skill_level = $classe->getSkillLevel()->getId();
+    
+        if ($skill_level == 1 || $skill_level == 2) {
+            $matieres = array_merge($matieres, $MatiereCycleRepository->findBy(['cycle' => 1]));
+        } elseif ($skill_level == 3 || $skill_level == 4) {
+            if (in_array($classe->getName(), $classesA4ALL)) {
+                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
                     ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
                     ->setParameter('cycle1', 1)
                     ->setParameter('cycle2', 11)
                     ->getQuery()
-                    ->getResult();
-                } elseif ($classe->getName() == "Quatrième ESP- 4ème ESP" || $classe->getName() == "Troisième ESP- 3ème ESP" || $classe->getName() == "Troisième Bilingue Espagnol- 3ème BIL. ESP"){
-                    $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
+                    ->getResult());
+            } elseif (in_array($classe->getName(), $classesA4ESP)) {
+                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
                     ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
                     ->setParameter('cycle1', 1)
                     ->setParameter('cycle2', 12)
                     ->getQuery()
-                    ->getResult();
-                } elseif ($classe->getName() == "Troisième Chinois- 3ème Chinois"){
-                    $matieres = $MatiereCycleRepository->createQueryBuilder('sc')
+                    ->getResult());
+            } elseif ($classe->getName() == "Troisième Chinois- 3ème Chinois") {
+                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
                     ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
                     ->setParameter('cycle1', 1)
                     ->setParameter('cycle2', 14)
                     ->getQuery()
-                    ->getResult();
-                }
-            
-            } else {
-                return;
+                    ->getResult());
             }
-
-        // Récupérer toutes les matières liées à son cycle
-        //$matieres = $entityManager->getRepository(Categorie::class)->findBy(['cycle' => $cycle]);
-
+        }
+    
+        if (empty($matieres)) {
+            echo " Aucune matière trouvée pour cet élève.<br>";
+            return;
+        }
+    
         foreach ($matieres as $matiere) {
-            // Vérifier si un SubjectChat existe déjà pour cette matière et cet élève
+            if (!$matiere->getMatiere()) {
+                echo " Matière non définie pour ID : " . $matiere->getId() . "<br>";
+                continue;
+            }
+    
             $existingSubjectChat = $entityManager->getRepository(SubjectChat::class)
                 ->findOneBy(['eleve' => $eleve, 'matiere' => $matiere->getMatiere()]);
-
+    
             if ($existingSubjectChat) {
-                // Mettre à jour la date de dernière activité pour réactiver la discussion
                 $existingSubjectChat->setCreatedAt(new \DateTimeImmutable());
                 $entityManager->persist($existingSubjectChat);
             } else {
-                // Créer un nouveau SubjectChat pour cette matière
                 $subjectChat = new SubjectChat();
                 $subjectChat->setEleve($eleve);
                 $subjectChat->setMatiere($matiere->getMatiere());
                 $subjectChat->setCycle($matiere->getCycle());
-                $subjectChat->setName($matiere->getName());
+                $subjectChat->setName($matiere->getMatiere()->getName());
                 $subjectChat->setCreatedAt(new \DateTimeImmutable());
-
-                // Récupérer un enseignant par défaut pour cette matière (si applicable)
-           /* $teacherPersona = $entityManager->getRepository(Enseignant::class)->findOneBy(['matiere' => $matiere]);
-                if ($teacherPersona) {
-                    $subjectChat->setTeacherPersona($teacherPersona);
-                }*/
-
-             $entityManager->persist($subjectChat);
+    
+                $entityManager->persist($subjectChat);
             }
         }
-
-        // Exécuter les changements en base de données
+    
         $entityManager->flush();
+       
     }
+    
 
 
 }

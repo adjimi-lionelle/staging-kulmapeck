@@ -17,6 +17,7 @@ framework:
     #fragments: true
     php_errors:
         log: true
+    trusted_proxies: '0.0.0.0/0'    
 
 when@test:
     framework:
