@@ -3,30 +3,7 @@
 {% block title %} - Courses{% endblock %}
 
 {% block script %}
-	<script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Disable right-click on the entire page
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            });
-            
-            // Disable keyboard shortcuts for saving
-            document.addEventListener('keydown', function(e) {
-                // Ctrl+S or Command+S
-                if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.keyCode === 83)) {
-                    e.preventDefault();
-                    return false;
-                }
-                
-                // Ctrl+P or Command+P (print)
-                if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.keyCode === 80)) {
-                    e.preventDefault();
-                    return false;
-                }
-            });
-        });
-    </script>
+	
 {% endblock %}
 
 {% block mainContent %}
@@ -86,65 +63,7 @@
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
-                                            <iframe id="examFrame" src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0" height="800px" width="100%" frameborder="0" style="overflow: auto;" oncontextmenu="return false;"></iframe>
-                                            
-                                            <script>
-                                                document.addEventListener('DOMContentLoaded', function() {
-                                                    var examFrame = document.getElementById('examFrame');
-                                                    
-                                                    // Prevent right-click on the iframe
-                                                    examFrame.addEventListener('contextmenu', function(e) {
-                                                        e.preventDefault();
-                                                        return false;
-                                                    });
-                                                    
-                                                    // Also prevent context menu in the parent document
-                                                    document.addEventListener('contextmenu', function(e) {
-                                                        if (e.target === examFrame || examFrame.contains(e.target)) {
-                                                            e.preventDefault();
-                                                            return false;
-                                                        }
-                                                    });
-                                                    
-                                                    // Disable keyboard shortcuts that could be used to download/print
-                                                    document.addEventListener('keydown', function(e) {
-                                                        // Ctrl+S, Ctrl+P, Ctrl+Shift+S
-                                                        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'p' || e.keyCode === 83 || e.keyCode === 80)) {
-                                                            e.preventDefault();
-                                                            return false;
-                                                        }
-                                                    });
-                                                    
-                                                    // Create a tooltip element to show when right-clicking
-                                                    var tooltip = document.createElement('div');
-                                                    tooltip.style.position = 'fixed';
-                                                    tooltip.style.background = 'rgba(0,0,0,0.8)';
-                                                    tooltip.style.color = 'white';
-                                                    tooltip.style.padding = '5px 10px';
-                                                    tooltip.style.borderRadius = '3px';
-                                                    tooltip.style.zIndex = '1000';
-                                                    tooltip.style.fontSize = '14px';
-                                                    tooltip.style.pointerEvents = 'none';
-                                                    tooltip.style.opacity = '0';
-                                                    tooltip.style.transition = 'opacity 0.3s';
-                                                    tooltip.innerText = 'Le téléchargement n\'est pas autorisé';
-                                                    document.body.appendChild(tooltip);
-                                                    
-                                                    // Show tooltip on right click
-                                                    document.addEventListener('mousedown', function(e) {
-                                                        if (e.button === 2 && (e.target === examFrame || examFrame.contains(e.target))) {
-                                                            tooltip.style.left = (e.clientX + 10) + 'px';
-                                                            tooltip.style.top = (e.clientY + 10) + 'px';
-                                                            tooltip.style.opacity = '1';
-                                                            
-                                                            // Hide tooltip after a delay
-                                                            setTimeout(function() {
-                                                                tooltip.style.opacity = '0';
-                                                            }, 1500);
-                                                        }
-                                                    });
-                                                });
-                                            </script>
+                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0" height="800px" frameborder="0" style="pointer-events: auto; overflow: scroll;" oncontextmenu="return false;"></iframe>
                                         </div>
                                     </div>
                                 </div>

@@ -207,4 +207,26 @@ class ChatServer implements MessageComponentInterface
         return trim($text);
     }
 
+    private function cleanAIMessage(string $text): string
+/*{
+    // Supprime les emojis
+    $text = preg_replace('/[\x{1F600}-\x{1F64F}]/u', '', $text); // Émoticons
+    $text = preg_replace('/[\x{1F300}-\x{1F5FF}]/u', '', $text); // Symboles & pictos divers
+    $text = preg_replace('/[\x{1F680}-\x{1F6FF}]/u', '', $text); // Transport & map
+    $text = preg_replace('/[\x{2600}-\x{26FF}]/u', '', $text);   // Symboles divers
+    $text = preg_replace('/[\x{2700}-\x{27BF}]/u', '', $text);   // Dingbats
+
+    // Supprime les astérisques
+    $text = str_replace('*', '', $text);
+
+    // Ajoute un retour à la ligne avant chaque tiret de liste (s'il n'y en a pas déjà un)
+    $text = preg_replace('/(?<!\n)- /', "\n- ", $text);
+
+    // Ajoute un retour à la ligne avant chaque numéro de liste (ex: 1), 2), etc.)
+    $text = preg_replace('/(?<!\n)(\d+\))/', "\n$1", $text);
+
+    return trim($text);
+}*/
+
+
 }
