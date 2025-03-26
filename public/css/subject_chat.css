@@ -25,9 +25,9 @@
   --font-size-sm: 0.85rem;
   --font-size-md: 1rem;
   --font-size-lg: 1.25rem;
-  --chat-color-blue: #09139f;
-  --chat-color-orange: #fd7e14;
-  --send-button-color: #09139f;
+  --chat-color-blue: #3355cc;
+  --chat-color-orange: #ee8834;
+  --send-button-color: #3355cc;
 }
 
 /* Dark mode variables */
