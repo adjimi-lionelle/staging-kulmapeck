@@ -51,7 +51,7 @@ class DeepSeekAIService
             return $data['choices'][0]['message']['content'];
         } catch (\Exception $e) {
             $this->logger->error('DeepSeek API error: ' . $e->getMessage());
-            return 'Sorry, I am having trouble connecting to my knowledge base. Please try again later.';
+            return 'Oups, je ne peux pas répondre pour le moment. Il semble que votre connexion internet ne soit pas bonne. Veuillez réessayer dans quelques secondes ';
         }
     }
     
@@ -60,7 +60,7 @@ class DeepSeekAIService
         $messages = [
             [
                 'role' => 'system',
-                'content' => "You are an AI teacher specialized in $subject. Provide accurate, helpful, and educational responses to student questions. Keep explanations clear, concise, and appropriate for students. Always give brief, to-the-point answers in 3 sentences or less when possible. Focus only on the most important information. If you don't know something, admit it rather than providing incorrect information.Go to line when the answer contains enumerations"
+                'content' => "You are an AI teacher specialized in $subject. Provide accurate, helpful, and educational responses to student questions. Keep explanations clear, concise, and appropriate for students. Always give brief, to-the-point answers in 3 sentences or less when possible. Focus only on the most important information. If you don't know something, admit it rather than providing incorrect information."
             ]
         ];
         

@@ -78,10 +78,11 @@ class AIMessageHandler
                 $class
                 //$username
             );
+            $content = $this->cleanAIMessage($aiResponse);
            // echo "IA RESPONSE : " . $aiResponse . "\n";
             // Create and save AI message
             $message = new MessageChat();
-            $message->setContent($aiResponse);
+            $message->setContent($content);
             $message->setSender($user); // Use the same user but mark as AI
             $message->setSubjectChat($subjectChat);
             $message->setIsRead(false);
@@ -93,7 +94,7 @@ class AIMessageHandler
             $this->entityManager->flush();
             
             return [
-                'message' => $aiResponse,
+                'message' => $content,
                 'author' => 'AI Teacher',
                 'isFromAI' => true,
                 'timestamp' => $message->getCreateAt()->format('c')
@@ -112,5 +113,29 @@ class AIMessageHandler
     {
         // For now, we'll enable AI for all chats
         return true;
+    }
+
+    private function cleanAIMessage(string $text): string
+    {
+        // Supprime les emojis
+        $text = preg_replace('/[\x{1F600}-\x{1F64F}]/u', '', $text);
+        $text = preg_replace('/[\x{1F300}-\x{1F5FF}]/u', '', $text);
+        $text = preg_replace('/[\x{1F680}-\x{1F6FF}]/u', '', $text);
+        $text = preg_replace('/[\x{2600}-\x{26FF}]/u', '', $text);
+        $text = preg_replace('/[\x{2700}-\x{27BF}]/u', '', $text);
+    
+        // Supprime les astérisques
+        $text = str_replace('*', '', $text);
+    
+        // Ajoute un retour à la ligne avant les formes d’énumération (avec gestion des espaces)
+        $text = preg_replace('/\s*-\s+/', "\n- ", $text);        // Tiret court
+        $text = preg_replace('/\s*–\s+/', "\n– ", $text);        // Tiret long
+        $text = preg_replace('/\s*(\d+\))/', "\n$1", $text);     // Numérotation style 1)
+        $text = preg_replace('/\s*(\d+\.)/', "\n$1", $text);     // Numérotation style 1.
+    
+        // Rendre les sauts de ligne visibles dans du HTML
+        $text = nl2br(trim($text));
+    
+        return $text;
     }
 }

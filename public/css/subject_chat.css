@@ -822,36 +822,6 @@ emoji-picker {
   }
 }
 
-/*.message {
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  max-width: 70%;
-}
-
-.message.sent {
-  background-color: #ddd7d7;
-  color: black;
-  align-self: flex-end;
-  text-align: right;
-}
-
-.message.received {
-  background-color: #31c07d;
-  color: white;
-  align-self: flex-start;
-  text-align: left;
-}
-
-.message.assistant {
-  background-color: #4a3999;
-  color: white;
-  font-weight: bold;
-  border-left: 5px solid #4a3999;
-  align-self: flex-start;
-  border-bottom-left-radius: 0;
-}*/
-
 /* Conteneur principal du message */
 .message-container {
   display: flex;
@@ -915,4 +885,12 @@ emoji-picker {
 .message p {
   margin: 0;
   line-height: 1.3; /* Espacement optimal entre les lignes */
+  text-align: justify;
+  /*white-space: pre-wrap;*/
+}
+
+@media screen and (max-width: 600px) {
+  .message p {
+    font-size: 14px;
+  }
 }
