@@ -206,11 +206,13 @@
 }
 
 .chat-item:nth-child(odd) .avatar-placeholder {
-  background-color: rgba(9, 19, 159, 0.8); /* More transparent blue */
+  background-color: rgba(9, 19, 159, 0.85); /* Transparent blue */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .chat-item:nth-child(even) .avatar-placeholder {
-  background-color: rgba(253, 126, 20, 0.8); /* More transparent orange */
+  background-color: rgba(253, 126, 20, 0.85); /* Transparent orange */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .chat-item-avatar {

@@ -84,23 +84,12 @@ document.addEventListener("DOMContentLoaded", function () {
             chatItem.className = "chat-item";
             chatItem.dataset.subjectId = subject.id;
 
-            // Get the subject initials for the avatar (up to 2 letters)
-            let initials = '';
-            const nameParts = subject.name.split(' ');
-            
-            if (nameParts.length > 1) {
-                // For multi-word names, take first letter of first and second word
-                initials = nameParts[0].charAt(0) + nameParts[1].charAt(0);
-            } else {
-                // For single word names, take first two letters
-                initials = subject.name.substring(0, 2);
-            }
-            
-            initials = initials.toUpperCase();
+            // Get the initials based on the subject name
+            const subjectInitials = getSubjectInitials(subject.name);
 
             chatItem.innerHTML = `
                 <div class="chat-item-avatar">
-                    <div class="avatar-placeholder rounded-circle">${initials}</div>
+                    <div class="avatar-placeholder rounded-circle">${subjectInitials}</div>
                 </div>
                 <div class="chat-item-info">
                     <div class="chat-item-name">${subject.name}</div>
@@ -121,6 +110,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
             subjectList.appendChild(chatItem);
         });
+    }
+
+    /**
+     * Get subject initials (two letters) from the subject name
+     * @param {string} name - The subject name
+     * @returns {string} - The initials (1-2 characters)
+     */
+    function getSubjectInitials(name) {
+        if (!name) return "?";
+        
+        // Split the name by spaces
+        const words = name.split(/\s+/);
+        
+        if (words.length >= 2) {
+            // If there are at least two words, take the first letter of each
+            return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+        } else if (words[0].length >= 2) {
+            // If there's only one word, take the first two letters
+            return words[0].substring(0, 2).toUpperCase();
+        } else {
+            // Fallback to the first letter if the word is only one character
+            return words[0].charAt(0).toUpperCase();
+        }
     }
 
     // Sélectionner un sujet et établir la connexion WebSocket
@@ -519,21 +531,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Update the avatar placeholder
         const avatarPlaceholder = chatHeader.querySelector('.avatar-placeholder');
         if (avatarPlaceholder) {
-            // Get the subject initials for the avatar (up to 2 letters)
-            let initials = '';
-            const nameParts = subjectName.split(' ');
-            
-            if (nameParts.length > 1) {
-                // For multi-word names, take first letter of first and second word
-                initials = nameParts[0].charAt(0) + nameParts[1].charAt(0);
-            } else {
-                // For single word names, take first two letters
-                initials = subjectName.substring(0, 2);
-            }
-            
-            initials = initials.toUpperCase();
-
-            avatarPlaceholder.textContent = initials;
+            avatarPlaceholder.textContent = subjectName.charAt(0).toUpperCase();
         }
         
         // Hide the online status
@@ -658,3 +656,4 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }, 500); // Vérifie la connexion toutes les 500ms jusqu'à ce que WebSocket soit ouvert
     }
+        
