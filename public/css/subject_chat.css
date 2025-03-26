@@ -1,18 +1,18 @@
 /* Base styles and variables */
 :root {
-  --primary-color: #4f7cff;
-  --primary-hover: #3867e0;
+  --primary-color: rgba(79, 124, 255, 0.9);
+  --primary-hover: rgba(56, 103, 224, 0.9);
   --text-color: #000;
   --text-secondary: #6c757d;
   --border-color: #f0f0f0;
   --bg-light: #f8f9fa;
   --bg-white: #fff;
   --shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-  --ai-message-bg: #e6f7ff;
-  --ai-message-border: #91d5ff;
-  --ai-message-color: #1890ff;
+  --ai-message-bg: rgba(230, 247, 255, 0.9);
+  --ai-message-border: rgba(145, 213, 255, 0.9);
+  --ai-message-color: rgba(24, 144, 255, 0.9);
   --ai-message-text-color: #000;
-  --ai-message-author-color: #1890ff;
+  --ai-message-author-color: rgba(24, 144, 255, 0.9);
   --border-radius-sm: 10px;
   --border-radius-md: 16px;
   --border-radius-lg: 20px;
@@ -25,9 +25,9 @@
   --font-size-sm: 0.85rem;
   --font-size-md: 1rem;
   --font-size-lg: 1.25rem;
-  --chat-color-blue: #09139f;
-  --chat-color-orange: #fd7e14;
-  --send-button-color: #09139f;
+  --chat-color-blue: rgba(9, 19, 159, 0.7);
+  --chat-color-orange: rgba(253, 126, 20, 0.7);
+  --send-button-color: rgba(9, 19, 159, 0.7);
 }
 
 /* Dark mode variables */
@@ -38,11 +38,11 @@
   --bg-light: #212529;
   --bg-white: #343a40;
   --shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  --ai-message-bg: #1a3a4a;
-  --ai-message-border: #2a617e;
-  --ai-message-color: #4dabf7;
+  --ai-message-bg: rgba(26, 58, 74, 0.9);
+  --ai-message-border: rgba(42, 97, 126, 0.9);
+  --ai-message-color: rgba(77, 171, 247, 0.9);
   --ai-message-text-color: #e9ecef;
-  --ai-message-author-color: #4dabf7;
+  --ai-message-author-color: rgba(77, 171, 247, 0.9);
 }
 
 /* Global styles */
@@ -206,13 +206,13 @@
 }
 
 .chat-item:nth-child(odd) .avatar-placeholder {
-  background-color: rgba(9, 19, 159, 0.85); /* Transparent blue */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: rgba(9, 19, 159, 0.7); /* More muted blue */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .chat-item:nth-child(even) .avatar-placeholder {
-  background-color: rgba(253, 126, 20, 0.85); /* Transparent orange */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: rgba(253, 126, 20, 0.7); /* More muted orange */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .chat-item-avatar {
@@ -313,8 +313,9 @@
   justify-content: center;
   font-weight: 600;
   color: var(--bg-white);
-  background-color: #09139f;
+  background-color: rgba(9, 19, 159, 0.7);
   border-radius: var(--border-radius-full);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .chat-header-details {
@@ -510,16 +511,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--send-button-color);
+  background-color: rgba(9, 19, 159, 0.7);
   color: var(--bg-white);
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .btn-send:hover {
-  background-color: var(--send-button-color);
-  opacity: 0.9;
+  background-color: rgba(9, 19, 159, 0.8);
 }
 
 /* AI Message Styling */
@@ -878,7 +879,7 @@ emoji-picker {
 
 /* Message de l'élève (à droite) */
 .message.sent {
-  background-color: #ddd7d7;
+  background-color: rgba(221, 215, 215, 0.9);
   color: black;
   text-align: right;
   border-bottom-right-radius: 0;
@@ -887,7 +888,7 @@ emoji-picker {
 
 /* Message de l'IA (à gauche) */
 .message.assistant {
-  background-color: #4a3999; /* Violet */
+  background-color: rgba(74, 57, 153, 0.9); /* Violet */
   color: white;
   font-weight: bold;
   text-align: left;
