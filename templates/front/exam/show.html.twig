@@ -86,7 +86,8 @@
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
-                                            <div id="pdf-container" style="width: 100%; height: 800px; overflow: auto;">
+                                            <div id="pdf-container" class="screenshot-protection" style="width: 100%; height: 800px; overflow: auto; position: relative;">
+                                                <div class="floating-watermark"></div>
                                                 <canvas id="pdfCanvas"></canvas>
                                             </div>
                                         </div>
@@ -155,8 +156,10 @@
     <script>
         // Prevent keyboard shortcuts for saving/printing
         document.addEventListener("keydown", function(event) {
-            if (event.ctrlKey && (event.key === "s" || event.key === "p" || event.key === "u" || 
-                                event.keyCode === 83 || event.keyCode === 80 || event.keyCode === 85)) {
+            // Block common shortcuts: Ctrl+S, Ctrl+P, Ctrl+U, PrintScreen
+            if ((event.ctrlKey && (event.key === "s" || event.key === "p" || event.key === "u" || 
+                                event.keyCode === 83 || event.keyCode === 80 || event.keyCode === 85)) ||
+                (event.key === "PrintScreen" || event.keyCode === 44)) {
                 event.preventDefault();
                 return false;
             }
@@ -167,6 +170,89 @@
             e.preventDefault();
             return false;
         });
+
+        // Detect clipboard events (triggered by screenshots)
+        document.addEventListener('copy', function(e) {
+            e.preventDefault();
+            e.clipboardData.setData('text/plain', 'Copier le contenu est interdit par kulmapeck');
+            return false;
+        });
+        
+        // Detect DevTools opening (which might be used for screenshots)
+        setInterval(function() {
+            if (window.outerHeight - window.innerHeight > 100 || window.outerWidth - window.innerWidth > 100) {
+                // Instead of replacing content, show a warning overlay
+                showScreenshotWarning();
+            }
+        }, 1000);
+        
+        // Create random moving watermarks to make screenshots less useful
+        function createMovingWatermarks() {
+            var watermarkElement = document.querySelector('.floating-watermark');
+            var container = document.getElementById('pdf-container');
+            var containerWidth = container.offsetWidth;
+            var containerHeight = container.offsetHeight;
+            
+            // Set username if available or default text
+            var username = "{{ app.user ? app.user.username : 'NON AUTORISE' }}";
+            var timestamp = new Date().toLocaleString();
+            
+            // Create multiple semi-transparent watermarks
+            var watermarks = [];
+            for (var i = 0; i < 15; i++) {
+                var watermark = document.createElement('div');
+                watermark.className = 'dynamic-watermark';
+                watermark.innerText = username + ' - ' + timestamp;
+                watermark.style.position = 'absolute';
+                watermark.style.color = 'rgba(255, 0, 0, 0.15)';
+                watermark.style.zIndex = '1000';
+                watermark.style.pointerEvents = 'none';
+                watermark.style.fontSize = '14px';
+                watermark.style.transform = 'rotate(' + (Math.random() * 90 - 45) + 'deg)';
+                
+                // Random position
+                watermark.style.left = Math.random() * containerWidth + 'px';
+                watermark.style.top = Math.random() * containerHeight + 'px';
+                
+                container.appendChild(watermark);
+                watermarks.push(watermark);
+            }
+            
+            // Periodically move watermarks
+            setInterval(function() {
+                watermarks.forEach(function(watermark) {
+                    watermark.style.left = Math.random() * containerWidth + 'px';
+                    watermark.style.top = Math.random() * containerHeight + 'px';
+                    watermark.style.transform = 'rotate(' + (Math.random() * 90 - 45) + 'deg)';
+                });
+            }, 3000);
+        }
+        
+        // Show warning when screenshot is detected
+        function showScreenshotWarning() {
+            var warningExists = document.getElementById('screenshot-warning');
+            if (!warningExists) {
+                var warning = document.createElement('div');
+                warning.id = 'screenshot-warning';
+                warning.style.position = 'fixed';
+                warning.style.top = '50%';
+                warning.style.left = '50%';
+                warning.style.transform = 'translate(-50%, -50%)';
+                warning.style.backgroundColor = 'rgba(255, 0, 0, 0.9)';
+                warning.style.color = 'white';
+                warning.style.padding = '20px';
+                warning.style.borderRadius = '5px';
+                warning.style.zIndex = '9999';
+                warning.style.textAlign = 'center';
+                warning.innerHTML = '<h3>Capture d\'écran détectée!</h3><p>La capture d\'écran n\'est pas autorisée sur Kulmapeck.</p>';
+                document.body.appendChild(warning);
+                
+                // Auto-dismiss after a few seconds
+                setTimeout(function() {
+                    document.body.removeChild(warning);
+                }, 3000);
+            }
+        }
         
         // Initialize PDF.js worker
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
@@ -222,6 +308,47 @@
         }
         
         // Run the renderer when the page loads
-        document.addEventListener('DOMContentLoaded', renderPDF);
+        document.addEventListener('DOMContentLoaded', function() {
+            renderPDF();
+            createMovingWatermarks();
+            
+            // Listen for print screen key
+            window.addEventListener('keyup', function(e) {
+                if (e.key === 'PrintScreen' || e.keyCode === 44) {
+                    showScreenshotWarning();
+                }
+            });
+        });
     </script>
+    
+    <style>
+        /* CSS to make screenshots less useful */
+        .screenshot-protection {
+            position: relative;
+        }
+        
+        .screenshot-protection::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='watermark' width='300' height='300' patternUnits='userSpaceOnUse'%3E%3Ctext x='50' y='150' font-family='Arial' font-size='20' fill='rgba(200, 0, 0, 0.05)' transform='rotate(-45 150 150)'%3EKulmapeck%3C/text%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23watermark)'/%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+        
+        @media print {
+            /* Prevent printing */
+            body * {
+                display: none !important;
+            }
+            body:after {
+                content: "L'impression n'est pas autorisée";
+                display: block !important;
+            }
+        }
+    </style>
 {% endblock %}
