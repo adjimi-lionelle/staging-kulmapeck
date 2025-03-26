@@ -86,12 +86,9 @@
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
-                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0" 
-                                                   height="800px" 
-                                                   frameborder="0" 
-                                                   style="width: 100%;" 
-                                                   oncontextmenu="return false;">
-                                            </iframe>
+                                            <div id="pdf-container" style="width: 100%; height: 800px; overflow: auto;">
+                                                <canvas id="pdfCanvas"></canvas>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -154,6 +151,7 @@
 
 {% block javascripts %}
 {{ parent() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
     <script>
         // Prevent keyboard shortcuts for saving/printing
         document.addEventListener("keydown", function(event) {
@@ -164,12 +162,66 @@
             }
         });
         
-        // Target right-clicks on the iframe specifically
-        var examFrame = document.querySelector('iframe');
-        if (examFrame) {
-            examFrame.oncontextmenu = function() { 
-                return false; 
-            };
+        // Prevent right-click on the canvas
+        document.getElementById('pdf-container').addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // Initialize PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+        
+        // PDF rendering function
+        function renderPDF() {
+            var url = "{{ asset('uploads/media/exams/files/' ~ data) }}";
+            
+            // Load the PDF
+            pdfjsLib.getDocument(url).promise.then(function(pdf) {
+                var numPages = pdf.numPages;
+                var container = document.getElementById('pdf-container');
+                var canvas = document.getElementById('pdfCanvas');
+                var ctx = canvas.getContext('2d');
+                
+                // Initial scale - can be adjusted
+                var scale = 1.5;
+                
+                // Keep track of which page we're on
+                var currentPage = 1;
+                
+                // Function to render a specific page
+                function renderPage(pageNum) {
+                    // Get the page
+                    pdf.getPage(pageNum).then(function(page) {
+                        var viewport = page.getViewport({scale: scale});
+                        
+                        // Set canvas dimensions to match the page
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        
+                        // Render the page
+                        var renderContext = {
+                            canvasContext: ctx,
+                            viewport: viewport
+                        };
+                        
+                        page.render(renderContext).promise.then(function() {
+                            if (pageNum < numPages) {
+                                // If there are more pages, increase canvas height and render next page
+                                canvas.height = canvas.height + viewport.height;
+                                renderPage(pageNum + 1);
+                            }
+                        });
+                    });
+                }
+                
+                // Start rendering with page 1
+                renderPage(1);
+            }).catch(function(error) {
+                console.error("Error loading PDF: " + error);
+            });
         }
+        
+        // Run the renderer when the page loads
+        document.addEventListener('DOMContentLoaded', renderPDF);
     </script>
 {% endblock %}
