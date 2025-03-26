@@ -84,16 +84,18 @@ document.addEventListener("DOMContentLoaded", function () {
             chatItem.className = "chat-item";
             chatItem.dataset.subjectId = subject.id;
 
-            // Create two-letter initials for the subject
+            // Get the subject initials for the avatar (up to 2 letters)
             let initials = '';
             const nameParts = subject.name.split(' ');
+            
             if (nameParts.length > 1) {
-                // For multi-word subjects, take first letter of each word (up to 2)
+                // For multi-word names, take first letter of first and second word
                 initials = nameParts[0].charAt(0) + nameParts[1].charAt(0);
             } else {
-                // For single-word subjects, take first two letters
+                // For single word names, take first two letters
                 initials = subject.name.substring(0, 2);
             }
+            
             initials = initials.toUpperCase();
 
             chatItem.innerHTML = `
@@ -514,21 +516,23 @@ document.addEventListener("DOMContentLoaded", function () {
             headerNameElement.textContent = subjectName;
         }
         
-        // Create two-letter initials for the subject
-        let initials = '';
-        const nameParts = subjectName.split(' ');
-        if (nameParts.length > 1) {
-            // For multi-word subjects, take first letter of each word (up to 2)
-            initials = nameParts[0].charAt(0) + nameParts[1].charAt(0);
-        } else {
-            // For single-word subjects, take first two letters
-            initials = subjectName.substring(0, 2);
-        }
-        initials = initials.toUpperCase();
-        
         // Update the avatar placeholder
         const avatarPlaceholder = chatHeader.querySelector('.avatar-placeholder');
         if (avatarPlaceholder) {
+            // Get the subject initials for the avatar (up to 2 letters)
+            let initials = '';
+            const nameParts = subjectName.split(' ');
+            
+            if (nameParts.length > 1) {
+                // For multi-word names, take first letter of first and second word
+                initials = nameParts[0].charAt(0) + nameParts[1].charAt(0);
+            } else {
+                // For single word names, take first two letters
+                initials = subjectName.substring(0, 2);
+            }
+            
+            initials = initials.toUpperCase();
+
             avatarPlaceholder.textContent = initials;
         }
         
@@ -654,4 +658,3 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }, 500); // Vérifie la connexion toutes les 500ms jusqu'à ce que WebSocket soit ouvert
     }
-        

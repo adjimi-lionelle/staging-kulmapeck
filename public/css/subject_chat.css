@@ -25,9 +25,9 @@
   --font-size-sm: 0.85rem;
   --font-size-md: 1rem;
   --font-size-lg: 1.25rem;
-  --chat-color-blue: #3355cc;
-  --chat-color-orange: #ee8834;
-  --send-button-color: #3355cc;
+  --chat-color-blue: #09139f;
+  --chat-color-orange: #fd7e14;
+  --send-button-color: #09139f;
 }
 
 /* Dark mode variables */
@@ -206,11 +206,11 @@
 }
 
 .chat-item:nth-child(odd) .avatar-placeholder {
-  background-color: var(--chat-color-blue);
+  background-color: rgba(9, 19, 159, 0.8); /* More transparent blue */
 }
 
 .chat-item:nth-child(even) .avatar-placeholder {
-  background-color: var(--chat-color-orange);
+  background-color: rgba(253, 126, 20, 0.8); /* More transparent orange */
 }
 
 .chat-item-avatar {
