@@ -86,7 +86,12 @@
                                 <div class="card-img-overlay d-flex align-items-center p-2 p-sm-4"> 
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
-                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0&navpanes=0" height="800px" frameborder="0" style="width: 100%; overflow: scroll;" sandbox="allow-same-origin allow-scripts" oncontextmenu="return false;"></iframe>
+                                            <iframe src="{{ asset('uploads/media/exams/files/' ~ data) }}#toolbar=0" 
+                                                   height="800px" 
+                                                   frameborder="0" 
+                                                   style="width: 100%;" 
+                                                   oncontextmenu="return false;">
+                                            </iframe>
                                         </div>
                                     </div>
                                 </div>
@@ -150,12 +155,6 @@
 {% block javascripts %}
 {{ parent() }}
     <script>
-        // Prevent right-click on the entire page
-        document.addEventListener("contextmenu", function(event) {
-            event.preventDefault();
-            return false;
-        });
-
         // Prevent keyboard shortcuts for saving/printing
         document.addEventListener("keydown", function(event) {
             if (event.ctrlKey && (event.key === "s" || event.key === "p" || event.key === "u" || 
@@ -165,20 +164,12 @@
             }
         });
         
-        // Add custom message when attempting to use right-click
+        // Target right-clicks on the iframe specifically
         var examFrame = document.querySelector('iframe');
         if (examFrame) {
-            examFrame.addEventListener('load', function() {
-                try {
-                    var frameDoc = examFrame.contentDocument || examFrame.contentWindow.document;
-                    frameDoc.addEventListener('contextmenu', function(e) {
-                        e.preventDefault();
-                        return false;
-                    });
-                } catch(e) {
-                    console.log("Could not attach event to iframe content due to security restrictions");
-                }
-            });
+            examFrame.oncontextmenu = function() { 
+                return false; 
+            };
         }
     </script>
 {% endblock %}
