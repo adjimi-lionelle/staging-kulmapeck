@@ -1,4 +1,3 @@
-
 var subjectList;
 var chatMessages;
 var chatContainer;
@@ -85,9 +84,12 @@ document.addEventListener("DOMContentLoaded", function () {
             chatItem.className = "chat-item";
             chatItem.dataset.subjectId = subject.id;
 
+            // Get the initials based on the subject name
+            const subjectInitials = getSubjectInitials(subject.name);
+
             chatItem.innerHTML = `
                 <div class="chat-item-avatar">
-                    <div class="avatar-placeholder rounded-circle">${subject.name.charAt(0).toUpperCase()}</div>
+                    <div class="avatar-placeholder rounded-circle">${subjectInitials}</div>
                 </div>
                 <div class="chat-item-info">
                     <div class="chat-item-name">${subject.name}</div>
@@ -108,6 +110,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
             subjectList.appendChild(chatItem);
         });
+    }
+
+    /**
+     * Get subject initials (two letters) from the subject name
+     * @param {string} name - The subject name
+     * @returns {string} - The initials (1-2 characters)
+     */
+    function getSubjectInitials(name) {
+        if (!name) return "?";
+        
+        // Split the name by spaces
+        const words = name.split(/\s+/);
+        
+        if (words.length >= 2) {
+            // If there are at least two words, take the first letter of each
+            return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+        } else if (words[0].length >= 2) {
+            // If there's only one word, take the first two letters
+            return words[0].substring(0, 2).toUpperCase();
+        } else {
+            // Fallback to the first letter if the word is only one character
+            return words[0].charAt(0).toUpperCase();
+        }
     }
 
     // Sélectionner un sujet et établir la connexion WebSocket
@@ -632,4 +657,3 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 500); // Vérifie la connexion toutes les 500ms jusqu'à ce que WebSocket soit ouvert
     }
         
-

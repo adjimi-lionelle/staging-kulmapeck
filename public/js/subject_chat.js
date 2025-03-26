@@ -140,48 +140,86 @@ document.addEventListener('DOMContentLoaded', function() {
      * Render subjects in sidebar
      */
     function renderSubjects(subjects) {
-        console.log("DEBUG: renderSubjects() called with", subjects);
+        console.log("DEBUG: Rendering subjects:", subjects);
         
-        if (!Array.isArray(subjects)) {
-            console.error("DEBUG: Subjects data is not an array", subjects);
+        if (!subjectList) {
+            console.error("DEBUG ERROR: Subject list element not found!");
             return;
         }
         
         subjectList.innerHTML = "";
         
-        subjects.forEach((subject) => {
+        if (!subjects || subjects.length === 0) {
+            console.log("DEBUG: No subjects to display");
+            subjectList.innerHTML = `
+                <div class="empty-state text-center p-4">
+                    <i class="bi bi-chat-left-text" style="font-size: 48px; color: #6c757d;"></i>
+                    <p class="mt-3 text-muted">No subjects available</p>
+                </div>
+            `;
+            return;
+        }
+        
+        subjects.forEach(subject => {
+            // Get the initials based on the subject name
+            const subjectInitials = getSubjectInitials(subject.name);
+            
             const chatItem = document.createElement("div");
             chatItem.className = "chat-item";
             chatItem.dataset.subjectId = subject.id;
             
             chatItem.innerHTML = `
                 <div class="chat-item-avatar">
-                    <div class="avatar-placeholder rounded-circle">${subject.name.charAt(0).toUpperCase()}</div>
+                    <div class="avatar-placeholder rounded-circle">${subjectInitials}</div>
                 </div>
                 <div class="chat-item-info">
                     <div class="chat-item-name">${subject.name}</div>
-                    <div class="chat-item-preview">${subject.lastMessage || "Start chatting..."}</div>
+                    <div class="chat-item-preview">${subject.lastMessage || "Commencez le chat..."}</div>
                 </div>
+                ${subject.unreadCount > 0 ? `
+                    <div class="chat-item-meta">
+                        <div class="chat-item-badge">${subject.unreadCount}</div>
+                    </div>
+                ` : ''}
             `;
             
-            chatItem.addEventListener("click", () => {
-                document.querySelectorAll(".chat-item").forEach(item => item.classList.remove("active"));
+            chatItem.addEventListener("click", function() {
+                // Remove active class from all items
+                document.querySelectorAll(".chat-item").forEach(item => {
+                    item.classList.remove("active");
+                });
+                
+                // Add active class to clicked item
                 chatItem.classList.add("active");
+                
+                // Select the subject
                 selectSubject(subject.id);
             });
             
             subjectList.appendChild(chatItem);
         });
+    }
+
+    /**
+     * Get subject initials (two letters) from the subject name
+     * @param {string} name - The subject name
+     * @returns {string} - The initials (1-2 characters)
+     */
+    function getSubjectInitials(name) {
+        if (!name) return "?";
         
-        // If no subjects, show empty state
-        if (subjects.length === 0) {
-            const emptyState = document.createElement('div');
-            emptyState.className = 'empty-subjects text-center p-4';
-            emptyState.innerHTML = `
-                <i class="bi bi-book" style="font-size: 48px; color: #6c757d;"></i>
-                <p class="mt-3 text-muted">No subjects available</p>
-            `;
-            subjectList.appendChild(emptyState);
+        // Split the name by spaces
+        const words = name.split(/\s+/);
+        
+        if (words.length >= 2) {
+            // If there are at least two words, take the first letter of each
+            return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
+        } else if (words[0].length >= 2) {
+            // If there's only one word, take the first two letters
+            return words[0].substring(0, 2).toUpperCase();
+        } else {
+            // Fallback to the first letter if the word is only one character
+            return words[0].charAt(0).toUpperCase();
         }
     }
     
@@ -555,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <i class="bi bi-arrow-left"></i> ${backButtonText}
                 </button>
                 <div class="chat-header-avatar">
-                    <div class="avatar-placeholder rounded-circle">${subjectName.charAt(0).toUpperCase()}</div>
+                    <div class="avatar-placeholder rounded-circle">${getSubjectInitials(subjectName)}</div>
                 </div>
                 <div class="chat-header-info">
                     <div class="chat-header-name">${subjectName}</div>
