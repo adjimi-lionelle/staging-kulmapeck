@@ -207,8 +207,8 @@ class ChatServer implements MessageComponentInterface
         return trim($text);
     }
 
-    private function cleanAIMessage(string $text): string
-/*{
+/*    private function cleanAIMessage(string $text): string
+{
     // Supprime les emojis
     $text = preg_replace('/[\x{1F600}-\x{1F64F}]/u', '', $text); // Émoticons
     $text = preg_replace('/[\x{1F300}-\x{1F5FF}]/u', '', $text); // Symboles & pictos divers
@@ -227,6 +227,5 @@ class ChatServer implements MessageComponentInterface
 
     return trim($text);
 }*/
-
 
 }
