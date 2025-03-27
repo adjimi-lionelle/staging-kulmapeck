@@ -171,35 +171,35 @@
             return false;
         });
 
-        // Detect clipboard events (triggered by screenshots)
-        var lastCopyEvent = 0;
-        document.getElementById('pdf-container').addEventListener('copy', function(e) {
-            // Prevent rapid-fire copy events by using a cooldown period
-            var now = new Date().getTime();
-            if (now - lastCopyEvent < 2000) { // 2 second cooldown
-                return;
-            }
-            lastCopyEvent = now;
-            
-            e.preventDefault();
-            e.clipboardData.setData('text/plain', 'Copier le contenu est interdit par kulmapeck');
-            return false;
-        });
-        
-        // Replace the global copy event with a more selective approach
-        // document.addEventListener('copy', function(e) {
-        //    e.preventDefault();
-        //    e.clipboardData.setData('text/plain', 'Copier le contenu est interdit par kulmapeck');
-        //    return false;
-        // });
-        
-        // Detect DevTools opening (which might be used for screenshots)
-        setInterval(function() {
-            if (window.outerHeight - window.innerHeight > 100 || window.outerWidth - window.innerWidth > 100) {
-                // Instead of replacing content, show a warning overlay
+        // ONLY detect actual PrintScreen key events
+        window.addEventListener('keyup', function(e) {
+            if (e.key === 'PrintScreen' || e.keyCode === 44) {
                 showScreenshotWarning();
             }
-        }, 1000);
+        });
+        
+        // Comment out the clipboard detection that might be causing false positives
+        // var lastCopyEvent = 0;
+        // document.getElementById('pdf-container').addEventListener('copy', function(e) {
+        //     // Prevent rapid-fire copy events by using a cooldown period
+        //     var now = new Date().getTime();
+        //     if (now - lastCopyEvent < 2000) { // 2 second cooldown
+        //         return;
+        //     }
+        //     lastCopyEvent = now;
+            
+        //     e.preventDefault();
+        //     e.clipboardData.setData('text/plain', 'Copier le contenu est interdit par kulmapeck');
+        //     return false;
+        // });
+        
+        // Comment out DevTools detection which might trigger false positives
+        // setInterval(function() {
+        //     if (window.outerHeight - window.innerHeight > 100 || window.outerWidth - window.innerWidth > 100) {
+        //         // Instead of replacing content, show a warning overlay
+        //         showScreenshotWarning();
+        //     }
+        // }, 1000);
         
         // Create random moving watermarks to make screenshots less useful
         function createMovingWatermarks() {
@@ -217,7 +217,7 @@
             for (var i = 0; i < 15; i++) {
                 var watermark = document.createElement('div');
                 watermark.className = 'dynamic-watermark';
-                watermark.innerText = username + ' - kulmapeck.com';
+                watermark.innerText = 'www.kulmapeck.com';
                 watermark.style.position = 'absolute';
                 watermark.style.color = 'rgba(255, 0, 0, 0.15)';
                 watermark.style.zIndex = '1000';
@@ -326,13 +326,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             renderPDF();
             createMovingWatermarks();
-            
-            // Listen for print screen key
-            window.addEventListener('keyup', function(e) {
-                if (e.key === 'PrintScreen' || e.keyCode === 44) {
-                    showScreenshotWarning();
-                }
-            });
         });
     </script>
     
