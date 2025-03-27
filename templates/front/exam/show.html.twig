@@ -172,7 +172,7 @@
         });
 
         // Detect clipboard events (triggered by screenshots)
-        document.addEventListener('copy', function(e) {
+        document.getElementById('pdf-container').addEventListener('copy', function(e) {
             e.preventDefault();
             e.clipboardData.setData('text/plain', 'Copier le contenu est interdit par kulmapeck');
             return false;
@@ -244,7 +244,7 @@
                 warning.style.borderRadius = '5px';
                 warning.style.zIndex = '9999';
                 warning.style.textAlign = 'center';
-                warning.innerHTML = '<h3>Capture d\'écran détectée!</h3><p>La capture d\'écran n\'est pas autorisée sur Kulmapeck.</p>';
+                warning.innerHTML = '<h3>Capture d\'écran détectée!</h3><p>La capture d\'écran n\'est pas autorisée sur Kulmapeck.com.</p>';
                 document.body.appendChild(warning);
                 
                 // Auto-dismiss after a few seconds
