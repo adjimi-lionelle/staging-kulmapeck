@@ -22,13 +22,13 @@ final class Version20250306201704 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
       
 
-        $this->addSql('ALTER TABLE message_chat ADD teacher_persona_id INT NOT NULL, ADD expires_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', ADD is_moderated TINYINT(1) NOT NULL');
+       /* $this->addSql('ALTER TABLE message_chat ADD teacher_persona_id INT NOT NULL, ADD expires_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', ADD is_moderated TINYINT(1) NOT NULL');
         $this->addSql('ALTER TABLE message_chat ADD CONSTRAINT FK_CC0869737FE72F19 FOREIGN KEY (teacher_persona_id) REFERENCES enseignant (id)');
         $this->addSql('ALTER TABLE subject_chat ADD eleve_id INT NOT NULL, ADD teacher_persona_id INT NOT NULL, DROP type');
         $this->addSql('ALTER TABLE subject_chat ADD CONSTRAINT FK_F7577671A6CC7B2 FOREIGN KEY (eleve_id) REFERENCES eleve (id)');
         $this->addSql('ALTER TABLE subject_chat ADD CONSTRAINT FK_F75776717FE72F19 FOREIGN KEY (teacher_persona_id) REFERENCES enseignant (id)');
         $this->addSql('CREATE INDEX IDX_F7577671A6CC7B2 ON subject_chat (eleve_id)');
-        $this->addSql('CREATE INDEX IDX_F75776717FE72F19 ON subject_chat (teacher_persona_id)');
+        $this->addSql('CREATE INDEX IDX_F75776717FE72F19 ON subject_chat (teacher_persona_id)');*/
     }
 
     public function down(Schema $schema): void

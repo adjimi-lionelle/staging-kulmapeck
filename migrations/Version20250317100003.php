@@ -21,7 +21,7 @@ final class Version20250317100003 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         
-        $this->addSql('ALTER TABLE message_chat CHANGE content content LONGTEXT NOT NULL');
+        //$this->addSql('ALTER TABLE message_chat CHANGE content content LONGTEXT NOT NULL');
     }
 
     public function down(Schema $schema): void
