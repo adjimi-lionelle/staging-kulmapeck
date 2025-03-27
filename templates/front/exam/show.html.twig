@@ -172,11 +172,26 @@
         });
 
         // Detect clipboard events (triggered by screenshots)
+        var lastCopyEvent = 0;
         document.getElementById('pdf-container').addEventListener('copy', function(e) {
+            // Prevent rapid-fire copy events by using a cooldown period
+            var now = new Date().getTime();
+            if (now - lastCopyEvent < 2000) { // 2 second cooldown
+                return;
+            }
+            lastCopyEvent = now;
+            
             e.preventDefault();
             e.clipboardData.setData('text/plain', 'Copier le contenu est interdit par kulmapeck');
             return false;
         });
+        
+        // Replace the global copy event with a more selective approach
+        // document.addEventListener('copy', function(e) {
+        //    e.preventDefault();
+        //    e.clipboardData.setData('text/plain', 'Copier le contenu est interdit par kulmapeck');
+        //    return false;
+        // });
         
         // Detect DevTools opening (which might be used for screenshots)
         setInterval(function() {
@@ -244,7 +259,7 @@
                 warning.style.borderRadius = '5px';
                 warning.style.zIndex = '9999';
                 warning.style.textAlign = 'center';
-                warning.innerHTML = '<h3>Capture d\'écran détectée!</h3><p>La capture d\'écran n\'est pas autorisée sur Kulmapeck.com.</p>';
+                warning.innerHTML = '<h3>Capture d\'écran détectée!</h3><p>La capture d\'écran n\'est pas autorisée sur Kulmapeck.</p>';
                 document.body.appendChild(warning);
                 
                 // Auto-dismiss after a few seconds
