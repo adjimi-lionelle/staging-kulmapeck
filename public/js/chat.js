@@ -299,12 +299,32 @@ document.addEventListener("DOMContentLoaded", function () {
             socket.close();
         }  
 
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+       /* const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
 
         const wsUrl = isLocal
             ? `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`
-            : `${protocol}//pay-kulmapeck.online/ws?token=${token}&subjectChat_id=${subjectId}`;
+            : `${protocol}//pay-kulmapeck.online/ws?token=${token}&subjectChat_id=${subjectId}`;*/
+
+            const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+            const hostname = window.location.hostname;
+            const isLocal = hostname === "127.0.0.1" || hostname === "localhost";
+
+            let wsHost;
+
+            if (isLocal) {
+                wsHost = "127.0.0.1:8085";
+            } else if (hostname === "pay-kulmapeck.online" || hostname === "www.pay-kulmapeck.online") {
+                wsHost = "pay-kulmapeck.online";
+            } else if (hostname === "kulmapeck.com" || hostname === "www.kulmapeck.com") {
+                wsHost = "kulmapeck.com";
+            } else {
+                // Par défaut en production si autre domaine
+                wsHost = hostname;
+            }
+
+            const wsUrl = `${protocol}//${wsHost}/ws?token=${token}&subjectChat_id=${subjectId}`;
+
 
         console.log(`DEBUG: WebSocket URL -> ${wsUrl}`); 
         socket = new WebSocket(wsUrl);
