@@ -171,9 +171,34 @@
             return false;
         });
 
-        // ONLY detect actual PrintScreen key events
+        // ONLY detect actual PrintScreen key events (desktop)
         window.addEventListener('keyup', function(e) {
             if (e.key === 'PrintScreen' || e.keyCode === 44) {
+                showScreenshotWarning();
+            }
+        });
+        
+        // Mobile screenshot detection (limited capabilities)
+        // iOS sometimes triggers visibilitychange during screenshots
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden' || document.visibilityState === 'visible') {
+                // Only trigger if on a mobile device
+                if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                    // This might be a screenshot attempt on iOS
+                    // Use a debounce to prevent false positives
+                    if (window.mobileScreenshotTimeout) {
+                        clearTimeout(window.mobileScreenshotTimeout);
+                    }
+                    window.mobileScreenshotTimeout = setTimeout(function() {
+                        showScreenshotWarning();
+                    }, 300);
+                }
+            }
+        });
+        
+        // Detect fullscreen changes which might indicate screenshot preparations on some devices
+        document.addEventListener('fullscreenchange', function() {
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
                 showScreenshotWarning();
             }
         });
