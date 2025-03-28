@@ -93,7 +93,7 @@ class SubjectChatService
                     ->setParameter('cycle2', 12)
                     ->getQuery()
                     ->getResult());
-            } elseif ($classe->getName() == "Troisième Chinois- 3ème Chinois") {
+            } elseif (in_array($classe->getName(), $classesChinois)) {
                 $matieres = array_merge($matieres, $this->matiereCycleRepository->createQueryBuilder('sc')
                     ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
                     ->setParameter('cycle1', 1)
