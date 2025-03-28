@@ -14,6 +14,7 @@ use App\Repository\RetraitRepository;
 use App\Repository\ClasseRepository;
 use App\Repository\UserRepository;
 use App\Service\SendAllUsersEmailService;
+use App\Service\SubjectChatService;
 use App\Utils\Keys;
 use App\Utils\ManageNetwork;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,13 +35,15 @@ class PaymentControllers extends AbstractController
     private $cacert;
     private $apiUrl;
     private $sendAllUsersEmailService;
+    private $subjectChatService;
 
 
-    public function __construct(Keys $apiKeys,SendAllUsersEmailService $sendAllUsersEmailService)
+    public function __construct(Keys $apiKeys,SendAllUsersEmailService $sendAllUsersEmailService, SubjectChatService $subjectChatService)
     {
         $this->sendAllUsersEmailService = $sendAllUsersEmailService;
         $this->privateKey = $apiKeys->getPrivateKey();
         $this->cacert = $apiKeys->getCacert();
+        $this->subjectChatService = $subjectChatService;
         //$this->apiUrl = $_ENV['API_PAY_URL'];
         $this->apiUrl = 'https://staging-kulmapeck.online/api/pay/';
 
@@ -83,7 +86,7 @@ class PaymentControllers extends AbstractController
                 $eleve->setIsPremium(true);
                 //$payment->getEleve()->setIsPremium(true);
                 $eleveRepository->save($eleve, true);
-                $this->manageSubjectChats($eleve, $em, $MatiereCycleRepository, $classeRepository);
+                $this->subjectChatService->manageSubjectChats($eleve);
             }elseif ($payment->getCours() !== null) {
                 $eleve->addCour($payment->getCours());
             }
@@ -154,109 +157,6 @@ class PaymentControllers extends AbstractController
         } else {
             return new JsonResponse('Email could not be sent. Mailer Error: ');
         }
-    }
-
-    private function manageSubjectChats($eleve, $entityManager, $MatiereCycleRepository, $classeRepository): void
-    {
-        // Récupérer la classe et le cycle de l'élève
-        $classe = $eleve->getClasse();
-        if (!$classe || !$classe->getSkillLevel()) {
-            echo " Classe ou niveau de compétence non défini. Arrêt du traitement.<br>";
-            return;
-        }
-    
-        $matieres = []; 
-        $classesA4ESP = array_map(fn($c) => $c['name'], $classeRepository->findAllA4ESP());
-        $classesA4ALL = array_map(fn($c) => $c['name'], $classeRepository->findAllA4ALL());
-    
-        if ($classe->getSpecialite()) {
-            $specialite = $classe->getSpecialite()->getId();
-            
-            if ($specialite == 1 || $specialite == 2) {
-                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
-                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                    ->setParameter('cycle1', 2)
-                    ->setParameter('cycle2', 21)
-                    ->getQuery()
-                    ->getResult());
-            } elseif ($specialite == 4 && in_array($classe->getName(), $classesA4ESP)) {
-                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
-                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                    ->setParameter('cycle1', 2)
-                    ->setParameter('cycle2', 22)
-                    ->getQuery()
-                    ->getResult());
-            } elseif ($specialite == 4 && in_array($classe->getName(), $classesA4ALL)) {
-                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
-                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                    ->setParameter('cycle1', 2)
-                    ->setParameter('cycle2', 23)
-                    ->getQuery()
-                    ->getResult());
-            }
-        }
-        
-
-        $skill_level = $classe->getSkillLevel()->getId();
-    
-        if ($skill_level == 1 || $skill_level == 2) {
-            $matieres = array_merge($matieres, $MatiereCycleRepository->findBy(['cycle' => 1]));
-        } elseif ($skill_level == 3 || $skill_level == 4) {
-            if (in_array($classe->getName(), $classesA4ALL)) {
-                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
-                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                    ->setParameter('cycle1', 1)
-                    ->setParameter('cycle2', 11)
-                    ->getQuery()
-                    ->getResult());
-            } elseif (in_array($classe->getName(), $classesA4ESP)) {
-                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
-                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                    ->setParameter('cycle1', 1)
-                    ->setParameter('cycle2', 12)
-                    ->getQuery()
-                    ->getResult());
-            } elseif ($classe->getName() == "Troisième Chinois- 3ème Chinois") {
-                $matieres = array_merge($matieres, $MatiereCycleRepository->createQueryBuilder('sc')
-                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
-                    ->setParameter('cycle1', 1)
-                    ->setParameter('cycle2', 14)
-                    ->getQuery()
-                    ->getResult());
-            }
-        }
-    
-        if (empty($matieres)) {
-            echo " Aucune matière trouvée pour cet élève.<br>";
-            return;
-        }
-    
-        foreach ($matieres as $matiere) {
-            if (!$matiere->getMatiere()) {
-                echo " Matière non définie pour ID : " . $matiere->getId() . "<br>";
-                continue;
-            }
-    
-            $existingSubjectChat = $entityManager->getRepository(SubjectChat::class)
-                ->findOneBy(['eleve' => $eleve, 'matiere' => $matiere->getMatiere()]);
-    
-            if ($existingSubjectChat) {
-                $existingSubjectChat->setCreatedAt(new \DateTimeImmutable());
-                $entityManager->persist($existingSubjectChat);
-            } else {
-                $subjectChat = new SubjectChat();
-                $subjectChat->setEleve($eleve);
-                $subjectChat->setMatiere($matiere->getMatiere());
-                $subjectChat->setCycle($matiere->getCycle());
-                $subjectChat->setName($matiere->getMatiere()->getName());
-                $subjectChat->setCreatedAt(new \DateTimeImmutable());
-    
-                $entityManager->persist($subjectChat);
-            }
-        }
-    
-        $entityManager->flush();
-       
     }
     
 

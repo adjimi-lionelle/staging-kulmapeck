@@ -14,6 +14,7 @@ use App\Repository\CategorieRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\MessageChatRepository;
 use App\Service\DeepSeekAIService;
+use App\Service\SubjectChatService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -36,21 +37,28 @@ class ChatController extends AbstractController
     private JWTTokenManagerInterface $jwtManager;
     private RequestStack $requestStack;
     private DeepSeekAIService $aiService;
+    private $subjectChatService;
 
     public function __construct(string $jwtSecret,
     private EleveRepository $eleveRepository,
     private SubjectChatRepository $subjectChatRepository,
-    private MessageChatRepository $messageChatRepository,
+    private MatiereCycleRepository $matiereCycleRepository,
+    private MessageChatRepository $messageChatRepository,   
+    private ClasseRepository $classeRepository,
     private EntityManagerInterface $entityManager,
     DeepSeekAIService $aiService,
+    SubjectChatService $subjectChatService,
     RequestStack $requestStack)
     {
         
         $this->jwtSecret = $jwtSecret;
         $this->subjectChatRepository = $subjectChatRepository;
+        $this->matiereCycleRepository = $matiereCycleRepository;
+        $this->classeRepository = $classeRepository;
         $this->requestStack = $requestStack;
         $this->entityManager = $entityManager;
         $this->aiService = $aiService;
+        $this->subjectChatService = $subjectChatService;
     }  
 
     
@@ -94,6 +102,7 @@ class ChatController extends AbstractController
         // Check if premium status is required
         $isPremium = $student->isIsPremium();
         
+        
         // If profile is incomplete or not premium, show setup modal
         if (!$isProfileComplete || !$isPremium) {
             return $this->render('student/chat/index.html.twig', [
@@ -102,7 +111,10 @@ class ChatController extends AbstractController
                 'isProfileComplete' => $isProfileComplete
             ]);
         }
+
         
+      $this->subjectChatService->manageSubjectChats($student);
+
         return $this->render('student/chat/index.html.twig');
     }
 
