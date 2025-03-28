@@ -90,4 +90,17 @@ class ClasseRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Récupère toutes les classes qui se terminent par "Chinois"
+     */
+    public function findAllChinois(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c.name')
+            ->where('c.name LIKE :chinois')
+            ->setParameter('chinois', '%Chinois')
+            ->getQuery()
+            ->getResult();
+    }
 }

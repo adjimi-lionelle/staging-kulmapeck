@@ -36,6 +36,7 @@ class SubjectChatService
         $matieres = [];
         $classesA4ESP = array_map(fn($c) => $c['name'], $this->classeRepository->findAllA4ESP());
         $classesA4ALL = array_map(fn($c) => $c['name'], $this->classeRepository->findAllA4ALL());
+        $classesChinois = array_map(fn($c) => $c['name'], $this->classeRepository->findAllChinois());
 
         // Logique pour ajouter des matières selon la spécialité
         if ($classe->getSpecialite()) {
@@ -60,6 +61,13 @@ class SubjectChatService
                     ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
                     ->setParameter('cycle1', 2)
                     ->setParameter('cycle2', 23)
+                    ->getQuery()
+                    ->getResult());
+            } elseif ($specialite == 4 && in_array($classe->getName(), $classesChinois)) {
+                $matieres = array_merge($matieres, $this->matiereCycleRepository->createQueryBuilder('sc')
+                    ->where('sc.cycle = :cycle1 OR sc.cycle = :cycle2')
+                    ->setParameter('cycle1', 2)
+                    ->setParameter('cycle2', 25)
                     ->getQuery()
                     ->getResult());
             }
