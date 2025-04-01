@@ -901,15 +901,16 @@ emoji-picker {
 .message-actions {
   display: none;
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background-color: rgba(255, 255, 255, 0.9);
+  top: 5px;
+  right: 15px;
+  background-color: rgba(255, 255, 255, 0.95);
   border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   z-index: 10;
+  padding: 3px;
 }
 
-.message-container:hover .message-actions {
+.message:hover .message-actions {
   display: flex;
 }
 
@@ -919,23 +920,29 @@ emoji-picker {
   padding: 6px;
   cursor: pointer;
   color: #666;
-  transition: color 0.2s;
+  transition: color 0.2s, transform 0.1s;
+  margin: 0 2px;
 }
 
 .message-action-btn:hover {
   color: #000;
+  transform: scale(1.2);
+}
+
+.message-action-btn i {
+  font-size: 16px;
 }
 
 .message-action-btn.edit:hover {
-  color: #007bff;
+  color: #007bff; /* Blue for edit */
 }
 
 .message-action-btn.delete:hover {
-  color: #dc3545;
+  color: #dc3545; /* Red for delete */
 }
 
 .message-action-btn.copy:hover {
-  color: #28a745;
+  color: #28a745; /* Green for copy */
 }
 
 /* Message editing */

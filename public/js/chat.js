@@ -272,9 +272,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="message-header">
                     <span class="message-date">${messageDate}</span>
                 </div>
+                ${!isFromAI && isOwnMessage ? 
+                `<div class="message-actions">
+                    <button class="message-action-btn edit" title="Edit"><i class="bi bi-pencil"></i></button>
+                    <button class="message-action-btn copy" title="Copy"><i class="bi bi-clipboard"></i></button>
+                    <button class="message-action-btn delete" title="Delete"><i class="bi bi-trash"></i></button>
+                </div>` : ''}
                 <p class="message-content">${messageContent}</p>
                 ${msg.edited ? '<div class="message-edited">Edited</div>' : ''}
-                ${messageActions}
             `;
 
             messageContainer.appendChild(messageElement);
@@ -349,10 +354,15 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="message-header">
                 <span class="message-date">${messageDate}</span>
             </div>
+            ${!isFromAI ? 
+            `<div class="message-actions">
+                <button class="message-action-btn edit" title="Edit"><i class="bi bi-pencil"></i></button>
+                <button class="message-action-btn copy" title="Copy"><i class="bi bi-clipboard"></i></button>
+                <button class="message-action-btn delete" title="Delete"><i class="bi bi-trash"></i></button>
+            </div>` : ''}
             <p class="message-content">${messageContent}</p>
-            ${messageActions}
         `;
-        
+
         // Ajouter le message dans son conteneur
         messageContainer.appendChild(messageElement);
         
@@ -394,11 +404,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         
         const messageElement = messageContainer.querySelector('.message');
-        const messageContent = messageContainer.querySelector('.message-content');
-        const originalText = messageContent.textContent;
+        const messageContentElement = messageContainer.querySelector('.message-content');
+        const originalText = messageContentElement.textContent;
         
         // Store original content in data attribute for cancellation
-        messageContent.setAttribute('data-original-content', originalText);
+        messageContentElement.setAttribute('data-original-content', originalText);
         
         // Store reference to the message being edited
         messageBeingEdited = messageContainer;
@@ -407,7 +417,7 @@ document.addEventListener("DOMContentLoaded", function () {
         messageElement.classList.add('editing');
         
         // Replace content with textarea
-        messageContent.innerHTML = `
+        messageContentElement.innerHTML = `
             <textarea class="message-edit-input">${originalText}</textarea>
             <div class="message-edit-actions">
                 <button class="message-edit-btn message-edit-cancel">Cancel</button>
@@ -416,13 +426,13 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         
         // Focus on textarea
-        const textarea = messageContent.querySelector('textarea');
+        const textarea = messageContentElement.querySelector('textarea');
         textarea.focus();
         textarea.setSelectionRange(textarea.value.length, textarea.value.length);
         
         // Add event listeners to buttons
-        const saveBtn = messageContent.querySelector('.message-edit-save');
-        const cancelBtn = messageContent.querySelector('.message-edit-cancel');
+        const saveBtn = messageContentElement.querySelector('.message-edit-save');
+        const cancelBtn = messageContentElement.querySelector('.message-edit-cancel');
         
         saveBtn.addEventListener('click', () => saveEdit(messageContainer, textarea.value, messageData));
         cancelBtn.addEventListener('click', () => cancelEdit(messageContainer));
@@ -451,7 +461,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         
         const messageElement = messageContainer.querySelector('.message');
-        const messageContent = messageContainer.querySelector('.message-content');
+        const messageContentElement = messageContainer.querySelector('.message-content');
         
         // Remove editing class
         messageElement.classList.remove('editing');
@@ -462,8 +472,8 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
         
-        // Update message content 
-        messageContent.innerHTML = newText;
+        // Update message content
+        messageContentElement.textContent = newText;
         
         // Add edited indicator if not already present
         if (!messageContainer.querySelector('.message-edited')) {
@@ -503,24 +513,16 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     function cancelEdit(messageContainer) {
         const messageElement = messageContainer.querySelector('.message');
-        const messageContent = messageContainer.querySelector('.message-content');
+        const messageContentElement = messageContainer.querySelector('.message-content');
         
         // Remove editing class
         messageElement.classList.remove('editing');
         
         // Get the original message data
-        const messageId = messageContainer.dataset.messageId;
-        let originalContent = "";
+        const originalContent = messageContentElement.getAttribute('data-original-content') || "";
         
-        // Try to find the message content in the DOM if we can't get it from messageData
-        const contentElement = messageContainer.querySelector('.message-content');
-        if (contentElement) {
-            // Save the original content before editing
-            originalContent = contentElement.getAttribute('data-original-content') || "";
-        }
-        
-        // If we couldn't find the original content, just use an empty string
-        messageContent.textContent = originalContent || "";
+        // Restore original content
+        messageContentElement.textContent = originalContent;
         
         // Reset messageBeingEdited
         messageBeingEdited = null;
