@@ -75,8 +75,8 @@ class AIMessageHandler
                 $data['message'],
                 $subjectName,
                 $messageHistory,
-                $class
-                //$username
+                $class,
+                $username
             );
             $content = $this->cleanAIMessage($aiResponse);
            // echo "IA RESPONSE : " . $aiResponse . "\n";

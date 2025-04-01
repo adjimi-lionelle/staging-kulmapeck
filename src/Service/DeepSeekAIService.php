@@ -22,10 +22,10 @@ class DeepSeekAIService
         $this->apiKey = $deepseekApiKey;
     }
     
-    public function generateResponse(string $prompt, string $subject, array $messageHistory = []): string
+    public function generateResponse(string $prompt, string $subject, array $messageHistory = [], string $class = '', string $username = ''): string
     {
         // Format conversation history for the AI
-        $messages = $this->formatConversationHistory($messageHistory, $subject);
+        $messages = $this->formatConversationHistory($messageHistory, $subject, $username);
         
         // Add the current prompt
         $messages[] = [
@@ -55,12 +55,14 @@ class DeepSeekAIService
         }
     }
     
-    private function formatConversationHistory(array $messageHistory, string $subject): array
+    private function formatConversationHistory(array $messageHistory, string $subject, string $username = ''): array
     {
+        $personalizedGreeting = $username ? "Always address the student as $username in your responses. " : "";
+        
         $messages = [
             [
                 'role' => 'system',
-                'content' => "You are an AI teacher specialized in $subject. Provide accurate, helpful, and educational responses to student questions. Keep explanations clear, concise, and appropriate for students. Always give brief, to-the-point answers in 3 sentences or less when possible. Focus only on the most important information. If you don't know something, admit it rather than providing incorrect information."
+                'content' => "You are an AI teacher specialized in $subject. {$personalizedGreeting}Provide accurate, helpful, and educational responses to student questions. Keep explanations clear, concise, and appropriate for students. Always give brief, to-the-point answers in 3 sentences or less when possible. Focus only on the most important information. If you don't know something, admit it rather than providing incorrect information."
             ]
         ];
         
