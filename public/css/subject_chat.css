@@ -376,6 +376,7 @@
   flex: 1;
   overflow-y: auto;
   padding: var(--spacing-lg);
+  -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
 }
 
 .message-wrapper {
@@ -740,6 +741,7 @@ emoji-picker {
   .chat-app {
     flex-direction: column;
     position: relative;
+    height: 100vh; /* Full viewport height */
   }
   
   .chat-sidebar {
@@ -747,7 +749,15 @@ emoji-picker {
     min-width: 100%;
     max-width: 100%;
     height: 100%;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Hide any overflow outside of the container */
+  }
+  
+  .sidebar-content {
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: calc(100% - 110px); /* Account for header and search bar */
+    flex: 1;
   }
   
   .sidebar-resizer {
@@ -762,6 +772,15 @@ emoji-picker {
     top: 0;
     left: 0;
     z-index: 10;
+    flex-direction: column;
+  }
+  
+  .chat-body {
+    flex: 1;
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: calc(100% - 120px); /* Account for header and input area */
+    -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+    padding: var(--spacing-md);
   }
   
   .chat-app.chat-active .chat-sidebar {
@@ -803,6 +822,45 @@ emoji-picker {
   
   .message-item {
     max-width: 85%;
+  }
+  
+  .chat-header {
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-white);
+    z-index: 15;
+    flex-shrink: 0;
+  }
+  
+  .mobile-back-button {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: var(--bg-white);
+    flex-shrink: 0;
+  }
+  
+  .chat-input-container {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--bg-white);
+    z-index: 15;
+    flex-shrink: 0;
+    padding: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+  }
+  
+  /* Ensure messages display properly */
+  .message-wrapper {
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  /* Ensure the mobile back button doesn't take up space from the chat window */
+  .chat-app.chat-active .chat-body {
+    padding-top: 10px;
   }
 }
 
