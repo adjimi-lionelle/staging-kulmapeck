@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /**
+    /***
      * Get subject initials (two letters) from the subject name
      * @param {string} name - The subject name
      * @returns {string} - The initials (1-2 characters)
