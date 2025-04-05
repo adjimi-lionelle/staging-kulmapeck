@@ -57,6 +57,8 @@ class DeepSeekAIService
     
     private function formatConversationHistory(array $messageHistory, string $subject, string $username, string $class): array
     {
+        $personalizedGreeting = $username ? "Always address the student as $username in your responses. " : "";
+        
         $messages = [
             [
                 'role' => 'system',

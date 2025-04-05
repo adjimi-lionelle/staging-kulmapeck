@@ -376,6 +376,7 @@
   flex: 1;
   overflow-y: auto;
   padding: var(--spacing-lg);
+  -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
 }
 
 .message-wrapper {
@@ -740,6 +741,7 @@ emoji-picker {
   .chat-app {
     flex-direction: column;
     position: relative;
+    height: 100vh; /* Full viewport height */
   }
   
   .chat-sidebar {
@@ -747,7 +749,15 @@ emoji-picker {
     min-width: 100%;
     max-width: 100%;
     height: 100%;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Hide any overflow outside of the container */
+  }
+  
+  .sidebar-content {
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: calc(100% - 110px); /* Account for header and search bar */
+    flex: 1;
   }
   
   .sidebar-resizer {
@@ -762,6 +772,15 @@ emoji-picker {
     top: 0;
     left: 0;
     z-index: 10;
+    flex-direction: column;
+  }
+  
+  .chat-body {
+    flex: 1;
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: calc(100% - 120px); /* Account for header and input area */
+    -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+    padding: var(--spacing-md);
   }
   
   .chat-app.chat-active .chat-sidebar {
@@ -804,6 +823,45 @@ emoji-picker {
   .message-item {
     max-width: 85%;
   }
+  
+  .chat-header {
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-white);
+    z-index: 15;
+    flex-shrink: 0;
+  }
+  
+  .mobile-back-button {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: var(--bg-white);
+    flex-shrink: 0;
+  }
+  
+  .chat-input-container {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--bg-white);
+    z-index: 15;
+    flex-shrink: 0;
+    padding: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+  }
+  
+  /* Ensure messages display properly */
+  .message-wrapper {
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  /* Ensure the mobile back button doesn't take up space from the chat window */
+  .chat-app.chat-active .chat-body {
+    padding-top: 10px;
+  }
 }
 
 @media (max-width: 576px) {
@@ -828,6 +886,7 @@ emoji-picker {
   width: 100%;
   justify-content: flex-start; /* Par défaut, les messages sont à gauche */
   margin-bottom: 5px; /* Réduit l'espace entre chaque message */
+  position: relative;
 }
 
 /* Alignement des messages envoyés par l'élève à droite */
@@ -845,6 +904,7 @@ emoji-picker {
   display: inline-block; /* Ajuste la hauteur automatiquement */
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Légère ombre pour un effet plus propre */
   transition: all 0.2s ease-in-out; /* Effet fluide */
+  position: relative;
 }
 
 /* Message de l'élève (à droite) */
@@ -893,4 +953,124 @@ emoji-picker {
   .message p {
     font-size: 14px;
   }
+}
+
+/* Message action buttons */
+.message-actions {
+  display: none;
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  padding: 3px;
+}
+
+.message:hover .message-actions {
+  display: flex;
+}
+
+.message-action-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s, transform 0.1s;
+  margin: 0 2px;
+}
+
+.message-action-btn:hover {
+  color: #000;
+  transform: scale(1.2);
+}
+
+.message-action-btn i {
+  font-size: 16px;
+}
+
+.message-action-btn.edit:hover {
+  color: #007bff; /* Blue for edit */
+}
+
+.message-action-btn.delete:hover {
+  color: #dc3545; /* Red for delete */
+}
+
+.message-action-btn.copy:hover {
+  color: #28a745; /* Green for copy */
+}
+
+/* Message editing */
+.message.editing .message-content {
+  background-color: #f8f9fa;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.message-edit-input {
+  width: 100%;
+  min-height: 60px;
+  resize: vertical;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 6px;
+  margin-bottom: 8px;
+}
+
+.message-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.message-edit-btn {
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.message-edit-cancel {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.message-edit-save {
+  background-color: #007bff;
+  color: white;
+}
+
+.message-edited {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* Copy notification */
+.copy-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  z-index: 1000;
+  animation: fadeInOut 2s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Message deleting animation */
+.message-container.deleting {
+  transition: opacity 0.5s ease-out;
 }

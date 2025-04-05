@@ -11,6 +11,11 @@
 {% endblock %}
 
 {% block studentContent %}
+    {% if app.user %}
+        <meta name="current-user-id" content="{{ app.user.id }}">
+        <meta name="current-username" content="{{ app.user.firstName }}">
+    {% endif %}
+    
     {% if needsSetup %}
         {{ include('student/chat/_setup_modal.html.twig') }}
     {% endif %}

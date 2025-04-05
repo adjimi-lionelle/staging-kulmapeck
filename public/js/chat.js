@@ -4,7 +4,7 @@ var chatContainer;
 var currentSubject;
 var socket = null;
 var isMobileView = window.innerWidth <= 768;
-
+var messageBeingEdited = null;
 
 document.addEventListener("DOMContentLoaded", function () {
    
@@ -73,6 +73,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return metaTag ? parseInt(metaTag.getAttribute("content")) : null;
     }
 
+    function getCurrentUsername() {
+        const metaTag = document.querySelector('meta[name="current-username"]');
+        return metaTag ? metaTag.getAttribute("content") : "";
+    }
+
     // Afficher les sujets dans la liste
     function renderSubjects(subjects) {
         
@@ -112,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /**
+    /***
      * Get subject initials (two letters) from the subject name
      * @param {string} name - The subject name
      * @returns {string} - The initials (1-2 characters)
@@ -242,22 +247,342 @@ document.addEventListener("DOMContentLoaded", function () {
             // Création du conteneur
             const messageContainer = document.createElement("div");
             messageContainer.className = containerClass;
+            messageContainer.dataset.messageId = msg.id;
 
             // Création du message
             const messageElement = document.createElement("div");
             messageElement.className = messageClass;
+            
+            // Create message content with personalized greeting if AI message
+            let messageContent = msg.content;
+            
+            // Add message actions for user messages only
+            let messageActions = '';
+            if (!isFromAI && isOwnMessage) {
+                messageActions = `
+                    <div class="message-actions">
+                        <button class="message-action-btn edit" title="Edit"><i class="bi bi-pencil"></i></button>
+                        <button class="message-action-btn copy" title="Copy"><i class="bi bi-clipboard"></i></button>
+                        <button class="message-action-btn delete" title="Delete"><i class="bi bi-trash"></i></button>
+                    </div>
+                `;
+            }
+
             messageElement.innerHTML = `
                 <div class="message-header">
                     <span class="message-date">${messageDate}</span>
                 </div>
-                <p>${msg.content}</p>
+                ${!isFromAI && isOwnMessage ? 
+                `<div class="message-actions">
+                    <button class="message-action-btn edit" title="Edit"><i class="bi bi-pencil"></i></button>
+                    <button class="message-action-btn copy" title="Copy"><i class="bi bi-clipboard"></i></button>
+                    <button class="message-action-btn delete" title="Delete"><i class="bi bi-trash"></i></button>
+                </div>` : ''}
+                <p class="message-content">${messageContent}</p>
+                ${msg.edited ? '<div class="message-edited">Edited</div>' : ''}
             `;
 
             messageContainer.appendChild(messageElement);
             chatMessages.appendChild(messageContainer);
+            
+            // Add event listeners to action buttons if they exist
+            if (!isFromAI && isOwnMessage) {
+                const editBtn = messageElement.querySelector('.edit');
+                const copyBtn = messageElement.querySelector('.copy');
+                const deleteBtn = messageElement.querySelector('.delete');
+                
+                if (editBtn) {
+                    editBtn.addEventListener('click', () => editMessage(messageContainer, msg));
+                }
+                
+                if (copyBtn) {
+                    copyBtn.addEventListener('click', () => copyMessageText(msg.content));
+                }
+                
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => deleteMessage(messageContainer, msg.id));
+                }
+            }
         });
 
         chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
+    }
+
+    function addMessageToChat(messageData, isFromAI = false) {
+
+        console.log("DEBUG: Ajout du message à l'UI:", messageData);
+         chatMessages = document.getElementById("chat-messages");
+        
+        // Déterminer si le message vient de l'IA ou de l'élève
+        const isSentByStudent = !isFromAI;
+        
+        // Création du conteneur pour le message
+        const messageContainer = document.createElement("div");
+        messageContainer.className = isSentByStudent ? "message-container sent" : "message-container assistant";
+        messageContainer.dataset.messageId = messageData.id || Date.now(); // Use timestamp as fallback ID
+        
+        // Création du bloc du message
+        const messageElement = document.createElement("div");
+        messageElement.className = isSentByStudent ? "message sent" : "message assistant";
+        
+        // Format de la date
+        const messageDate = new Date(messageData.timestamp).toLocaleString("fr-FR", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+        
+        // Add personalized greeting if AI message
+        let messageContent = messageData.content;
+        
+        // Add message actions for user messages only
+        let messageActions = '';
+        if (isSentByStudent) {
+            messageActions = `
+                <div class="message-actions">
+                    <button class="message-action-btn edit" title="Edit"><i class="bi bi-pencil"></i></button>
+                    <button class="message-action-btn copy" title="Copy"><i class="bi bi-clipboard"></i></button>
+                    <button class="message-action-btn delete" title="Delete"><i class="bi bi-trash"></i></button>
+                </div>
+            `;
+        }
+        
+        // Contenu du message
+        messageElement.innerHTML = `
+            <div class="message-header">
+                <span class="message-date">${messageDate}</span>
+            </div>
+            ${!isFromAI ? 
+            `<div class="message-actions">
+                <button class="message-action-btn edit" title="Edit"><i class="bi bi-pencil"></i></button>
+                <button class="message-action-btn copy" title="Copy"><i class="bi bi-clipboard"></i></button>
+                <button class="message-action-btn delete" title="Delete"><i class="bi bi-trash"></i></button>
+            </div>` : ''}
+            <p class="message-content">${messageContent}</p>
+        `;
+
+        // Ajouter le message dans son conteneur
+        messageContainer.appendChild(messageElement);
+        
+        // Ajouter au chat
+        chatMessages.appendChild(messageContainer);
+        
+        // Add event listeners to action buttons if they exist
+        if (isSentByStudent) {
+            const editBtn = messageElement.querySelector('.edit');
+            const copyBtn = messageElement.querySelector('.copy');
+            const deleteBtn = messageElement.querySelector('.delete');
+            
+            if (editBtn) {
+                editBtn.addEventListener('click', () => editMessage(messageContainer, messageData));
+            }
+            
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => copyMessageText(messageData.content));
+            }
+            
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => deleteMessage(messageContainer, messageData.id));
+            }
+        }
+        
+        // Scroll automatique vers le bas
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    /**
+     * Edit message
+     * @param {HTMLElement} messageContainer - The message container element
+     * @param {Object} messageData - The message data object
+     */
+    function editMessage(messageContainer, messageData) {
+        // Prevent multiple edit operations
+        if (messageBeingEdited) {
+            cancelEdit(messageBeingEdited);
+        }
+        
+        const messageElement = messageContainer.querySelector('.message');
+        const messageContentElement = messageContainer.querySelector('.message-content');
+        const originalText = messageContentElement.textContent;
+        
+        // Store original content in data attribute for cancellation
+        messageContentElement.setAttribute('data-original-content', originalText);
+        
+        // Store reference to the message being edited
+        messageBeingEdited = messageContainer;
+        
+        // Add editing class
+        messageElement.classList.add('editing');
+        
+        // Replace content with textarea
+        messageContentElement.innerHTML = `
+            <textarea class="message-edit-input">${originalText}</textarea>
+            <div class="message-edit-actions">
+                <button class="message-edit-btn message-edit-cancel">Cancel</button>
+                <button class="message-edit-btn message-edit-save">Save</button>
+            </div>
+        `;
+        
+        // Focus on textarea
+        const textarea = messageContentElement.querySelector('textarea');
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        
+        // Add event listeners to buttons
+        const saveBtn = messageContentElement.querySelector('.message-edit-save');
+        const cancelBtn = messageContentElement.querySelector('.message-edit-cancel');
+        
+        saveBtn.addEventListener('click', () => saveEdit(messageContainer, textarea.value, messageData));
+        cancelBtn.addEventListener('click', () => cancelEdit(messageContainer));
+        
+        // Add event listener for Escape key
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cancelEdit(messageContainer);
+            } else if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveEdit(messageContainer, textarea.value, messageData);
+            }
+        });
+    }
+    
+    /**
+     * Save edited message
+     * @param {HTMLElement} messageContainer - The message container element
+     * @param {string} newText - The new message text
+     * @param {Object} messageData - The original message data
+     */
+    function saveEdit(messageContainer, newText, messageData) {
+        if (!newText.trim()) {
+            alert('Message cannot be empty');
+            return;
+        }
+        
+        const messageElement = messageContainer.querySelector('.message');
+        const messageContentElement = messageContainer.querySelector('.message-content');
+        
+        // Remove editing class
+        messageElement.classList.remove('editing');
+        
+        // If text hasn't changed, just cancel the edit
+        if (newText.trim() === messageData.content) {
+            cancelEdit(messageContainer);
+            return;
+        }
+        
+        // Update message content
+        messageContentElement.textContent = newText;
+        
+        // Add edited indicator if not already present
+        if (!messageContainer.querySelector('.message-edited')) {
+            const editedIndicator = document.createElement('div');
+            editedIndicator.className = 'message-edited';
+            editedIndicator.textContent = 'Edited';
+            messageElement.appendChild(editedIndicator);
+        }
+        
+        // Reset messageBeingEdited
+        messageBeingEdited = null;
+        
+        // Send updated message to server
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            const editedMessage = {
+                type: 'edit_message',
+                message_id: messageData.id,
+                content: newText,
+                subject_id: currentSubject
+            };
+            
+            socket.send(JSON.stringify(editedMessage));
+            
+            // After editing, request a new AI response
+            setTimeout(() => {
+                sendMessage(newText, true);
+            }, 500);
+        } else {
+            console.error('WebSocket not connected, cannot send edited message');
+            showError('Connection lost. Please refresh the page.');
+        }
+    }
+    
+    /**
+     * Cancel message edit
+     * @param {HTMLElement} messageContainer - The message container element
+     */
+    function cancelEdit(messageContainer) {
+        const messageElement = messageContainer.querySelector('.message');
+        const messageContentElement = messageContainer.querySelector('.message-content');
+        
+        // Remove editing class
+        messageElement.classList.remove('editing');
+        
+        // Get the original message data
+        const originalContent = messageContentElement.getAttribute('data-original-content') || "";
+        
+        // Restore original content
+        messageContentElement.textContent = originalContent;
+        
+        // Reset messageBeingEdited
+        messageBeingEdited = null;
+    }
+    
+    /**
+     * Copy message text to clipboard
+     * @param {string} text - The text to copy
+     */
+    function copyMessageText(text) {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                // Show a brief success message
+                const notification = document.createElement('div');
+                notification.className = 'copy-notification';
+                notification.textContent = 'Copied to clipboard';
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy text: ', err);
+                showError('Failed to copy text to clipboard');
+            });
+    }
+    
+    /**
+     * Delete message
+     * @param {HTMLElement} messageContainer - The message container element
+     * @param {string|number} messageId - The message ID
+     */
+    function deleteMessage(messageContainer, messageId) {
+        if (confirm('Are you sure you want to delete this message?')) {
+            // Remove from DOM
+            messageContainer.classList.add('deleting');
+            messageContainer.style.opacity = '0.5';
+            
+            // Send delete request to server
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const deleteRequest = {
+                    type: 'delete_message',
+                    message_id: messageId,
+                    subject_id: currentSubject
+                };
+                
+                socket.send(JSON.stringify(deleteRequest));
+                
+                // Remove from DOM after animation
+                setTimeout(() => {
+                    messageContainer.remove();
+                }, 500);
+            } else {
+                console.error('WebSocket not connected, cannot delete message');
+                showError('Connection lost. Please refresh the page.');
+                messageContainer.classList.remove('deleting');
+                messageContainer.style.opacity = '1';
+            }
+        }
     }
 
     // Obtenir le token WebSocket
@@ -323,8 +648,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 wsHost = hostname;
             }
 
-            const wsUrl = `${protocol}//${wsHost}/ws?token=${token}&subjectChat_id=${subjectId}`;
-
+            const wsUrl = `${protocol}://${wsHost}/ws?token=${token}&subjectChat_id=${subjectId}`;
 
         console.log(`DEBUG: WebSocket URL -> ${wsUrl}`); 
         socket = new WebSocket(wsUrl);
@@ -441,96 +765,55 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function addMessageToChat(messageData, isFromAI = false) {
+    function sendMessage(customText = null, isResend = false) {
+        const messageInput = document.getElementById("message-input");
+        const message = customText || messageInput.value.trim();
 
-        console.log("DEBUG: Ajout du message à l'UI:", messageData);
-         chatMessages = document.getElementById("chat-messages");
-        
-        // Déterminer si le message vient de l'IA ou de l'élève
-        const isSentByStudent = !isFromAI;
-        
-        // Création du conteneur pour le message
-        const messageContainer = document.createElement("div");
-        messageContainer.className = isSentByStudent ? "message-container sent" : "message-container assistant";
-        
-        // Création du bloc du message
-        const messageElement = document.createElement("div");
-        messageElement.className = isSentByStudent ? "message sent" : "message assistant";
-        
-        // Format de la date
-        const messageDate = new Date(messageData.timestamp).toLocaleString("fr-FR", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        });
-        
-        // Contenu du message
-        messageElement.innerHTML = `
-            <div class="message-header">
-                <span class="message-date">${messageDate}</span>
-            </div>
-            <p>${messageData.content}</p>
-        `;
-        
-        // Ajouter le message dans son conteneur
-        messageContainer.appendChild(messageElement);
-        
-        // Ajouter au chat
-        chatMessages.appendChild(messageContainer);
-        
-        // Scroll automatique vers le bas
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function sendMessage() {
-        let messageInput = document.getElementById("message-input");
-        let content = messageInput.value.trim();
-    
-        if (content === "") return;
-    
-        if (!currentSubject) {
-            console.error("DEBUG: Aucun sujet sélectionné (currentSubject manquant) !");
+        if (!message) {
             return;
         }
-    
-        const subjectChatId = parseInt(currentSubject);
-        let messageData = {
-            subject_id: subjectChatId,
-            message: content,
+
+        if (!isResend) {
+            messageInput.value = "";
+        }
+
+        if (!currentSubject) {
+            console.error("DEBUG: Aucun sujet sélectionné");
+            showError("Veuillez sélectionner un sujet avant d'envoyer un message");
+            return;
+        }
+
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+            console.log("DEBUG: WebSocket déconnecté, tentative de reconnexion...");
+            reconnectWebSocket(currentSubject);
+            showError("Connexion perdue, veuillez patienter pendant la reconnexion...");
+            return;
+        }
+        
+        // Créer le message JSON
+        const messageData = {
+            type: "message",
+            subject_id: currentSubject,
+            message: message, // Contenu du message
             timestamp: new Date().toISOString()
         };
-    
-        console.log("DEBUG: État actuel du WebSocket avant envoi :", socket ? socket.readyState : "Socket non défini");
-    
-        if (!socket || socket.readyState !== WebSocket.OPEN) {
-            console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...");
-            let pendingMessages = [];
-            // Ajoute le message à une file d'attente pour qu'il soit envoyé après la reconnexion
-            pendingMessages.push(messageData);
-    
-            // Reconnecte WebSocket et envoie les messages après reconnexion
-           // reconnectWebSocket(subjectChatId);
-           getWebSocketToken(subjectChatId);
-        } else {
-            console.log("DEBUG: Envoi du message via WebSocket");
-            socket.send(JSON.stringify(messageData));
-            
-            // Ajouter le message immédiatement à l'interface utilisateur
-            const optimisticMessageData = {
-                content: content,
-                timestamp: new Date().toISOString(),
-                sender_id: getCurrentUserId(),
-                isFromAI: false
-            };
-            addMessageToChat(optimisticMessageData, false);
-            
-            // Afficher l'indicateur de frappe de l'IA
-           // showAITypingIndicator(); 
+        
+        // Si c'est un message réédité, ne pas l'ajouter à l'interface
+        if (!isResend) {
+            // Afficher le message dans le chat localement
+            addMessageToChat({
+                content: message,
+                timestamp: new Date().toISOString()
+            });
         }
-    
-        messageInput.value = "";
+        
+        // Envoyer le message via WebSocket
+        socket.send(JSON.stringify(messageData));
+        
+        // Afficher l'indicateur de frappe IA
+        showAITypingIndicator();
+        
+        console.log("DEBUG: Message envoyé:", message);
     }
 
     function updateChatHeader(subjectId) {
@@ -676,4 +959,3 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }, 500); // Vérifie la connexion toutes les 500ms jusqu'à ce que WebSocket soit ouvert
     }
-        
