@@ -63,6 +63,33 @@ class ChatServer implements MessageComponentInterface
                 return;
             }
 
+            // Déconnexion de l’ancienne connexion active (même user + même sujet)
+        /*foreach ($this->clients as $client) {
+            $clientUser = $this->clients[$client]['user'];
+            $clientSubject = $this->clients[$client]['subjectChat'];
+
+            if ($clientUser->getId() === $user->getId() && $clientSubject->getId() === $subjectChat->getId()) {
+                echo " Ancienne connexion détectée pour l'utilisateur #$userId sur ce sujet. Déconnexion forcée...\n";
+                
+                $client->send(json_encode([
+                    'type' => 'forced_disconnect',
+                    'message' => 'Tu as été déconnecté car tu t’es connecté ailleurs sur ce sujet.'
+                ]));
+                
+                $client->close();
+                $this->clients->detach($client);
+                break;
+            }
+        }
+
+        // Supprimer la connexion précédente en base (si elle existe)
+        $repo = $this->entityManager->getRepository(WebSocketConnection::class);
+        $oldConnection = $repo->findOneBy(['user' => $user, 'subjectChat' => $subjectChat]);
+        if ($oldConnection) {
+            $this->entityManager->remove($oldConnection);
+            $this->entityManager->flush();
+        }*/
+
             //  Ajout de la nouvelle connexion (uniquement si aucune connexion existante)
             $this->clients->attach($conn, ['user' => $user, 'subjectChat' => $subjectChat]);
             echo "Nouvelle connexion : Utilisateur #{$userId} dans la discussion #{$subjectChatId}.\n";
@@ -177,14 +204,34 @@ class ChatServer implements MessageComponentInterface
         }
     }
 
-    public function onClose(ConnectionInterface $conn)
+    /*public function onClose(ConnectionInterface $conn)
     {
         if (isset($this->clients[$conn])) {
             $userId = $this->clients[$conn]['user']->getId();
             echo "Connexion WebSocket fermée pour l'utilisateur : " . $userId . "\n";
             $this->clients->detach($conn);
         }
+    }*/
+
+    public function onClose(ConnectionInterface $conn)
+    {
+        if (isset($this->clients[$conn])) {
+            $user = $this->clients[$conn]['user'];
+            $subjectChat = $this->clients[$conn]['subjectChat'];
+            echo " Déconnexion WebSocket : Utilisateur #" . $user->getId() . "\n";
+
+            // Supprimer la ligne WebSocketConnection correspondante
+            $repo = $this->entityManager->getRepository(WebSocketConnection::class);
+            $dbConnection = $repo->findOneBy(['user' => $user, 'subjectChat' => $subjectChat]);
+            if ($dbConnection) {
+                $this->entityManager->remove($dbConnection);
+                $this->entityManager->flush();
+            }
+
+            $this->clients->detach($conn);
+        }
     }
+
 
     public function onError(ConnectionInterface $conn, \Exception $e)
     {

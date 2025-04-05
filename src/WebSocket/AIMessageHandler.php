@@ -6,6 +6,7 @@ use App\Entity\SubjectChat;
 use App\Entity\MessageChat;
 use App\Entity\User;
 use App\Repository\SubjectChatRepository;
+use App\Repository\PersonneRepository;
 use App\Repository\MessageChatRepository;
 use App\Service\DeepSeekAIService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,6 +16,7 @@ class AIMessageHandler
 {
     private $entityManager;
     private $subjectChatRepository;
+    private $personneRepository;
     private $messageChatRepository;
     private $aiService;
     private $logger;
@@ -23,11 +25,13 @@ class AIMessageHandler
         EntityManagerInterface $entityManager,
         SubjectChatRepository $subjectChatRepository,
         MessageChatRepository $messageChatRepository,
+        PersonneRepository $personneRepository,
         DeepSeekAIService $aiService,
         LoggerInterface $logger
     ) {
         $this->entityManager = $entityManager;
         $this->subjectChatRepository = $subjectChatRepository;
+        $this->personneRepository = $personneRepository;
         $this->messageChatRepository = $messageChatRepository;
         $this->aiService = $aiService;
         $this->logger = $logger;
@@ -67,7 +71,10 @@ class AIMessageHandler
         
         // Get subject name
         $subjectName = $subjectChat->getName();
-        $username = $user->getUsername();
+        $username1 = $user->getUsername();
+        $username2 = $this->personneRepository->findOneBy(['utilisateur' => $user])->getFirstName();
+        $username  = $username1 ?: $username2;
+
         
         try {
             // Generate AI response
@@ -75,8 +82,9 @@ class AIMessageHandler
                 $data['message'],
                 $subjectName,
                 $messageHistory,
+                $username,
                 $class
-                //$username
+            
             );
             $content = $this->cleanAIMessage($aiResponse);
            // echo "IA RESPONSE : " . $aiResponse . "\n";

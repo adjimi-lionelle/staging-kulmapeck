@@ -22,10 +22,10 @@ class DeepSeekAIService
         $this->apiKey = $deepseekApiKey;
     }
     
-    public function generateResponse(string $prompt, string $subject, array $messageHistory = []): string
+    public function generateResponse(string $prompt, string $subject, array $messageHistory, $username, $class): string
     {
         // Format conversation history for the AI
-        $messages = $this->formatConversationHistory($messageHistory, $subject);
+        $messages = $this->formatConversationHistory($messageHistory, $subject, $username, $class);
         
         // Add the current prompt
         $messages[] = [
@@ -55,12 +55,13 @@ class DeepSeekAIService
         }
     }
     
-    private function formatConversationHistory(array $messageHistory, string $subject): array
+    private function formatConversationHistory(array $messageHistory, string $subject, string $username, string $class): array
     {
         $messages = [
             [
                 'role' => 'system',
-                'content' => "You are an AI teacher specialized in $subject. Provide accurate, helpful, and educational responses to student questions. Keep explanations clear, concise, and appropriate for students. Always give brief, to-the-point answers in 3 sentences or less when possible. Focus only on the most important information. If you don't know something, admit it rather than providing incorrect information."
+                'content' => "You are an AI teacher specialized in $subject. You are helping a student named $username, who is in class $class. Provide accurate, helpful, and educational responses to the student's questions. Keep explanations clear, concise, and appropriate for this class level. Always give brief, to-the-point answers in 3 sentences or less when possible. Focus only on the most important information. If you don't know something, admit it rather than providing incorrect information."
+               // "You are an AI teacher specialized in $subject. Provide accurate, helpful, and educational responses to student questions. Keep explanations clear, concise, and appropriate for students. Always give brief, to-the-point answers in 3 sentences or less when possible. Focus only on the most important information. If you don't know something, admit it rather than providing incorrect information."
             ]
         ];
         
