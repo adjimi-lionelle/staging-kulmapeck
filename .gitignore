@@ -32,6 +32,7 @@
 /nbproject/private/
 /stat
 /.env
+/.venv
 
 /node_modules/
 /public/build/
