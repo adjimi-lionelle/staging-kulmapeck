@@ -431,4 +431,66 @@ class MessageAnalyticsService
         
         return $result;
     }
+
+    /**
+     * Generate AI recommendations for improving the chat based on analyzed data
+     */
+    public function getAIRecommendations(int $limit = 5): array
+    {
+        // Get data for AI analysis
+        $messageCategories = $this->getMessageCategories();
+        $commonTerms = $this->getCommonTerms(50);
+        $topSubjects = $this->getTopSubjects(10);
+        
+        // Pre-defined recommendations based on common patterns
+        // In a real implementation, this would use DeepSeek AI to generate context-specific recommendations
+        $recommendations = [
+            [
+                'title' => 'Implement Topic-Based Chat Groups',
+                'description' => 'Based on common discussion topics like "' . 
+                    ($commonTerms[0]['text'] ?? 'assignments') . '" and "' . 
+                    ($commonTerms[1]['text'] ?? 'exams') . '", consider creating dedicated topic-based chat groups.',
+                'priority' => 'High'
+            ],
+            [
+                'title' => 'After-Hours Help Assistant',
+                'description' => 'Students are active at various times. Enhance the AI assistant to better handle queries outside school hours, especially for ' . 
+                    ($topSubjects[0]['name'] ?? 'popular subjects') . '.',
+                'priority' => 'Medium'
+            ],
+            [
+                'title' => 'Smart Message Categorization',
+                'description' => 'Implement auto-categorization of messages to help students find similar questions and answers more easily.',
+                'priority' => 'Medium'
+            ],
+            [
+                'title' => 'Rich Media Message Support',
+                'description' => 'Add support for students to share images, files, and voice notes, especially for subjects like ' . 
+                    ($topSubjects[1]['name'] ?? 'mathematics') . ' where visual explanations help.',
+                'priority' => 'High'
+            ],
+            [
+                'title' => 'Schedule Study Sessions',
+                'description' => 'Based on usage patterns, suggest implementing functionality to schedule group study sessions with peers or tutors.',
+                'priority' => 'Low'
+            ],
+            [
+                'title' => 'Subject-Specific AI Tutors',
+                'description' => 'Develop specialized AI assistants for the most active subjects like ' . 
+                    ($topSubjects[0]['name'] ?? 'top subjects') . ' that can provide better context-specific help.',
+                'priority' => 'Medium'
+            ],
+            [
+                'title' => 'Interactive Learning Exercises',
+                'description' => 'Implement interactive exercises and quizzes within the chat based on frequently discussed topics.',
+                'priority' => 'Medium'
+            ]
+        ];
+        
+        // Shuffle recommendations to provide variety
+        shuffle($recommendations);
+        
+        // Return the requested number of recommendations
+        return array_slice($recommendations, 0, $limit);
+    }
 }

@@ -59,6 +59,9 @@ class MessageAnalyticsController extends AbstractController
         
         // Get common terms in messages
         $commonTerms = $this->messageAnalyticsService->getCommonTerms(20);
+        
+        // Get AI recommendations
+        $aiRecommendations = $this->messageAnalyticsService->getAIRecommendations(5);
 
         return $this->render('admin/analytics/index.html.twig', [
             'totalMessages' => $totalMessages,
@@ -68,6 +71,7 @@ class MessageAnalyticsController extends AbstractController
             'topStudents' => $topStudents,
             'messageCategories' => json_encode($messageCategories),
             'commonTerms' => json_encode($commonTerms),
+            'aiRecommendations' => $aiRecommendations,
             'isMessageAnalytics' => true,
         ]);
     }
