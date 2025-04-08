@@ -1,0 +1,2 @@
+# Run message analytics processing every day at 1:00 AM
+0 1 * * * cd /path/to/kulmapeck && php bin/console app:process-message-analytics >> var/log/message-analytics.log 2>&1
