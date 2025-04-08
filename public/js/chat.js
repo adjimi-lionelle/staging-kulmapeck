@@ -3,6 +3,7 @@ var chatMessages;
 var chatContainer;
 var currentSubject;
 var socket = null;
+var pendingMessages = [];
 var isMobileView = window.innerWidth <= 768;
 
 
@@ -10,10 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
    
      chatContainer = document.querySelector('.chat-app');
      subjectList = document.getElementById("subject-list");
-    // Setup mobile view
+   
     setupMobileView();
-    
-    // Charger les sujets au démarrage
     loadSubjects();
 });
    
@@ -137,39 +136,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Sélectionner un sujet et établir la connexion WebSocket
   
-         function selectSubject(subjectId) {
-            console.log(`DEBUG: selectSubject() appelé avec ID ${subjectId}`);
-            if (!subjectId) {
+    function selectSubject(subjectId) {
+         console.log(`DEBUG: selectSubject() appelé avec ID ${subjectId}`);
+         if (!subjectId) {
                 console.error("DEBUG: Aucun subject ID fourni !");
                 return;
-            }
+         }
             
-            currentSubject = subjectId;
-            console.log(`DEBUG: currentSubject mis à jour -> ${currentSubject}`);
-            updateChatHeader(subjectId)
+        currentSubject = subjectId;
+        console.log(`DEBUG: currentSubject mis à jour -> ${currentSubject}`);
+        updateChatHeader(subjectId)
             
-            try {
+        try {
                  getWebSocketToken(subjectId); // Assurer que la connexion WebSocket est établie avec un token valide
                 console.log(`DEBUG: connexion okay`);
                 console.log(`DEBUG: currentSubject mis à jour -> ${currentSubject}`);
-            } catch (error) {
-                console.error("DEBUG: Échec de la récupération du token WebSocket, annulation de la connexion WebSocket.", error);
-                return;
-            }
+        } catch (error) {
+            console.error("DEBUG: Échec de la récupération du token WebSocket, annulation de la connexion WebSocket.", error);
+            return;
+        }
             
-            loadChatHistory(subjectId); // Charger l'historique ici
+        loadChatHistory(subjectId); // Charger l'historique ici
             
             // Mise à jour de l'affichage du chat
-            document.getElementById('welcome-screen').style.display = 'none';
-            document.getElementById('chat-header').style.display = 'flex';
-            document.getElementById('chat-messages').style.display = 'block';
-            document.getElementById('chat-footer').style.display = 'flex';
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('chat-header').style.display = 'flex';
+        document.getElementById('chat-messages').style.display = 'block';
+        document.getElementById('chat-footer').style.display = 'flex';
             
             // Handle mobile view
-            if (isMobileView) {
+        if (isMobileView) {
                 chatContainer.classList.add('chat-active');
-            }
         }
+    }
+
     function loadChatHistory(subjectId) {
         console.log(`DEBUG: Chargement de l'historique pour le sujet ${subjectId}`);
         chatMessages = document.getElementById('chat-messages');
@@ -246,18 +246,50 @@ document.addEventListener("DOMContentLoaded", function () {
             // Création du message
             const messageElement = document.createElement("div");
             messageElement.className = messageClass;
-            messageElement.innerHTML = `
+           /* messageElement.innerHTML = `
                 <div class="message-header">
                     <span class="message-date">${messageDate}</span>
                 </div>
                 <p>${msg.content}</p>
-            `;
+            `;*/
+            messageElement.innerHTML = `
+            <div class="message-header">
+                <span class="message-date">${messageDate}</span>
+                <!-- Flèche + menu uniquement pour les messages de l'élève -->
+                <div class="message-actions">
+                    <button class="actions-toggle" title="Menu">
+                        <span class="custom-arrow"></span>
+                    </button>
+                    <div class="actions-menu d-none">
+                        <button class="copy-btn">Copier</button>
+                        <button class="edit-btn">Modifier</button>
+                        <button class="delete-btn">Supprimer</button>
+                    </div>
+                </div>
+            </div>
+            <p>${msg.content}</p>
+        `;
 
             messageContainer.appendChild(messageElement);
             chatMessages.appendChild(messageContainer);
         });
 
         chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
+
+              /* const toggleBtn = messageElement.querySelector('.actions-toggle');
+                const menu = messageElement.querySelector('.actions-menu');
+        
+                if (toggleBtn && menu) {
+                    toggleBtn.addEventListener('click', (e) => {
+                        menu.classList.toggle('d-none'); // Affiche ou masque le menu
+                        e.stopPropagation(); // Empêche la propagation pour ne pas refermer directement
+                    });
+        
+                    // Fermer tous les menus au clic en dehors
+                    document.addEventListener('click', () => {
+                        document.querySelectorAll('.actions-menu').forEach(m => m.classList.add('d-none'));
+                    });
+                }*/
     }
 
     // Obtenir le token WebSocket
@@ -284,12 +316,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function connectWebSocket(subjectId, token) {
         console.log(`DEBUG: Ouverture de la connexion WebSocket pour subjectChat ${subjectId}...`);
 
-        //  Vérifier si une connexion est déjà active et ouverte
-       /* if (socket && socket.readyState === WebSocket.OPEN) {
-            console.log("DEBUG: Une connexion WebSocket est déjà active, annulation de la nouvelle connexion.");
-            return;
-        }*/
-
         // Fermer proprement l'ancienne connexion avant d'en ouvrir une nouvelle
         if (socket) {
             console.log("DEBUG: Fermeture de l'ancienne connexion WebSocket...");
@@ -299,12 +325,6 @@ document.addEventListener("DOMContentLoaded", function () {
             socket.close();
         }  
 
-       /* const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost";
-
-        const wsUrl = isLocal
-            ? `${protocol}//127.0.0.1:8085/ws?token=${token}&subjectChat_id=${subjectId}`
-            : `${protocol}//pay-kulmapeck.online/ws?token=${token}&subjectChat_id=${subjectId}`;*/
 
             const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
             const hostname = window.location.hostname;
@@ -331,6 +351,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         socket.onopen = function () {
             console.log("WebSocket connecté avec succès !");
+            while (pendingMessages.length > 0) {
+                const msg = pendingMessages.shift();
+                socket.send(JSON.stringify(msg));
+                console.log("DEBUG: Message en attente envoyé :", msg);
+            }
             // Effacer les erreurs éventuelles
             const errorBanner = document.querySelector('.error-message');
             if (errorBanner) {
@@ -372,6 +397,31 @@ document.addEventListener("DOMContentLoaded", function () {
      */
     function handleWebSocketMessage(data) {
         console.log('DEBUG: Traitement du message WebSocket:', data);
+
+        if (data.type === 'message_edited') {
+            const messageId = data.message_id;
+            const newContent = data.new_content;
+            const messageElement = document.querySelector(`.message[data-id="${messageId}"]`);
+            if (messageElement) {
+                messageElement.querySelector('p').textContent = newContent;
+                console.log(`DEBUG: Message modifié dans le DOM (ID ${messageId})`);
+            } else {
+                console.warn(`DEBUG: Message à modifier introuvable (ID ${messageId})`);
+            }
+            return;
+        }
+
+        if (data.type === 'message_deleted') {
+            const messageId = data.message_id;
+            const container = document.querySelector(`.message[data-id="${messageId}"]`)?.closest('.message-container');
+            if (container) {
+                container.remove();
+                console.log(`DEBUG: Message supprimé du DOM (ID ${messageId})`);
+            } else {
+                console.warn(`DEBUG: Message à supprimer introuvable (ID ${messageId})`);
+            }
+            return;
+        }
         
         if (data.type === 'new_message' || data.type === 'message' || data.message) {
             console.log('DEBUG: Traitement du message individuel:', data);
@@ -390,6 +440,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 timestamp = data.message.createdAt || data.message.timestamp;
                 isFromAI = data.message.isFromAI === true;
                 messageId = data.message.id; //  Utilisé pour éviter les doublons
+
+                if (userId === getCurrentUserId() && !isFromAI && messageId) {
+                    const tempMessages = document.querySelectorAll('.message[data-id^="temp-"]');
+                    for (const tempMessage of tempMessages) {
+                        const container = tempMessage.closest('.message-container');
+                        const data = container?.__messageData;
+                
+                        if (data && data.content === messageContent) {
+                            tempMessage.setAttribute("data-id", messageId);
+                            tempMessage.querySelector("p").textContent = messageContent;
+                
+                            // met à jour l'ID dans __messageData
+                            data.id = messageId;
+                            console.log("✅ DEBUG: Message temporaire remplacé par ID réel:", messageId);
+                            return;
+                        }
+                    }
+                }
+                
             } else {
                 //  Vérifier si le message est dans un format simple (messages standards)
                 console.log('DEBUG: Traitement du message avec format plat');
@@ -403,7 +472,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log(`DEBUG: Message traité - Contenu: "${messageContent}", isFromAI: ${isFromAI}`);
 
             // Vérifier si le message est déjà affiché pour éviter les doublons
-            if (messageId) {
+           /* if (messageId) {
                 const existingMessages = document.querySelectorAll('.message[data-id]');
                 for (let msg of existingMessages) {
                     if (msg.getAttribute("data-id") === messageId) {
@@ -416,7 +485,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (userId === getCurrentUserId() && !isFromAI) {
                 console.log("DEBUG: Ignoré - L'utilisateur actuel a déjà affiché ce message.");
                 return;
-            }
+            }*/
             
             // Si c'est une réponse AI, supprimer l'indicateur de frappe
            /* if (isFromAI) {
@@ -426,6 +495,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Ajouter le message avec le style approprié
             if (messageContent) {
                 const messageData = {
+                    id: messageId,
                     content: messageContent,
                     timestamp: timestamp,
                     sender_id: userId,
@@ -441,7 +511,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function addMessageToChat(messageData, isFromAI = false) {
+   /* function addMessageToChat(messageData, isFromAI = false) {
 
         console.log("DEBUG: Ajout du message à l'UI:", messageData);
          chatMessages = document.getElementById("chat-messages");
@@ -482,8 +552,123 @@ document.addEventListener("DOMContentLoaded", function () {
         
         // Scroll automatique vers le bas
         chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+    }*/
 
+
+        function addMessageToChat(messageData, isFromAI = false) {
+            console.log("DEBUG: Ajout du message à l'UI:", messageData);
+            chatMessages = document.getElementById("chat-messages");
+        
+            // Déterminer si le message vient de l'IA ou de l'élève
+            const isSentByStudent = !isFromAI;
+        
+            // Création du conteneur pour le message
+            const messageContainer = document.createElement("div");
+            messageContainer.className = isSentByStudent ? "message-container sent" : "message-container assistant";
+        
+            // Création du bloc du message
+            const messageElement = document.createElement("div");
+            messageElement.className = isSentByStudent ? "message sent" : "message assistant";
+            if (messageData.id) {
+                messageElement.setAttribute("data-id", messageData.id); 
+            }
+
+            messageContainer.__messageData = messageData;
+
+            console.log("DEBUG: ID assigné au message:", messageData.id);
+
+        
+            // Format de la date
+            const messageDate = new Date(messageData.timestamp).toLocaleString("fr-FR", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        
+            messageElement.innerHTML = `
+                <div class="message-header">
+                    <span class="message-date">${messageDate}</span>
+                    ${isSentByStudent ? `
+                    <!-- Flèche + menu uniquement pour les messages de l'élève -->
+                    <div class="message-actions">
+                        <button class="actions-toggle" title="Menu">
+                            <span class="custom-arrow"></span>
+                        </button>
+                        <div class="actions-menu d-none">
+                            <button class="copy-btn">Copier</button>
+                            <button class="edit-btn">Modifier</button>
+                            <button class="delete-btn">Supprimer</button>
+                        </div>
+                    </div>
+                    ` : ""}
+                </div>
+                <p>${messageData.content}</p>
+            `;
+        
+            // Ajouter le message dans son conteneur
+            messageContainer.appendChild(messageElement);
+        
+            // Ajouter au chat
+            chatMessages.appendChild(messageContainer);
+        
+            // Scroll automatique vers le bas
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+           
+            if (isSentByStudent) {
+                const toggleBtn = messageElement.querySelector('.actions-toggle');
+                const menu = messageElement.querySelector('.actions-menu');
+        
+                if (toggleBtn && menu) {
+                    toggleBtn.addEventListener('click', (e) => {
+                        menu.classList.toggle('d-none'); 
+                        e.stopPropagation(); 
+                    });
+        
+                   
+                    document.addEventListener('click', () => {
+                        document.querySelectorAll('.actions-menu').forEach(m => m.classList.add('d-none'));
+                    });
+
+                   
+                    const copyBtn = menu.querySelector('.copy-btn');
+                    const editBtn = menu.querySelector('.edit-btn');
+                    const deleteBtn = menu.querySelector('.delete-btn');
+
+                    if (copyBtn) {
+                        copyBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            copyToClipboard(messageData.content);
+                            menu.classList.add('d-none'); 
+                        });
+                    }
+
+                    if (editBtn) {
+                        editBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            editMessage(messageElement, {
+                                id: messageData.id,  
+                                content: messageData.content
+                            });
+                            menu.classList.add('d-none');
+                        });
+                    }
+
+                    if (deleteBtn) {
+                        deleteBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            deleteMessage(messageContainer, {
+                                id: messageData.id   
+                            });
+                            menu.classList.add('d-none');
+                        });
+                    }
+                }
+            }
+        }
+        
     function sendMessage() {
         let messageInput = document.getElementById("message-input");
         let content = messageInput.value.trim();
@@ -497,6 +682,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
         const subjectChatId = parseInt(currentSubject);
         let messageData = {
+            type: "new_message",
             subject_id: subjectChatId,
             message: content,
             timestamp: new Date().toISOString()
@@ -505,9 +691,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("DEBUG: État actuel du WebSocket avant envoi :", socket ? socket.readyState : "Socket non défini");
     
         if (!socket || socket.readyState !== WebSocket.OPEN) {
-            console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...");
-            let pendingMessages = [];
-            // Ajoute le message à une file d'attente pour qu'il soit envoyé après la reconnexion
+            console.warn("DEBUG: WebSocket non ouvert, tentative de reconnexion...")
             pendingMessages.push(messageData);
     
             // Reconnecte WebSocket et envoie les messages après reconnexion
@@ -516,9 +700,11 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             console.log("DEBUG: Envoi du message via WebSocket");
             socket.send(JSON.stringify(messageData));
+            const tempId = `temp-${Date.now()}`;
             
             // Ajouter le message immédiatement à l'interface utilisateur
             const optimisticMessageData = {
+                id: tempId,
                 content: content,
                 timestamp: new Date().toISOString(),
                 sender_id: getCurrentUserId(),
@@ -676,4 +862,43 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }, 500); // Vérifie la connexion toutes les 500ms jusqu'à ce que WebSocket soit ouvert
     }
+    
+    function editMessage(messageElement, messageData) {
+        const currentText = messageData.content;
+        const newText = prompt("Modifier le message :", currentText);
+        console.log("DEBUG: ID du message à modifier :", messageData.id);
+    
+        if (newText && newText.trim() !== "" && newText !== currentText) {
+            socket.send(JSON.stringify({
+                type: 'edit_message',
+                message_id: messageData.id,
+                new_content: newText
+            }));
+    
+            messageElement.querySelector('p').textContent = newText;
+            messageData.content = newText;
+            console.log("DEBUG: Message modifié localement :", newText);
+        }
+    }
+
+    function deleteMessage(container, messageData) {
+        if (confirm("Es-tu sûr de vouloir supprimer ce message ?")) {
+            socket.send(JSON.stringify({
+                type: 'delete_message',
+                message_id: messageData.id
+            }));
+    
+            container.remove();
+            console.log("DEBUG: Message supprimé localement");
+        }
+    }
+    
+    
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+        }).catch(err => {
+            console.error("Erreur de copie :", err);
+        });
+    }
+    
         

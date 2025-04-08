@@ -13,6 +13,7 @@ use App\Repository\SubjectChatRepository;
 use App\Repository\CategorieRepository;
 use App\Repository\PersonneRepository;
 use App\Repository\MessageChatRepository;
+use App\Service\WebSocketPusher;
 use App\Service\DeepSeekAIService;
 use App\Service\SubjectChatService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -218,9 +219,7 @@ class ChatController extends AbstractController
    }
 
         /**
-     * Récupérer les groupes auxquels un élève connecté appartient/ completer  
-     * cette fonction pour envoyer le nombbre de message non lu pr un user connecté dans chacun de ses groupe 
-     * exempele groupe 1 nombre de message non lu groupe 2 nombre de message non lu groupe 3 nombre de message non lu
+     * Récupérer les matières auxquelles un élève connecté appartient
      */
     #[Route('/api/chat/subjectChats', name: 'api_chat_subjectChats', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
@@ -303,6 +302,48 @@ class ChatController extends AbstractController
         ] : null;
     
         return new JsonResponse($messagesArray);
+    }
+
+
+    #[Route('/api/chat/message/{id}/edit', name: 'chat_edit_message', methods: ['POST'])]
+    public function editMessage(Request $request, MessageChat $message, EntityManagerInterface $em, WebSocketPusher $pusher): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $newContent = $data['content'] ?? '';
+
+        if (empty(trim($newContent))) {
+            return new JsonResponse(['error' => 'Le contenu ne peut pas être vide'], 400);
+        }
+
+        $message->setContent($newContent);
+        $em->flush();
+
+        // Notifier les autres clients via WebSocket
+        $pusher->pushToSubject($message->getSubjectChat(), [
+            'type' => 'message_edited',
+            'message_id' => $message->getId(),
+            'new_content' => $newContent,
+        ]);
+
+        return new JsonResponse(['success' => true]);
+    }
+
+    #[Route('/api/chat/message/{id}/delete', name: 'chat_delete_message', methods: ['DELETE'])]
+    public function deleteMessage(MessageChat $message, EntityManagerInterface $em, WebSocketPusher $pusher): JsonResponse
+    {
+        $messageId = $message->getId();
+        $subjectChat = $message->getSubjectChat();
+
+        $em->remove($message);
+        $em->flush();
+
+        // Notifier les autres clients via WebSocket
+        $pusher->pushToSubject($subjectChat, [
+            'type' => 'message_deleted',
+            'message_id' => $messageId,
+        ]);
+
+        return new JsonResponse(['success' => true]);
     }
 
     /**
