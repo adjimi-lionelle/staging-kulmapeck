@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function displayMessages(messages) {
+   /* function displayMessages(messages) {
          chatMessages = document.getElementById("chat-messages");
         chatMessages.innerHTML = ""; // Effacer les anciens messages
 
@@ -246,52 +246,135 @@ document.addEventListener("DOMContentLoaded", function () {
             // Création du message
             const messageElement = document.createElement("div");
             messageElement.className = messageClass;
-           /* messageElement.innerHTML = `
+            messageElement.innerHTML = `
                 <div class="message-header">
                     <span class="message-date">${messageDate}</span>
                 </div>
                 <p>${msg.content}</p>
-            `;*/
-            messageElement.innerHTML = `
-            <div class="message-header">
-                <span class="message-date">${messageDate}</span>
-                <!-- Flèche + menu uniquement pour les messages de l'élève -->
-                <div class="message-actions">
-                    <button class="actions-toggle" title="Menu">
-                        <span class="custom-arrow"></span>
-                    </button>
-                    <div class="actions-menu d-none">
-                        <button class="copy-btn">Copier</button>
-                        <button class="edit-btn">Modifier</button>
-                        <button class="delete-btn">Supprimer</button>
-                    </div>
-                </div>
-            </div>
-            <p>${msg.content}</p>
-        `;
+            `;
 
             messageContainer.appendChild(messageElement);
             chatMessages.appendChild(messageContainer);
         });
 
         chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
+    }*/
 
-              /* const toggleBtn = messageElement.querySelector('.actions-toggle');
-                const menu = messageElement.querySelector('.actions-menu');
-        
-                if (toggleBtn && menu) {
-                    toggleBtn.addEventListener('click', (e) => {
-                        menu.classList.toggle('d-none'); // Affiche ou masque le menu
-                        e.stopPropagation(); // Empêche la propagation pour ne pas refermer directement
-                    });
-        
-                    // Fermer tous les menus au clic en dehors
-                    document.addEventListener('click', () => {
-                        document.querySelectorAll('.actions-menu').forEach(m => m.classList.add('d-none'));
-                    });
-                }*/
-    }
 
+        function displayMessages(messages) {
+            const chatMessages = document.getElementById("chat-messages");
+            chatMessages.innerHTML = ""; // Effacer les anciens messages
+        
+            const currentUserId = getCurrentUserId();
+            if (!currentUserId) {
+                console.error("DEBUG ERROR: currentUserId non défini !");
+                return;
+            }
+        
+            messages.forEach(msg => {
+                if (!msg.content || !msg.createdAt || msg.isFromAI === undefined) {
+                    console.warn("DEBUG: Message mal formaté, ignoré :", msg);
+                    return;
+                }
+        
+                const isFromAI = msg.isFromAI;
+                const isOwnMessage = msg.sender_id === currentUserId;
+                const containerClass = isFromAI ? "message-container assistant" : "message-container sent";
+                const messageClass = isFromAI ? "message assistant" : "message sent";
+        
+                const messageDate = new Date(msg.createdAt).toLocaleString("fr-FR", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+        
+                const messageContainer = document.createElement("div");
+                messageContainer.className = containerClass;
+        
+                const messageElement = document.createElement("div");
+                messageElement.className = messageClass;
+                messageElement.setAttribute("data-id", msg.id); // ✅ Ajout de l’ID pour les actions
+        
+                // Enregistrement des données utiles
+                messageContainer.__messageData = msg;
+        
+                // Structure HTML du message
+                messageElement.innerHTML = `
+                    <div class="message-header">
+                        <span class="message-date">${messageDate}</span>
+                        ${!isFromAI && isOwnMessage ? `
+                        <div class="message-actions">
+                            <button class="actions-toggle" title="Menu">
+                                <span class="custom-arrow"></span>
+                            </button>
+                            <div class="actions-menu d-none">
+                                <button class="copy-btn">Copier</button>
+                                <button class="edit-btn">Modifier</button>
+                                <button class="delete-btn">Supprimer</button>
+                            </div>
+                        </div>` : ""}
+                    </div>
+                    <p>${msg.content}</p>
+                `;
+        
+                messageContainer.appendChild(messageElement);
+                chatMessages.appendChild(messageContainer);
+        
+                // ✅ Ajouter les événements si c’est un message de l’élève
+                if (!isFromAI && isOwnMessage) {
+                    const toggleBtn = messageElement.querySelector('.actions-toggle');
+                    const menu = messageElement.querySelector('.actions-menu');
+                    const copyBtn = menu?.querySelector('.copy-btn');
+                    const editBtn = menu?.querySelector('.edit-btn');
+                    const deleteBtn = menu?.querySelector('.delete-btn');
+        
+                    if (toggleBtn && menu) {
+                        toggleBtn.addEventListener('click', (e) => {
+                            menu.classList.toggle('d-none');
+                            e.stopPropagation();
+                        });
+        
+                        document.addEventListener('click', () => {
+                            document.querySelectorAll('.actions-menu').forEach(m => m.classList.add('d-none'));
+                        });
+        
+                        if (copyBtn) {
+                            copyBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                copyToClipboard(msg.content);
+                                menu.classList.add('d-none');
+                            });
+                        }
+        
+                        if (editBtn) {
+                            editBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                editMessage(messageElement, {
+                                    id: msg.id,
+                                    content: msg.content
+                                });
+                                menu.classList.add('d-none');
+                            });
+                        }
+        
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                deleteMessage(messageContainer, {
+                                    id: msg.id
+                                });
+                                menu.classList.add('d-none');
+                            });
+                        }
+                    }
+                }
+            });
+        
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
+        }
+        
     // Obtenir le token WebSocket
     function getWebSocketToken(subjectId) {
         console.log(`DEBUG: getWebSocketToken() called for subject ${subjectId}`);
