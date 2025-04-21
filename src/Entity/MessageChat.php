@@ -43,6 +43,9 @@ class MessageChat
     #[ORM\Column]
     private ?bool $isModerated = false;
 
+    #[ORM\Column]
+    private ?bool $isDeleted = false;
+
     public function __construct()
     {
         $this->createAt = new \DateTimeImmutable();
@@ -151,6 +154,18 @@ class MessageChat
     public function setIsModerated(bool $isModerated): static
     {
         $this->isModerated = $isModerated;
+
+        return $this;
+    }
+
+    public function isIsDeleted(): ?bool
+    {
+        return $this->isDeleted;
+    }
+
+    public function setIsDeleted(bool $isDeleted): static
+    {
+        $this->isDeleted = $isDeleted;
 
         return $this;
     }

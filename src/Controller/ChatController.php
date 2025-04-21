@@ -279,8 +279,12 @@ class ChatController extends AbstractController
             return new JsonResponse(['error' => 'Unauthorized'], 403);
         }
 
+        $criteria = [
+            'subjectChat' => $subjectId,
+            'isDeleted' => false
+        ];
         $messages = $this->entityManager->getRepository(MessageChat::class)
-            ->findBy(['subjectChat' => $subjectId], ['createAt' => 'ASC']);
+            ->findBy($criteria, ['createAt' => 'ASC']);
 
         $lastMessage = $this->entityManager->getRepository(MessageChat::class)
             ->findOneBy(['subjectChat' => $subjectId], ['createAt' => 'DESC']);    

@@ -130,6 +130,26 @@
             </div>
         </div>
     </div>
+
+        <!-- Modal de modification -->
+    <div class="modal fade" id="editMessageModal" tabindex="-1" aria-labelledby="editMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="editMessageModalLabel">Modifier le message</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+            <textarea id="edit-message-input" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-primary" id="save-edit-btn">Enregistrer</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
 {% endblock %}
 
 {% block javascripts %}
