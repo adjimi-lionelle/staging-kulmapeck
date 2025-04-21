@@ -87,7 +87,7 @@
                                     <div class="w-100 my-auto">
                                         <div class="row justify-content-center">
                                             <div id="pdf-container" class="screenshot-protection" style="width: 100%; height: 800px; overflow: auto; position: relative;">
-                                                <div class="floating-watermark"></div>
+                                                <div class="floating-watermark" style="pointer-events:none; position:absolute; left:0; top:0; width:100%; height:100%; z-index:1001;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -228,14 +228,12 @@
         // Create random moving watermarks to make screenshots less useful
         function createMovingWatermarks() {
             var watermarkElement = document.querySelector('.floating-watermark');
+            watermarkElement.innerHTML = '';
             var container = document.getElementById('pdf-container');
             var containerWidth = container.offsetWidth;
             var containerHeight = container.offsetHeight;
-            
             // Set username if available or default text
             var username = "{{ app.user ? app.user.username : 'NON AUTORISE' }}";
-            var timestamp = new Date().toLocaleString();
-            
             // Create multiple semi-transparent watermarks
             var watermarks = [];
             for (var i = 0; i < 15; i++) {
@@ -244,19 +242,16 @@
                 watermark.innerText = 'www.kulmapeck.com';
                 watermark.style.position = 'absolute';
                 watermark.style.color = 'rgba(255, 0, 0, 0.15)';
-                watermark.style.zIndex = '1000';
+                watermark.style.zIndex = '1001';
                 watermark.style.pointerEvents = 'none';
                 watermark.style.fontSize = '18px';
                 watermark.style.transform = 'rotate(' + (Math.random() * 90 - 45) + 'deg)';
-                
                 // Random position
                 watermark.style.left = Math.random() * containerWidth + 'px';
                 watermark.style.top = Math.random() * containerHeight + 'px';
-                
-                container.appendChild(watermark);
+                watermarkElement.appendChild(watermark);
                 watermarks.push(watermark);
             }
-            
             // Periodically move watermarks
             setInterval(function() {
                 watermarks.forEach(function(watermark) {
@@ -302,9 +297,9 @@
             pdfjsLib.getDocument(url).promise.then(function(pdf) {
                 var numPages = pdf.numPages;
                 var container = document.getElementById('pdf-container');
-                container.innerHTML = '<div class="floating-watermark"></div>'; // Keep watermark
+                // Clear only canvases, keep watermark
+                Array.from(container.querySelectorAll('canvas')).forEach(c => c.remove());
                 var scale = 1.5;
-                
                 function renderPage(pageNum) {
                     pdf.getPage(pageNum).then(function(page) {
                         var viewport = page.getViewport({scale: scale});
@@ -314,7 +309,6 @@
                         canvas.style.display = 'block';
                         canvas.style.margin = '0 auto 24px auto';
                         var ctx = canvas.getContext('2d');
-                        
                         var renderContext = {
                             canvasContext: ctx,
                             viewport: viewport
