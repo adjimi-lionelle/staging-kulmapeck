@@ -317,6 +317,9 @@
                             container.appendChild(canvas);
                             if (pageNum < numPages) {
                                 renderPage(pageNum + 1);
+                            } else {
+                                // After all pages rendered, update watermark overlay height
+                                setTimeout(updateWatermarkOverlay, 100); // slight delay to ensure DOM update
                             }
                         });
                     });
@@ -325,6 +328,39 @@
             }).catch(function(error) {
                 console.error("Error loading PDF: " + error);
             });
+        }
+
+        // Update watermark overlay to cover all canvases
+        function updateWatermarkOverlay() {
+            var container = document.getElementById('pdf-container');
+            var watermarkElement = container.querySelector('.floating-watermark');
+            // Calculate total height of all canvases
+            var totalHeight = 0;
+            var canvases = Array.from(container.querySelectorAll('canvas'));
+            canvases.forEach(function(canvas) {
+                totalHeight += canvas.height + 24; // 24px margin
+            });
+            watermarkElement.style.height = totalHeight + 'px';
+            watermarkElement.style.width = '100%';
+            // Recreate watermarks distributed vertically
+            watermarkElement.innerHTML = '';
+            var containerWidth = container.offsetWidth;
+            var numWatermarks = 15;
+            for (var i = 0; i < numWatermarks; i++) {
+                var watermark = document.createElement('div');
+                watermark.className = 'dynamic-watermark';
+                watermark.innerText = 'www.kulmapeck.com';
+                watermark.style.position = 'absolute';
+                watermark.style.color = 'rgba(255, 0, 0, 0.15)';
+                watermark.style.zIndex = '1001';
+                watermark.style.pointerEvents = 'none';
+                watermark.style.fontSize = '18px';
+                watermark.style.transform = 'rotate(' + (Math.random() * 90 - 45) + 'deg)';
+                // Distribute vertically
+                watermark.style.left = Math.random() * containerWidth + 'px';
+                watermark.style.top = (Math.random() * totalHeight) + 'px';
+                watermarkElement.appendChild(watermark);
+            }
         }
         
         // Run the renderer when the page loads
