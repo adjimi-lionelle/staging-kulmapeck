@@ -208,6 +208,58 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+   /* function displayMessages(messages) {
+         chatMessages = document.getElementById("chat-messages");
+        chatMessages.innerHTML = ""; // Effacer les anciens messages
+
+        const currentUserId = getCurrentUserId();
+        if (!currentUserId) {
+            console.error("DEBUG ERROR: currentUserId non défini !");
+            return;
+        }
+
+        messages.forEach(msg => {
+            if (!msg.content || !msg.createdAt || msg.isFromAI === undefined) {
+                console.warn("DEBUG: Message mal formaté, ignoré :", msg);
+                return;
+            }
+
+            const isFromAI = msg.isFromAI;
+            const isOwnMessage = msg.sender_id === currentUserId;
+
+            // Définition des classes CSS
+            let containerClass = isFromAI ? "message-container assistant" : "message-container sent";
+            let messageClass = isFromAI ? "message assistant" : "message sent";
+
+            const messageDate = new Date(msg.createdAt).toLocaleString("fr-FR", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+
+            // Création du conteneur
+            const messageContainer = document.createElement("div");
+            messageContainer.className = containerClass;
+
+            // Création du message
+            const messageElement = document.createElement("div");
+            messageElement.className = messageClass;
+            messageElement.innerHTML = `
+                <div class="message-header">
+                    <span class="message-date">${messageDate}</span>
+                </div>
+                <p>${msg.content}</p>
+            `;
+
+            messageContainer.appendChild(messageElement);
+            chatMessages.appendChild(messageContainer);
+        });
+
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll en bas
+    }*/
+
 
         function displayMessages(messages) {
             const chatMessages = document.getElementById("chat-messages");
@@ -429,21 +481,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function handleWebSocketMessage(data) {
         console.log('DEBUG: Traitement du message WebSocket:', data);
 
-        if (data.type === 'soft_delete') {
-            const { after_message_id, sender_id } = data;
-    
-            // Sélectionne tous les messages dans la vue (ex: avec data attributes)
-            document.querySelectorAll('.message[data-sender-id][data-message-id]').forEach(messageEl => {
-                const msgId = parseInt(messageEl.getAttribute('data-message-id'));
-                const userId = parseInt(messageEl.getAttribute('data-sender-id'));
-    
-                // Supprime les messages de ce sender avec un ID > after_message_id
-                if (userId === sender_id && msgId > after_message_id) {
-                    messageEl.remove(); // ou messageEl.style.display = "none";
-                }
-            });
-        }
-
         if (data.type === 'message_edited') {
             const messageId = data.message_id;
             const newContent = data.new_content;
@@ -517,7 +554,28 @@ document.addEventListener("DOMContentLoaded", function () {
             
             console.log(`DEBUG: Message traité - Contenu: "${messageContent}", isFromAI: ${isFromAI}`);
 
-        
+            // Vérifier si le message est déjà affiché pour éviter les doublons
+           /* if (messageId) {
+                const existingMessages = document.querySelectorAll('.message[data-id]');
+                for (let msg of existingMessages) {
+                    if (msg.getAttribute("data-id") === messageId) {
+                        console.warn(`DEBUG: Message déjà affiché (ID ${messageId}), ignoré.`);
+                        return;
+                    }
+                }
+            }
+
+            if (userId === getCurrentUserId() && !isFromAI) {
+                console.log("DEBUG: Ignoré - L'utilisateur actuel a déjà affiché ce message.");
+                return;
+            }*/
+            
+            // Si c'est une réponse AI, supprimer l'indicateur de frappe
+           /* if (isFromAI) {
+                removeAITypingIndicator();
+            }*/
+            
+            // Ajouter le message avec le style approprié
             if (messageContent) {
                 const messageData = {
                     id: messageId,
@@ -536,7 +594,51 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-   function addMessageToChat(messageData, isFromAI = false) {
+   /* function addMessageToChat(messageData, isFromAI = false) {
+
+        console.log("DEBUG: Ajout du message à l'UI:", messageData);
+         chatMessages = document.getElementById("chat-messages");
+        
+        // Déterminer si le message vient de l'IA ou de l'élève
+        const isSentByStudent = !isFromAI;
+        
+        // Création du conteneur pour le message
+        const messageContainer = document.createElement("div");
+        messageContainer.className = isSentByStudent ? "message-container sent" : "message-container assistant";
+        
+        // Création du bloc du message
+        const messageElement = document.createElement("div");
+        messageElement.className = isSentByStudent ? "message sent" : "message assistant";
+        
+        // Format de la date
+        const messageDate = new Date(messageData.timestamp).toLocaleString("fr-FR", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+        
+        // Contenu du message
+        messageElement.innerHTML = `
+            <div class="message-header">
+                <span class="message-date">${messageDate}</span>
+            </div>
+            <p>${messageData.content}</p>
+        `;
+        
+        // Ajouter le message dans son conteneur
+        messageContainer.appendChild(messageElement);
+        
+        // Ajouter au chat
+        chatMessages.appendChild(messageContainer);
+        
+        // Scroll automatique vers le bas
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }*/
+
+
+        function addMessageToChat(messageData, isFromAI = false) {
             console.log("DEBUG: Ajout du message à l'UI:", messageData);
             chatMessages = document.getElementById("chat-messages");
         
@@ -843,8 +945,26 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }, 500); // Vérifie la connexion toutes les 500ms jusqu'à ce que WebSocket soit ouvert
     }
+    
+    /*function editMessage(messageElement, messageData) {
+        const currentText = messageData.content;
+        const newText = prompt("Modifier le message :", currentText);
+        console.log("DEBUG: ID du message à modifier :", messageData.id);
+    
+        if (newText && newText.trim() !== "" && newText !== currentText) {
+            socket.send(JSON.stringify({
+                type: 'edit_message',
+                message_id: messageData.id,
+                new_content: newText
+            }));
+    
+            messageElement.querySelector('p').textContent = newText;
+            messageData.content = newText;
+            console.log("DEBUG: Message modifié localement :", newText);
+        }
+    }*/
   
-       /* let currentEditingMessageElement = null;
+        let currentEditingMessageElement = null;
         let currentEditingMessageData = null;
         
         function editMessage(messageElement, messageData) {
@@ -878,60 +998,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const modalEl = document.getElementById('editMessageModal');
             const modal = bootstrap.Modal.getInstance(modalEl);
             modal.hide();
-        });*/
-        let currentEditingMessageElement = null;
-        let currentEditingMessageData = null;
-        
-        // Fonction appelée quand on clique sur "modifier"
-        function editMessage(messageElement, messageData) {
-            currentEditingMessageElement = messageElement;
-        
-            // ✅ Récupération du contenu à jour depuis l'attribut data-content si présent
-            const updatedContent = messageElement.getAttribute('data-content') || messageData.content;
-        
-            // ✅ Mise à jour de l'objet temporaire avec le contenu à jour
-            currentEditingMessageData = {
-                ...messageData,
-                content: updatedContent
-            };
-        
-            // Pré-remplir le champ avec le texte actuel
-            const input = document.getElementById('edit-message-input');
-            input.value = updatedContent;
-        
-            // Ouvrir le modal
-            const editModal = new bootstrap.Modal(document.getElementById('editMessageModal'));
-            editModal.show();
-        }
-        
-        // Bouton "Enregistrer" dans le modal
-        document.getElementById('save-edit-btn').addEventListener('click', function () {
-            const newText = document.getElementById('edit-message-input').value.trim();
-        
-            if (newText && currentEditingMessageData && newText !== currentEditingMessageData.content) {
-                // Envoi du message modifié via WebSocket
-                socket.send(JSON.stringify({
-                    type: 'edit_message',
-                    message_id: currentEditingMessageData.id,
-                    new_content: newText
-                }));
-        
-                //Mise à jour immédiate dans le DOM
-                currentEditingMessageElement.querySelector('p').textContent = newText;
-        
-                // Mise à jour du dataset DOM pour les futurs clics sur "modifier"
-                currentEditingMessageElement.setAttribute('data-content', newText);
-        
-                // Mise à jour de l'objet temporaire
-                currentEditingMessageData.content = newText;
-            }
-        
-            // Fermer le modal
-            const modalEl = document.getElementById('editMessageModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            modal.hide();
         });
-              
+          
 
     function deleteMessage(container, messageData) {
         if (confirm("Es-tu sûr de vouloir supprimer ce message ?")) {

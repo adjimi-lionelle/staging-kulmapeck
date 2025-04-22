@@ -111,4 +111,24 @@ class MessageChatRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+     /**
+     * Supprimer les mesages après modification d'un message
+     */
+    public function deletesoft(SubjectChat $chat, User $user, int $messageId): void
+    {
+        
+        $this->createQueryBuilder('m')
+            ->update()
+            ->set('m.isDeleted', ':isDeleted')
+            ->where('m.subjectChat = :chat')
+            ->andWhere('m.sender = :user')
+            ->andWhere('m.id > :messageId')
+            ->setParameter('isDeleted', true)
+            ->setParameter('chat', $chat)
+            ->setParameter('user', $user)
+            ->setParameter('messageId', $messageId)
+            ->getQuery()
+            ->execute();
+    }
 }

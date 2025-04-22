@@ -932,6 +932,9 @@ emoji-picker {
   color: #555;
   margin-bottom: 3px; /* Réduit l'espace entre la date et le message */
   text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* Style de la date du message */
@@ -949,128 +952,81 @@ emoji-picker {
   /*white-space: pre-wrap;*/
 }
 
+/* Icône flèche style WhatsApp */
+.menu-icon {
+  font-size: 16px;
+  color: #5f5f5f;
+  margin-left: 6px;
+  cursor: pointer;
+  vertical-align: middle;
+  padding: 2px;
+}
+
+/* Conteneur du menu */
+.actions-menu {
+  position: absolute;
+  right: 0;
+  top: 25px;
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  overflow: hidden;
+  padding: 5px 0;
+}
+
+/* Les boutons dans le menu */
+.actions-menu button {
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  text-align: left;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+  color: #333;
+}
+
+.actions-menu button:hover {
+  background-color: #f5f5f5;
+}
+
+/* Empêche le clic accidentel de refermer trop vite */
+.message-actions {
+  position: relative;
+}
+
+.actions-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-arrow {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border: solid #6c757d;
+  border-width: 0 2px 2px 0;
+  padding: 3px;
+  transform: rotate(45deg);
+  margin-left: 4px;
+  opacity: 0.5;
+}
+
+
 @media screen and (max-width: 600px) {
   .message p {
     font-size: 14px;
   }
 }
 
-/* Message action buttons */
-.message-actions {
-  display: none;
-  position: absolute;
-  top: 5px;
-  right: 15px;
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  z-index: 10;
-  padding: 3px;
-}
 
-.message:hover .message-actions {
-  display: flex;
-}
-
-.message-action-btn {
-  background: none;
-  border: none;
-  padding: 6px;
-  cursor: pointer;
-  color: #666;
-  transition: color 0.2s, transform 0.1s;
-  margin: 0 2px;
-}
-
-.message-action-btn:hover {
-  color: #000;
-  transform: scale(1.2);
-}
-
-.message-action-btn i {
-  font-size: 16px;
-}
-
-.message-action-btn.edit:hover {
-  color: #007bff; /* Blue for edit */
-}
-
-.message-action-btn.delete:hover {
-  color: #dc3545; /* Red for delete */
-}
-
-.message-action-btn.copy:hover {
-  color: #28a745; /* Green for copy */
-}
-
-/* Message editing */
-.message.editing .message-content {
-  background-color: #f8f9fa;
-  padding: 8px;
-  border-radius: 4px;
-}
-
-.message-edit-input {
-  width: 100%;
-  min-height: 60px;
-  resize: vertical;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  padding: 6px;
-  margin-bottom: 8px;
-}
-
-.message-edit-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.message-edit-btn {
-  border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.message-edit-cancel {
-  background-color: #f8f9fa;
-  color: #6c757d;
-}
-
-.message-edit-save {
-  background-color: #007bff;
-  color: white;
-}
-
-.message-edited {
-  font-size: 0.75rem;
-  color: #6c757d;
-  font-style: italic;
-  margin-top: 4px;
-}
-
-/* Copy notification */
-.copy-notification {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 4px;
-  z-index: 1000;
-  animation: fadeInOut 2s ease-in-out;
-}
-
-@keyframes fadeInOut {
-  0% { opacity: 0; }
-  20% { opacity: 1; }
-  80% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-/* Message deleting animation */
-.message-container.deleting {
-  transition: opacity 0.5s ease-out;
-}

@@ -63,32 +63,7 @@ class ChatServer implements MessageComponentInterface
                 return;
             }
 
-            // Déconnexion de l’ancienne connexion active (même user + même sujet)
-        /*foreach ($this->clients as $client) {
-            $clientUser = $this->clients[$client]['user'];
-            $clientSubject = $this->clients[$client]['subjectChat'];
 
-            if ($clientUser->getId() === $user->getId() && $clientSubject->getId() === $subjectChat->getId()) {
-                echo " Ancienne connexion détectée pour l'utilisateur #$userId sur ce sujet. Déconnexion forcée...\n";
-                
-                $client->send(json_encode([
-                    'type' => 'forced_disconnect',
-                    'message' => 'Tu as été déconnecté car tu t’es connecté ailleurs sur ce sujet.'
-                ]));
-                
-                $client->close();
-                $this->clients->detach($client);
-                break;
-            }
-        }
-
-        // Supprimer la connexion précédente en base (si elle existe)
-        $repo = $this->entityManager->getRepository(WebSocketConnection::class);
-        $oldConnection = $repo->findOneBy(['user' => $user, 'subjectChat' => $subjectChat]);
-        if ($oldConnection) {
-            $this->entityManager->remove($oldConnection);
-            $this->entityManager->flush();
-        }*/
 
             //  Ajout de la nouvelle connexion (uniquement si aucune connexion existante)
             $this->clients->attach($conn, ['user' => $user, 'subjectChat' => $subjectChat]);
@@ -120,7 +95,7 @@ class ChatServer implements MessageComponentInterface
     }
 
 
-    public function onMessage(ConnectionInterface $from, $msg)
+    /*public function onMessage(ConnectionInterface $from, $msg)
     {
         echo "Message reçu : " . $msg . "\n";
         try {
@@ -202,7 +177,168 @@ class ChatServer implements MessageComponentInterface
         } catch (\Exception $e) {
             echo "Erreur lors de la sauvegarde du message : " . $e->getMessage() . "\n";
         }
+    }*/
+
+    public function onMessage(ConnectionInterface $from, $msg)
+{
+    echo "Message reçu : " . $msg . "\n";
+    try {
+        $data = json_decode($msg, true);
+        //echo $data['type'];
+
+        if (!isset($data['type'])) {
+            echo "Type de message non défini.\n";
+            return;
+        }
+        
+        $user = $this->clients[$from]['user'];
+        $subjectChat = $this->clients[$from]['subjectChat'];
+
+        if ($data['type'] === 'new_message') {
+            if (!isset($data['message']) || empty(trim($data['message']))) {
+                echo "Message invalide ou vide.\n";
+                return;
+            }
+        
+            $eleve = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+            $class = $eleve->getClasse()->getName();
+        
+            $message = new MessageChat();
+            $message->setSender($user);
+            $message->setSubjectChat($subjectChat);
+            $message->setContent($data['message']);
+            $message->setIsFromAI(false);
+            $message->setIsRead(true);
+            $message->setExpiresAt((new \DateTimeImmutable())->modify('+30 days'));
+        
+            $this->entityManager->persist($message);
+            $this->entityManager->flush();
+        
+            echo "Message sauvegardé en BD avec ID : " . $message->getId() . "\n";
+        
+            $response = json_encode([
+                'type' => 'new_message',
+                'message' => [
+                    'id' => $message->getId(),
+                    'content' => $message->getContent(),
+                    'sender_id' => $user->getId(),
+                    'createdAt' => $message->getExpiresAt()->format('Y-m-d H:i:s'),
+                ]
+            ]);
+        
+            foreach ($this->clients as $client) {
+                if ($this->clients[$client]['subjectChat'] === $subjectChat) {
+                    $client->send($response);
+                }
+            }
+        
+            echo "DEBUG: Appel de l'IA pour générer une réponse...\n";
+            $aiResponse = $this->aiMessageHandler->handleMessage($data, $user, $class);
+        
+            if (!$aiResponse) {
+                echo "DEBUG ERROR: Aucune réponse IA générée !\n";
+                return;
+            }
+        
+            if ($aiResponse) {
+                $aiResponseData = [
+                    'type' => 'new_message',
+                    'message' => [
+                        'id' => null, 
+                        'content' => $aiResponse['message'],
+                        'sender_id' => $aiResponse['author'],  
+                        'isFromAI'  => $aiResponse['isFromAI'],
+                        'createdAt' => $aiResponse['timestamp'],
+                    ]
+                ];
+        
+                foreach ($this->clients as $client) {
+                    echo "DEBUG: Vérification client WebSocket - Utilisateur #" . $this->clients[$client]['user']->getId() . " - Discussion #" . $this->clients[$client]['subjectChat']->getId() . "\n";
+        
+                    if ($this->clients[$client]['subjectChat']->getId() === $subjectChat->getId()) {
+                        echo "DEBUG: Envoi de la réponse IA au client WebSocket ID: " . $this->clients[$client]['user']->getId() . "\n";
+                        $client->send(json_encode($aiResponseData));
+                    }
+                }
+            }
+        } elseif ($data['type'] === 'edit_message') {
+            if (!isset($data['message_id']) || !isset($data['new_content'])) {
+                echo "Champs requis manquants pour la modification.\n";
+                return;
+            }
+        
+            $message = $this->entityManager->getRepository(MessageChat::class)->find($data['message_id']);
+        
+            if (!$message || $message->getSender()->getId() !== $user->getId()) {
+                echo "Message introuvable ou permission refusée.\n";
+                return;
+            }
+        
+            $message->setContent($data['new_content']);
+            $this->entityManager->flush();
+
+            $this->entityManager->getRepository(MessageChat::class)->deletesoft($subjectChat, $user, $message->getId());
+        
+            $response = [
+                'type' => 'message_edited',
+                'message_id' => $message->getId(),
+                'new_content' => $message->getContent(),
+            ];
+
+            $responseDelete = [
+                'type' => 'soft_delete',
+                'after_message_id' => $message->getId(),
+                'sender_id' => $user->getId(),
+            ];
+        
+            /*foreach ($this->clients as $client) {
+                if ($this->clients[$client]['subjectChat'] === $subjectChat) {
+                    $client->send(json_encode($response));
+                }
+            }*/
+
+            foreach ($this->clients as $client) {
+                if ($this->clients[$client]['subjectChat'] === $subjectChat) {
+                    $client->send(json_encode($response));
+                    $client->send(json_encode($responseDelete)); // <-- Envoi du signal de suppression
+                }
+            }
+        } elseif ($data['type'] === 'delete_message') {
+            if (!isset($data['message_id'])) {
+                echo "ID du message requis pour suppression.\n";
+                return;
+            }
+        
+            $message = $this->entityManager->getRepository(MessageChat::class)->find($data['message_id']);
+        
+            if (!$message || $message->getSender()->getId() !== $user->getId()) {
+                echo "Message introuvable ou permission refusée.\n";
+                return;
+            }
+        
+            $messageId = $message->getId();
+            $this->entityManager->remove($message);
+            $this->entityManager->flush();
+        
+            $response = [
+                'type' => 'message_deleted',
+                'message_id' => $messageId,
+            ];
+        
+            foreach ($this->clients as $client) {
+                if ($this->clients[$client]['subjectChat'] === $subjectChat) {
+                    $client->send(json_encode($response));
+                }
+            }
+        } else {
+            echo "Type d'action non supporté : " . $data['type'] . "\n";
+        }
+        
+    } catch (\Exception $e) {
+        echo "Erreur WebSocket : " . $e->getMessage() . "\n";
     }
+}
+
 
     /*public function onClose(ConnectionInterface $conn)
     {
@@ -218,7 +354,7 @@ class ChatServer implements MessageComponentInterface
         if (isset($this->clients[$conn])) {
             $user = $this->clients[$conn]['user'];
             $subjectChat = $this->clients[$conn]['subjectChat'];
-            echo " Déconnexion WebSocket : Utilisateur #" . $user->getId() . "\n";
+         //   echo " Déconnexion WebSocket : Utilisateur #" . $user->getId() . "\n";
 
             // Supprimer la ligne WebSocketConnection correspondante
             $repo = $this->entityManager->getRepository(WebSocketConnection::class);
