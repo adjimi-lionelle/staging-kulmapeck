@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
                 const messageElement = document.createElement("div");
                 messageElement.className = messageClass;
-                messageElement.setAttribute("data-id", msg.id); // ✅ Ajout de l’ID pour les actions
+                messageElement.setAttribute("data-message-id", msg.id); // ✅ Ajout de l’ID pour les actions
         
                 // Enregistrement des données utiles
                 messageContainer.__messageData = msg;
@@ -259,8 +259,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             </button>
                             <div class="actions-menu d-none">
                                 <button class="copy-btn">Copier</button>
-                                <button class="edit-btn">Modifier</button>
-                                <button class="delete-btn">Supprimer</button>
+                                <!-- button class="edit-btn">Modifier</button -->
                             </div>
                         </div>` : ""}
                     </div>
@@ -275,8 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const toggleBtn = messageElement.querySelector('.actions-toggle');
                     const menu = messageElement.querySelector('.actions-menu');
                     const copyBtn = menu?.querySelector('.copy-btn');
-                    const editBtn = menu?.querySelector('.edit-btn');
-                    const deleteBtn = menu?.querySelector('.delete-btn');
+                   // const editBtn = menu?.querySelector('.edit-btn');
         
                     if (toggleBtn && menu) {
                         toggleBtn.addEventListener('click', (e) => {
@@ -296,7 +294,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             });
                         }
         
-                        if (editBtn) {
+                       /* if (editBtn) {
                             editBtn.addEventListener('click', (e) => {
                                 e.stopPropagation();
                                 editMessage(messageElement, {
@@ -305,17 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 });
                                 menu.classList.add('d-none');
                             });
-                        }
-        
-                        if (deleteBtn) {
-                            deleteBtn.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                deleteMessage(messageContainer, {
-                                    id: msg.id
-                                });
-                                menu.classList.add('d-none');
-                            });
-                        }
+                        }*/
                     }
                 }
             });
@@ -431,40 +419,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (data.type === 'soft_delete') {
             const { after_message_id, sender_id } = data;
-    
-            // Sélectionne tous les messages dans la vue (ex: avec data attributes)
+
+            console.log('DEBUG: Traitement du message WebSocket: soft_delete', data);
+
             document.querySelectorAll('.message[data-sender-id][data-message-id]').forEach(messageEl => {
                 const msgId = parseInt(messageEl.getAttribute('data-message-id'));
                 const userId = parseInt(messageEl.getAttribute('data-sender-id'));
-    
-                // Supprime les messages de ce sender avec un ID > after_message_id
+
+                console.log(`→ Analyse message ID ${msgId} de l'utilisateur ${userId}`);
+
                 if (userId === sender_id && msgId > after_message_id) {
-                    messageEl.remove(); // ou messageEl.style.display = "none";
+                    console.log(` Suppression du message ID ${msgId}`);
+                    const container = messageEl.closest('.message-container');
+                    if (container) container.remove();
                 }
             });
+
+            return;
         }
 
         if (data.type === 'message_edited') {
             const messageId = data.message_id;
             const newContent = data.new_content;
-            const messageElement = document.querySelector(`.message[data-id="${messageId}"]`);
+            const messageElement = document.querySelector(`.message[data-message-id="${messageId}"]`);
             if (messageElement) {
                 messageElement.querySelector('p').textContent = newContent;
                 console.log(`DEBUG: Message modifié dans le DOM (ID ${messageId})`);
             } else {
                 console.warn(`DEBUG: Message à modifier introuvable (ID ${messageId})`);
-            }
-            return;
-        }
-
-        if (data.type === 'message_deleted') {
-            const messageId = data.message_id;
-            const container = document.querySelector(`.message[data-id="${messageId}"]`)?.closest('.message-container');
-            if (container) {
-                container.remove();
-                console.log(`DEBUG: Message supprimé du DOM (ID ${messageId})`);
-            } else {
-                console.warn(`DEBUG: Message à supprimer introuvable (ID ${messageId})`);
             }
             return;
         }
@@ -488,13 +470,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 messageId = data.message.id; //  Utilisé pour éviter les doublons
 
                 if (userId === getCurrentUserId() && !isFromAI && messageId) {
-                    const tempMessages = document.querySelectorAll('.message[data-id^="temp-"]');
+                    const tempMessages = document.querySelectorAll('.message[data-message-id^="temp-"]');
                     for (const tempMessage of tempMessages) {
                         const container = tempMessage.closest('.message-container');
                         const data = container?.__messageData;
                 
                         if (data && data.content === messageContent) {
-                            tempMessage.setAttribute("data-id", messageId);
+                            tempMessage.setAttribute("data-message-id", messageId);
                             tempMessage.querySelector("p").textContent = messageContent;
                 
                             // met à jour l'ID dans __messageData
@@ -550,8 +532,15 @@ document.addEventListener("DOMContentLoaded", function () {
             // Création du bloc du message
             const messageElement = document.createElement("div");
             messageElement.className = isSentByStudent ? "message sent" : "message assistant";
-            if (messageData.id) {
+            /*if (messageData.id) {
                 messageElement.setAttribute("data-id", messageData.id); 
+            }*/
+
+            if (messageData.id) {
+                 messageElement.setAttribute("data-message-id", messageData.id);
+            }
+            if (messageData.sender_id) {
+                messageElement.setAttribute("data-sender-id", messageData.sender_id);
             }
 
             messageContainer.__messageData = messageData;
@@ -579,8 +568,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         </button>
                         <div class="actions-menu d-none">
                             <button class="copy-btn">Copier</button>
-                            <button class="edit-btn">Modifier</button>
-                            <button class="delete-btn">Supprimer</button>
+                            <!-- button class="edit-btn">Modifier</button -->
                         </div>
                     </div>
                     ` : ""}
@@ -615,8 +603,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                    
                     const copyBtn = menu.querySelector('.copy-btn');
-                    const editBtn = menu.querySelector('.edit-btn');
-                    const deleteBtn = menu.querySelector('.delete-btn');
+                    //const editBtn = menu.querySelector('.edit-btn');
 
                     if (copyBtn) {
                         copyBtn.addEventListener('click', (e) => {
@@ -626,7 +613,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         });
                     }
 
-                    if (editBtn) {
+                    /*if (editBtn) {
                         editBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
                             editMessage(messageElement, {
@@ -635,17 +622,8 @@ document.addEventListener("DOMContentLoaded", function () {
                             });
                             menu.classList.add('d-none');
                         });
-                    }
+                    }*/
 
-                    if (deleteBtn) {
-                        deleteBtn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            deleteMessage(messageContainer, {
-                                id: messageData.id   
-                            });
-                            menu.classList.add('d-none');
-                        });
-                    }
                 }
             }
         }
@@ -660,13 +638,16 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("DEBUG: Aucun sujet sélectionné (currentSubject manquant) !");
             return;
         }
+
+        const tempId = `temp-${Date.now()}`;
     
         const subjectChatId = parseInt(currentSubject);
         let messageData = {
             type: "new_message",
             subject_id: subjectChatId,
             message: content,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            tempId: tempId 
         };
     
         console.log("DEBUG: État actuel du WebSocket avant envoi :", socket ? socket.readyState : "Socket non défini");
@@ -681,7 +662,6 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             console.log("DEBUG: Envoi du message via WebSocket");
             socket.send(JSON.stringify(messageData));
-            const tempId = `temp-${Date.now()}`;
             
             // Ajouter le message immédiatement à l'interface utilisateur
             const optimisticMessageData = {
@@ -886,10 +866,10 @@ document.addEventListener("DOMContentLoaded", function () {
         function editMessage(messageElement, messageData) {
             currentEditingMessageElement = messageElement;
         
-            // ✅ Récupération du contenu à jour depuis l'attribut data-content si présent
+            //  Récupération du contenu à jour depuis l'attribut data-content si présent
             const updatedContent = messageElement.getAttribute('data-content') || messageData.content;
         
-            // ✅ Mise à jour de l'objet temporaire avec le contenu à jour
+            //  Mise à jour de l'objet temporaire avec le contenu à jour
             currentEditingMessageData = {
                 ...messageData,
                 content: updatedContent
@@ -907,11 +887,13 @@ document.addEventListener("DOMContentLoaded", function () {
         // Bouton "Enregistrer" dans le modal
         document.getElementById('save-edit-btn').addEventListener('click', function () {
             const newText = document.getElementById('edit-message-input').value.trim();
+            const subjectChatId = parseInt(currentSubject);
         
             if (newText && currentEditingMessageData && newText !== currentEditingMessageData.content) {
                 // Envoi du message modifié via WebSocket
                 socket.send(JSON.stringify({
                     type: 'edit_message',
+                    subject_id: subjectChatId,
                     message_id: currentEditingMessageData.id,
                     new_content: newText
                 }));
@@ -931,19 +913,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const modal = bootstrap.Modal.getInstance(modalEl);
             modal.hide();
         });
-              
-
-    function deleteMessage(container, messageData) {
-        if (confirm("Es-tu sûr de vouloir supprimer ce message ?")) {
-            socket.send(JSON.stringify({
-                type: 'delete_message',
-                message_id: messageData.id
-            }));
-    
-            container.remove();
-            console.log("DEBUG: Message supprimé localement");
-        }
-    }
+   
     
     
     function copyToClipboard(text) {

@@ -261,7 +261,7 @@ class ChatServer implements MessageComponentInterface
                     }
                 }
             }
-        } elseif ($data['type'] === 'edit_message') {
+        } /*elseif ($data['type'] === 'edit_message') {
             if (!isset($data['message_id']) || !isset($data['new_content'])) {
                 echo "Champs requis manquants pour la modification.\n";
                 return;
@@ -291,46 +291,55 @@ class ChatServer implements MessageComponentInterface
                 'sender_id' => $user->getId(),
             ];
         
-            /*foreach ($this->clients as $client) {
-                if ($this->clients[$client]['subjectChat'] === $subjectChat) {
-                    $client->send(json_encode($response));
-                }
-            }*/
+            //foreach ($this->clients as $client) {
+              //  if ($this->clients[$client]['subjectChat'] === $subjectChat) {
+              //      $client->send(json_encode($response));
+                //}
+           // }
 
             foreach ($this->clients as $client) {
                 if ($this->clients[$client]['subjectChat'] === $subjectChat) {
                     $client->send(json_encode($response));
-                    $client->send(json_encode($responseDelete)); // <-- Envoi du signal de suppression
+                    $client->send(json_encode($responseDelete)); 
                 }
             }
-        } elseif ($data['type'] === 'delete_message') {
-            if (!isset($data['message_id'])) {
-                echo "ID du message requis pour suppression.\n";
-                return;
-            }
-        
-            $message = $this->entityManager->getRepository(MessageChat::class)->find($data['message_id']);
-        
-            if (!$message || $message->getSender()->getId() !== $user->getId()) {
-                echo "Message introuvable ou permission refusée.\n";
-                return;
-            }
-        
-            $messageId = $message->getId();
-            $this->entityManager->remove($message);
-            $this->entityManager->flush();
-        
-            $response = [
-                'type' => 'message_deleted',
-                'message_id' => $messageId,
+
+                        // Appel IA après modification
+            $eleve = $this->eleveRepository->findOneBy(['utilisateur' => $user]);
+            $class = $eleve->getClasse()->getName();
+
+            $dataForAI = [
+                'type' => 'edit_message',
+                'message' => $message->getContent(), // Nouveau contenu modifié
+                'subject_id' => $data['new_content'],
             ];
-        
-            foreach ($this->clients as $client) {
-                if ($this->clients[$client]['subjectChat'] === $subjectChat) {
-                    $client->send(json_encode($response));
+
+            echo "DEBUG: Appel de l'IA suite à modification...\n";
+            $aiResponse = $this->aiMessageHandler->handleMessage($dataForAI, $user, $class);
+
+            if ($aiResponse) {
+                $aiResponseData = [
+                    'type' => 'new_message',
+                    'message' => [
+                        'id' => null,
+                        'content' => $aiResponse['message'],
+                        'sender_id' => $aiResponse['author'],
+                        'isFromAI'  => $aiResponse['isFromAI'],
+                        'createdAt' => $aiResponse['timestamp'],
+                    ]
+                ];
+
+                foreach ($this->clients as $client) {
+                    if ($this->clients[$client]['subjectChat']->getId() === $subjectChat->getId()) {
+                        $client->send(json_encode($aiResponseData));
+                    }
                 }
+            } else {
+                echo "DEBUG: Aucune réponse IA générée après modification.\n";
             }
-        } else {
+
+        } */
+         else {
             echo "Type d'action non supporté : " . $data['type'] . "\n";
         }
         

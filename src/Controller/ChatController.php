@@ -332,23 +332,6 @@ class ChatController extends AbstractController
         return new JsonResponse(['success' => true]);
     }
 
-    #[Route('/api/chat/message/{id}/delete', name: 'chat_delete_message', methods: ['DELETE'])]
-    public function deleteMessage(MessageChat $message, EntityManagerInterface $em, WebSocketPusher $pusher): JsonResponse
-    {
-        $messageId = $message->getId();
-        $subjectChat = $message->getSubjectChat();
-
-        $em->remove($message);
-        $em->flush();
-
-        // Notifier les autres clients via WebSocket
-        $pusher->pushToSubject($subjectChat, [
-            'type' => 'message_deleted',
-            'message_id' => $messageId,
-        ]);
-
-        return new JsonResponse(['success' => true]);
-    }
 
     /**
      * Send a message to a subject chat
@@ -435,7 +418,7 @@ class ChatController extends AbstractController
     /**
      * Process and generate an AI response for a message
      */
-    private function processAIResponse(SubjectChat $chat, string $userMessage, $user): ?MessageChat
+  /*  private function processAIResponse(SubjectChat $chat, string $userMessage, $user): ?MessageChat
     {
         try {
             // Get recent messages for context (last 10)
@@ -481,7 +464,7 @@ class ChatController extends AbstractController
             error_log('Error generating AI response: ' . $e->getMessage());
             return null;
         }
-    }
+    }*/
     
     /**
      * Determine if a subject chat should have AI responses
